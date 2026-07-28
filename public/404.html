@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Card.tj</title>
+    <script>
+      (function () {
+        var isGithubPages = location.hostname.endsWith("github.io");
+        var firstPart = location.pathname.split("/").filter(Boolean)[0] || "";
+        var base = isGithubPages && firstPart ? "/" + firstPart + "/" : "/";
+        sessionStorage.setItem(
+          "card-tj-spa-redirect",
+          location.pathname + location.search + location.hash
+        );
+        location.replace(base);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
