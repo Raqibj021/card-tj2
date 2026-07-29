@@ -6,7 +6,7 @@ import Footer from "../components/layout/Footer";
 type Side = "front" | "back";
 type TemplateId = "executive" | "modern" | "minimal" | "ribbon" | "orbit" | "goldwave" | "prism" | "mono" | "chevron";
 type LogoId = "orbit" | "peak" | "link" | "spark" | "frame" | "leaf" | "monogram" | "diamond";
-type MoveKey = "brand" | "person" | "company" | "contacts" | "socials" | "qr" | "photo";
+type MoveKey = "logo" | "brand" | "person" | "company" | "contacts" | "socials" | "qr" | "photo";
 type Positions = Record<MoveKey, { x: number; y: number }>;
 
 const templates: { id: TemplateId; name: string; source?: string }[] = [
@@ -41,9 +41,10 @@ const fontOptions = [
   { name: "Courier", value: "Courier New" }
 ];
 const defaultPositions = (right: boolean): Positions => ({
-  brand: { x: right ? 67 : 10, y: 17 },
+  logo: { x: right ? 67 : 10, y: 15 },
+  brand: { x: right ? 79 : 22, y: 18 },
   person: { x: right ? 67 : 10, y: 20 },
-  company: { x: right ? 67 : 10, y: 48 },
+  company: { x: right ? 79 : 20, y: 48 },
   contacts: { x: right ? 67 : 10, y: 62 },
   socials: { x: right ? 67 : 10, y: 84 },
   qr: { x: right ? 13 : 76, y: 66 },
@@ -115,9 +116,9 @@ export default function PrintCardDesignerPage() {
   const [logoMark, setLogoMark] = useState<LogoId>("orbit");
   const [data, setData] = useState({ name: "Фируз Саидов", position: "Архитектор и основатель", organization: "FORMA Studio", phone: "+992 93 555 21 21", email: "hello@forma.tj", website: "forma.tj", address: "Душанбе, проспект Рудаки, 70", instagram: "@forma.tj", facebook: "forma.tj", telegram: "@forma_tj", whatsapp: "+992 93 555 21 21", qr: "https://raqibj021.github.io/card-tj2/#/card/demo" });
   const [positions, setPositions] = useState<Positions>(() => defaultPositions(false));
-  const [sizes, setSizes] = useState<Record<MoveKey, number>>({ brand: 1, person: 1, company: 1, contacts: 1, socials: 1, qr: 1, photo: 1 });
+  const [sizes, setSizes] = useState<Record<MoveKey, number>>({ logo: 1, brand: 1, person: 1, company: 1, contacts: 1, socials: 1, qr: 1, photo: 1 });
   const [selected, setSelected] = useState<MoveKey>("person");
-  const [visible, setVisible] = useState<Record<MoveKey, boolean>>({ brand: true, person: true, company: true, contacts: true, socials: true, qr: true, photo: true });
+  const [visible, setVisible] = useState<Record<MoveKey, boolean>>({ logo: true, brand: true, person: true, company: true, contacts: true, socials: true, qr: true, photo: true });
   const [backgroundStyle, setBackgroundStyle] = useState<"clean" | "grid" | "waves" | "dots" | "custom">("clean");
   const [backgroundImage, setBackgroundImage] = useState("");
   const [fontFamily, setFontFamily] = useState("Manrope");
@@ -184,18 +185,15 @@ export default function PrintCardDesignerPage() {
     };
     if (side === "front") {
       const brand = point("brand");
-      if (visible.brand) {
-        if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, brand.x, brand.y, 120 * brand.scale, 75 * brand.scale); }
-        else drawLogoMark(ctx, logoMark, brand.x, brand.y, 72 * brand.scale, useRightPanel ? colors.accent : colors.ink);
-        ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px ${canvasFont}`; ctx.fillText(data.organization, brand.x + 90 * brand.scale, brand.y + 34 * brand.scale);
-        ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px ${canvasFont}`; ctx.fillText(data.website, brand.x + 90 * brand.scale, brand.y + 61 * brand.scale);
-      }
+      if (visible.logo) { const logoPoint = point("logo"); if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, logoPoint.x, logoPoint.y, 120 * logoPoint.scale, 75 * logoPoint.scale); } else drawLogoMark(ctx, logoMark, logoPoint.x, logoPoint.y, 72 * logoPoint.scale, useRightPanel ? colors.accent : colors.ink); }
+      if (visible.brand) { ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px ${canvasFont}`; ctx.fillText(data.organization, brand.x, brand.y + 34 * brand.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px ${canvasFont}`; ctx.fillText(data.website, brand.x, brand.y + 61 * brand.scale); }
       if (visible.photo) await drawUploadedPhoto();
       if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 190, margin: 1, color: { dark: textColor, light: colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 150 * qrPoint.scale, 150 * qrPoint.scale); }
     } else {
       const person = point("person"); if (visible.person) { ctx.fillStyle = textColor; ctx.font = `700 ${43 * person.scale}px ${canvasFont}`; ctx.fillText(data.name, person.x, person.y + 38 * person.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${21 * person.scale}px ${canvasFont}`; ctx.fillText(data.position, person.x, person.y + 70 * person.scale); }
       const company = point("company");
-      if (visible.company) { if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, company.x, company.y, 72 * company.scale, 55 * company.scale); } else drawLogoMark(ctx, logoMark, company.x, company.y, 55 * company.scale, colors.accent); ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px ${canvasFont}`; ctx.fillText(data.organization, company.x + 70 * company.scale, company.y + 34 * company.scale); }
+      if (visible.logo) { const logoPoint = point("logo"); if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, logoPoint.x, logoPoint.y, 72 * logoPoint.scale, 55 * logoPoint.scale); } else drawLogoMark(ctx, logoMark, logoPoint.x, logoPoint.y, 55 * logoPoint.scale, colors.accent); }
+      if (visible.company) { ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px ${canvasFont}`; ctx.fillText(data.organization, company.x, company.y + 34 * company.scale); }
       if (visible.contacts) { const contacts = point("contacts"); ctx.font = `18px ${canvasFont}`; const contactLines = [`☎  ${data.phone}`, `✉  ${data.email}`, `●  ${data.website}`, `⌖  ${data.address}`]; contactLines.forEach((line, index) => ctx.fillText(line, contacts.x, contacts.y + index * 35 * contacts.scale)); }
       if (visible.socials) { const social = point("socials"); ["I", "f", "T", "W"].forEach((letter, index) => { ctx.fillStyle = colors.accent; ctx.beginPath(); ctx.arc(social.x + index * 47 * social.scale, social.y, 16 * social.scale, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = `700 ${15 * social.scale}px Arial`; ctx.textAlign = "center"; ctx.fillText(letter, social.x + index * 47 * social.scale, social.y + 5 * social.scale); }); ctx.textAlign = "left"; }
       if (visible.photo) await drawUploadedPhoto();
@@ -219,8 +217,8 @@ export default function PrintCardDesignerPage() {
       <h2 className="editor-subtitle"><Shapes size={16} /> Знак вместо логотипа</h2>
       <div className="logo-library">{logoIds.map((id) => <button className={!logo && logoMark === id ? "active" : ""} onClick={() => { setLogo(""); setLogoMark(id); }} key={id}><LogoMark id={id} /></button>)}</div>
       <div className="asset-upload-pair"><label className="logo-upload"><ImagePlus size={17} /> Собственный логотип<input hidden type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={(e) => void readImage(e.target.files?.[0]).then(setLogo)} /></label><label className="logo-upload"><ImagePlus size={17} /> Фотография<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void readImage(e.target.files?.[0]).then(setPhoto)} /></label></div>
-      <div className="element-size-control"><div><strong>Выбранный элемент</strong><span>{({ brand: "Логотип и компания", person: "ФИО и должность", company: "Логотип", contacts: "Контакты", socials: "Социальные сети", qr: "QR-код", photo: "Фотография" } as Record<MoveKey,string>)[selected]}</span></div><input type="range" min=".5" max="2" step=".05" value={sizes[selected]} onChange={(e) => setSizes((value) => ({ ...value, [selected]: Number(e.target.value) }))} /><b>{Math.round(sizes[selected] * 100)}%</b><div className="element-actions"><button type="button" onClick={() => setVisible((value) => ({ ...value, [selected]: false }))}><Trash2 size={14} /> Удалить</button><button type="button" onClick={() => { const defaults = defaultPositions(useRightPanel); setVisible((value) => ({ ...value, [selected]: true })); setSizes((value) => ({ ...value, [selected]: 1 })); setPositions((value) => ({ ...value, [selected]: defaults[selected] })); }}><RotateCcw size={14} /> Восстановить</button></div></div>
-      <div className="hidden-elements">{(Object.keys(visible) as MoveKey[]).filter((key) => !visible[key]).map((key) => <button key={key} onClick={() => { setVisible((value) => ({ ...value, [key]: true })); setSelected(key); }}>+ Вернуть {({ brand: "логотип", person: "ФИО", company: "компанию", contacts: "контакты", socials: "соцсети", qr: "QR", photo: "фото" } as Record<MoveKey,string>)[key]}</button>)}</div>
+      <div className="element-size-control"><div><strong>Выбранный элемент</strong><span>{({ logo: "Логотип", brand: "Название компании", person: "ФИО и должность", company: "Название компании", contacts: "Контакты", socials: "Социальные сети", qr: "QR-код", photo: "Фотография" } as Record<MoveKey,string>)[selected]}</span></div><input type="range" min=".5" max="2" step=".05" value={sizes[selected]} onChange={(e) => setSizes((value) => ({ ...value, [selected]: Number(e.target.value) }))} /><b>{Math.round(sizes[selected] * 100)}%</b><div className="element-actions"><button type="button" onClick={() => setVisible((value) => ({ ...value, [selected]: false }))}><Trash2 size={14} /> Удалить</button><button type="button" onClick={() => { const defaults = defaultPositions(useRightPanel); setVisible((value) => ({ ...value, [selected]: true })); setSizes((value) => ({ ...value, [selected]: 1 })); setPositions((value) => ({ ...value, [selected]: defaults[selected] })); }}><RotateCcw size={14} /> Восстановить</button></div></div>
+      <div className="hidden-elements">{(Object.keys(visible) as MoveKey[]).filter((key) => !visible[key]).map((key) => <button key={key} onClick={() => { setVisible((value) => ({ ...value, [key]: true })); setSelected(key); }}>+ Вернуть {({ logo: "логотип", brand: "название", person: "ФИО", company: "компанию", contacts: "контакты", socials: "соцсети", qr: "QR", photo: "фото" } as Record<MoveKey,string>)[key]}</button>)}</div>
       {Object.entries(data).map(([key, value]) => <label key={key}><span>{({ name: "ФИО", position: "Должность", organization: "Организация", phone: "Телефон", email: "E-mail", website: "Сайт", address: "Адрес", instagram: "Instagram", facebook: "Facebook", telegram: "Telegram", whatsapp: "WhatsApp", qr: "Ссылка QR" } as Record<string,string>)[key]}</span><input value={value} onChange={(e) => setData({ ...data, [key]: e.target.value })} /></label>)}
     </div>
     <div className="print-preview-column">
@@ -228,13 +226,15 @@ export default function PrintCardDesignerPage() {
       <div ref={cardRef} className={`physical-card physical-${layout} card-side-${side} pattern-${backgroundStyle}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink, "--card-font": fontFamily, backgroundImage: patternBackground, backgroundSize: backgroundStyle === "custom" ? "cover" : backgroundStyle === "grid" ? "58px 58px" : backgroundStyle === "dots" ? "24px 24px" : "cover", backgroundPosition: "center" } as CSSProperties}>
         <CardDecor layout={layout} />
         {side === "front" ? <div className="physical-content physical-front-content">
-          {visible.brand && <div {...movableProps("brand", "physical-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<span><strong>{data.organization}</strong><small>{data.website}</small></span></div>}
+          {visible.logo && <div {...movableProps("logo", "physical-logo")}>{logo ? <img src={logo} alt="Логотип компании" /> : <LogoMark id={logoMark} />}</div>}
+          {visible.brand && <div {...movableProps("brand", "physical-brand")}><span><strong>{data.organization}</strong><small>{data.website}</small></span></div>}
           {visible.photo && photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
           {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={colors.ink} light={colors.bg} /></div>}
         </div>
         : <div className="physical-content physical-back-content">
           {visible.person && <div {...movableProps("person", "physical-person")}><h2>{data.name}</h2><h3>{data.position}</h3></div>}
-          {visible.company && <div {...movableProps("company", "physical-contact-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<strong>{data.organization}</strong></div>}
+          {visible.logo && <div {...movableProps("logo", "physical-logo")}>{logo ? <img src={logo} alt="Логотип компании" /> : <LogoMark id={logoMark} />}</div>}
+          {visible.company && <div {...movableProps("company", "physical-contact-brand")}><strong>{data.organization}</strong></div>}
           {visible.photo && photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
           {visible.contacts && <div {...movableProps("contacts", "print-contact-list")}><span><Phone />{data.phone}</span><span><Mail />{data.email}</span><span><Globe2 />{data.website}</span><span><MapPin />{data.address}</span></div>}
           {visible.socials && <div {...movableProps("socials", "print-social-list")}><span title={data.instagram}><Instagram /></span><span title={data.facebook}><Facebook /></span><span title={data.telegram}><Send /></span><span title={data.whatsapp}><MessageCircle /></span></div>}
