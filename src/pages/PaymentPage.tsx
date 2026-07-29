@@ -22,23 +22,45 @@ export default function PaymentPage() {
   };
   const [params] = useSearchParams();
   const planKey = params.get("plan") as keyof typeof plans;
+  const organizationId = params.get("organization") ?? undefined;
   const plan = plans[planKey] ?? plans.personal;
   const [created, setCreated] = useState<PaymentRequest | null>(null);
   const [copied, setCopied] = useState(false);
   const [receiptName, setReceiptName] = useState("");
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [activationCode, setActivationCode] = useState("");
+  const [activationMessage, setActivationMessage] = useState("");
+  const activationCopy = {
+    ru: { title: "Уже получили код?", text: "Введите код менеджера, чтобы активировать тариф.", placeholder: "VZ-XXXX-XXXX", button: "Активировать", success: "Тариф активирован" },
+    tj: { title: "Рамзро гирифтед?", text: "Барои фаъол кардани тарофа рамзи менеҷерро ворид кунед.", placeholder: "VZ-XXXX-XXXX", button: "Фаъол кардан", success: "Тарофа фаъол шуд" },
+    en: { title: "Already have a code?", text: "Enter the manager’s code to activate your plan.", placeholder: "VZ-XXXX-XXXX", button: "Activate", success: "Plan activated" }
+  }[language];
   const orderDraft = useMemo(() => `VZ-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`, []);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!receiptFile) return;
+    setBusy(true);
+    setError("");
     const data = new FormData(event.currentTarget);
-    setCreated(paymentRepository.create({
-      customerName: String(data.get("customerName")),
-      phone: String(data.get("phone")),
-      plan: plan.name,
-      amount: plan.amount,
-      payerName: String(data.get("payerName")),
-      receiptName
-    }));
+    try {
+      setCreated(await paymentRepository.create({
+        customerName: String(data.get("customerName")),
+        phone: String(data.get("phone")),
+        plan: plan.name,
+        planCode: planKey || "personal",
+        amount: plan.amount,
+        payerName: String(data.get("payerName")),
+        receiptFile,
+        organizationId
+      }));
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Не удалось отправить оплату.");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -75,9 +97,22 @@ export default function PaymentPage() {
                     <Upload size={23} />
                     <strong>{receiptName || c.upload}</strong>
                     <span>{c.formats}</span>
-                    <input type="file" required accept="image/png,image/jpeg,application/pdf" onChange={(event) => setReceiptName(event.target.files?.[0]?.name ?? "")} />
+                    <input type="file" required accept="image/png,image/jpeg,application/pdf" onChange={(event) => {
+                      const file = event.target.files?.[0] ?? null;
+                      if (file && file.size > 5 * 1024 * 1024) {
+                        setError(c.formats);
+                        event.target.value = "";
+                        setReceiptFile(null);
+                        setReceiptName("");
+                        return;
+                      }
+                      setError("");
+                      setReceiptFile(file);
+                      setReceiptName(file?.name ?? "");
+                    }} />
                   </label>
-                  <button className="button button-primary button-large" type="submit">{c.submit}</button>
+                  {error && <div className="auth-message">{error}</div>}
+                  <button className="button button-primary button-large" type="submit" disabled={busy}>{busy ? "…" : c.submit}</button>
                 </form>
               </>
             )}
@@ -88,6 +123,22 @@ export default function PaymentPage() {
             <ol>{c.steps.map((step, index) => <li key={step}><span>{index + 1}</span> {step}</li>)}</ol>
             <div className="payment-note"><Clock3 size={18} /><div><strong>{c.hours}</strong><span>{c.hoursText}</span></div></div>
             <div className="payment-note"><LockKeyhole size={18} /><div><strong>{c.noPassword}</strong><span>{c.noPasswordText}</span></div></div>
+            <form className="activation-form" onSubmit={async (event) => {
+              event.preventDefault();
+              setActivationMessage("");
+              try {
+                await paymentRepository.activate(activationCode);
+                setActivationMessage(activationCopy.success);
+              } catch (caught) {
+                setActivationMessage(caught instanceof Error ? caught.message : "Ошибка");
+              }
+            }}>
+              <h3>{activationCopy.title}</h3>
+              <p>{activationCopy.text}</p>
+              <input value={activationCode} onChange={(event) => setActivationCode(event.target.value.toUpperCase())} required placeholder={activationCopy.placeholder} />
+              <button className="button button-secondary w-full" type="submit">{activationCopy.button}</button>
+              {activationMessage && <small>{activationMessage}</small>}
+            </form>
           </aside>
         </div>
       </main>
