@@ -1,70 +1,84 @@
 # Автоматические письма Vizora.tj
 
-## Что реализовано
+Vizora использует очередь `email_outbox`, Edge Function и бесплатный Gmail-шлюз.
+Регистрация и восстановление пароля отправляются непосредственно через SMTP
+Supabase. Остальные служебные письма обрабатываются очередью каждые 10 минут.
 
-- очередь `email_outbox` с блокировкой, повторными попытками и журналом ошибок;
-- Edge Function `process-email-outbox`;
-- шаблоны RU / TJ / EN;
-- подтверждение оплаты и код активации;
+## Какие письма автоматизированы
+
+- код подтверждения регистрации и восстановление пароля — Supabase Auth SMTP;
+- подтверждение оплаты и код активации тарифа;
 - результат проверки и запрос дополнительных документов;
-- приглашение сотрудника;
+- приглашение сотрудника в организацию;
 - уведомление об изменении данных;
 - предупреждение об окончании тарифа;
-- уведомление о блокировке;
-- ответ поддержки;
-- статусы заказов и договоров.
+- блокировка после проверки или жалобы;
+- ответ службы поддержки;
+- изменение статуса заказа и договора.
 
-Подтверждение регистрации и восстановление пароля отправляет Supabase Auth.
-Для них включите тот же Resend SMTP в Authentication → Emails → SMTP Settings.
+## 1. Миграция базы
 
-## 1. База
+Выполнить в SQL Editor:
 
-Выполните `supabase/migrations/008_transactional_email.sql`.
+`supabase/migrations/010_email_delivery_completion.sql`
 
-## 2. Resend
+## 2. Бесплатный Gmail-шлюз
 
-Создайте бесплатный аккаунт Resend, подтвердите домен `vizora.tj`, создайте API key.
+1. Открыть [Google Apps Script](https://script.google.com/) под почтой
+   `vizora.platform.tj@gmail.com`.
+2. Создать новый проект `Vizora Mail Gateway`.
+3. Заменить содержимое редактора кодом из
+   `integrations/google-apps-script/VizoraMailGateway.gs`.
+4. Открыть **Project Settings → Script properties**.
+5. Добавить свойство `VIZORA_GATEWAY_SECRET` и длинную случайную строку.
+6. Нажать **Deploy → New deployment → Web app**.
+7. `Execute as`: **Me**. `Who has access`: **Anyone**.
+8. Скопировать URL, который заканчивается на `/exec`.
 
 ## 3. Секреты Edge Function
 
-```bash
-supabase secrets set \
-  RESEND_API_KEY=re_xxxxx \
-  MAIL_WORKER_SECRET=СЛУЧАЙНАЯ_ДЛИННАЯ_СТРОКА \
-  VIZORA_FROM_EMAIL="Vizora.tj <noreply@vizora.tj>" \
-  VIZORA_REPLY_TO=support@vizora.tj \
-  VIZORA_SITE_URL=https://raqibj021.github.io/card-tj2
+В Supabase открыть **Edge Functions → Secrets** и добавить:
+
+```text
+MAIL_PROVIDER=google_apps_script
+MAIL_WORKER_SECRET=отдельная_длинная_случайная_строка
+GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
+GOOGLE_APPS_SCRIPT_SECRET=значение_VIZORA_GATEWAY_SECRET
+VIZORA_REPLY_TO=vizora.platform.tj@gmail.com
+VIZORA_SITE_URL=https://raqibj021.github.io/card-tj2
 ```
 
-## 4. Публикация функции
+`SUPABASE_URL` и `SUPABASE_SERVICE_ROLE_KEY` Edge Function получает
+автоматически. Их не нужно вставлять в код сайта.
 
-```bash
-supabase functions deploy process-email-outbox --no-verify-jwt
+## 4. Секреты GitHub
+
+В репозитории открыть **Settings → Secrets and variables → Actions**.
+
+Repository secrets:
+
+```text
+SUPABASE_ACCESS_TOKEN
+SUPABASE_PROJECT_REF=kzyjkvztucihkbhitrvu
+SUPABASE_MAIL_FUNCTION_URL=https://kzyjkvztucihkbhitrvu.supabase.co/functions/v1/process-email-outbox
+MAIL_WORKER_SECRET
 ```
 
-## 5. Автоматический запуск
+Значение `MAIL_WORKER_SECRET` должно совпадать с секретом Edge Function.
 
-В Supabase Dashboard создайте Database Webhook для таблицы `email_outbox`:
+Repository variable:
 
-- event: `INSERT`;
-- method: `POST`;
-- URL: `https://PROJECT_REF.supabase.co/functions/v1/process-email-outbox`;
-- header: `x-mail-worker-secret: значение MAIL_WORKER_SECRET`.
+```text
+EMAIL_WORKER_ENABLED=true
+```
 
-Для повторной отправки временно не доставленных писем добавьте Cron-вызов функции
-раз в 5 минут либо повторный Database Webhook на событие `UPDATE`.
+## 5. Публикация и проверка
 
-## 6. SMTP для регистрации и восстановления пароля
+1. В GitHub Actions вручную запустить `Deploy Vizora email function`.
+2. Затем запустить `Process Vizora service emails`.
+3. В Supabase Table Editor открыть `email_outbox`.
+4. Успешные письма получают статус `sent`; ошибка сохраняется в `last_error`.
 
-В Resend откройте SMTP credentials. В Supabase:
-
-`Authentication → Emails → SMTP Settings`
-
-- Host: `smtp.resend.com`
-- Port: `465`
-- Username: `resend`
-- Password: API key Resend
-- Sender: `noreply@vizora.tj`
-- Sender name: `Vizora.tj`
-
-Никогда не добавляйте API key или service-role key в GitHub и клиентский `.env`.
+После подключения домена Gmail-шлюз можно заменить на Resend без изменения базы
+и шаблонов. Для этого достаточно установить `MAIL_PROVIDER=resend`,
+`RESEND_API_KEY` и `VIZORA_FROM_EMAIL`.
