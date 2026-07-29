@@ -2,6 +2,7 @@ import { BadgeCheck, Check, RefreshCw, ShieldAlert, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { supabase } from "../lib/supabase";
+import AdminShell from "../components/admin/AdminShell";
 
 interface ReviewCard {
   id: string;
@@ -44,12 +45,8 @@ export default function ModerationPage() {
   };
 
   return (
-    <main className="admin-page">
-      <div className="site-container py-10 md:py-14">
-        <div className="platform-section-head">
-          <div><span className="section-label">Безопасность Vizora</span><h1 className="page-title">Модерация визиток</h1><p className="page-copy">Публикуйте только профили с достоверными и разрешёнными данными.</p></div>
-          <div className="flex gap-2"><button className="button button-secondary" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button><Link to="/admin" className="button button-secondary">Обзор</Link></div>
-        </div>
+    <AdminShell title="Проверка визиток" description="Система собирает подозрительные и новые профили в одну очередь. Администратор принимает итоговое решение." actions={<button className="admin-toolbar-button" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button>}>
+      <div className="admin-subpage">
         {message && <div className="admin-notice mt-6"><ShieldAlert size={18} /><span>{message}</span></div>}
         <section className="admin-panel mt-6">
           <div className="admin-panel-heading"><div><h2>Очередь проверки</h2><p>{cards.length} профилей ожидают решения</p></div><BadgeCheck size={21} /></div>
@@ -74,6 +71,6 @@ export default function ModerationPage() {
           </div>
         </section>
       </div>
-    </main>
+    </AdminShell>
   );
 }

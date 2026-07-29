@@ -4,10 +4,14 @@ import { useAuth, type AccountRole } from "../context/AuthContext";
 
 export default function ProtectedRoute({
   children,
-  roles
+  roles,
+  loginPath = "/login",
+  deniedPath = "/dashboard"
 }: {
   children: ReactNode;
   roles?: AccountRole[];
+  loginPath?: string;
+  deniedPath?: string;
 }) {
   const { user, profile, loading } = useAuth();
   const location = useLocation();
@@ -21,10 +25,10 @@ export default function ProtectedRoute({
     );
   }
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to={loginPath} replace state={{ from: location.pathname }} />;
   }
   if (roles?.length && (!profile || !roles.includes(profile.role))) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={deniedPath} replace />;
   }
   return children;
 }

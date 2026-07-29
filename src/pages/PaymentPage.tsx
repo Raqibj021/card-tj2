@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock3, Copy, CreditCard, FileCheck2, LockKeyhole, Upload } from "lucide-react";
+import { CheckCircle2, Clock3, Copy, CreditCard, FileCheck2, LockKeyhole, ShieldCheck, Upload } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import Footer from "../components/layout/Footer";
@@ -30,13 +30,6 @@ export default function PaymentPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [activationCode, setActivationCode] = useState("");
-  const [activationMessage, setActivationMessage] = useState("");
-  const activationCopy = {
-    ru: { title: "Уже получили код?", text: "Введите код менеджера, чтобы активировать тариф.", placeholder: "VZ-XXXX-XXXX", button: "Активировать", success: "Тариф активирован" },
-    tj: { title: "Рамзро гирифтед?", text: "Барои фаъол кардани тарофа рамзи менеҷерро ворид кунед.", placeholder: "VZ-XXXX-XXXX", button: "Фаъол кардан", success: "Тарофа фаъол шуд" },
-    en: { title: "Already have a code?", text: "Enter the manager’s code to activate your plan.", placeholder: "VZ-XXXX-XXXX", button: "Activate", success: "Plan activated" }
-  }[language];
   const orderDraft = useMemo(() => `VZ-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -73,6 +66,9 @@ export default function PaymentPage() {
                 <CheckCircle2 size={54} />
                 <span className="section-label">{c.accepted}</span>
                 <h1>{created.orderNumber}</h1>
+                <strong className="payment-reference-note">
+                  {language === "ru" ? "Это номер заявки, не код активации." : language === "tj" ? "Ин рақами дархост аст, на рамзи фаъолсозӣ." : "This is the application number, not an activation code."}
+                </strong>
                 <p>{c.acceptedText}</p>
                 <div><Clock3 size={18} /> {c.waiting}</div>
               </div>
@@ -123,22 +119,13 @@ export default function PaymentPage() {
             <ol>{c.steps.map((step, index) => <li key={step}><span>{index + 1}</span> {step}</li>)}</ol>
             <div className="payment-note"><Clock3 size={18} /><div><strong>{c.hours}</strong><span>{c.hoursText}</span></div></div>
             <div className="payment-note"><LockKeyhole size={18} /><div><strong>{c.noPassword}</strong><span>{c.noPasswordText}</span></div></div>
-            <form className="activation-form" onSubmit={async (event) => {
-              event.preventDefault();
-              setActivationMessage("");
-              try {
-                await paymentRepository.activate(activationCode);
-                setActivationMessage(activationCopy.success);
-              } catch (caught) {
-                setActivationMessage(caught instanceof Error ? caught.message : "Ошибка");
-              }
-            }}>
-              <h3>{activationCopy.title}</h3>
-              <p>{activationCopy.text}</p>
-              <input value={activationCode} onChange={(event) => setActivationCode(event.target.value.toUpperCase())} required placeholder={activationCopy.placeholder} />
-              <button className="button button-secondary w-full" type="submit">{activationCopy.button}</button>
-              {activationMessage && <small>{activationMessage}</small>}
-            </form>
+            <div className="payment-code-policy">
+              <ShieldCheck size={18} />
+              <div>
+                <strong>{language === "ru" ? "Код ещё не создан" : language === "tj" ? "Рамз ҳоло сохта нашудааст" : "The code has not been created yet"}</strong>
+                <span>{language === "ru" ? "Он появится только после проверки чека и подтверждения оплаты администратором." : language === "tj" ? "Он танҳо пас аз санҷиши расид ва тасдиқи пардохт аз ҷониби администратор пайдо мешавад." : "It will be created only after the administrator verifies the receipt and approves payment."}</span>
+              </div>
+            </div>
           </aside>
         </div>
       </main>

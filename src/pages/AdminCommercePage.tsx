@@ -1,6 +1,6 @@
 import { Banknote, FileSignature, PackageCheck, RefreshCw, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import AdminShell from "../components/admin/AdminShell";
 import {
   getCommerceStats,
   listContracts,
@@ -35,8 +35,7 @@ export default function AdminCommercePage() {
   const updateOrder = async (order: ServiceOrderRecord, values: Parameters<typeof updateServiceOrder>[1]) => {
     try { await updateServiceOrder(order.id, values); setNotice(`Заказ ${order.order_number} обновлён`); await refresh(); } catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка"); }
   };
-  return <main className="admin-page"><section className="site-container py-10 md:py-14">
-    <div className="platform-section-head"><div><span className="section-label">Администратор</span><h1 className="page-title">Заказы и договоры</h1><p className="page-copy">Управляйте производством, оплатами и документами заказчиков.</p></div><div className="commerce-head-actions"><button className="button button-secondary" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button><Link className="button button-secondary" to="/admin">Обзор</Link></div></div>
+  return <AdminShell title="Заказы и договоры" description="Производство визиток, QR-табличек, NFC-карт и документы заказчиков." actions={<button className="admin-toolbar-button" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button>}><section className="admin-subpage">
     <div className="admin-stats commerce-admin-stats">
       <article><div className="admin-stat-icon"><ShoppingBag size={20} /></div><p>Всего заказов</p><strong>{stats.orders}</strong></article>
       <article><div className="admin-stat-icon"><PackageCheck size={20} /></div><p>Новые</p><strong>{stats.newOrders}</strong></article>
@@ -52,5 +51,5 @@ export default function AdminCommercePage() {
       <div className="admin-order-controls"><label>Статус<select value={order.status} onChange={(e) => void updateOrder(order, { status: e.target.value as OrderStatus })}>{orderStatuses.map((status) => <option value={status} key={status}>{labels[status]}</option>)}</select></label><label>Оплата<select value={order.payment_status} onChange={(e) => void updateOrder(order, { payment_status: e.target.value as PaymentStatus })}>{paymentStatuses.map((status) => <option value={status} key={status}>{labels[status]}</option>)}</select></label><label className="manager-comment">Комментарий<input defaultValue={order.manager_comment} onBlur={(e) => { if (e.target.value !== order.manager_comment) void updateOrder(order, { manager_comment: e.target.value }); }} placeholder="Комментарий для клиента" /></label></div>
     </article>)}{!orders.length && <div className="table-empty">Заказов пока нет.</div>}</div> :
     <div className="admin-order-list">{contracts.map((contract) => <article key={contract.id}><header><div><strong>{contract.contract_number}</strong><small>{contract.customer.fullName} · {contract.customer.phone}</small></div><b>{Number(contract.total).toLocaleString()} c.</b></header><p>{contract.services.join(" · ")}</p><div className="admin-order-controls"><label>Статус договора<select value={contract.status} onChange={async (e) => { try { await updateContractStatus(contract.id, e.target.value as ContractStatus); setNotice(`Договор ${contract.contract_number} обновлён`); await refresh(); } catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка"); } }}>{contractStatuses.map((status) => <option value={status} key={status}>{labels[status]}</option>)}</select></label></div></article>)}{!contracts.length && <div className="table-empty">Договоров пока нет.</div>}</div>}
-  </section></main>;
+  </section></AdminShell>;
 }

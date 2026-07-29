@@ -33,6 +33,7 @@ import PrintCardDesignerPage from "./pages/PrintCardDesignerPage";
 import OrdersPage from "./pages/OrdersPage";
 import AdminCommercePage from "./pages/AdminCommercePage";
 import AdminSupportPage from "./pages/AdminSupportPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -47,7 +48,7 @@ function ScrollToTop() {
 export default function App() {
   const location = useLocation();
   const standaloneCard = location.pathname.startsWith("/card/");
-  const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password"].includes(location.pathname);
+  const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname);
   const standaloneAdmin = location.pathname.startsWith("/admin");
 
   return (
@@ -80,11 +81,12 @@ export default function App() {
         <Route path="/dashboard/leads" element={<ProtectedRoute><CrmPage /></ProtectedRoute>} />
         <Route path="/dashboard/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="/verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPage /></ProtectedRoute>} />
-        <Route path="/admin/payments" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPaymentsPage /></ProtectedRoute>} />
-        <Route path="/admin/moderation" element={<ProtectedRoute roles={["admin", "moderator"]}><ModerationPage /></ProtectedRoute>} />
-        <Route path="/admin/commerce" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminCommercePage /></ProtectedRoute>} />
-        <Route path="/admin/support" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminSupportPage /></ProtectedRoute>} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<ProtectedRoute roles={["admin"]} loginPath="/admin/login"><AdminPage /></ProtectedRoute>} />
+        <Route path="/admin/payments" element={<ProtectedRoute roles={["admin"]} loginPath="/admin/login"><AdminPaymentsPage /></ProtectedRoute>} />
+        <Route path="/admin/moderation" element={<ProtectedRoute roles={["admin"]} loginPath="/admin/login"><ModerationPage /></ProtectedRoute>} />
+        <Route path="/admin/commerce" element={<ProtectedRoute roles={["admin"]} loginPath="/admin/login"><AdminCommercePage /></ProtectedRoute>} />
+        <Route path="/admin/support" element={<ProtectedRoute roles={["admin"]} loginPath="/admin/login"><AdminSupportPage /></ProtectedRoute>} />
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

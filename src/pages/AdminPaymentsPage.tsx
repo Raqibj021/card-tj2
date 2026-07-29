@@ -1,6 +1,6 @@
 import { Check, Copy, CreditCard, RefreshCw, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import AdminShell from "../components/admin/AdminShell";
 import { paymentRepository, type PaymentRequest } from "../lib/paymentRepository";
 
 export default function AdminPaymentsPage() {
@@ -14,14 +14,10 @@ export default function AdminPaymentsPage() {
   }, []);
 
   return (
-    <main className="admin-page">
-      <div className="site-container py-10 md:py-14">
-        <div className="platform-section-head">
-          <div><span className="section-label">Администратор</span><h1 className="page-title">Проверка оплат</h1><p className="page-copy">Подтверждайте перевод только после проверки банковского поступления.</p></div>
-          <div className="flex gap-2"><button className="button button-secondary" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button><Link className="button button-secondary" to="/admin">Обзор</Link></div>
-        </div>
+    <AdminShell title="Проверка оплат" description="Подтверждайте заявку только после фактического поступления денег. До одобрения код активации не существует." actions={<button className="admin-toolbar-button" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button>}>
+      <div className="admin-subpage">
         {error && <div className="auth-message">{error}</div>}
-        {code && <div className="activation-result"><Check size={18} /><span>Создан код активации: <strong>{code}</strong></span><button onClick={() => navigator.clipboard.writeText(code)}><Copy size={16} /> Копировать</button></div>}
+        {code && <div className="activation-result"><Check size={18} /><span>Оплата подтверждена. Код создан сервером и отправлен пользователю: <strong>{code}</strong></span><button onClick={() => navigator.clipboard.writeText(code)}><Copy size={16} /> Копировать</button></div>}
         <section className="admin-panel">
           <div className="admin-panel-heading"><div><h2>Заявки на оплату</h2><p>{requests.length} заявок в демонстрационном хранилище</p></div><CreditCard size={20} /></div>
           <div className="admin-table-wrap">
@@ -59,6 +55,6 @@ export default function AdminPaymentsPage() {
           </div>
         </section>
       </div>
-    </main>
+    </AdminShell>
   );
 }

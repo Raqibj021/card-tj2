@@ -1,7 +1,7 @@
-import { ArrowLeft, CheckCircle2, Mail, MessageSquareReply, RefreshCw, Send } from "lucide-react";
+import { CheckCircle2, Mail, MessageSquareReply, RefreshCw, Send } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
 import { supabase } from "../lib/supabase";
+import AdminShell from "../components/admin/AdminShell";
 
 interface SupportTicket {
   id: string;
@@ -53,12 +53,8 @@ export default function AdminSupportPage() {
     await refresh();
   };
 
-  return <main className="admin-page">
-    <div className="site-container py-10 md:py-14">
-      <div className="platform-section-head">
-        <div><span className="section-label">VIZORA SUPPORT</span><h1 className="page-title">Обращения пользователей</h1><p className="page-copy">Ответ сохраняется в кабинете и автоматически отправляется пользователю по электронной почте.</p></div>
-        <div className="flex flex-wrap gap-2"><Link to="/admin" className="button button-secondary"><ArrowLeft size={16} /> Админ-панель</Link><button className="button button-secondary" onClick={() => void refresh()}><RefreshCw className={busy ? "spin" : ""} size={16} /> Обновить</button></div>
-      </div>
+  return <AdminShell title="Поддержка и жалобы" description="Ответ сохраняется в кабинете и автоматически ставится в очередь отправки пользователю." actions={<button className="admin-toolbar-button" onClick={() => void refresh()}><RefreshCw className={busy ? "spin" : ""} size={16} /> Обновить</button>}>
+    <div className="admin-subpage">
       {notice && <div className="admin-notice mt-6"><Mail size={18} />{notice}</div>}
       <section className="admin-panel mt-6">
         <div className="admin-panel-heading"><div><h2>Очередь поддержки</h2><p>{tickets.filter((item) => !["closed","resolved"].includes(item.status)).length} открытых обращений</p></div><MessageSquareReply size={21} /></div>
@@ -86,5 +82,5 @@ export default function AdminSupportPage() {
         <div className="mt-5 flex flex-wrap justify-end gap-2"><button className="button button-secondary" disabled={busy || reply.trim().length < 2} onClick={() => void sendReply(false)}><Send size={17} /> Отправить</button><button className="button button-primary" disabled={busy || reply.trim().length < 2} onClick={() => void sendReply(true)}><CheckCircle2 size={17} /> Ответить и закрыть</button></div>
       </section>
     </div>}
-  </main>;
+  </AdminShell>;
 }
