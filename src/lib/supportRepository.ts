@@ -4,6 +4,7 @@ export const supportRepository = {
   create: async (data: {
     name: string;
     phone: string;
+    email: string;
     topic: string;
     reference: string;
     message: string;
@@ -12,6 +13,7 @@ export const supportRepository = {
     const { data: ticketNumber, error } = await supabase.rpc("submit_support_ticket", {
       contact_name: data.name,
       contact_phone: data.phone,
+      contact_email: data.email,
       ticket_category: data.topic,
       reference_number: data.reference,
       ticket_message: data.message
