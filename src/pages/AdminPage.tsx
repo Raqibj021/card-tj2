@@ -8,6 +8,7 @@ import {
   MoreHorizontal,
   TrendingUp,
   Users
+  ,ShoppingBag
 } from "lucide-react";
 import { Link } from "react-router";
 import { useApp } from "../context/AppContext";
@@ -63,6 +64,9 @@ export default function AdminPage() {
           </Link>
           <Link to="/admin/moderation" className="button button-secondary">
             <Info size={17} /> Модерация
+          </Link>
+          <Link to="/admin/commerce" className="button button-secondary">
+            <ShoppingBag size={17} /> Заказы
           </Link>
         </div>
 
