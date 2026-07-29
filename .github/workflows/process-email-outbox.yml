@@ -1,0 +1,31 @@
+name: Process Vizora service emails
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vizora-email-worker
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.EMAIL_WORKER_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deliver queued emails
+        env:
+          FUNCTION_URL: ${{ secrets.SUPABASE_MAIL_FUNCTION_URL }}
+          WORKER_SECRET: ${{ secrets.MAIL_WORKER_SECRET }}
+        run: |
+          test -n "$FUNCTION_URL"
+          test -n "$WORKER_SECRET"
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "x-mail-worker-secret: $WORKER_SECRET" \
+            --header "content-type: application/json" \
+            "$FUNCTION_URL"
