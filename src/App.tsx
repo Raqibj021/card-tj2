@@ -20,6 +20,10 @@ import AdminPaymentsPage from "./pages/AdminPaymentsPage";
 import CrmPage from "./pages/CrmPage";
 import LoadingScreen from "./components/LoadingScreen";
 import HelpWidget from "./components/HelpWidget";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PasswordRecoveryPage from "./pages/PasswordRecoveryPage";
+import ModerationPage from "./pages/ModerationPage";
+import VerificationPage from "./pages/VerificationPage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -34,7 +38,7 @@ function ScrollToTop() {
 export default function App() {
   const location = useLocation();
   const standaloneCard = location.pathname.startsWith("/card/");
-  const standaloneAuth = location.pathname === "/login" || location.pathname === "/register";
+  const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password"].includes(location.pathname);
 
   return (
     <div className="min-h-screen bg-[var(--page)] text-[var(--ink)]">
@@ -46,18 +50,22 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/organizations" element={<OrganizationsPage />} />
-        <Route path="/organization/apply" element={<OrganizationApplyPage />} />
-        <Route path="/organization/dashboard" element={<OrganizationDashboardPage />} />
-        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/organization/apply" element={<ProtectedRoute><OrganizationApplyPage /></ProtectedRoute>} />
+        <Route path="/organization/dashboard" element={<ProtectedRoute><OrganizationDashboardPage /></ProtectedRoute>} />
+        <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />
+        <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
+        <Route path="/reset-password" element={<PasswordRecoveryPage reset />} />
         <Route path="/create" element={<CreatePage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/dashboard/leads" element={<CrmPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/admin/payments" element={<AdminPaymentsPage />} />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/dashboard/leads" element={<ProtectedRoute><CrmPage /></ProtectedRoute>} />
+        <Route path="/verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPage /></ProtectedRoute>} />
+        <Route path="/admin/payments" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPaymentsPage /></ProtectedRoute>} />
+        <Route path="/admin/moderation" element={<ProtectedRoute roles={["admin", "moderator"]}><ModerationPage /></ProtectedRoute>} />
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
