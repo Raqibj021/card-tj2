@@ -6060,14 +6060,87 @@ body,
 }
 
 
-/* Profile identity alignment */
+/* Unified digital card grid */
+.digital-card {
+  height: 650px;
+  min-height: 650px;
+}
+
+.card-preview-cover,
+.digital-card-minimal .card-preview-cover,
+.digital-card-creative .card-preview-cover {
+  height: 168px;
+}
+
+.card-preview-brand {
+  max-width: calc(100% - 68px);
+  max-height: 46px;
+  gap: 10px;
+  overflow: hidden;
+  font-size: 11px;
+  letter-spacing: .06em;
+  line-height: 1.25;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.card-preview-brand > span {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+}
+
+.card-preview-qr {
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+}
+
+.card-preview-qr svg {
+  width: 28px;
+  height: 28px;
+}
+
 .card-preview-body .card-profile {
+  align-items: start;
+  min-height: 140px;
   margin-top: -34px;
 }
 
+.card-avatar-wrap {
+  align-self: start;
+}
+
+.card-preview-body .card-avatar {
+  object-position: center 20%;
+}
+
 .card-preview-body .card-profile > div:last-child {
+  height: 140px;
   padding-top: 40px;
   transform: none;
+}
+
+.card-preview-body .card-name {
+  height: 48px;
+  min-height: 48px;
+  margin: 5px 0 0;
+}
+
+.card-preview-body .card-role {
+  height: 28px;
+  min-height: 28px;
+  margin: 5px 0 0;
+}
+
+.card-preview-body .card-description {
+  height: 38px;
+  min-height: 38px;
+}
+
+.card-preview-body .card-organization {
+  height: 38px;
+  min-height: 38px;
 }
 
 .design-showcase-item {
