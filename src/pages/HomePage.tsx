@@ -14,12 +14,14 @@ import {
   Sparkles,
   Zap
 } from "lucide-react";
+import type { CSSProperties } from "react";
 import { Link } from "react-router";
 import CardPreview from "../components/CardPreview";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { demoCards } from "../data/demo";
 import LaunchPromo from "../components/LaunchPromo";
+import { themeColors } from "../lib/cardUtils";
 
 export default function HomePage() {
   const { t } = useApp();
@@ -127,6 +129,44 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="mobile-card-gallery" aria-label="Новые шаблоны визиток">
+          <div className="site-container">
+            <div className="mobile-card-gallery-head">
+              <div>
+                <span className="section-label">New</span>
+                <h2>Готовые визитки</h2>
+              </div>
+              <Link to="/create">Создать <ArrowRight size={14} /></Link>
+            </div>
+            <div className="mobile-card-gallery-track">
+              {demoCards.slice(0, 4).map((card) => (
+                <Link
+                  key={card.id}
+                  to={`/card/${card.slug}`}
+                  className={`mobile-card-mini mobile-card-mini-${card.template}`}
+                  style={{ "--mini-accent": themeColors[card.theme].accent } as CSSProperties}
+                >
+                  <div className="mobile-card-mini-top">
+                    {card.photo ? (
+                      <img src={card.photo} alt="" />
+                    ) : (
+                      <span>{card.fullName.slice(0, 1)}</span>
+                    )}
+                    <em>{card.template === "minimal" ? "Neon" : card.template === "creative" ? "Atelier" : "Premium"}</em>
+                    <span className="mobile-card-mini-qr"><QrCode size={17} /></span>
+                  </div>
+                  <strong>{card.fullName}</strong>
+                  <small>{card.organization}</small>
+                  <div className="mobile-card-mini-actions">
+                    <span>Открыть</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="section home-benefits">
           <div className="site-container">
             <div className="section-heading">
@@ -134,7 +174,7 @@ export default function HomePage() {
               <h2>{t("benefitTitle")}</h2>
               <p>{t("benefitText")}</p>
             </div>
-            <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="home-benefits-grid mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {benefits.map(({ icon: Icon, title, text }) => (
                 <article key={title} className="feature-card">
                   <div className="feature-icon"><Icon size={22} /></div>
@@ -142,6 +182,19 @@ export default function HomePage() {
                   <p>{text}</p>
                 </article>
               ))}
+            </div>
+            <div className="mobile-benefits-marquee" aria-label={t("benefitTitle")}>
+              <div className="mobile-benefits-track">
+                {[...benefits, ...benefits].map(({ icon: Icon, title, text }, index) => (
+                  <article key={`${title}-${index}`} className="mobile-benefit-pill">
+                    <div className="feature-icon"><Icon size={17} /></div>
+                    <span>
+                      <strong>{title}</strong>
+                      <small>{text}</small>
+                    </span>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </section>
