@@ -1,4 +1,6 @@
-export type PaymentStatus = "payment_pending" | "payment_review" | "active" | "rejected";
+import { supabase } from "./supabase";
+
+export type PaymentStatus = "draft" | "payment_pending" | "payment_review" | "active" | "rejected" | "expired";
 
 export interface PaymentRequest {
   id: string;
@@ -6,9 +8,11 @@ export interface PaymentRequest {
   customerName: string;
   phone: string;
   plan: string;
+  planCode: string;
   amount: number;
   payerName: string;
   receiptName: string;
+  receiptPath?: string;
   status: PaymentStatus;
   activationCode?: string;
   createdAt: string;
@@ -27,34 +31,117 @@ const read = (): PaymentRequest[] => {
 const write = (items: PaymentRequest[]) =>
   localStorage.setItem(KEY, JSON.stringify(items));
 
-const randomCode = () =>
-  `VZ-${Math.random().toString(36).slice(2, 6).toUpperCase()}-${Math.random()
-    .toString(36)
-    .slice(2, 6)
-    .toUpperCase()}`;
+const fromDatabase = (row: Record<string, unknown>): PaymentRequest => ({
+  id: String(row.id),
+  orderNumber: String(row.order_number),
+  customerName: String((row.customer_snapshot as Record<string, unknown> | null)?.fullName ?? ""),
+  phone: String((row.customer_snapshot as Record<string, unknown> | null)?.phone ?? ""),
+  plan: String(row.plan_code),
+  planCode: String(row.plan_code),
+  amount: Number(row.amount_somoni),
+  payerName: String(row.payer_name ?? ""),
+  receiptName: String(row.receipt_path ?? "").split("/").pop() ?? "",
+  receiptPath: String(row.receipt_path ?? ""),
+  status: row.status as PaymentStatus,
+  createdAt: String(row.created_at)
+});
 
 export const paymentRepository = {
   list: () => read().sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-  create: (data: Omit<PaymentRequest, "id" | "orderNumber" | "status" | "createdAt">) => {
+
+  listRemote: async () => {
+    if (!supabase) return read().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) return read().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const items = (data ?? []).map((row) => fromDatabase(row as Record<string, unknown>));
+    write(items);
+    return items;
+  },
+
+  create: async (data: {
+    customerName: string;
+    phone: string;
+    plan: string;
+    planCode: string;
+    amount: number;
+    payerName: string;
+    receiptFile: File;
+    organizationId?: string;
+  }) => {
+    const orderNumber = `VZ-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
+    if (supabase) {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
+      const safeName = data.receiptFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+      const receiptPath = `${auth.user.id}/${orderNumber}/${safeName}`;
+      const { error: uploadError } = await supabase.storage
+        .from("payment-receipts")
+        .upload(receiptPath, data.receiptFile, {
+          upsert: true,
+          contentType: data.receiptFile.type
+        });
+      if (uploadError) throw uploadError;
+      const { data: inserted, error } = await supabase
+        .from("orders")
+        .insert({
+          user_id: auth.user.id,
+          organization_id: data.organizationId ?? null,
+          order_number: orderNumber,
+          plan_code: data.planCode,
+          amount_somoni: data.amount,
+          payer_name: data.payerName,
+          receipt_path: receiptPath,
+          customer_snapshot: { fullName: data.customerName, phone: data.phone },
+          status: "payment_review"
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      const item = fromDatabase(inserted as Record<string, unknown>);
+      write([item, ...read().filter((order) => order.id !== item.id)]);
+      return item;
+    }
+
     const item: PaymentRequest = {
-      ...data,
       id: crypto.randomUUID(),
-      orderNumber: `VZ-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
+      orderNumber,
+      customerName: data.customerName,
+      phone: data.phone,
+      plan: data.plan,
+      planCode: data.planCode,
+      amount: data.amount,
+      payerName: data.payerName,
+      receiptName: data.receiptFile.name,
       status: "payment_review",
       createdAt: new Date().toISOString()
     };
     write([item, ...read()]);
     return item;
   },
-  approve: (id: string) => {
-    const code = randomCode();
-    write(read().map((item) =>
-      item.id === id ? { ...item, status: "active", activationCode: code } : item
-    ));
-    return code;
+
+  approve: async (id: string) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const { data, error } = await supabase.rpc("approve_order", { target_order_id: id });
+    if (error) throw error;
+    return String(data);
   },
-  reject: (id: string) =>
-    write(read().map((item) =>
-      item.id === id ? { ...item, status: "rejected" } : item
-    ))
+
+  reject: async (id: string) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: "rejected", updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) throw error;
+  },
+
+  activate: async (code: string) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const { data, error } = await supabase.rpc("activate_plan", { plain_code: code });
+    if (error) throw error;
+    return String(data);
+  }
 };
