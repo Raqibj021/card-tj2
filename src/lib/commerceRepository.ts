@@ -18,6 +18,80 @@ export interface CustomerDetails {
   document?: string;
 }
 
+export type OrderStatus = "new" | "clarifying" | "approved" | "in_progress" | "ready" | "completed" | "cancelled";
+export type PaymentStatus = "unpaid" | "pending" | "paid" | "refunded";
+export type ContractStatus = "draft" | "submitted" | "approved" | "signed" | "cancelled";
+
+export interface ServiceOrderRecord {
+  id: string;
+  user_id: string;
+  order_number: string;
+  customer: CustomerDetails;
+  items: OrderItem[];
+  total: number;
+  status: OrderStatus;
+  payment_status: PaymentStatus;
+  manager_comment: string;
+  created_at: string;
+}
+
+export interface ContractRecord {
+  id: string;
+  user_id: string;
+  contract_number: string;
+  customer_type: "individual" | "organization";
+  customer: CustomerDetails;
+  services: string[];
+  total: number;
+  status: ContractStatus;
+  created_at: string;
+}
+
+export async function listServiceOrders(): Promise<ServiceOrderRecord[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("service_orders")
+    .select("id,user_id,order_number,customer,items,total,status,payment_status,manager_comment,created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ServiceOrderRecord[];
+}
+
+export async function listContracts(): Promise<ContractRecord[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from("contracts")
+    .select("id,user_id,contract_number,customer_type,customer,services,total,status,created_at")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as ContractRecord[];
+}
+
+export async function updateServiceOrder(
+  id: string,
+  values: Partial<Pick<ServiceOrderRecord, "status" | "payment_status" | "manager_comment">>
+) {
+  if (!supabase) throw new Error("Supabase не подключён");
+  const { error } = await supabase.from("service_orders").update(values).eq("id", id);
+  if (error) throw error;
+}
+
+export async function updateContractStatus(id: string, status: ContractStatus) {
+  if (!supabase) throw new Error("Supabase не подключён");
+  const { error } = await supabase
+    .from("contracts")
+    .update({ status, accepted_at: status === "signed" ? new Date().toISOString() : null })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+export async function getCommerceStats() {
+  if (!supabase) return { orders: 0, newOrders: 0, unpaid: 0, revenue: 0, contracts: 0 };
+  const { data, error } = await supabase.rpc("get_commerce_admin_stats");
+  if (error) throw error;
+  return data as { orders: number; newOrders: number; unpaid: number; revenue: number; contracts: number };
+}
+
 export async function createServiceOrder(
   userId: string,
   customer: CustomerDetails,
