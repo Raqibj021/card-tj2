@@ -932,6 +932,9 @@ body {
 .background-picker { display:grid;gap:7px;grid-template-columns:repeat(5,minmax(0,1fr)); }
 .background-picker button,.background-picker label { display:grid;min-height:58px;place-items:center;gap:4px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:6px;color:var(--muted);cursor:pointer;font-size:8px;font-weight:800;text-align:center; }
 .background-picker .active { border-color:#0f9f8d;color:#0f8c7f;box-shadow:0 0 0 2px color-mix(in srgb,#0f9f8d 14%,transparent); }
+.font-picker { display:grid;gap:7px;grid-template-columns:repeat(4,minmax(0,1fr)); }
+.font-picker button { min-height:39px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:7px;color:var(--ink);font-size:11px;cursor:pointer; }
+.font-picker button.active { border-color:#0f9f8d;background:color-mix(in srgb,#0f9f8d 9%,var(--panel));color:#0f8c7f;box-shadow:0 0 0 2px color-mix(in srgb,#0f9f8d 12%,transparent); }
 .bg-sample { display:block;width:34px;height:23px;border-radius:5px;background:#182235; }
 .bg-grid { background:repeating-linear-gradient(45deg,#182235 0 4px,#48617c 4px 5px); }
 .bg-waves { background:radial-gradient(ellipse at 10% 110%,#182235 50%,#38bda9 52% 57%,#182235 59%); }
@@ -940,7 +943,7 @@ body {
 .physical-card { isolation:isolate; }
 .card-decor { position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none; }
 .card-decor i,.card-decor b { position:absolute;display:block; }
-.physical-content { position:absolute;inset:0;z-index:2;color:var(--card-ink); }
+.physical-content { position:absolute;inset:0;z-index:2;color:var(--card-ink);font-family:var(--card-font,"Manrope"),sans-serif; }
 .print-movable { position:absolute!important;z-index:6;touch-action:none;cursor:grab;transform-origin:top left;user-select:none; }
 .print-movable:active { cursor:grabbing; }
 .print-movable.selected:after { position:absolute;z-index:20;inset:-7px;border:1px dashed color-mix(in srgb,var(--card-accent) 85%,#fff);border-radius:8px;content:"";pointer-events:none; }
@@ -970,25 +973,25 @@ body {
 .print-social-list span { display:grid;width:25px;aspect-ratio:1;place-items:center;border:1px solid currentColor;border-radius:50%;color:var(--card-accent);background:color-mix(in srgb,var(--card-light) 8%,transparent); }
 .print-social-list svg { width:55%;height:55%;stroke-width:2; }
 
-.decor-ribbon:after { position:absolute;inset:0 0 0 61%;background:var(--card-light);content:""; }
+.decor-ribbon:after { display:none;content:""; }
 .decor-ribbon i:nth-child(1) { top:-20%;left:37%;width:24%;height:145%;background:var(--card-accent);transform:rotate(-17deg); }
 .decor-ribbon i:nth-child(2) { top:-15%;left:46%;width:6%;height:140%;background:color-mix(in srgb,var(--card-accent) 62%,#000);transform:rotate(21deg); }
 .decor-ribbon b:nth-of-type(1) { top:-10%;left:54%;width:3px;height:130%;background:var(--card-bg);transform:rotate(22deg); }
-.decor-orbit:after { position:absolute;top:-25%;left:-24%;width:58%;height:150%;border-radius:50%;background:var(--card-light);content:""; }
+.decor-orbit:after { display:none;content:""; }
 .decor-orbit i:nth-child(1) { top:-35%;left:28%;width:23%;height:170%;border:22px solid var(--card-accent);border-radius:50%;transform:rotate(-18deg); }
-.decor-orbit i:nth-child(2) { top:-35%;left:36%;width:12%;height:170%;border:4px solid var(--card-light);border-radius:50%;transform:rotate(-18deg); }
-.decor-goldwave:after { position:absolute;top:0;right:0;width:44%;height:100%;background:linear-gradient(135deg,transparent 10%,var(--card-light) 70%);content:""; }
+.decor-orbit i:nth-child(2) { top:-35%;left:36%;width:12%;height:170%;border:4px solid color-mix(in srgb,var(--card-accent) 45%,transparent);border-radius:50%;transform:rotate(-18deg); }
+.decor-goldwave:after { display:none;content:""; }
 .decor-goldwave i { right:-8%;bottom:-43%;width:93%;height:76%;border:22px solid var(--card-accent);border-radius:50%;transform:rotate(-12deg); }
 .decor-goldwave i:nth-child(2) { right:-16%;bottom:-30%;border-width:9px;opacity:.65; }
 .decor-goldwave i:nth-child(3) { right:-22%;bottom:-15%;border-width:4px;opacity:.45; }
-.decor-prism:after { position:absolute;inset:0 0 0 63%;background:var(--card-light);content:""; }
+.decor-prism:after { display:none;content:""; }
 .decor-prism i { top:-20%;left:46%;width:22%;height:140%;background:var(--card-accent);opacity:.2;clip-path:polygon(0 0,100% 50%,0 100%,35% 50%); }
 .decor-prism i:nth-child(2) { left:51%;opacity:.35; }.decor-prism i:nth-child(3) { left:56%;opacity:.55; }
-.decor-mono:after { position:absolute;inset:0 0 0 50%;background:var(--card-light);content:""; }
+.decor-mono:after { display:none;content:""; }
 .decor-mono i:nth-child(1) { top:27%;left:46%;width:8%;height:46%;border-radius:12px;background:var(--card-accent); }
 .decor-chevron i,.decor-chevron b { top:-26%;right:4%;width:32%;height:150%;border:24px solid var(--card-accent);transform:rotate(45deg); }
 .decor-chevron i:nth-child(2) { right:20%;opacity:.55; }.decor-chevron i:nth-child(3) { right:36%;opacity:.2; }
-.physical-ribbon .physical-content,.physical-orbit .physical-content,.physical-goldwave .physical-content,.physical-prism .physical-content,.physical-mono .physical-content { color:#15171c; }
+.physical-ribbon .physical-content,.physical-orbit .physical-content,.physical-goldwave .physical-content,.physical-prism .physical-content,.physical-mono .physical-content { color:var(--card-ink); }
 .physical-ribbon .physical-brand,.physical-ribbon .physical-person,.physical-ribbon .physical-contact-brand,.physical-ribbon .physical-back-content ul,
 .physical-orbit .physical-brand,.physical-orbit .physical-person,.physical-orbit .physical-contact-brand,.physical-orbit .physical-back-content ul,
 .physical-goldwave .physical-brand,.physical-goldwave .physical-person,.physical-goldwave .physical-contact-brand,.physical-goldwave .physical-back-content ul,
@@ -1006,6 +1009,7 @@ body {
   .logo-library { grid-template-columns:repeat(4,1fr); }
   .asset-upload-pair { grid-template-columns:1fr; }
   .background-picker { grid-template-columns:repeat(3,1fr); }
+  .font-picker { grid-template-columns:repeat(2,1fr); }
   .element-size-control { grid-template-columns:1fr auto; }
   .element-size-control input { grid-column:1/-1; }
 }
