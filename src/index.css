@@ -6993,3 +6993,9 @@ body,
     transform: scale(.3415);
   }
 }
+
+
+/* Executive card identity alignment */
+.digital-card-executive .card-profile > div:last-child {
+  transform: translateY(16px);
+}
