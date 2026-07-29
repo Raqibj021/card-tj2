@@ -50,7 +50,7 @@ export default function App() {
   const standaloneAdmin = location.pathname.startsWith("/admin");
 
   return (
-    <div className="min-h-screen bg-[var(--page)] text-[var(--ink)]">
+    <div className="app-shell min-h-screen text-[var(--ink)]">
       <LoadingScreen />
       <PromoClaimer />
       <ScrollToTop />
