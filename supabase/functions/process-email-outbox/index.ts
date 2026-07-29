@@ -7,6 +7,17 @@ const json = (body: unknown, status = 200) =>
     headers: { "content-type": "application/json; charset=utf-8" }
   });
 
+const supabaseAdminKey = () => {
+  const legacy = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (legacy) return legacy;
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}") as Record<string, string>;
+    return keys.default ?? Object.values(keys)[0];
+  } catch {
+    return undefined;
+  }
+};
+
 async function deliverWithGoogleAppsScript(
   endpoint: string,
   secret: string,
@@ -60,7 +71,7 @@ Deno.serve(async (request) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const serviceKey = supabaseAdminKey();
   const resendKey = Deno.env.get("RESEND_API_KEY");
   const googleAppsScriptUrl = Deno.env.get("GOOGLE_APPS_SCRIPT_URL");
   const googleAppsScriptSecret = Deno.env.get("GOOGLE_APPS_SCRIPT_SECRET");
