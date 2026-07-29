@@ -47,13 +47,14 @@ export default function App() {
   const location = useLocation();
   const standaloneCard = location.pathname.startsWith("/card/");
   const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password"].includes(location.pathname);
+  const standaloneAdmin = location.pathname.startsWith("/admin");
 
   return (
     <div className="min-h-screen bg-[var(--page)] text-[var(--ink)]">
       <LoadingScreen />
       <PromoClaimer />
       <ScrollToTop />
-      {!standaloneCard && !standaloneAuth && <Header />}
+      {!standaloneCard && !standaloneAuth && !standaloneAdmin && <Header />}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/directory" element={<DirectoryPage />} />
@@ -85,7 +86,7 @@ export default function App() {
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      {!standaloneCard && !standaloneAuth && <HelpWidget />}
+      {!standaloneCard && !standaloneAuth && !standaloneAdmin && <HelpWidget />}
     </div>
   );
 }
