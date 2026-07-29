@@ -1,4 +1,4 @@
-name: Deploy Card.tj to GitHub Pages
+name: Deploy VIZORA.TJ to GitHub Pages
 
 on:
   push:
