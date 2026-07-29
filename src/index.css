@@ -5378,6 +5378,7 @@ summary:focus-visible {
   position: relative;
   overflow: hidden;
   border-block: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+  padding-block: 72px;
   background:
     radial-gradient(circle at 8% 12%, rgba(40, 163, 150, .12), transparent 30%),
     radial-gradient(circle at 94% 88%, rgba(198, 161, 103, .13), transparent 34%),
@@ -5401,47 +5402,49 @@ summary:focus-visible {
   z-index: 1;
   display: grid;
   align-items: end;
-  gap: 44px;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .55fr);
+  gap: 32px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, .55fr);
 }
 
 .impact-heading h2,
 .journey-heading h2 {
   margin: 15px 0 0;
   font-family: "Unbounded", "Manrope", sans-serif;
-  font-size: clamp(34px, 4vw, 60px);
+  font-size: clamp(32px, 3.2vw, 48px);
   font-weight: 700;
   letter-spacing: -.055em;
   line-height: 1.06;
 }
 
 .impact-heading h2 {
-  max-width: 900px;
+  max-width: 780px;
   color: var(--ink);
 }
 
 .impact-heading > p {
   margin: 0 0 5px;
   color: var(--muted);
-  font-size: 15px;
-  line-height: 1.75;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .impact-bento {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 16px;
-  margin-top: 52px;
+  max-width: 100%;
+  gap: 12px;
+  margin-top: 36px;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(210px, auto));
+  grid-template-rows: repeat(2, minmax(176px, auto));
 }
 
 .impact-card {
   position: relative;
+  min-width: 0;
   overflow: hidden;
   border: 1px solid rgba(20, 32, 49, .1);
-  border-radius: 30px;
+  border-radius: 24px;
   box-shadow: 0 18px 55px rgba(33, 48, 58, .1);
   transition: transform .32s ease, box-shadow .32s ease;
 }
@@ -5452,9 +5455,9 @@ summary:focus-visible {
 }
 
 .impact-photo-card {
-  min-height: 436px;
+  min-height: 364px;
   background: #0b1720;
-  grid-column: 1 / span 7;
+  grid-column: 1 / span 6;
   grid-row: 1 / span 2;
 }
 
@@ -5475,43 +5478,15 @@ summary:focus-visible {
     linear-gradient(90deg, rgba(5, 19, 26, .35), transparent 65%);
 }
 
-.impact-live-badge {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  display: inline-flex;
-  min-height: 38px;
-  align-items: center;
-  gap: 9px;
-  border: 1px solid rgba(255, 255, 255, .25);
-  border-radius: 999px;
-  background: rgba(8, 23, 31, .58);
-  padding: 0 14px;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .02em;
-  backdrop-filter: blur(14px);
-}
-
-.impact-live-badge > span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #6ee7b7;
-  box-shadow: 0 0 0 0 rgba(110, 231, 183, .55);
-  animation: impact-live-pulse 2.2s ease-out infinite;
-}
-
 .impact-photo-content {
   position: absolute;
-  right: 28px;
-  bottom: 28px;
-  left: 28px;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
   color: #fff;
 }
 
@@ -5523,15 +5498,15 @@ summary:focus-visible {
 .impact-avatars img,
 .impact-avatars > span {
   display: grid;
-  width: 43px;
-  height: 43px;
+  width: 36px;
+  height: 36px;
   place-items: center;
   margin-left: -9px;
   border: 2px solid rgba(255, 255, 255, .9);
   border-radius: 50%;
   background: #15776f;
   color: #fff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 900;
   object-fit: cover;
 }
@@ -5551,27 +5526,22 @@ summary:focus-visible {
 
 .impact-stat strong {
   font-family: "Unbounded", "Manrope", sans-serif;
-  font-size: clamp(28px, 3vw, 42px);
+  font-size: clamp(24px, 2.4vw, 34px);
   letter-spacing: -.055em;
   line-height: 1;
 }
 
 .impact-stat span {
-  margin-top: 7px;
+  margin-top: 5px;
   color: rgba(255, 255, 255, .72);
-  font-size: 11px;
+  font-size: 9px;
 }
 
 .impact-benefit {
   display: flex;
-  min-height: 210px;
+  min-height: 176px;
   flex-direction: column;
-  padding: 25px 27px 24px;
-}
-
-.impact-benefit-1,
-.impact-benefit-2 {
-  grid-column: 8 / span 5;
+  padding: 19px 20px 18px;
 }
 
 .impact-benefit-1 {
@@ -5579,6 +5549,7 @@ summary:focus-visible {
     radial-gradient(circle at 78% 20%, rgba(47, 202, 183, .2), transparent 30%),
     #0d2a2b;
   color: #f4fbf8;
+  grid-column: 7 / span 3;
   grid-row: 1;
 }
 
@@ -5587,7 +5558,8 @@ summary:focus-visible {
     radial-gradient(circle at 90% 15%, rgba(255, 255, 255, .7), transparent 32%),
     #dfe6dc;
   color: #142031;
-  grid-row: 2;
+  grid-column: 10 / span 3;
+  grid-row: 1;
 }
 
 .impact-benefit-3 {
@@ -5595,8 +5567,8 @@ summary:focus-visible {
     radial-gradient(circle at 88% 20%, rgba(218, 166, 91, .25), transparent 32%),
     #eee5d7;
   color: #142031;
-  grid-column: 1 / span 6;
-  grid-row: 3;
+  grid-column: 7 / span 3;
+  grid-row: 2;
 }
 
 .impact-benefit-4 {
@@ -5604,8 +5576,8 @@ summary:focus-visible {
     linear-gradient(135deg, rgba(255, 255, 255, .08), transparent 60%),
     #126e68;
   color: #f6fffd;
-  grid-column: 7 / span 6;
-  grid-row: 3;
+  grid-column: 10 / span 3;
+  grid-row: 2;
 }
 
 .impact-benefit-top {
@@ -5617,8 +5589,8 @@ summary:focus-visible {
 }
 
 .impact-benefit .feature-icon {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border: 1px solid rgba(20, 32, 49, .08);
   background: rgba(255, 255, 255, .72);
   color: #0f766e;
@@ -5635,7 +5607,7 @@ summary:focus-visible {
 .impact-index {
   color: currentColor;
   font-family: "Unbounded", "Manrope", sans-serif;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: 600;
   letter-spacing: .12em;
   opacity: .48;
@@ -5646,7 +5618,8 @@ summary:focus-visible {
   z-index: 2;
   margin: auto 0 0;
   font-family: "Unbounded", "Manrope", sans-serif;
-  font-size: 18px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -.04em;
   line-height: 1.2;
@@ -5656,22 +5629,25 @@ summary:focus-visible {
   position: relative;
   z-index: 2;
   max-width: 470px;
-  margin: 9px 0 0;
+  margin: 7px 0 0;
   color: currentColor;
-  font-size: 11px;
-  line-height: 1.55;
+  overflow-wrap: anywhere;
+  font-size: 9.5px;
+  line-height: 1.45;
   opacity: .67;
 }
 
 .impact-visual {
   position: absolute;
   z-index: 1;
-  top: 26px;
-  right: 70px;
+  top: 20px;
+  right: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
+  transform: scale(.82);
+  transform-origin: right center;
 }
 
 .impact-visual-1 {
@@ -5761,6 +5737,7 @@ summary:focus-visible {
 .journey-section {
   position: relative;
   overflow: hidden;
+  padding-block: 72px;
   background:
     radial-gradient(circle at 8% 16%, rgba(56, 189, 172, .18), transparent 26%),
     radial-gradient(circle at 94% 84%, rgba(203, 169, 106, .12), transparent 28%),
@@ -5788,7 +5765,7 @@ summary:focus-visible {
   z-index: 1;
   display: grid;
   align-items: end;
-  gap: 24px 48px;
+  gap: 18px 36px;
   grid-template-columns: minmax(0, 1fr) minmax(280px, .42fr);
 }
 
@@ -5805,8 +5782,8 @@ summary:focus-visible {
 .journey-heading p {
   margin: 0 0 5px;
   color: rgba(224, 240, 236, .65);
-  font-size: 15px;
-  line-height: 1.75;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 .journey-layout {
@@ -5814,18 +5791,20 @@ summary:focus-visible {
   z-index: 1;
   display: grid;
   align-items: stretch;
-  gap: 22px;
-  margin-top: 52px;
-  grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr);
+  max-width: 100%;
+  gap: 16px;
+  margin-top: 36px;
+  grid-template-columns: minmax(0, 1.04fr) minmax(380px, .96fr);
 }
 
 .journey-visual {
   position: relative;
+  min-width: 0;
   overflow: hidden;
-  min-height: 610px;
+  min-height: 510px;
   margin: 0;
   border: 1px solid rgba(255, 255, 255, .13);
-  border-radius: 36px;
+  border-radius: 30px;
   background: #15272b;
   box-shadow: 0 34px 80px rgba(0, 0, 0, .32);
 }
@@ -5852,26 +5831,26 @@ summary:focus-visible {
 
 .journey-profile-chip {
   position: absolute;
-  right: 25px;
-  bottom: 25px;
-  left: 25px;
+  right: 20px;
+  bottom: 20px;
+  left: 20px;
   display: grid;
   max-width: 340px;
-  min-height: 78px;
+  min-height: 68px;
   align-items: center;
   gap: 13px;
   border: 1px solid rgba(255, 255, 255, .22);
-  border-radius: 20px;
+  border-radius: 17px;
   background: rgba(7, 24, 29, .68);
-  padding: 13px 16px;
+  padding: 10px 13px;
   grid-template-columns: auto 1fr;
   backdrop-filter: blur(17px);
 }
 
 .journey-profile-chip > span {
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   place-items: center;
   border-radius: 13px;
   background: #71e1cf;
@@ -5897,18 +5876,18 @@ summary:focus-visible {
 
 .journey-ready-chip {
   position: absolute;
-  top: 26px;
-  right: 26px;
+  top: 20px;
+  right: 20px;
   display: flex;
-  min-height: 43px;
+  min-height: 38px;
   align-items: center;
   gap: 8px;
   border: 1px solid rgba(255, 255, 255, .7);
   border-radius: 999px;
   background: rgba(255, 255, 255, .88);
-  padding: 0 15px;
+  padding: 0 13px;
   color: #0b3d38;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 850;
   box-shadow: 0 14px 34px rgba(0, 0, 0, .18);
   backdrop-filter: blur(12px);
@@ -5920,9 +5899,9 @@ summary:focus-visible {
   min-width: 0;
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, .1);
-  border-radius: 36px;
+  border-radius: 30px;
   background: rgba(255, 255, 255, .045);
-  padding: 18px 25px 24px;
+  padding: 14px 20px 18px;
   box-shadow: inset 0 1px rgba(255, 255, 255, .04);
   backdrop-filter: blur(12px);
 }
@@ -5930,12 +5909,12 @@ summary:focus-visible {
 .journey-step {
   position: relative;
   display: grid;
-  min-height: 145px;
+  min-height: 118px;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, .1);
-  padding: 21px 5px;
-  grid-template-columns: 38px 46px minmax(0, 1fr);
+  padding: 14px 4px;
+  grid-template-columns: 34px 42px minmax(0, 1fr);
 }
 
 .journey-step-number {
@@ -5948,8 +5927,8 @@ summary:focus-visible {
 
 .journey-step-icon {
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, .12);
   border-radius: 15px;
@@ -5967,17 +5946,19 @@ summary:focus-visible {
   margin: 0;
   color: #fff;
   font-family: "Unbounded", "Manrope", sans-serif;
-  font-size: 16px;
+  overflow-wrap: anywhere;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -.035em;
   line-height: 1.3;
 }
 
 .journey-step p {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: rgba(221, 238, 234, .58);
-  font-size: 11px;
-  line-height: 1.6;
+  overflow-wrap: anywhere;
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .journey-cta {
@@ -5995,11 +5976,6 @@ summary:focus-visible {
 @keyframes impact-photo-drift {
   from { transform: scale(1.025) translate3d(-.4%, 0, 0); }
   to { transform: scale(1.075) translate3d(.6%, -.4%, 0); }
-}
-
-@keyframes impact-live-pulse {
-  70% { box-shadow: 0 0 0 8px rgba(110, 231, 183, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(110, 231, 183, 0); }
 }
 
 @keyframes impact-bars {
@@ -6050,7 +6026,7 @@ summary:focus-visible {
   }
 
   .impact-photo-card {
-    min-height: 470px;
+    min-height: 320px;
     grid-column: 1 / -1;
     grid-row: auto;
   }
@@ -6059,9 +6035,13 @@ summary:focus-visible {
   .impact-benefit-2,
   .impact-benefit-3,
   .impact-benefit-4 {
-    min-height: 230px;
+    min-height: 168px;
     grid-column: auto;
     grid-row: auto;
+  }
+
+  .journey-section {
+    padding-block: 60px;
   }
 
   .journey-layout {
@@ -6069,7 +6049,7 @@ summary:focus-visible {
   }
 
   .journey-visual {
-    min-height: 560px;
+    min-height: 420px;
   }
 
   .journey-timeline {
@@ -6079,165 +6059,171 @@ summary:focus-visible {
 
 @media (max-width: 680px) {
   .impact-section {
-    padding-block: 66px 70px;
+    padding-block: 44px 48px;
   }
 
   .impact-section::before {
     background-size: 42px 42px;
   }
 
+  .impact-section .site-container,
+  .journey-section .site-container {
+    min-width: 0;
+    overflow: clip;
+  }
+
   .impact-heading h2,
   .journey-heading h2 {
-    margin-top: 12px;
-    font-size: clamp(28px, 8.4vw, 38px);
-    letter-spacing: -.06em;
-    line-height: 1.12;
+    max-width: 100%;
+    margin-top: 9px;
+    font-size: clamp(24px, 7.2vw, 30px);
+    letter-spacing: -.055em;
+    line-height: 1.13;
+    overflow-wrap: anywhere;
   }
 
   .impact-heading > p,
   .journey-heading p {
-    font-size: 13px;
-    line-height: 1.65;
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
   }
 
   .impact-bento {
-    gap: 10px;
-    margin-top: 31px;
+    width: 100%;
+    min-width: 0;
+    gap: 8px;
+    margin-top: 22px;
   }
 
   .impact-card {
-    border-radius: 22px;
+    max-width: 100%;
+    border-radius: 18px;
   }
 
   .impact-photo-card {
-    min-height: 340px;
-  }
-
-  .impact-live-badge {
-    top: 16px;
-    left: 16px;
-    min-height: 34px;
-    padding-inline: 12px;
-    font-size: 9px;
+    min-height: 210px;
   }
 
   .impact-photo-content {
-    right: 17px;
-    bottom: 18px;
-    left: 17px;
-    gap: 12px;
+    right: 13px;
+    bottom: 13px;
+    left: 13px;
+    gap: 8px;
   }
 
   .impact-avatars img,
   .impact-avatars > span {
-    width: 35px;
-    height: 35px;
-    margin-left: -10px;
-    font-size: 10px;
+    width: 30px;
+    height: 30px;
+    margin-left: -8px;
+    font-size: 8px;
   }
 
   .impact-stat strong {
-    font-size: 23px;
+    font-size: 19px;
   }
 
   .impact-stat span {
-    max-width: 120px;
-    margin-top: 5px;
-    font-size: 8px;
+    max-width: 105px;
+    margin-top: 4px;
+    font-size: 7px;
+    line-height: 1.25;
   }
 
   .impact-benefit-1,
   .impact-benefit-2,
   .impact-benefit-3,
   .impact-benefit-4 {
-    min-height: 198px;
-    padding: 17px 16px 16px;
+    min-height: 124px;
+    padding: 11px 12px;
   }
 
   .impact-benefit .feature-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
   }
 
   .impact-index {
-    font-size: 8px;
+    font-size: 7px;
   }
 
   .impact-benefit h3 {
-    font-size: 13px;
-    line-height: 1.28;
+    font-size: 11px;
+    line-height: 1.25;
   }
 
   .impact-benefit p {
-    display: -webkit-box;
-    overflow: hidden;
-    margin-top: 6px;
-    font-size: 8.5px;
-    line-height: 1.45;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    display: none;
   }
 
   .impact-visual {
-    top: 20px;
-    right: 50px;
-    transform: scale(.76);
-    transform-origin: right center;
+    display: none;
   }
 
   .journey-section {
-    padding-block: 70px;
+    padding-block: 52px;
   }
 
   .journey-layout {
-    gap: 13px;
-    margin-top: 31px;
+    width: 100%;
+    min-width: 0;
+    gap: 10px;
+    margin-top: 24px;
   }
 
   .journey-visual,
   .journey-timeline {
-    border-radius: 24px;
+    max-width: 100%;
+    border-radius: 20px;
   }
 
   .journey-visual {
-    min-height: 360px;
+    min-height: 240px;
   }
 
   .journey-ready-chip {
-    top: 15px;
-    right: 15px;
-    min-height: 38px;
-    padding-inline: 12px;
-    font-size: 9px;
+    top: 12px;
+    right: 12px;
+    min-height: 32px;
+    padding-inline: 10px;
+    font-size: 8px;
   }
 
   .journey-profile-chip {
-    right: 15px;
-    bottom: 15px;
-    left: 15px;
-    min-height: 68px;
-    padding: 10px 12px;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    min-height: 56px;
+    padding: 8px 10px;
   }
 
   .journey-profile-chip > span {
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
   }
 
   .journey-profile-chip strong {
-    font-size: 10px;
+    font-size: 9px;
+  }
+
+  .journey-profile-chip small {
+    margin-top: 4px;
+    font-size: 7px;
   }
 
   .journey-timeline {
-    padding: 8px 15px 15px;
+    padding: 6px 12px 12px;
   }
 
   .journey-step {
-    min-height: 132px;
-    gap: 10px 12px;
-    padding: 18px 2px;
-    grid-template-columns: 32px minmax(0, 1fr);
+    min-height: 96px;
+    gap: 8px 10px;
+    padding: 12px 2px;
+    grid-template-columns: 28px minmax(0, 1fr);
     grid-template-rows: auto auto;
   }
 
@@ -6249,9 +6235,9 @@ summary:focus-visible {
 
   .journey-step-icon {
     align-self: start;
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
     grid-column: 1;
     grid-row: 2;
   }
@@ -6262,16 +6248,21 @@ summary:focus-visible {
   }
 
   .journey-step h3 {
-    font-size: 13px;
+    font-size: 11px;
   }
 
   .journey-step p {
-    font-size: 9.5px;
-    line-height: 1.55;
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 8.5px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .journey-cta {
-    margin-top: 13px;
+    min-height: 46px;
+    margin-top: 10px;
   }
 }
 
@@ -6280,22 +6271,21 @@ summary:focus-visible {
   .impact-benefit-2,
   .impact-benefit-3,
   .impact-benefit-4 {
-    min-height: 188px;
-    padding-inline: 13px;
+    min-height: 116px;
+    padding-inline: 10px;
   }
 
   .impact-benefit h3 {
-    font-size: 12px;
+    font-size: 10px;
   }
 
-  .impact-visual {
-    display: none;
+  .impact-photo-card {
+    min-height: 190px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .impact-photo-card > img,
-  .impact-live-badge > span,
   .impact-visual-1 span,
   .journey-ready-chip {
     animation: none;
