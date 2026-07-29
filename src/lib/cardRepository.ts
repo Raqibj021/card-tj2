@@ -27,6 +27,7 @@ class LocalStorageCardRepository implements CardRepository {
       id: String(row.id),
       slug: String(row.slug),
       photo: String(row.photo_path ?? ""),
+      companyLogo: String(contacts.companyLogo ?? ""),
       fullName: String(row.full_name ?? ""),
       position: String(row.position ?? ""),
       organization: String(row.organization_name ?? ""),
@@ -78,7 +79,8 @@ class LocalStorageCardRepository implements CardRepository {
           instagram: card.instagram,
           facebook: card.facebook,
           email: card.email,
-          website: card.website
+          website: card.website,
+          companyLogo: card.companyLogo
         },
         address: card.address,
         language: card.language,

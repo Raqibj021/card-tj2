@@ -50,6 +50,51 @@ const initials = (name: string) =>
     .join("")
     .toUpperCase();
 
+const profileCopy = {
+  ru: {
+    digitalCard: "Цифровая визитка",
+    verified: "Профиль подтверждён",
+    quickRequest: "Быстрая заявка",
+    howHelp: "Чем я могу помочь?",
+    write: "Написать",
+    callback: "Заказать звонок",
+    request: "Оставить заявку",
+    qrCode: "QR-код",
+    addWallet: "Добавить в Wallet",
+    createOwn: "Создайте свою визитку",
+    createdOn: "Создано на",
+    loading: "Загружаем визитку…"
+  },
+  tj: {
+    digitalCard: "Варақаи рақамӣ",
+    verified: "Профил тасдиқ шудааст",
+    quickRequest: "Дархости фаврӣ",
+    howHelp: "Чӣ тавр кумак карда метавонам?",
+    write: "Навиштан",
+    callback: "Дархости занг",
+    request: "Пешниҳоди дархост",
+    qrCode: "QR-код",
+    addWallet: "Илова ба Wallet",
+    createOwn: "Варақаи худро созед",
+    createdOn: "Сохта шудааст дар",
+    loading: "Варақа бор шуда истодааст…"
+  },
+  en: {
+    digitalCard: "Digital business card",
+    verified: "Verified profile",
+    quickRequest: "Quick request",
+    howHelp: "How can I help?",
+    write: "Message",
+    callback: "Request a call",
+    request: "Send a request",
+    qrCode: "QR code",
+    addWallet: "Add to Wallet",
+    createOwn: "Create your own card",
+    createdOn: "Created with",
+    loading: "Loading business card…"
+  }
+} as const;
+
 export default function CardPage() {
   const { slug = "" } = useParams();
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
@@ -60,6 +105,7 @@ export default function CardPage() {
   const [loading, setLoading] = useState(!card);
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
   const cardUrl = window.location.href;
+  const labels = profileCopy[language];
 
   useEffect(() => {
     let active = true;
@@ -86,7 +132,7 @@ export default function CardPage() {
     return (
       <main className="card-missing">
         <BrandLogo />
-        <div className="profile-loading"><span /><p>Загружаем визитку…</p></div>
+        <div className="profile-loading"><span /><p>{labels.loading}</p></div>
       </main>
     );
   }
@@ -233,14 +279,18 @@ export default function CardPage() {
           <div className="profile-cover">
             <div className="profile-cover-brand">
               <span className="profile-cover-logo">
-                {(card.organization || card.fullName || "V").charAt(0)}
+                {card.companyLogo ? (
+                  <img src={card.companyLogo} alt="" />
+                ) : (
+                  (card.organization || card.fullName || "V").charAt(0)
+                )}
               </span>
               <div>
-                <small>Цифровая визитка</small>
+                <small>{labels.digitalCard}</small>
                 <strong>{card.organization || "Vizora.tj"}</strong>
               </div>
             </div>
-            <span className="profile-status"><Check size={13} /> Профиль подтверждён</span>
+            <span className="profile-status"><Check size={13} /> {labels.verified}</span>
           </div>
           <div className="profile-content">
             <div className="profile-avatar-wrap">
@@ -296,18 +346,18 @@ export default function CardPage() {
 
             <div className="profile-lead-panel">
               <div>
-                <small>Быстрая заявка</small>
-                <strong>Чем я могу помочь?</strong>
+                <small>{labels.quickRequest}</small>
+                <strong>{labels.howHelp}</strong>
               </div>
               <div className="lead-action-grid">
                 <button type="button" onClick={() => setLeadSource("contact")}>
-                  <MessageCircle size={18} /><span>Написать</span>
+                  <MessageCircle size={18} /><span>{labels.write}</span>
                 </button>
                 <button type="button" onClick={() => setLeadSource("callback")}>
-                  <PhoneCall size={18} /><span>Заказать звонок</span>
+                  <PhoneCall size={18} /><span>{labels.callback}</span>
                 </button>
                 <button type="button" onClick={() => setLeadSource("request")}>
-                  <ClipboardPenLine size={18} /><span>Оставить заявку</span>
+                  <ClipboardPenLine size={18} /><span>{labels.request}</span>
                 </button>
               </div>
             </div>
@@ -323,12 +373,6 @@ export default function CardPage() {
                 <a href={`tel:${sanitizePhone(card.secondPhone)}`}>
                   <span><Phone size={18} /></span>
                   <div><small>{t("secondPhone")}</small><strong>{card.secondPhone}</strong></div>
-                </a>
-              )}
-              {card.email && (
-                <a href={`mailto:${card.email}`}>
-                  <span><Mail size={18} /></span>
-                  <div><small>{t("email")}</small><strong>{card.email}</strong></div>
                 </a>
               )}
               {card.website && (
@@ -375,7 +419,7 @@ export default function CardPage() {
         <aside className="profile-side">
           <div className="profile-qr-card">
             <QRCodeImage value={cardUrl} size={210} className="mx-auto rounded-2xl" />
-            <h2>QR-код</h2>
+            <h2>{labels.qrCode}</h2>
             <p>{t("scanQr")}</p>
             <div className="mt-5 grid gap-2">
               <button type="button" className="button button-secondary w-full" onClick={copyLink}>
@@ -389,19 +433,19 @@ export default function CardPage() {
                 <Download size={17} /> {t("downloadQr")}
               </button>
               <button type="button" className="button button-ghost w-full" onClick={addToWallet}>
-                <WalletCards size={17} /> Добавить в Wallet
+                <WalletCards size={17} /> {labels.addWallet}
               </button>
             </div>
           </div>
           <Link to="/create" className="profile-powered">
-            <span>Создайте свою визитку бесплатно</span>
+            <span>{labels.createOwn}</span>
             <ArrowLeft className="rotate-180" size={17} />
           </Link>
         </aside>
       </div>
 
       <footer className="profile-footer">
-        <span>Создано на</span>
+        <span>{labels.createdOn}</span>
         <Link to="/">Vizora.tj</Link>
       </footer>
 

@@ -53,7 +53,13 @@ export default function CardPreview({
       <div className="card-preview-cover">
         <div className="card-preview-orb" />
         <span className="card-preview-brand">
-          <span>{(card.organization || "V").charAt(0)}</span>
+          <span>
+            {card.companyLogo ? (
+              <img src={card.companyLogo} alt="" />
+            ) : (
+              (card.organization || "V").charAt(0)
+            )}
+          </span>
           {card.organization || "VIZORA.TJ"}
         </span>
         <span className="card-preview-qr"><QrCode size={18} /></span>

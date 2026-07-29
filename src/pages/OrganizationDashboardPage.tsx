@@ -115,6 +115,7 @@ export default function OrganizationDashboardPage() {
             cardRepository.save({
               slug,
               photo: "",
+              companyLogo: "",
               fullName: name,
               position,
               organization: "Университет «Сомон»",

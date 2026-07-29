@@ -14,6 +14,7 @@ export interface DigitalCard {
   id: string;
   slug: string;
   photo: string;
+  companyLogo: string;
   fullName: string;
   position: string;
   organization: string;

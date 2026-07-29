@@ -5,6 +5,7 @@ const now = new Date().toISOString();
 export const emptyCard: CardDraft = {
   slug: "",
   photo: "",
+  companyLogo: "",
   fullName: "",
   position: "",
   organization: "",
@@ -29,6 +30,7 @@ export const demoCards: DigitalCard[] = [
     slug: "firuz",
     photo:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=700&q=88",
+    companyLogo: "",
     fullName: "Фируз Саидов",
     position: "Архитектор и основатель",
     organization: "FORMA Studio",
@@ -54,6 +56,7 @@ export const demoCards: DigitalCard[] = [
     id: "demo-card",
     slug: "demo",
     photo: "",
+    companyLogo: "",
     fullName: "Мадина Раҳимова",
     position: "Бренд-стратег",
     organization: "NOM Studio",

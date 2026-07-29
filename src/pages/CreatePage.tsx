@@ -87,7 +87,7 @@ const compressImage = (file: File) =>
   });
 
 export default function CreatePage() {
-  const { t, setLanguage } = useApp();
+  const { t, language, setLanguage } = useApp();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit") ?? "";
@@ -100,6 +100,7 @@ export default function CreatePage() {
       ? {
           slug: existing.slug,
           photo: existing.photo,
+          companyLogo: existing.companyLogo ?? "",
           fullName: existing.fullName,
           position: existing.position,
           organization: existing.organization,
@@ -123,6 +124,7 @@ export default function CreatePage() {
   const [saving, setSaving] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(existing));
   const fileInput = useRef<HTMLInputElement>(null);
+  const logoInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (existing) setLanguage(existing.language);
@@ -146,23 +148,26 @@ export default function CreatePage() {
     }));
   };
 
-  const handleImage = async (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImage = async (
+    event: ChangeEvent<HTMLInputElement>,
+    field: "photo" | "companyLogo"
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setErrors((current) => ({ ...current, photo: "Выберите файл изображения" }));
+      setErrors((current) => ({ ...current, [field]: "Выберите файл изображения" }));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
-      setErrors((current) => ({ ...current, photo: t("photoLarge") }));
+      setErrors((current) => ({ ...current, [field]: t("photoLarge") }));
       return;
     }
     try {
-      update("photo", await compressImage(file));
+      update(field, await compressImage(file));
     } catch {
       setErrors((current) => ({
         ...current,
-        photo: "Не удалось обработать изображение"
+        [field]: "Не удалось обработать изображение"
       }));
     }
   };
@@ -211,11 +216,23 @@ export default function CreatePage() {
     id: CardTemplate;
     title: string;
     detail: string;
-  }> = [
-    { id: "executive", title: "Деловой", detail: "Тёмный верх и плавная волна" },
-    { id: "minimal", title: "Технологичный", detail: "Тёмный неоновый стиль" },
-    { id: "creative", title: "Архитектурный", detail: "Светлый стиль с фирменной полосой" }
-  ];
+  }> = language === "tj"
+    ? [
+        { id: "executive", title: "Расмӣ", detail: "Қисми болоии торик ва мавҷи нарм" },
+        { id: "minimal", title: "Технологӣ", detail: "Услуби торик бо рангҳои неонӣ" },
+        { id: "creative", title: "Меъморӣ", detail: "Услуби равшан бо хати фирмавӣ" }
+      ]
+    : language === "en"
+      ? [
+          { id: "executive", title: "Executive", detail: "Dark header with a smooth wave" },
+          { id: "minimal", title: "Technology", detail: "Dark style with neon accents" },
+          { id: "creative", title: "Architectural", detail: "Light style with a brand stripe" }
+        ]
+      : [
+          { id: "executive", title: "Деловой", detail: "Тёмный верх и плавная волна" },
+          { id: "minimal", title: "Технологичный", detail: "Тёмный неоновый стиль" },
+          { id: "creative", title: "Архитектурный", detail: "Светлый стиль с фирменной полосой" }
+        ];
 
   return (
     <main className="pb-20">
@@ -277,7 +294,47 @@ export default function CreatePage() {
                   className="sr-only"
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
-                  onChange={handleImage}
+                  onChange={(event) => handleImage(event, "photo")}
+                />
+              </div>
+            </div>
+
+            <div className="photo-upload company-logo-upload">
+              <div className="photo-upload-preview">
+                {form.companyLogo ? (
+                  <img src={form.companyLogo} alt="" />
+                ) : (
+                  <Building2 size={25} />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold">Логотип компании</p>
+                <p className="form-hint mt-1">Отдельный логотип для верхней части визитки</p>
+                {errors.companyLogo && <p className="form-error mt-1">{errors.companyLogo}</p>}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className="button button-secondary !min-h-9 !px-3 !text-xs"
+                    onClick={() => logoInput.current?.click()}
+                  >
+                    <ImagePlus size={16} /> Загрузить логотип
+                  </button>
+                  {form.companyLogo && (
+                    <button
+                      type="button"
+                      className="button button-ghost !min-h-9 !px-3 !text-xs text-red-600"
+                      onClick={() => update("companyLogo", "")}
+                    >
+                      <Trash2 size={15} /> {t("delete")}
+                    </button>
+                  )}
+                </div>
+                <input
+                  ref={logoInput}
+                  className="sr-only"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(event) => handleImage(event, "companyLogo")}
                 />
               </div>
             </div>

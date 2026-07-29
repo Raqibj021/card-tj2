@@ -3244,6 +3244,19 @@ summary:focus-visible {
   background: rgba(255,255,255,.16);
 }
 
+.card-preview-brand > span img,
+.profile-cover-logo img {
+  width: 82%;
+  height: 82%;
+  border-radius: inherit;
+  object-fit: contain;
+}
+
+.company-logo-upload .photo-upload-preview img {
+  padding: 8px;
+  object-fit: contain;
+}
+
 .card-preview-qr {
   position: relative;
   z-index: 1;
