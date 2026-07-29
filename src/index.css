@@ -6996,6 +6996,10 @@ body,
 
 
 /* Executive card identity alignment */
+.digital-card-executive .card-profile {
+  margin-top: -34px;
+}
+
 .digital-card-executive .card-profile > div:last-child {
   transform: translateY(16px);
 }
