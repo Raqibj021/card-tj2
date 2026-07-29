@@ -2,9 +2,14 @@ import { Headphones, Mail, Phone, Send } from "lucide-react";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
+import { useState, type FormEvent } from "react";
+import { supportRepository } from "../lib/supportRepository";
 
 export default function SupportPage() {
   const { language } = useApp();
+  const [ticket, setTicket] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
   const copy = {
     ru: { label: "Поддержка Vizora", title: "Связь с менеджером", text: "Опишите вопрос — обращение получит номер и сохранится в вашем кабинете.", name: "Ваше имя *", namePlaceholder: "Имя и фамилия", phone: "Телефон *", topic: "Тема обращения *", topics: ["Создание визитки", "Регистрация организации", "Тариф и оплата", "Проверка специалиста", "Техническая проблема"], number: "Номер заявки", numberHint: "Если имеется", message: "Сообщение *", messageHint: "Кратко опишите вопрос", send: "Отправить обращение", manager: "Менеджер Vizora", working: "Ответ в рабочее время", email: "Электронная почта", chat: "Открыть чат", write: "Написать менеджеру", call: "Заказать звонок" },
     tj: { label: "Дастгирии Vizora", title: "Тамос бо менеҷер", text: "Саволи худро шарҳ диҳед — муроҷиат рақам мегирад ва дар кабинети шумо нигоҳ дошта мешавад.", name: "Номи шумо *", namePlaceholder: "Ному насаб", phone: "Телефон *", topic: "Мавзӯи муроҷиат *", topics: ["Сохтани варақа", "Сабти ташкилот", "Тарофа ва пардохт", "Санҷиши мутахассис", "Мушкили техникӣ"], number: "Рақами дархост", numberHint: "Агар мавҷуд бошад", message: "Паём *", messageHint: "Саволро кӯтоҳ шарҳ диҳед", send: "Фиристодани муроҷиат", manager: "Менеҷери Vizora", working: "Ҷавоб дар вақти корӣ", email: "Почтаи электронӣ", chat: "Кушодани чат", write: "Навиштан ба менеҷер", call: "Дархости занг" },
@@ -21,15 +26,36 @@ export default function SupportPage() {
           </div>
           <div className="support-layout">
             <section className="application-panel">
-              <form className="platform-form" onSubmit={(event) => event.preventDefault()}>
+              <form className="platform-form" onSubmit={async (event: FormEvent<HTMLFormElement>) => {
+                event.preventDefault();
+                setBusy(true);
+                setError("");
+                const data = new FormData(event.currentTarget);
+                try {
+                  setTicket(await supportRepository.create({
+                    name: String(data.get("name")),
+                    phone: String(data.get("phone")),
+                    topic: String(data.get("topic")),
+                    reference: String(data.get("reference")),
+                    message: String(data.get("message"))
+                  }));
+                  event.currentTarget.reset();
+                } catch (caught) {
+                  setError(caught instanceof Error ? caught.message : "Не удалось отправить обращение.");
+                } finally {
+                  setBusy(false);
+                }
+              }}>
                 <div className="form-grid">
-                  <label><span>{copy.name}</span><input required placeholder={copy.namePlaceholder} /></label>
-                  <label><span>{copy.phone}</span><input required type="tel" placeholder="+992" /></label>
-                  <label><span>{copy.topic}</span><select required>{copy.topics.map((topic) => <option key={topic}>{topic}</option>)}</select></label>
-                  <label><span>{copy.number}</span><input placeholder={copy.numberHint} /></label>
+                  <label><span>{copy.name}</span><input name="name" required placeholder={copy.namePlaceholder} /></label>
+                  <label><span>{copy.phone}</span><input name="phone" required type="tel" placeholder="+992" /></label>
+                  <label><span>{copy.topic}</span><select name="topic" required>{copy.topics.map((topic) => <option key={topic}>{topic}</option>)}</select></label>
+                  <label><span>{copy.number}</span><input name="reference" placeholder={copy.numberHint} /></label>
                 </div>
-                <label><span>{copy.message}</span><textarea required rows={6} placeholder={copy.messageHint} /></label>
-                <button className="button button-primary button-large" type="submit"><Send size={18} /> {copy.send}</button>
+                <label><span>{copy.message}</span><textarea name="message" required rows={6} placeholder={copy.messageHint} /></label>
+                {ticket && <div className="activation-result"><span>{copy.number}: <strong>{ticket}</strong></span></div>}
+                {error && <div className="auth-message">{error}</div>}
+                <button className="button button-primary button-large" type="submit" disabled={busy}><Send size={18} /> {busy ? "…" : copy.send}</button>
               </form>
             </section>
             <aside className="support-options">
