@@ -179,7 +179,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
       </section>
       <section className="auth-form-wrap">
         <div className="auth-mobile-topbar">
-          <Link to="/" className="auth-mobile-logo"><BrandLogo /></Link>
+          <Link to="/" className="auth-mobile-logo" aria-label="Vizora"><BrandLogo light /></Link>
           <label className="auth-language auth-language-mobile">
             <Globe2 size={15} />
             <select
