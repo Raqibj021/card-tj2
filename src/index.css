@@ -501,6 +501,17 @@ body {
 .activation-form p, .activation-form small { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.55; }
 .activation-form input { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 12px 13px; color: var(--ink); font-weight: 800; letter-spacing: .08em; }
 .profile-report-button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--muted); font-size: 10px; cursor: pointer; }
+.organization-public-page { min-height: 100vh; background: var(--page); }
+.organization-public-logo { width: 76px; height: 76px; margin: 0 auto 18px; display: grid; place-items: center; border-radius: 22px; background: var(--surface); box-shadow: var(--shadow); object-fit: contain; }
+.organization-public-contacts { margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.organization-public-contacts a, .organization-public-contacts span { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); padding: 9px 13px; color: var(--ink); font-size: 11px; }
+.notification-list { display: grid; gap: 12px; margin-top: 28px; }
+.notification-list article { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: start; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: 18px; }
+.notification-list article.unread { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); box-shadow: inset 3px 0 var(--accent); }
+.notification-list article > span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--soft); color: var(--accent); }
+.notification-list small, .notification-list time { color: var(--muted); font-size: 9px; }
+.notification-list h2 { margin: 3px 0; font-size: 15px; }
+.notification-list p { margin: 0; color: var(--muted); font-size: 11px; }
 @media (min-width: 700px) { .trial-countdown { grid-template-columns: 1fr auto auto; } .trial-countdown .button { grid-column: 3; grid-row: 1 / span 2; margin-top: 0; } .trial-countdown em { grid-column: 2; } }
 .org-dashboard-page { min-height: 100vh; background: var(--page); }
 .org-workspace-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
