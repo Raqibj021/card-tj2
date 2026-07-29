@@ -265,7 +265,7 @@ export default function CreatePage() {
         ];
 
   return (
-    <main className="pb-20">
+    <main className="builder-page pb-20">
       <section className="builder-header">
         <div className="site-container py-10 md:py-14">
           <Link to="/dashboard" className="back-link">
