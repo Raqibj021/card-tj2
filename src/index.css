@@ -6985,11 +6985,30 @@ body,
 }
 
 
-/* Executive card identity alignment */
-.digital-card-executive .card-profile {
+/* Profile identity alignment */
+.card-preview-body .card-profile {
   margin-top: -34px;
 }
 
-.digital-card-executive .card-profile > div:last-child {
-  transform: translateY(16px);
+.card-preview-body .card-profile > div:last-child {
+  padding-top: 40px;
+  transform: none;
+}
+
+.design-showcase-item {
+  height: 416px;
+}
+
+.design-showcase-canvas {
+  height: 348px;
+}
+
+@media (max-width: 680px) {
+  .design-showcase-item {
+    height: 274px;
+  }
+
+  .design-showcase-canvas {
+    height: 224px;
+  }
 }
