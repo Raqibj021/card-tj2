@@ -30,6 +30,8 @@ import NotificationsPage from "./pages/NotificationsPage";
 import ServiceOrderPage from "./pages/ServiceOrderPage";
 import ContractPage from "./pages/ContractPage";
 import PrintCardDesignerPage from "./pages/PrintCardDesignerPage";
+import OrdersPage from "./pages/OrdersPage";
+import AdminCommercePage from "./pages/AdminCommercePage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -74,10 +76,12 @@ export default function App() {
         <Route path="/create" element={<CreatePage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/leads" element={<ProtectedRoute><CrmPage /></ProtectedRoute>} />
+        <Route path="/dashboard/orders" element={<ProtectedRoute><OrdersPage /></ProtectedRoute>} />
         <Route path="/verification" element={<ProtectedRoute><VerificationPage /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPage /></ProtectedRoute>} />
         <Route path="/admin/payments" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPaymentsPage /></ProtectedRoute>} />
         <Route path="/admin/moderation" element={<ProtectedRoute roles={["admin", "moderator"]}><ModerationPage /></ProtectedRoute>} />
+        <Route path="/admin/commerce" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminCommercePage /></ProtectedRoute>} />
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
