@@ -32,6 +32,7 @@ import ContractPage from "./pages/ContractPage";
 import PrintCardDesignerPage from "./pages/PrintCardDesignerPage";
 import OrdersPage from "./pages/OrdersPage";
 import AdminCommercePage from "./pages/AdminCommercePage";
+import AdminSupportPage from "./pages/AdminSupportPage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -83,6 +84,7 @@ export default function App() {
         <Route path="/admin/payments" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminPaymentsPage /></ProtectedRoute>} />
         <Route path="/admin/moderation" element={<ProtectedRoute roles={["admin", "moderator"]}><ModerationPage /></ProtectedRoute>} />
         <Route path="/admin/commerce" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminCommercePage /></ProtectedRoute>} />
+        <Route path="/admin/support" element={<ProtectedRoute roles={["admin", "moderator"]}><AdminSupportPage /></ProtectedRoute>} />
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
