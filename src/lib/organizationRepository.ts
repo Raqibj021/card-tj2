@@ -23,6 +23,7 @@ export interface OrganizationDepartment {
 
 export interface OrganizationEmployee {
   id: string;
+  kind: "assignment" | "invitation";
   profileId?: string;
   name: string;
   email: string;
@@ -103,10 +104,10 @@ export const organizationRepository = {
     return (data ?? []).map((row) => mapOrganization(row as Record<string, unknown>));
   },
 
-  getWorkspace: async (): Promise<OrganizationWorkspace | null> => {
+  getWorkspace: async (organizationId?: string): Promise<OrganizationWorkspace | null> => {
     if (!supabase) return null;
     const organizations = await organizationRepository.listMine();
-    const organization = organizations[0];
+    const organization = organizations.find((item) => item.id === organizationId) ?? organizations[0];
     if (!organization) return null;
     const { data, error } = await supabase.rpc("get_organization_workspace", {
       target_organization_id: organization.id
@@ -125,6 +126,7 @@ export const organizationRepository = {
     }));
     const accepted = (payload.employees ?? []).map((item) => ({
       id: String(item.id),
+      kind: "assignment" as const,
       profileId: String(item.profileId ?? ""),
       name: String(item.name ?? ""),
       email: String(item.email ?? ""),
@@ -136,6 +138,7 @@ export const organizationRepository = {
     }));
     const invited = (payload.invitations ?? []).map((item) => ({
       id: String(item.id),
+      kind: "invitation" as const,
       name: String(item.name ?? ""),
       email: String(item.email ?? ""),
       phone: String(item.phone ?? ""),
@@ -151,13 +154,29 @@ export const organizationRepository = {
     };
   },
 
-  addDepartment: async (organizationId: string, name: string) => {
+  addDepartment: async (organizationId: string, name: string, parentId: string | null = null) => {
     if (!supabase) throw new Error("Сервер недоступен.");
     const { error } = await supabase.from("departments").insert({
       organization_id: organizationId,
+      parent_id: parentId,
       name: name.trim(),
       slug: `${createSlug(name)}-${String(Date.now()).slice(-4)}`
     });
+    if (error) throw error;
+  },
+
+  updateDepartment: async (departmentId: string, name: string, parentId: string | null) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const { error } = await supabase
+      .from("departments")
+      .update({ name: name.trim(), parent_id: parentId })
+      .eq("id", departmentId);
+    if (error) throw error;
+  },
+
+  deleteDepartment: async (departmentId: string) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const { error } = await supabase.from("departments").delete().eq("id", departmentId);
     if (error) throw error;
   },
 
@@ -197,9 +216,20 @@ export const organizationRepository = {
     if (error) throw error;
   },
 
-  updateEmployee: async (assignmentId: string, position: string) => {
+  revokeInvitation: async (invitationId: string) => {
     if (!supabase) throw new Error("Сервер недоступен.");
-    const { error } = await supabase.from("employee_assignments").update({ position }).eq("id", assignmentId);
+    const { error } = await supabase
+      .from("organization_invitations")
+      .update({ status: "revoked" })
+      .eq("id", invitationId);
+    if (error) throw error;
+  },
+
+  updateEmployee: async (assignmentId: string, position: string, departmentId?: string | null) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const updates: { position: string; department_id?: string | null } = { position };
+    if (departmentId !== undefined) updates.department_id = departmentId;
+    const { error } = await supabase.from("employee_assignments").update(updates).eq("id", assignmentId);
     if (error) throw error;
   }
 };
