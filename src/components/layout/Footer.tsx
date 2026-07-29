@@ -1,6 +1,7 @@
 import { ArrowUpRight, Instagram, Mail } from "lucide-react";
 import { Link } from "react-router";
 import { useApp } from "../../context/AppContext";
+import BrandLogo from "../BrandLogo";
 
 export default function Footer() {
   const { t } = useApp();
@@ -10,8 +11,7 @@ export default function Footer() {
       <div className="site-container grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div className="max-w-sm">
           <Link to="/" className="brand-mark text-white">
-            <span className="brand-symbol">C</span>
-            <span>Card<span className="text-teal-400">.tj</span></span>
+            <BrandLogo light />
           </Link>
           <p className="mt-5 text-sm leading-7 text-slate-400">
             {t("footerText")}
@@ -23,13 +23,16 @@ export default function Footer() {
             <Link to="/create">{t("create")}</Link>
             <Link to="/dashboard">{t("dashboard")}</Link>
             <Link to="/card/demo">{t("example")}</Link>
+            <Link to="/directory">Каталог специалистов</Link>
+            <Link to="/organizations">Организациям</Link>
+            <Link to="/services">Визитки и QR-услуги</Link>
           </div>
         </div>
         <div>
           <p className="footer-title">{t("contacts")}</p>
           <div className="footer-links">
-            <a href="mailto:hello@card.tj">
-              <Mail size={15} /> hello@card.tj
+            <a href="mailto:support@vizora.tj">
+              <Mail size={15} /> support@vizora.tj
             </a>
             <a href="https://instagram.com" target="_blank" rel="noreferrer">
               <Instagram size={15} /> Instagram
@@ -42,7 +45,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="site-container flex flex-col gap-2 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} Card.tj. {t("rights")}</span>
+          <span>© {new Date().getFullYear()} Vizora.tj. {t("rights")}</span>
           <span>Сделано в Таджикистане</span>
         </div>
       </div>

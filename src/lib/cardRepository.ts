@@ -1,7 +1,7 @@
 import { demoCards } from "../data/demo";
 import type { CardDraft, DigitalCard } from "../types/card";
 
-const STORAGE_KEY = "card-tj.cards.v1";
+const STORAGE_KEY = "vizora.cards.v1";
 
 export interface CardRepository {
   list(): DigitalCard[];

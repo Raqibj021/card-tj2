@@ -53,7 +53,7 @@ export default function CardPage() {
   useEffect(() => {
     if (!card) return;
     setLanguage(card.language);
-    const viewKey = `card-tj.viewed.${card.id}`;
+    const viewKey = `vizora.viewed.${card.id}`;
     if (!sessionStorage.getItem(viewKey)) {
       cardRepository.incrementViews(card.id);
       sessionStorage.setItem(viewKey, "1");
@@ -92,7 +92,7 @@ export default function CardPage() {
 
   const share = async () => {
     const data = {
-      title: `${card.fullName} — Card.tj`,
+      title: `${card.fullName} — Vizora.tj`,
       text: `${card.fullName}, ${card.position}`,
       url: cardUrl
     };
@@ -150,7 +150,7 @@ export default function CardPage() {
       <div className="profile-background-shape" />
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
-          <span>C</span> Card.tj
+          <span>C</span> Vizora.tj
         </Link>
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="profile-language">
@@ -191,7 +191,7 @@ export default function CardPage() {
         <section className="profile-main-card">
           <div className="profile-cover">
             <span className="profile-cover-logo">C</span>
-            <span>{card.organization || "Card.tj"}</span>
+            <span>{card.organization || "Vizora.tj"}</span>
           </div>
           <div className="profile-content">
             <div className="profile-avatar-wrap">
@@ -331,7 +331,7 @@ export default function CardPage() {
 
       <footer className="profile-footer">
         <span>Создано на</span>
-        <Link to="/">Card.tj</Link>
+        <Link to="/">Vizora.tj</Link>
       </footer>
 
       {toast && <div className="toast"><Check size={17} /> {toast}</div>}

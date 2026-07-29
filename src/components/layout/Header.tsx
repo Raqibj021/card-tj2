@@ -3,6 +3,8 @@ import {
   LayoutDashboard,
   Menu,
   Moon,
+  Search,
+  Building2,
   Plus,
   ShieldCheck,
   Sun,
@@ -11,11 +13,15 @@ import {
 import { Link, NavLink, useLocation } from "react-router";
 import { useApp } from "../../context/AppContext";
 import type { Language } from "../../types/card";
+import BrandLogo from "../BrandLogo";
 
 const navItems = [
-  { to: "/", label: "home" as const },
-  { to: "/dashboard", label: "dashboard" as const, icon: LayoutDashboard },
-  { to: "/admin", label: "admin" as const, icon: ShieldCheck }
+  { to: "/", text: "Главная" },
+  { to: "/directory", text: "Специалисты", icon: Search },
+  { to: "/organizations", text: "Организации", icon: Building2 },
+  { to: "/services", text: "Услуги" },
+  { to: "/dashboard", text: "Кабинет", icon: LayoutDashboard },
+  { to: "/admin", text: "Админ", icon: ShieldCheck }
 ];
 
 export default function Header() {
@@ -28,13 +34,12 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[color:var(--header)] backdrop-blur-xl">
       <div className="site-container flex h-18 items-center justify-between gap-4">
-        <Link to="/" className="brand-mark" aria-label="Card.tj">
-          <span className="brand-symbol">C</span>
-          <span>Card<span className="text-teal-600">.tj</span></span>
+        <Link to="/" className="brand-mark" aria-label="Vizora.tj">
+          <BrandLogo />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Основная навигация">
-          {navItems.map(({ to, label }) => (
+          {navItems.map(({ to, text }) => (
             <NavLink
               key={to}
               to={to}
@@ -42,7 +47,7 @@ export default function Header() {
                 `nav-link ${isActive ? "nav-link-active" : ""}`
               }
             >
-              {t(label)}
+              {text}
             </NavLink>
           ))}
         </nav>
@@ -92,7 +97,7 @@ export default function Header() {
       {open && (
         <div className="mobile-menu sm:hidden">
           <nav className="grid gap-1" aria-label="Мобильная навигация">
-            {navItems.map(({ to, label, icon: Icon }) => (
+            {navItems.map(({ to, text, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -101,7 +106,7 @@ export default function Header() {
                 }
               >
                 {Icon && <Icon size={18} />}
-                {t(label)}
+                {text}
               </NavLink>
             ))}
           </nav>

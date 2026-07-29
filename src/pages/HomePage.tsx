@@ -40,20 +40,20 @@ export default function HomePage() {
 
   const plans = [
     {
-      name: t("free"),
-      price: "0",
-      features: [t("freeFeatureOne"), t("freeFeatureTwo"), t("freeFeatureThree")]
+      name: "Личная визитка",
+      price: "20",
+      features: ["Персональный QR-код", "vCard и готовые шаблоны", "Доступ по ссылке и QR"]
     },
     {
-      name: t("professional"),
-      price: "29",
+      name: "Проверенный специалист",
+      price: "50",
       featured: true,
-      features: [t("proFeatureOne"), t("proFeatureTwo"), t("proFeatureThree")]
+      features: ["Публикация в каталоге", "Проверка документов", "Портфолио и статистика"]
     },
     {
-      name: t("corporate"),
-      price: "99",
-      features: [t("corpFeatureOne"), t("corpFeatureTwo"), t("corpFeatureThree")]
+      name: "Специалист PRO",
+      price: "100",
+      features: ["Приоритет в каталоге", "До 20 фотографий", "Индивидуальное оформление"]
     }
   ];
 
@@ -124,7 +124,7 @@ export default function HomePage() {
         <section className="section">
           <div className="site-container">
             <div className="section-heading">
-              <span className="section-label">Card.tj</span>
+              <span className="section-label">Vizora.tj</span>
               <h2>{t("benefitTitle")}</h2>
               <p>{t("benefitText")}</p>
             </div>
@@ -209,7 +209,7 @@ export default function HomePage() {
                   </div>
                   <div className="pricing-price">
                     <strong>{plan.price}</strong>
-                    <span>{t("perMonth")}</span>
+                    <span>сомони / год</span>
                   </div>
                   <ul>
                     {plan.features.map((feature) => (
@@ -251,7 +251,7 @@ export default function HomePage() {
           <div className="site-container">
             <div className="cta-panel">
               <div>
-                <span className="section-label">Card.tj</span>
+                <span className="section-label">Vizora.tj</span>
                 <h2>{t("heroTitle")}</h2>
                 <p>{t("heroText")}</p>
               </div>

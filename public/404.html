@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Card.tj</title>
+    <title>Vizora.tj</title>
     <script>
       (function () {
         var isGithubPages = location.hostname.endsWith("github.io");
         var firstPart = location.pathname.split("/").filter(Boolean)[0] || "";
         var base = isGithubPages && firstPart ? "/" + firstPart + "/" : "/";
         sessionStorage.setItem(
-          "card-tj-spa-redirect",
+          "vizora-spa-redirect",
           location.pathname + location.search + location.hash
         );
         location.replace(base);

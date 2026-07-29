@@ -63,7 +63,7 @@ export default function CardPreview({
         )}
         <div className="min-w-0">
           <span className="card-kicker">
-            {card.organization || "Card.tj profile"}
+            {card.organization || "Vizora.tj profile"}
           </span>
           <h3 className="card-name">{card.fullName || t("fullName")}</h3>
           <p className="card-role">{card.position || t("position")}</p>

@@ -16,7 +16,7 @@ const ru = {
   noInstall: "Без установки",
   benefitTitle: "Всё необходимое для сильного первого впечатления",
   benefitText:
-    "Card.tj помогает представить себя профессионально и держать все способы связи в одном месте.",
+    "Vizora.tj помогает представить себя профессионально и держать все способы связи в одном месте.",
   benefitOne: "Всегда актуально",
   benefitOneText:
     "Обновляйте данные один раз — ссылка и QR-код останутся прежними.",
@@ -77,7 +77,7 @@ const ru = {
   resources: "Возможности",
   contacts: "Контакты",
   rights: "Все права защищены.",
-  builderEyebrow: "Конструктор Card.tj",
+  builderEyebrow: "Конструктор Vizora.tj",
   builderTitle: "Создайте визитку под свой стиль",
   builderText:
     "Заполните данные и сразу посмотрите, как визитка будет выглядеть у ваших клиентов.",
@@ -140,7 +140,7 @@ const ru = {
   noCardsText: "Создайте первую визитку — это займёт несколько минут.",
   adminEyebrow: "Панель управления · демо",
   adminTitle: "Обзор платформы",
-  adminText: "Демонстрационные показатели и последние визитки Card.tj.",
+  adminText: "Демонстрационные показатели и последние визитки Vizora.tj.",
   users: "Пользователи",
   cards: "Визитки",
   views: "Просмотры",
@@ -180,7 +180,7 @@ const tj: Record<CopyKey, string> = {
   noInstall: "Бе насб",
   benefitTitle: "Ҳама чиз барои таассуроти аввалини қавӣ",
   benefitText:
-    "Card.tj ба шумо кӯмак мекунад, ки худро касбӣ муаррифӣ намоед ва ҳамаи роҳҳои алоқаро дар як ҷой нигоҳ доред.",
+    "Vizora.tj ба шумо кӯмак мекунад, ки худро касбӣ муаррифӣ намоед ва ҳамаи роҳҳои алоқаро дар як ҷой нигоҳ доред.",
   benefitOne: "Ҳамеша нав",
   benefitOneText:
     "Маълумотро як маротиба нав кунед — пайванд ва QR-код бетағйир мемонанд.",
@@ -241,7 +241,7 @@ const tj: Record<CopyKey, string> = {
   resources: "Имкониятҳо",
   contacts: "Тамос",
   rights: "Ҳамаи ҳуқуқҳо ҳифз шудаанд.",
-  builderEyebrow: "Созандаи Card.tj",
+  builderEyebrow: "Созандаи Vizora.tj",
   builderTitle: "Корти худро бо услуби дилхоҳ созед",
   builderText:
     "Маълумотро пур кунед ва ҳамзамон намуди кортро барои муштариён бинед.",
@@ -303,7 +303,7 @@ const tj: Record<CopyKey, string> = {
   noCardsText: "Корти аввалро созед — ин чанд дақиқа мегирад.",
   adminEyebrow: "Панели идоракунӣ · намоиш",
   adminTitle: "Шарҳи платформа",
-  adminText: "Нишондодҳои намоишӣ ва кортҳои охирини Card.tj.",
+  adminText: "Нишондодҳои намоишӣ ва кортҳои охирини Vizora.tj.",
   users: "Истифодабарандагон",
   cards: "Кортҳо",
   views: "Дида шуд",
@@ -339,7 +339,7 @@ const en: Record<CopyKey, string> = {
   noInstall: "No installation",
   benefitTitle: "Everything for a strong first impression",
   benefitText:
-    "Card.tj helps you present yourself professionally and keep every way to connect in one place.",
+    "Vizora.tj helps you present yourself professionally and keep every way to connect in one place.",
   benefitOne: "Always current",
   benefitOneText:
     "Update your details once — your link and QR code stay the same.",
@@ -399,7 +399,7 @@ const en: Record<CopyKey, string> = {
   resources: "Features",
   contacts: "Contacts",
   rights: "All rights reserved.",
-  builderEyebrow: "Card.tj builder",
+  builderEyebrow: "Vizora.tj builder",
   builderTitle: "Create a card in your own style",
   builderText:
     "Enter your details and instantly see what your clients will see.",
@@ -461,7 +461,7 @@ const en: Record<CopyKey, string> = {
   noCardsText: "Create your first card — it only takes a few minutes.",
   adminEyebrow: "Admin console · demo",
   adminTitle: "Platform overview",
-  adminText: "Demonstration metrics and the latest Card.tj cards.",
+  adminText: "Demonstration metrics and the latest Vizora.tj cards.",
   users: "Users",
   cards: "Cards",
   views: "Views",

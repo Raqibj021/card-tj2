@@ -23,11 +23,11 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    const stored = localStorage.getItem("card-tj.language");
+    const stored = localStorage.getItem("vizora.language");
     return stored === "tj" || stored === "en" ? stored : "ru";
   });
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    const stored = localStorage.getItem("card-tj.theme");
+    const stored = localStorage.getItem("vizora.theme");
     if (stored === "dark" || stored === "light") return stored;
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -36,12 +36,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("card-tj.theme", theme);
+    localStorage.setItem("vizora.theme", theme);
   }, [theme]);
 
   useEffect(() => {
     document.documentElement.lang = language;
-    localStorage.setItem("card-tj.language", language);
+    localStorage.setItem("vizora.language", language);
   }, [language]);
 
   const value = useMemo<AppContextValue>(
