@@ -1,5 +1,5 @@
 import { ArrowRight, Check, Eye, EyeOff, Gift, Globe2, LockKeyhole, Mail, UserRound } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
@@ -34,7 +34,17 @@ const authCopy = {
     hasAccount: "Уже есть аккаунт?",
     noAccount: "Ещё нет аккаунта?",
     registerLink: "Зарегистрироваться",
-    checkEmail: "Проверьте электронную почту и подтвердите регистрацию.",
+    checkEmail: "Мы отправили шестизначный код на вашу электронную почту.",
+    codeTitle: "Подтвердите почту",
+    codeText: "Введите шестизначный код, отправленный на",
+    codeLabel: "Код подтверждения",
+    confirmCode: "Подтвердить код",
+    resendCode: "Отправить код повторно",
+    resendIn: "Повторная отправка через",
+    seconds: "сек.",
+    changeEmail: "Указать другую почту",
+    invalidCode: "Код неверный или истёк. Проверьте код либо запросите новый.",
+    codeResent: "Новый код отправлен.",
     databaseUnavailable: "Регистрация временно недоступна. Попробуйте ещё раз позднее."
   },
   tj: {
@@ -64,7 +74,17 @@ const authCopy = {
     hasAccount: "Аллакай ҳисоб доред?",
     noAccount: "Ҳоло ҳисоб надоред?",
     registerLink: "Бақайдгирӣ",
-    checkEmail: "Почтаи электронии худро санҷида, бақайдгириро тасдиқ намоед.",
+    checkEmail: "Мо рамзи шашрақамаро ба почтаи электронии шумо фиристодем.",
+    codeTitle: "Почтаро тасдиқ намоед",
+    codeText: "Рамзи шашрақамаи ба ин суроға фиристодашударо ворид кунед:",
+    codeLabel: "Рамзи тасдиқ",
+    confirmCode: "Тасдиқи рамз",
+    resendCode: "Рамзро дубора фиристед",
+    resendIn: "Ирсоли такрорӣ пас аз",
+    seconds: "сон.",
+    changeEmail: "Почтаи дигарро ворид кунед",
+    invalidCode: "Рамз нодуруст аст ё муҳлаташ гузаштааст. Рамзро санҷед ё рамзи нав гиред.",
+    codeResent: "Рамзи нав фиристода шуд.",
     databaseUnavailable: "Бақайдгирӣ муваққатан дастнорас аст. Баъдтар кӯшиш кунед."
   },
   en: {
@@ -94,7 +114,17 @@ const authCopy = {
     hasAccount: "Already have an account?",
     noAccount: "Don’t have an account?",
     registerLink: "Register",
-    checkEmail: "Check your email and confirm your registration.",
+    checkEmail: "We sent a six-digit code to your email.",
+    codeTitle: "Confirm your email",
+    codeText: "Enter the six-digit code sent to",
+    codeLabel: "Confirmation code",
+    confirmCode: "Confirm code",
+    resendCode: "Resend code",
+    resendIn: "Resend available in",
+    seconds: "sec.",
+    changeEmail: "Use a different email",
+    invalidCode: "The code is incorrect or has expired. Check it or request a new one.",
+    codeResent: "A new code has been sent.",
     databaseUnavailable: "Registration is temporarily unavailable. Please try again later."
   }
 } as const;
@@ -108,6 +138,17 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setResendCooldown((value) => Math.max(0, value - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [resendCooldown]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -140,12 +181,60 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
       return;
     }
 
-    if (isRegister) {
+    if (isRegister && !result.data.session) {
+      setPendingEmail(email);
+      setVerificationCode("");
+      setResendCooldown(60);
       setMessage(text.checkEmail);
+    } else if (isRegister) {
+      navigate("/dashboard", { replace: true });
     } else {
       const destination = (location.state as { from?: string } | null)?.from ?? "/dashboard";
       navigate(destination, { replace: true });
     }
+  }
+
+  async function handleVerifyCode(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!supabase || verificationCode.length !== 6) return;
+
+    setBusy(true);
+    setMessage("");
+    const { error } = await supabase.auth.verifyOtp({
+      email: pendingEmail,
+      token: verificationCode,
+      type: "signup"
+    });
+    setBusy(false);
+
+    if (error) {
+      setMessage(text.invalidCode);
+      return;
+    }
+
+    navigate("/dashboard", { replace: true });
+  }
+
+  async function handleResendCode() {
+    if (!supabase || resendCooldown > 0) return;
+    setBusy(true);
+    setMessage("");
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: pendingEmail,
+      options: {
+        emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`
+      }
+    });
+    setBusy(false);
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    setResendCooldown(60);
+    setMessage(text.codeResent);
   }
 
   return (
@@ -197,8 +286,49 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
         </div>
         <div className="auth-form-card">
           <span className="section-label">{isRegister ? text.newAccount : text.cabinet}</span>
-          <h2>{isRegister ? text.register : text.login}</h2>
-          <p>{isRegister ? text.registerIntro : text.loginIntro}</p>
+          <h2>{pendingEmail ? text.codeTitle : isRegister ? text.register : text.login}</h2>
+          <p>{pendingEmail ? <>{text.codeText} <strong>{pendingEmail}</strong></> : isRegister ? text.registerIntro : text.loginIntro}</p>
+          {pendingEmail ? (
+            <form className="platform-form auth-code-form" onSubmit={handleVerifyCode}>
+              <label>
+                <span>{text.codeLabel}</span>
+                <div className="auth-input">
+                  <Mail size={18} />
+                  <input
+                    className="auth-code-input"
+                    value={verificationCode}
+                    onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="[0-9]{6}"
+                    minLength={6}
+                    maxLength={6}
+                    required
+                    autoFocus
+                    placeholder="000000"
+                  />
+                </div>
+              </label>
+              {message && <div className="auth-message">{message}</div>}
+              <button type="submit" className="button button-primary button-large w-full" disabled={busy || verificationCode.length !== 6}>
+                {busy ? text.wait : text.confirmCode} <ArrowRight size={18} />
+              </button>
+              <button type="button" className="button button-secondary w-full" disabled={busy || resendCooldown > 0} onClick={handleResendCode}>
+                {resendCooldown > 0 ? `${text.resendIn} ${resendCooldown} ${text.seconds}` : text.resendCode}
+              </button>
+              <button
+                type="button"
+                className="auth-change-email"
+                onClick={() => {
+                  setPendingEmail("");
+                  setVerificationCode("");
+                  setMessage("");
+                }}
+              >
+                {text.changeEmail}
+              </button>
+            </form>
+          ) : (
           <form className="platform-form" onSubmit={handleSubmit}>
             {isRegister && (
               <label><span>{text.fullName}</span><div className="auth-input"><UserRound size={18} /><input name="fullName" required autoComplete="name" placeholder={text.fullNamePlaceholder} /></div></label>
@@ -213,10 +343,11 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
               {busy ? text.wait : isRegister ? text.create : text.enter} <ArrowRight size={18} />
             </button>
           </form>
+          )}
           {!isRegister && (
             <p className="auth-switch"><Link to="/forgot-password">{language === "ru" ? "Забыли пароль?" : language === "tj" ? "Рамзро фаромӯш кардед?" : "Forgot password?"}</Link></p>
           )}
-          {isRegister && <div className="auth-benefits"><span><Check size={15} /> {text.emailConfirmation}</span><span><Check size={15} /> {text.duplicateProtection}</span><span><Check size={15} /> {text.dataSaving}</span></div>}
+          {isRegister && !pendingEmail && <div className="auth-benefits"><span><Check size={15} /> {text.emailConfirmation}</span><span><Check size={15} /> {text.duplicateProtection}</span><span><Check size={15} /> {text.dataSaving}</span></div>}
           <p className="auth-switch">
             {isRegister ? text.hasAccount : text.noAccount}{" "}
             <Link to={isRegister ? "/login" : "/register"}>{isRegister ? text.enter : text.registerLink}</Link>
