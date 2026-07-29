@@ -66,7 +66,7 @@ export default function HomePage() {
     ru: {
       cardExample: "Пример электронной визитки", qrReady: "QR готов", saved: "Контакт сохранён", perYear: "сомони / год", pricing: "Тарифы", faq: "Вопросы и ответы",
       mobileLabel: "Возможности Vizora", mobileTitle: "Всё нужное — в одном месте", mobileText: "Выберите нужный раздел без долгой прокрутки страницы.",
-      impactLabel: "Возможности в действии", impactStat: "визиток уже работают", profileLive: "Профиль обновлён",
+      impactLabel: "Возможности в действии", impactStat: "визиток уже работают",
       journeyLabel: "От идеи до готового профиля", journeyText: "Заполните данные один раз — Vizora превратит их в красивую визитку, которой удобно делиться.",
       liveCard: "Живая визитка", linkReady: "Ссылка готова",
       readyCard: "Готовая цифровая визитка", directory: "Каталог специалистов", directoryText: "Найдите проверенного исполнителя",
@@ -80,7 +80,7 @@ export default function HomePage() {
     tj: {
       cardExample: "Намунаи варақаи рақамӣ", qrReady: "QR омода аст", saved: "Тамос нигоҳ дошта шуд", perYear: "сомонӣ / сол", pricing: "Тарофаҳо", faq: "Саволу ҷавоб",
       mobileLabel: "Имкониятҳои Vizora", mobileTitle: "Ҳама чизи зарурӣ — дар як ҷой", mobileText: "Бахши лозимиро бе паймоиши тӯлонӣ интихоб кунед.",
-      impactLabel: "Имкониятҳо дар амал", impactStat: "варақа аллакай фаъоланд", profileLive: "Профил нав шуд",
+      impactLabel: "Имкониятҳо дар амал", impactStat: "варақа аллакай фаъоланд",
       journeyLabel: "Аз ғоя то профили омода", journeyText: "Маълумотро як бор пур кунед — Vizora онро ба варақаи зебо ва омода барои мубодила табдил медиҳад.",
       liveCard: "Варақаи зинда", linkReady: "Пайванд омода аст",
       readyCard: "Варақаи рақамии омода", directory: "Феҳристи мутахассисон", directoryText: "Иҷрокунандаи тасдиқшударо ёбед",
@@ -94,7 +94,7 @@ export default function HomePage() {
     en: {
       cardExample: "Digital business card example", qrReady: "QR ready", saved: "Contact saved", perYear: "somoni / year", pricing: "Pricing", faq: "FAQ",
       mobileLabel: "Vizora features", mobileTitle: "Everything you need in one place", mobileText: "Choose the section you need without a long scroll.",
-      impactLabel: "Features in action", impactStat: "cards already live", profileLive: "Profile updated",
+      impactLabel: "Features in action", impactStat: "cards already live",
       journeyLabel: "From idea to a ready profile", journeyText: "Enter your details once — Vizora turns them into a beautiful card that is easy to share.",
       liveCard: "Live business card", linkReady: "Link is ready",
       readyCard: "Ready digital business card", directory: "Specialist directory", directoryText: "Find a verified professional",
@@ -236,10 +236,6 @@ export default function HomePage() {
                   decoding="async"
                 />
                 <div className="impact-photo-shade" />
-                <div className="impact-live-badge">
-                  <span aria-hidden="true" />
-                  {homeCopy.profileLive}
-                </div>
                 <div className="impact-photo-content">
                   <div className="impact-avatars" aria-hidden="true">
                     {[demoCards[3], demoCards[2], demoCards[5]].map((card) => (
