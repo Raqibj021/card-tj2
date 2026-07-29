@@ -4882,7 +4882,7 @@ summary:focus-visible {
     display: block;
     overflow: hidden;
     width: calc(100% + var(--page-pad) * 2);
-    margin: 24px calc(var(--page-pad) * -1) 0;
+    margin: 44px calc(var(--page-pad) * -1) 0;
   }
 
   .mobile-benefits-track {
