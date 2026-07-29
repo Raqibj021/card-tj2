@@ -86,11 +86,13 @@ body {
 }
 
 .dark .brand-mark .vizora-brand > img,
+.dark .loading-brand .vizora-brand > img,
 .vizora-brand-light > img {
   opacity: 0;
 }
 
 .dark .brand-mark .vizora-brand-gradient,
+.dark .loading-brand .vizora-brand-gradient,
 .vizora-brand-light .vizora-brand-gradient {
   display: block;
 }
@@ -106,7 +108,21 @@ body {
 }
 
 .dark .loading-screen {
-  background: #07101f;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(48, 121, 224, .12), transparent 30%),
+    #07101f;
+}
+
+.dark .loading-brand .vizora-brand {
+  filter: drop-shadow(0 10px 30px rgba(87, 157, 255, .18));
+}
+
+.dark .loading-brand p {
+  color: #9fb4d1;
+}
+
+.dark .loading-line {
+  background: #172840;
 }
 
 .loading-screen-leaving {
