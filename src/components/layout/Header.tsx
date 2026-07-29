@@ -81,6 +81,7 @@ export default function Header() {
             <Plus size={17} />
             {t("create")}
           </Link>
+          <Link to="/login" className="button button-secondary !min-h-10 !px-4">Войти</Link>
         </div>
 
         <button
@@ -136,6 +137,7 @@ export default function Header() {
             <Plus size={18} />
             {t("create")}
           </Link>
+          <Link to="/login" className="button button-secondary mt-2 w-full">Войти</Link>
         </div>
       )}
     </header>

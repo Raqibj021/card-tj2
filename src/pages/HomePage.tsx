@@ -17,6 +17,7 @@ import CardPreview from "../components/CardPreview";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { demoCards } from "../data/demo";
+import LaunchPromo from "../components/LaunchPromo";
 
 export default function HomePage() {
   const { t } = useApp();
@@ -67,6 +68,9 @@ export default function HomePage() {
   return (
     <>
       <main>
+        <div className="site-container pt-4">
+          <LaunchPromo compact />
+        </div>
         <section className="hero-section overflow-hidden">
           <div className="hero-grid-pattern" />
           <div className="site-container relative grid min-h-[calc(100vh-4.5rem)] items-center gap-14 py-16 lg:grid-cols-[1.06fr_.94fr] lg:py-20">

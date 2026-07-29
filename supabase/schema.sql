@@ -168,6 +168,23 @@ create table public.reports (
   created_at timestamptz not null default now()
 );
 
+create table public.subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null unique references public.profiles(id) on delete cascade,
+  plan_code text not null,
+  source text not null default 'payment',
+  starts_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
+create table public.launch_promo_claims (
+  id bigint generated always as identity primary key,
+  profile_id uuid not null unique references public.profiles(id) on delete cascade,
+  claimed_at timestamptz not null default now(),
+  check (id between 1 and 50)
+);
+
 alter table public.profiles enable row level security;
 alter table public.cards enable row level security;
 alter table public.organizations enable row level security;
@@ -178,6 +195,8 @@ alter table public.orders enable row level security;
 alter table public.verification_requests enable row level security;
 alter table public.support_tickets enable row level security;
 alter table public.reports enable row level security;
+alter table public.subscriptions enable row level security;
+alter table public.launch_promo_claims enable row level security;
 
 create policy "profiles read own" on public.profiles for select using (auth.uid() = id);
 create policy "profiles update own" on public.profiles for update using (auth.uid() = id);
@@ -235,6 +254,71 @@ create policy "verifications own read" on public.verification_requests for selec
 create policy "verifications own create" on public.verification_requests for insert with check (profile_id = auth.uid());
 create policy "tickets own access" on public.support_tickets for all using (user_id = auth.uid()) with check (user_id = auth.uid());
 create policy "reports own create" on public.reports for insert with check (reporter_id = auth.uid());
+create policy "subscriptions own read" on public.subscriptions for select using (profile_id = auth.uid());
+create policy "promo own read" on public.launch_promo_claims for select using (profile_id = auth.uid());
+
+create or replace function public.claim_launch_promo()
+returns table (claimed boolean, place_number bigint, expires_at timestamptz)
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+declare
+  new_place bigint;
+  promo_expiry timestamptz := now() + interval '1 year';
+begin
+  if auth.uid() is null then
+    raise exception 'Authentication required';
+  end if;
+
+  if not exists (
+    select 1 from auth.users
+    where id = auth.uid() and email_confirmed_at is not null
+  ) then
+    raise exception 'Email verification required';
+  end if;
+
+  select id into new_place
+  from public.launch_promo_claims
+  where profile_id = auth.uid();
+
+  if new_place is null then
+    lock table public.launch_promo_claims in exclusive mode;
+    if (select count(*) from public.launch_promo_claims) >= 50 then
+      return query select false, null::bigint, null::timestamptz;
+      return;
+    end if;
+
+    insert into public.launch_promo_claims (profile_id)
+    values (auth.uid())
+    returning id into new_place;
+
+    insert into public.subscriptions (profile_id, plan_code, source, expires_at)
+    values (auth.uid(), 'personal', 'launch_promo', promo_expiry)
+    on conflict (profile_id) do nothing;
+  else
+    select s.expires_at into promo_expiry
+    from public.subscriptions s
+    where s.profile_id = auth.uid();
+  end if;
+
+  return query select true, new_place, promo_expiry;
+end;
+$$;
+
+create or replace function public.launch_promo_remaining()
+returns integer
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select greatest(0, 50 - count(*))::integer
+  from public.launch_promo_claims;
+$$;
+
+grant execute on function public.claim_launch_promo() to authenticated;
+grant execute on function public.launch_promo_remaining() to anon, authenticated;
 
 create or replace function public.handle_new_user()
 returns trigger
