@@ -1,11 +1,13 @@
-import { Download, ImagePlus, Printer, QrCode as QrIcon, Shapes } from "lucide-react";
+import { Download, Facebook, Globe2, ImagePlus, Instagram, Mail, MapPin, MessageCircle, Phone, Printer, QrCode as QrIcon, Send, Shapes } from "lucide-react";
 import QRCode from "qrcode";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import Footer from "../components/layout/Footer";
 
 type Side = "front" | "back";
 type TemplateId = "executive" | "modern" | "minimal" | "ribbon" | "orbit" | "goldwave" | "prism" | "mono" | "chevron";
 type LogoId = "orbit" | "peak" | "link" | "spark" | "frame" | "leaf" | "monogram" | "diamond";
+type MoveKey = "brand" | "person" | "company" | "contacts" | "socials" | "qr" | "photo";
+type Positions = Record<MoveKey, { x: number; y: number }>;
 
 const templates: { id: TemplateId; name: string; source?: string }[] = [
   { id: "executive", name: "Деловой" },
@@ -29,6 +31,15 @@ const palettes = [
 ];
 
 const logoIds: LogoId[] = ["orbit", "peak", "link", "spark", "frame", "leaf", "monogram", "diamond"];
+const defaultPositions = (right: boolean): Positions => ({
+  brand: { x: right ? 67 : 10, y: 17 },
+  person: { x: right ? 67 : 10, y: 20 },
+  company: { x: right ? 67 : 10, y: 48 },
+  contacts: { x: right ? 67 : 10, y: 62 },
+  socials: { x: right ? 67 : 10, y: 84 },
+  qr: { x: right ? 13 : 76, y: 66 },
+  photo: { x: right ? 12 : 67, y: 12 }
+});
 
 const readImage = (file?: File) => new Promise<string>((resolve, reject) => {
   if (!file) return reject();
@@ -87,38 +98,80 @@ const drawDecor = (ctx: CanvasRenderingContext2D, layout: TemplateId, side: Side
 };
 
 export default function PrintCardDesignerPage() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ key: MoveKey; offsetX: number; offsetY: number } | null>(null);
   const [layout, setLayout] = useState<TemplateId>("executive");
   const [palette, setPalette] = useState(palettes[0]);
   const [colors, setColors] = useState({ bg: palettes[0].bg, accent: palettes[0].accent, light: palettes[0].light, ink: palettes[0].ink });
   const [side, setSide] = useState<Side>("front");
   const [logo, setLogo] = useState("");
+  const [photo, setPhoto] = useState("");
   const [logoMark, setLogoMark] = useState<LogoId>("orbit");
-  const [data, setData] = useState({ name: "Фируз Саидов", position: "Архитектор и основатель", organization: "FORMA Studio", phone: "+992 93 555 21 21", email: "hello@forma.tj", website: "forma.tj", address: "Душанбе, проспект Рудаки, 70", qr: "https://raqibj021.github.io/card-tj2/#/card/demo" });
+  const [data, setData] = useState({ name: "Фируз Саидов", position: "Архитектор и основатель", organization: "FORMA Studio", phone: "+992 93 555 21 21", email: "hello@forma.tj", website: "forma.tj", address: "Душанбе, проспект Рудаки, 70", instagram: "@forma.tj", facebook: "forma.tj", telegram: "@forma_tj", whatsapp: "+992 93 555 21 21", qr: "https://raqibj021.github.io/card-tj2/#/card/demo" });
+  const [positions, setPositions] = useState<Positions>(() => defaultPositions(false));
+  const [sizes, setSizes] = useState<Record<MoveKey, number>>({ brand: 1, person: 1, company: 1, contacts: 1, socials: 1, qr: 1, photo: 1 });
+  const [selected, setSelected] = useState<MoveKey>("person");
 
   const choosePalette = (item: typeof palettes[number]) => { setPalette(item); setColors({ bg: item.bg, accent: item.accent, light: item.light, ink: item.ink }); };
   const useRightPanel = ["ribbon", "orbit", "goldwave", "prism", "mono"].includes(layout);
+  useEffect(() => setPositions(defaultPositions(useRightPanel)), [layout, useRightPanel]);
+
+  const startMove = (key: MoveKey, event: ReactPointerEvent<HTMLDivElement>) => {
+    const rect = cardRef.current?.getBoundingClientRect(); if (!rect) return;
+    dragRef.current = { key, offsetX: event.clientX - rect.left - rect.width * positions[key].x / 100, offsetY: event.clientY - rect.top - rect.height * positions[key].y / 100 };
+    setSelected(key);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+  const move = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current; const rect = cardRef.current?.getBoundingClientRect(); if (!drag || !rect) return;
+    const x = Math.max(2, Math.min(88, (event.clientX - rect.left - drag.offsetX) / rect.width * 100));
+    const y = Math.max(2, Math.min(88, (event.clientY - rect.top - drag.offsetY) / rect.height * 100));
+    setPositions((value) => ({ ...value, [drag.key]: { x, y } }));
+  };
+  const stopMove = () => { dragRef.current = null; };
+  const moveStyle = (key: MoveKey): CSSProperties => ({ left: `${positions[key].x}%`, top: `${positions[key].y}%`, transform: `scale(${sizes[key]})` });
+  const dragProps = (key: MoveKey) => ({
+    onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => startMove(key, event),
+    onPointerMove: move,
+    onPointerUp: stopMove,
+    onPointerCancel: stopMove,
+    style: moveStyle(key),
+    className: `print-movable ${selected === key ? "selected" : ""}`
+  });
+  const movableProps = (key: MoveKey, className: string) => ({ ...dragProps(key), className: `${dragProps(key).className} ${className}` });
 
   const renderCanvas = async () => {
     const canvas = document.createElement("canvas"); canvas.width = 1004; canvas.height = 650;
     const ctx = canvas.getContext("2d"); if (!ctx) return null;
     drawDecor(ctx, layout, side, colors.bg, colors.accent, colors.light);
     const textColor = useRightPanel ? "#15171c" : colors.ink;
-    const x = useRightPanel ? 675 : 90;
+    const point = (key: MoveKey) => ({ x: positions[key].x / 100 * 1004, y: positions[key].y / 100 * 650, scale: sizes[key] });
+    const drawUploadedPhoto = async () => {
+      if (!photo) return;
+      const image = new Image(); image.src = photo; await image.decode();
+      const target = point("photo"); const size = 150 * target.scale;
+      ctx.save(); ctx.beginPath(); ctx.arc(target.x + size / 2, target.y + size / 2, size / 2, 0, Math.PI * 2); ctx.clip(); ctx.drawImage(image, target.x, target.y, size, size); ctx.restore();
+      ctx.strokeStyle = colors.accent; ctx.lineWidth = 8; ctx.beginPath(); ctx.arc(target.x + size / 2, target.y + size / 2, size / 2, 0, Math.PI * 2); ctx.stroke();
+    };
     if (side === "front") {
-      if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, x, 85, 150, 95); }
-      else drawLogoMark(ctx, logoMark, x, 78, 88, useRightPanel ? colors.accent : colors.ink);
-      ctx.fillStyle = textColor; ctx.font = "700 52px Arial"; ctx.fillText(data.organization, x, 245);
-      ctx.fillStyle = colors.accent; ctx.font = "600 23px Arial"; ctx.fillText(data.website, x, 290);
+      const brand = point("brand");
+      if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, brand.x, brand.y, 120 * brand.scale, 75 * brand.scale); }
+      else drawLogoMark(ctx, logoMark, brand.x, brand.y, 72 * brand.scale, useRightPanel ? colors.accent : colors.ink);
+      ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px Arial`; ctx.fillText(data.organization, brand.x + 90 * brand.scale, brand.y + 34 * brand.scale);
+      ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px Arial`; ctx.fillText(data.website, brand.x + 90 * brand.scale, brand.y + 61 * brand.scale);
+      await drawUploadedPhoto();
       const qr = await QRCode.toDataURL(data.qr, { width: 190, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } });
-      const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); ctx.drawImage(qrImage, useRightPanel ? 110 : 730, 370, 170, 170);
+      const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 150 * qrPoint.scale, 150 * qrPoint.scale);
     } else {
-      ctx.fillStyle = textColor; ctx.font = "700 48px Arial"; ctx.fillText(data.name, x, 205);
-      ctx.fillStyle = colors.accent; ctx.font = "600 24px Arial"; ctx.fillText(data.position, x, 250);
-      if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, x, 300, 120, 70); }
-      else drawLogoMark(ctx, logoMark, x, 290, 70, colors.accent);
-      ctx.fillStyle = textColor; ctx.font = "20px Arial"; [data.organization, data.phone, data.email, data.website, data.address].forEach((line, index) => ctx.fillText(line, x + 95, 315 + index * 42));
+      const person = point("person"); ctx.fillStyle = textColor; ctx.font = `700 ${43 * person.scale}px Arial`; ctx.fillText(data.name, person.x, person.y + 38 * person.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${21 * person.scale}px Arial`; ctx.fillText(data.position, person.x, person.y + 70 * person.scale);
+      const company = point("company");
+      if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, company.x, company.y, 72 * company.scale, 55 * company.scale); } else drawLogoMark(ctx, logoMark, company.x, company.y, 55 * company.scale, colors.accent);
+      ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px Arial`; ctx.fillText(data.organization, company.x + 70 * company.scale, company.y + 34 * company.scale);
+      const contacts = point("contacts"); ctx.font = `18px Arial`; const contactLines = [`☎  ${data.phone}`, `✉  ${data.email}`, `●  ${data.website}`, `⌖  ${data.address}`]; contactLines.forEach((line, index) => ctx.fillText(line, contacts.x, contacts.y + index * 35 * contacts.scale));
+      const social = point("socials"); ["I", "f", "T", "W"].forEach((letter, index) => { ctx.fillStyle = colors.accent; ctx.beginPath(); ctx.arc(social.x + index * 47 * social.scale, social.y, 16 * social.scale, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = `700 ${15 * social.scale}px Arial`; ctx.textAlign = "center"; ctx.fillText(letter, social.x + index * 47 * social.scale, social.y + 5 * social.scale); }); ctx.textAlign = "left";
+      await drawUploadedPhoto();
       const qr = await QRCode.toDataURL(data.qr, { width: 160, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } });
-      const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); ctx.drawImage(qrImage, useRightPanel ? 90 : 760, 410, 140, 140);
+      const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 140 * qrPoint.scale, 140 * qrPoint.scale);
     }
     return canvas;
   };
@@ -133,17 +186,29 @@ export default function PrintCardDesignerPage() {
       <div className="custom-colors"><label>Фон<input type="color" value={colors.bg} onChange={(e) => setColors({ ...colors, bg: e.target.value })} /></label><label>Акцент<input type="color" value={colors.accent} onChange={(e) => setColors({ ...colors, accent: e.target.value })} /></label><label>Светлая зона<input type="color" value={colors.light} onChange={(e) => setColors({ ...colors, light: e.target.value })} /></label><label>Текст<input type="color" value={colors.ink} onChange={(e) => setColors({ ...colors, ink: e.target.value })} /></label></div>
       <h2 className="editor-subtitle"><Shapes size={16} /> Знак вместо логотипа</h2>
       <div className="logo-library">{logoIds.map((id) => <button className={!logo && logoMark === id ? "active" : ""} onClick={() => { setLogo(""); setLogoMark(id); }} key={id}><LogoMark id={id} /></button>)}</div>
-      <label className="logo-upload"><ImagePlus size={17} /> Загрузить собственный логотип<input hidden type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={(e) => void readImage(e.target.files?.[0]).then(setLogo)} /></label>
-      {Object.entries(data).map(([key, value]) => <label key={key}><span>{({ name: "ФИО", position: "Должность", organization: "Организация", phone: "Телефон", email: "E-mail", website: "Сайт", address: "Адрес", qr: "Ссылка QR" } as Record<string,string>)[key]}</span><input value={value} onChange={(e) => setData({ ...data, [key]: e.target.value })} /></label>)}
+      <div className="asset-upload-pair"><label className="logo-upload"><ImagePlus size={17} /> Собственный логотип<input hidden type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={(e) => void readImage(e.target.files?.[0]).then(setLogo)} /></label><label className="logo-upload"><ImagePlus size={17} /> Фотография<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void readImage(e.target.files?.[0]).then(setPhoto)} /></label></div>
+      <div className="element-size-control"><div><strong>Размер выбранного элемента</strong><span>{({ brand: "Логотип и компания", person: "ФИО и должность", company: "Логотип", contacts: "Контакты", socials: "Социальные сети", qr: "QR-код", photo: "Фотография" } as Record<MoveKey,string>)[selected]}</span></div><input type="range" min=".5" max="2" step=".05" value={sizes[selected]} onChange={(e) => setSizes((value) => ({ ...value, [selected]: Number(e.target.value) }))} /><b>{Math.round(sizes[selected] * 100)}%</b></div>
+      {Object.entries(data).map(([key, value]) => <label key={key}><span>{({ name: "ФИО", position: "Должность", organization: "Организация", phone: "Телефон", email: "E-mail", website: "Сайт", address: "Адрес", instagram: "Instagram", facebook: "Facebook", telegram: "Telegram", whatsapp: "WhatsApp", qr: "Ссылка QR" } as Record<string,string>)[key]}</span><input value={value} onChange={(e) => setData({ ...data, [key]: e.target.value })} /></label>)}
     </div>
     <div className="print-preview-column">
       <div className="side-switch no-print"><button className={side === "front" ? "active" : ""} onClick={() => setSide("front")}>Лицевая сторона</button><button className={side === "back" ? "active" : ""} onClick={() => setSide("back")}>Обратная сторона</button></div>
-      <div className={`physical-card physical-${layout} card-side-${side}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink } as CSSProperties}>
+      <div ref={cardRef} className={`physical-card physical-${layout} card-side-${side}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink } as CSSProperties}>
         <CardDecor layout={layout} />
-        {side === "front" ? <div className="physical-content physical-front-content"><div className="physical-brand">{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<span><strong>{data.organization}</strong><small>{data.website}</small></span></div><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>
-        : <div className="physical-content physical-back-content"><div className="physical-person"><h2>{data.name}</h2><h3>{data.position}</h3></div><div className="physical-contact-brand">{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<strong>{data.organization}</strong></div><ul><li>{data.phone}</li><li>{data.email}</li><li>{data.website}</li><li>{data.address}</li></ul><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>}
+        {side === "front" ? <div className="physical-content physical-front-content">
+          <div {...movableProps("brand", "physical-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<span><strong>{data.organization}</strong><small>{data.website}</small></span></div>
+          {photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
+          <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>
+        </div>
+        : <div className="physical-content physical-back-content">
+          <div {...movableProps("person", "physical-person")}><h2>{data.name}</h2><h3>{data.position}</h3></div>
+          <div {...movableProps("company", "physical-contact-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<strong>{data.organization}</strong></div>
+          {photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
+          <div {...movableProps("contacts", "print-contact-list")}><span><Phone />{data.phone}</span><span><Mail />{data.email}</span><span><Globe2 />{data.website}</span><span><MapPin />{data.address}</span></div>
+          <div {...movableProps("socials", "print-social-list")}><span title={data.instagram}><Instagram /></span><span title={data.facebook}><Facebook /></span><span title={data.telegram}><Send /></span><span title={data.whatsapp}><MessageCircle /></span></div>
+          <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>
+        </div>}
       </div>
-      <p className="print-safe-note">Пунктир показывает безопасную зону. Все шаблоны подготовлены строго в пропорции 85 × 55 мм.</p>
+      <p className="print-safe-note">Нажмите на текст, логотип, фото, контакты или QR и перетащите. Выбранный элемент можно увеличить или уменьшить ползунком.</p>
       <div className="print-buttons no-print"><button className="button button-primary" onClick={download}><Download size={17} /> Скачать PNG</button><button className="button button-secondary" onClick={() => window.print()}><Printer size={17} /> Печать / PDF</button></div>
     </div>
   </section></main><div className="no-print"><Footer /></div></>;
