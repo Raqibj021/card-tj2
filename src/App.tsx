@@ -24,6 +24,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import PasswordRecoveryPage from "./pages/PasswordRecoveryPage";
 import ModerationPage from "./pages/ModerationPage";
 import VerificationPage from "./pages/VerificationPage";
+import OrganizationPublicPage from "./pages/OrganizationPublicPage";
+import OrganizationJoinPage from "./pages/OrganizationJoinPage";
+import NotificationsPage from "./pages/NotificationsPage";
+import ServiceOrderPage from "./pages/ServiceOrderPage";
+import ContractPage from "./pages/ContractPage";
+import PrintCardDesignerPage from "./pages/PrintCardDesignerPage";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -52,9 +58,15 @@ export default function App() {
         <Route path="/organizations" element={<OrganizationsPage />} />
         <Route path="/organization/apply" element={<ProtectedRoute><OrganizationApplyPage /></ProtectedRoute>} />
         <Route path="/organization/dashboard" element={<ProtectedRoute><OrganizationDashboardPage /></ProtectedRoute>} />
+        <Route path="/organization/:slug" element={<OrganizationPublicPage />} />
+        <Route path="/organization/join" element={<ProtectedRoute><OrganizationJoinPage /></ProtectedRoute>} />
         <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route path="/service-order" element={<ProtectedRoute><ServiceOrderPage /></ProtectedRoute>} />
+        <Route path="/contract" element={<ProtectedRoute><ContractPage /></ProtectedRoute>} />
+        <Route path="/print-card" element={<PrintCardDesignerPage />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />
         <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
