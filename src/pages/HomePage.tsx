@@ -28,6 +28,38 @@ export default function HomePage() {
   const { t, language } = useApp();
   const [selectedDesign, setSelectedDesign] = useState<DigitalCard | null>(null);
   const showcaseDesigns = demoCards.slice(0, 8);
+  const founderDescription = {
+    ru: "Развиваю VIZORA.TJ — платформу современных электронных визиток для специалистов и компаний.",
+    tj: "VIZORA.TJ-ро рушд медиҳам — платформаи варақаҳои рақамии муосир барои мутахассисон ва ширкатҳо.",
+    en: "Building VIZORA.TJ — a modern digital business card platform for professionals and companies."
+  }[language];
+  const founderCard: DigitalCard = {
+    id: "founder-raqibjon",
+    slug: "raqibjon",
+    photo: `${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov.webp`,
+    companyLogo: `${import.meta.env.BASE_URL}brand/vizora-mark.webp`,
+    fullName: "Муродкулов Ракибджон",
+    position: "Основатель VIZORA.TJ",
+    organization: "VIZORA.TJ",
+    description: founderDescription,
+    phone: "+992084785555",
+    secondPhone: "",
+    whatsapp: "+992084785555",
+    telegram: "@raqibjon_vizora",
+    instagram: "@vizora.tj",
+    facebook: "raqibjon.murodqulov",
+    email: "founder@vizora.tj",
+    website: "https://vizora.tj",
+    address: "Душанбе, Таджикистан",
+    language: "tj",
+    theme: "teal",
+    template: "executive",
+    visibility: "public",
+    reviewStatus: "approved",
+    views: 2026,
+    createdAt: "2026-07-30T00:00:00.000Z",
+    updatedAt: "2026-07-30T00:00:00.000Z"
+  };
 
   useEffect(() => {
     if (!selectedDesign) return;
@@ -161,12 +193,12 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="hero-showcase" aria-label={homeCopy.cardExample}>
+            <div className="hero-showcase founder-showcase" aria-label={homeCopy.cardExample}>
               <div className="hero-orbit hero-orbit-one" />
               <div className="hero-orbit hero-orbit-two" />
-              <div className="phone-shell">
+              <div className="phone-shell phone-shell-founder">
                 <div className="phone-speaker" />
-                <CardPreview card={demoCards[0]} />
+                <CardPreview card={founderCard} />
               </div>
               <div className="floating-chip floating-chip-top">
                 <QrCode size={19} />
