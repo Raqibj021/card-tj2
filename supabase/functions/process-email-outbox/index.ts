@@ -18,6 +18,23 @@ const supabaseAdminKey = () => {
   }
 };
 
+const bundledMailConfig = () => {
+  const raw = Deno.env.get("MAIL_PROVIDER") ?? "";
+  if (!raw.includes("=")) return {} as Record<string, string>;
+
+  return raw
+    .replaceAll("\\n", "\n")
+    .split(/\r?\n/)
+    .reduce<Record<string, string>>((config, line) => {
+      const separator = line.indexOf("=");
+      if (separator <= 0) return config;
+      const key = line.slice(0, separator).trim();
+      const value = line.slice(separator + 1).trim();
+      if (key && value) config[key] = value;
+      return config;
+    }, {});
+};
+
 async function deliverWithGoogleAppsScript(
   endpoint: string,
   secret: string,
@@ -65,21 +82,24 @@ async function deliverWithResend(
 Deno.serve(async (request) => {
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
-  const expectedSecret = Deno.env.get("MAIL_WORKER_SECRET");
+  const bundled = bundledMailConfig();
+  const setting = (name: string) => Deno.env.get(name) ?? bundled[name];
+  const expectedSecret = setting("MAIL_WORKER_SECRET");
   if (!expectedSecret || request.headers.get("x-mail-worker-secret") !== expectedSecret) {
     return json({ error: "Unauthorized" }, 401);
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceKey = supabaseAdminKey();
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  const googleAppsScriptUrl = Deno.env.get("GOOGLE_APPS_SCRIPT_URL");
-  const googleAppsScriptSecret = Deno.env.get("GOOGLE_APPS_SCRIPT_SECRET");
-  const providerName = Deno.env.get("MAIL_PROVIDER")
+  const resendKey = setting("RESEND_API_KEY");
+  const googleAppsScriptUrl = setting("GOOGLE_APPS_SCRIPT_URL");
+  const googleAppsScriptSecret = setting("GOOGLE_APPS_SCRIPT_SECRET");
+  const rawProvider = setting("MAIL_PROVIDER");
+  const providerName = (rawProvider?.includes("=") ? bundled.MAIL_PROVIDER : rawProvider)
     ?? (googleAppsScriptUrl ? "google_apps_script" : "resend");
   const from = Deno.env.get("VIZORA_FROM_EMAIL") ?? "Vizora.tj <noreply@vizora.tj>";
-  const replyTo = Deno.env.get("VIZORA_REPLY_TO") ?? "support@vizora.tj";
-  const siteUrl = Deno.env.get("VIZORA_SITE_URL") ?? "https://raqibj021.github.io/card-tj2";
+  const replyTo = setting("VIZORA_REPLY_TO") ?? "support@vizora.tj";
+  const siteUrl = setting("VIZORA_SITE_URL") ?? "https://raqibj021.github.io/card-tj2";
   const missing: string[] = [];
   if (!supabaseUrl) missing.push("SUPABASE_URL");
   if (!serviceKey) missing.push("SUPABASE_SECRET_KEYS");
