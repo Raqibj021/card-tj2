@@ -1,6 +1,6 @@
 import { ArrowRight, Check, Eye, EyeOff, Gift, Globe2, LockKeyhole, Mail, UserRound } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
@@ -102,6 +102,7 @@ const authCopy = {
 export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
   const navigate = useNavigate();
+  const location = useLocation();
   const { language, setLanguage } = useApp();
   const text = authCopy[language];
   const [showPassword, setShowPassword] = useState(false);
@@ -142,7 +143,8 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
     if (isRegister) {
       setMessage(text.checkEmail);
     } else {
-      navigate("/dashboard");
+      const destination = (location.state as { from?: string } | null)?.from ?? "/dashboard";
+      navigate(destination, { replace: true });
     }
   }
 
@@ -211,6 +213,9 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
               {busy ? text.wait : isRegister ? text.create : text.enter} <ArrowRight size={18} />
             </button>
           </form>
+          {!isRegister && (
+            <p className="auth-switch"><Link to="/forgot-password">{language === "ru" ? "Забыли пароль?" : language === "tj" ? "Рамзро фаромӯш кардед?" : "Forgot password?"}</Link></p>
+          )}
           {isRegister && <div className="auth-benefits"><span><Check size={15} /> {text.emailConfirmation}</span><span><Check size={15} /> {text.duplicateProtection}</span><span><Check size={15} /> {text.dataSaving}</span></div>}
           <p className="auth-switch">
             {isRegister ? text.hasAccount : text.noAccount}{" "}
