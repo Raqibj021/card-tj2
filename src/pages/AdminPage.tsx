@@ -94,7 +94,7 @@ export default function AdminPage() {
           <Panel title="Требуют внимания" subtitle="Очереди, где необходимо решение администратора">
             <ActionRow icon={BadgeCheck} label="Проверка визиток и документов" value={snapshot.pendingReviews} to="/admin/moderation" tone="purple" />
             <ActionRow icon={CreditCard} label="Подтверждение оплат" value={snapshot.pendingPayments} to="/admin/payments" tone="amber" />
-            <ActionRow icon={HelpCircle} label="Открытые обращения поддержки" value={snapshot.openTickets} tone="blue" />
+            <ActionRow icon={HelpCircle} label="Открытые обращения поддержки" value={snapshot.openTickets} to="/admin/support" tone="blue" />
             <ActionRow icon={Mail} label="Письма в очереди" value={snapshot.queuedEmails} tone="green" />
           </Panel>
           <Panel title="Бизнес-показатели" subtitle="Заявки, услуги, договоры и поступления">
@@ -129,7 +129,7 @@ export default function AdminPage() {
       </>}
 
       {section === "messages" && <>
-        <SectionHead title="Коммуникации" text="Поддержка, автоматические письма, уведомления, новости и акции." />
+        <SectionHead title="Коммуникации" text="Поддержка, автоматические письма, уведомления, новости и акции." actions={<Link to="/admin/support" className="admin-primary-action">Ответить пользователям</Link>} />
         <div className="admin-kpi-grid"><MetricCard label="Открытые обращения" value={snapshot.openTickets} icon={TicketCheck} /><MetricCard label="Письма в очереди" value={snapshot.queuedEmails} icon={Mail} /><MetricCard label="Лиды" value={snapshot.leads} icon={ContactRound} /><MetricCard label="Рассылки" value="Ручные" icon={Megaphone} /></div>
         <Panel title="Последние обращения" subtitle="Запросы пользователей и ответы службы поддержки">
           <DataTable heads={["Номер", "Тема", "Статус", "Дата"]} rows={snapshot.recentTickets.map((item) => [item.number, item.subject, <Status value={item.status} />, date(item.createdAt)])} empty="Новых обращений нет." />
