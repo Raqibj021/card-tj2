@@ -3,17 +3,23 @@ import { useMemo, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import Footer from "../components/layout/Footer";
 import { paymentRepository, type PaymentRequest } from "../lib/paymentRepository";
-
-const plans = {
-  personal: { name: "Личная визитка", amount: 20 },
-  specialist: { name: "Проверенный специалист", amount: 50 },
-  pro: { name: "Специалист PRO", amount: 100 },
-  start: { name: "Организация Start", amount: 200 },
-  business: { name: "Организация Business", amount: 300 },
-  organization_pro: { name: "Организация Pro", amount: 500 }
-} as const;
+import { useApp } from "../context/AppContext";
 
 export default function PaymentPage() {
+  const { language } = useApp();
+  const c = {
+    ru: { planNames: ["Личная визитка", "Проверенный специалист", "Специалист PRO", "Организация Start", "Организация Business", "Организация Pro"], accepted: "Заявка принята", acceptedText: "Проверка оплаты выполняется до трёх часов. После подтверждения код активации появится в кабинете и будет отправлен автоматически.", waiting: "Статус: ожидается проверка оплаты", manual: "Ручная оплата", title: "Подтверждение платежа", intro: "Переведите точную сумму по реквизитам и загрузите подтверждение. Черновик заказа сохраняется на 7 дней.", copied: "Скопировано", copy: "Копировать", amount: "Сумма к оплате", currency: "сомони", order: "Номер заказа", customer: "ФИО заказчика *", phone: "Телефон *", payer: "Имя отправителя платежа *", selected: "Выбранный тариф", upload: "Загрузить чек оплаты", formats: "JPG, PNG или PDF до 5 МБ", submit: "Отправить на проверку", safe: "Безопасный порядок", steps: ["Выберите тариф", "Переведите точную сумму", "Загрузите чек", "Получите одноразовый код"], hours: "До 3 часов", hoursText: "Максимальный срок ручной проверки", noPassword: "Не отправляйте пароль", noPasswordText: "Менеджер никогда его не запрашивает" },
+    tj: { planNames: ["Варақаи шахсӣ", "Мутахассиси тасдиқшуда", "Мутахассиси PRO", "Ташкилоти Start", "Ташкилоти Business", "Ташкилоти Pro"], accepted: "Дархост қабул шуд", acceptedText: "Санҷиши пардохт то се соат давом мекунад. Пас аз тасдиқ рамзи фаъолсозӣ дар кабинет пайдо шуда, худкор фиристода мешавад.", waiting: "Ҳолат: санҷиши пардохт интизор аст", manual: "Пардохти дастӣ", title: "Тасдиқи пардохт", intro: "Маблағи дақиқро гузаронед ва тасдиқномаро бор кунед. Нусхаи фармоиш 7 рӯз нигоҳ дошта мешавад.", copied: "Нусхабардорӣ шуд", copy: "Нусхабардорӣ", amount: "Маблағи пардохт", currency: "сомонӣ", order: "Рақами фармоиш", customer: "Ному насаби фармоишгар *", phone: "Телефон *", payer: "Номи фиристандаи пардохт *", selected: "Тарофаи интихобшуда", upload: "Бор кардани расиди пардохт", formats: "JPG, PNG ё PDF то 5 МБ", submit: "Фиристодан ба санҷиш", safe: "Тартиби бехатар", steps: ["Тарофаро интихоб кунед", "Маблағи дақиқро гузаронед", "Расидро бор кунед", "Рамзи якдафъаинаро гиред"], hours: "То 3 соат", hoursText: "Муҳлати ниҳоии санҷиши дастӣ", noPassword: "Рамзро нафиристед", noPasswordText: "Менеҷер ҳеҷ гоҳ онро талаб намекунад" },
+    en: { planNames: ["Personal card", "Verified specialist", "Specialist PRO", "Organization Start", "Organization Business", "Organization Pro"], accepted: "Application received", acceptedText: "Payment verification takes up to three hours. Once approved, the activation code will appear in your dashboard and be sent automatically.", waiting: "Status: awaiting payment verification", manual: "Manual payment", title: "Payment confirmation", intro: "Transfer the exact amount and upload confirmation. The order draft is saved for 7 days.", copied: "Copied", copy: "Copy", amount: "Amount due", currency: "somoni", order: "Order number", customer: "Customer full name *", phone: "Phone *", payer: "Payment sender’s name *", selected: "Selected plan", upload: "Upload payment receipt", formats: "JPG, PNG or PDF up to 5 MB", submit: "Send for verification", safe: "Secure process", steps: ["Choose a plan", "Transfer the exact amount", "Upload the receipt", "Receive a one-time code"], hours: "Within 3 hours", hoursText: "Maximum manual verification time", noPassword: "Never send your password", noPasswordText: "A manager will never ask for it" }
+  }[language];
+  const plans = {
+    personal: { name: c.planNames[0], amount: 20 },
+    specialist: { name: c.planNames[1], amount: 50 },
+    pro: { name: c.planNames[2], amount: 100 },
+    start: { name: c.planNames[3], amount: 200 },
+    business: { name: c.planNames[4], amount: 300 },
+    organization_pro: { name: c.planNames[5], amount: 500 }
+  };
   const [params] = useSearchParams();
   const planKey = params.get("plan") as keyof typeof plans;
   const plan = plans[planKey] ?? plans.personal;
@@ -43,45 +49,45 @@ export default function PaymentPage() {
             {created ? (
               <div className="payment-success">
                 <CheckCircle2 size={54} />
-                <span className="section-label">Заявка принята</span>
+                <span className="section-label">{c.accepted}</span>
                 <h1>{created.orderNumber}</h1>
-                <p>Проверка оплаты выполняется до трёх часов. После подтверждения код активации появится в кабинете и будет отправлен автоматически.</p>
-                <div><Clock3 size={18} /> Статус: ожидается проверка оплаты</div>
+                <p>{c.acceptedText}</p>
+                <div><Clock3 size={18} /> {c.waiting}</div>
               </div>
             ) : (
               <>
-                <span className="section-label">Ручная оплата</span>
-                <h1>Подтверждение платежа</h1>
-                <p className="form-intro">Переведите точную сумму по реквизитам и загрузите подтверждение. Черновик заказа сохраняется на 7 дней.</p>
+                <span className="section-label">{c.manual}</span>
+                <h1>{c.title}</h1>
+                <p className="form-intro">{c.intro}</p>
                 <div className="payment-details">
-                  <div><CreditCard size={21} /><span><small>ДС Банк / Alif Bank</small><strong>929213537</strong></span><button type="button" onClick={async () => { await navigator.clipboard.writeText("929213537"); setCopied(true); }}><Copy size={17} /> {copied ? "Скопировано" : "Копировать"}</button></div>
-                  <div><FileCheck2 size={21} /><span><small>Сумма к оплате</small><strong>{plan.amount} сомони</strong></span></div>
-                  <div><LockKeyhole size={21} /><span><small>Номер заказа</small><strong>{orderDraft}</strong></span></div>
+                  <div><CreditCard size={21} /><span><small>DC Bank / Alif Bank</small><strong>929213537</strong></span><button type="button" onClick={async () => { await navigator.clipboard.writeText("929213537"); setCopied(true); }}><Copy size={17} /> {copied ? c.copied : c.copy}</button></div>
+                  <div><FileCheck2 size={21} /><span><small>{c.amount}</small><strong>{plan.amount} {c.currency}</strong></span></div>
+                  <div><LockKeyhole size={21} /><span><small>{c.order}</small><strong>{orderDraft}</strong></span></div>
                 </div>
                 <form className="platform-form mt-7" onSubmit={submit}>
                   <div className="form-grid">
-                    <label><span>ФИО заказчика *</span><input name="customerName" required /></label>
-                    <label><span>Телефон *</span><input name="phone" type="tel" required placeholder="+992" /></label>
-                    <label><span>Имя отправителя платежа *</span><input name="payerName" required /></label>
-                    <label><span>Выбранный тариф</span><input value={`${plan.name} — ${plan.amount} сомони`} readOnly /></label>
+                    <label><span>{c.customer}</span><input name="customerName" required /></label>
+                    <label><span>{c.phone}</span><input name="phone" type="tel" required placeholder="+992" /></label>
+                    <label><span>{c.payer}</span><input name="payerName" required /></label>
+                    <label><span>{c.selected}</span><input value={`${plan.name} — ${plan.amount} ${c.currency}`} readOnly /></label>
                   </div>
                   <label className="receipt-upload">
                     <Upload size={23} />
-                    <strong>{receiptName || "Загрузить чек оплаты"}</strong>
-                    <span>JPG, PNG или PDF до 5 МБ</span>
+                    <strong>{receiptName || c.upload}</strong>
+                    <span>{c.formats}</span>
                     <input type="file" required accept="image/png,image/jpeg,application/pdf" onChange={(event) => setReceiptName(event.target.files?.[0]?.name ?? "")} />
                   </label>
-                  <button className="button button-primary button-large" type="submit">Отправить на проверку</button>
+                  <button className="button button-primary button-large" type="submit">{c.submit}</button>
                 </form>
               </>
             )}
           </section>
           <aside className="application-aside">
             <CreditCard size={26} />
-            <h2>Безопасный порядок</h2>
-            <ol><li><span>1</span> Выберите тариф</li><li><span>2</span> Переведите точную сумму</li><li><span>3</span> Загрузите чек</li><li><span>4</span> Получите одноразовый код</li></ol>
-            <div className="payment-note"><Clock3 size={18} /><div><strong>До 3 часов</strong><span>Максимальный срок ручной проверки</span></div></div>
-            <div className="payment-note"><LockKeyhole size={18} /><div><strong>Не отправляйте пароль</strong><span>Менеджер никогда его не запрашивает</span></div></div>
+            <h2>{c.safe}</h2>
+            <ol>{c.steps.map((step, index) => <li key={step}><span>{index + 1}</span> {step}</li>)}</ol>
+            <div className="payment-note"><Clock3 size={18} /><div><strong>{c.hours}</strong><span>{c.hoursText}</span></div></div>
+            <div className="payment-note"><LockKeyhole size={18} /><div><strong>{c.noPassword}</strong><span>{c.noPasswordText}</span></div></div>
           </aside>
         </div>
       </main>

@@ -2,25 +2,32 @@ import { Building2, CheckCircle2, Clock3, CreditCard, LockKeyhole } from "lucide
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import Footer from "../components/layout/Footer";
+import { useApp } from "../context/AppContext";
 
 export default function OrganizationApplyPage() {
+  const { language } = useApp();
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
+  const c = {
+    ru: { label: "Заявка организации", title: "Регистрация в Vizora", intro: "Черновик сохраняется автоматически. После проверки оплаты вы получите код активации.", saved: "Заявка сохранена", demo: "Демонстрационный режим: после подключения Supabase заявка будет доступна по номеру и на другом устройстве.", edit: "Изменить данные", org: "Название организации *", full: "Полное название", type: "Тип организации *", choose: "Выберите", types: ["Компания", "Учебное учреждение", "Государственное учреждение", "Магазин", "Другое"], person: "ФИО ответственного лица *", personHint: "Имя и фамилия", position: "Должность *", positionHint: "Руководитель или администратор", phone: "Телефон *", email: "Электронная почта *", plan: "Выберите тариф", consent: "Я подтверждаю достоверность данных и согласен с правилами платформы.", save: "Сохранить заявку", activation: "Как проходит активация", steps: ["Заполните заявку", "Переведите оплату", "Загрузите подтверждение", "Получите код активации"], requisites: "Реквизиты после заявки", check: "Проверка до 3 часов", kept: "Заявка сохраняется 7 дней", protected: "Защищённые данные", private: "Документы не публикуются" },
+    tj: { label: "Дархости ташкилот", title: "Сабти ном дар Vizora", intro: "Нусхаи муваққатӣ худкор нигоҳ дошта мешавад. Пас аз санҷиши пардохт рамзи фаъолсозиро мегиред.", saved: "Дархост нигоҳ дошта шуд", demo: "Реҷаи намоишӣ: пас аз пайваст кардани Supabase дархост аз рӯи рақам ва дар дастгоҳи дигар дастрас мешавад.", edit: "Тағйир додани маълумот", org: "Номи ташкилот *", full: "Номи пурра", type: "Навъи ташкилот *", choose: "Интихоб кунед", types: ["Ширкат", "Муассисаи таълимӣ", "Муассисаи давлатӣ", "Мағоза", "Дигар"], person: "Ному насаби шахси масъул *", personHint: "Ному насаб", position: "Вазифа *", positionHint: "Роҳбар ё маъмур", phone: "Телефон *", email: "Почтаи электронӣ *", plan: "Тарофаро интихоб кунед", consent: "Дурустии маълумотро тасдиқ намуда, ба қоидаҳои платформа розӣ ҳастам.", save: "Нигоҳ доштани дархост", activation: "Фаъолсозӣ чӣ гуна мегузарад", steps: ["Дархостро пур кунед", "Пардохтро гузаронед", "Тасдиқномаро бор кунед", "Рамзи фаъолсозиро гиред"], requisites: "Реквизитҳо пас аз дархост", check: "Санҷиш то 3 соат", kept: "Дархост 7 рӯз нигоҳ дошта мешавад", protected: "Маълумоти муҳофизатшуда", private: "Ҳуҷҷатҳо нашр намешаванд" },
+    en: { label: "Organization application", title: "Register with Vizora", intro: "Your draft is saved automatically. After payment verification, you will receive an activation code.", saved: "Application saved", demo: "Demo mode: after Supabase is connected, the application will be available by number and on another device.", edit: "Edit information", org: "Organization name *", full: "Full legal name", type: "Organization type *", choose: "Choose", types: ["Company", "Educational institution", "Government institution", "Store", "Other"], person: "Authorized person’s full name *", personHint: "Full name", position: "Position *", positionHint: "Manager or administrator", phone: "Phone *", email: "Email *", plan: "Choose a plan", consent: "I confirm that the information is accurate and accept the platform rules.", save: "Save application", activation: "How activation works", steps: ["Complete the application", "Make the payment", "Upload confirmation", "Receive an activation code"], requisites: "Payment details after application", check: "Verification within 3 hours", kept: "Application is saved for 7 days", protected: "Protected information", private: "Documents are not published" }
+  }[language];
 
   return (
     <>
       <main className="application-page">
         <div className="site-container grid gap-8 py-10 lg:grid-cols-[1fr_360px] lg:py-14">
           <section className="application-panel">
-            <span className="section-label">Заявка организации</span>
-            <h1>Регистрация в Vizora</h1>
-            <p className="form-intro">Черновик сохраняется автоматически. После проверки оплаты вы получите код активации.</p>
+            <span className="section-label">{c.label}</span>
+            <h1>{c.title}</h1>
+            <p className="form-intro">{c.intro}</p>
             {submitted ? (
               <div className="application-success">
                 <CheckCircle2 size={48} />
-                <h2>Заявка сохранена</h2>
-                <p>Демонстрационный режим: после подключения Supabase заявка будет доступна по номеру и на другом устройстве.</p>
-                <button type="button" className="button button-primary" onClick={() => setSubmitted(false)}>Изменить данные</button>
+                <h2>{c.saved}</h2>
+                <p>{c.demo}</p>
+                <button type="button" className="button button-primary" onClick={() => setSubmitted(false)}>{c.edit}</button>
               </div>
             ) : (
               <form className="platform-form" onSubmit={(event) => {
@@ -30,15 +37,15 @@ export default function OrganizationApplyPage() {
                 window.setTimeout(() => navigate(`/payment?plan=${String(form.get("plan") ?? "start")}`), 700);
               }}>
                 <div className="form-grid">
-                  <label><span>Название организации *</span><input required placeholder="Полное название" /></label>
-                  <label><span>Тип организации *</span><select required defaultValue=""><option value="" disabled>Выберите</option><option>Компания</option><option>Учебное учреждение</option><option>Государственное учреждение</option><option>Магазин</option><option>Другое</option></select></label>
-                  <label><span>ФИО ответственного лица *</span><input required placeholder="Имя и фамилия" /></label>
-                  <label><span>Должность *</span><input required placeholder="Руководитель или администратор" /></label>
-                  <label><span>Телефон *</span><input required type="tel" placeholder="+992" /></label>
-                  <label><span>Электронная почта *</span><input required type="email" placeholder="name@company.tj" /></label>
+                  <label><span>{c.org}</span><input required placeholder={c.full} /></label>
+                  <label><span>{c.type}</span><select required defaultValue=""><option value="" disabled>{c.choose}</option>{c.types.map((type) => <option key={type}>{type}</option>)}</select></label>
+                  <label><span>{c.person}</span><input required placeholder={c.personHint} /></label>
+                  <label><span>{c.position}</span><input required placeholder={c.positionHint} /></label>
+                  <label><span>{c.phone}</span><input required type="tel" placeholder="+992" /></label>
+                  <label><span>{c.email}</span><input required type="email" placeholder="name@company.tj" /></label>
                 </div>
                 <fieldset>
-                  <legend>Выберите тариф</legend>
+                  <legend>{c.plan}</legend>
                   <div className="plan-radio-grid">
                     {[
                       ["start", "Start — до 20 / 200 с."],
@@ -49,23 +56,20 @@ export default function OrganizationApplyPage() {
                     ))}
                   </div>
                 </fieldset>
-                <label className="consent-row"><input required type="checkbox" /> Я подтверждаю достоверность данных и согласен с правилами платформы.</label>
-                <button className="button button-primary button-large" type="submit">Сохранить заявку</button>
+                <label className="consent-row"><input required type="checkbox" /> {c.consent}</label>
+                <button className="button button-primary button-large" type="submit">{c.save}</button>
               </form>
             )}
           </section>
           <aside className="application-aside">
             <Building2 size={26} />
-            <h2>Как проходит активация</h2>
+            <h2>{c.activation}</h2>
             <ol>
-              <li><span>1</span> Заполните заявку</li>
-              <li><span>2</span> Переведите оплату</li>
-              <li><span>3</span> Загрузите подтверждение</li>
-              <li><span>4</span> Получите код активации</li>
+              {c.steps.map((step, index) => <li key={step}><span>{index + 1}</span> {step}</li>)}
             </ol>
-            <div className="payment-note"><CreditCard size={18} /><div><strong>Реквизиты после заявки</strong><span>ДС Банк и Alif Bank: 929213537</span></div></div>
-            <div className="payment-note"><Clock3 size={18} /><div><strong>Проверка до 3 часов</strong><span>Заявка сохраняется 7 дней</span></div></div>
-            <div className="payment-note"><LockKeyhole size={18} /><div><strong>Защищённые данные</strong><span>Документы не публикуются</span></div></div>
+            <div className="payment-note"><CreditCard size={18} /><div><strong>{c.requisites}</strong><span>DC Bank / Alif Bank: 929213537</span></div></div>
+            <div className="payment-note"><Clock3 size={18} /><div><strong>{c.check}</strong><span>{c.kept}</span></div></div>
+            <div className="payment-note"><LockKeyhole size={18} /><div><strong>{c.protected}</strong><span>{c.private}</span></div></div>
           </aside>
         </div>
       </main>

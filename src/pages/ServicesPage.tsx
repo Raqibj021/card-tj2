@@ -1,27 +1,36 @@
 import { Badge, Contact, CreditCard, Download, QrCode, ScanLine, Sparkles } from "lucide-react";
 import { Link } from "react-router";
 import Footer from "../components/layout/Footer";
-
-const services = [
-  { icon: Contact, title: "Визитка под ключ", text: "Менеджер полностью оформит личную или организационную визитку." },
-  { icon: Sparkles, title: "Индивидуальный дизайн", text: "Макет электронной и печатной визитки 85 × 55 мм." },
-  { icon: Download, title: "Подготовка к печати", text: "Лицевая и обратная стороны, QR-код, экспорт в PDF и PNG." },
-  { icon: CreditCard, title: "NFC-визитка", text: "Физическая карта с быстрым открытием цифрового профиля." },
-  { icon: Badge, title: "QR-карты и бейджи", text: "Персональные карточки сотрудников и пропуска с QR-кодом." },
-  { icon: ScanLine, title: "QR-таблички", text: "Настольные таблички, наклейки и общий QR организации." }
-];
+import { useApp } from "../context/AppContext";
 
 export default function ServicesPage() {
+  const { language } = useApp();
+  const copy = {
+    ru: {
+      label: "Дополнительные услуги", title: "Всё для визиток и QR-кодов", text: "Только профильные решения Vizora — без посторонней полиграфии", calculate: "Рассчитать стоимость", request: "Оставить заявку",
+      items: [["Визитка под ключ", "Менеджер полностью оформит личную или организационную визитку."], ["Индивидуальный дизайн", "Макет электронной и печатной визитки 85 × 55 мм."], ["Подготовка к печати", "Лицевая и обратная стороны, QR-код, экспорт в PDF и PNG."], ["NFC-визитка", "Физическая карта с быстрым открытием цифрового профиля."], ["QR-карты и бейджи", "Персональные карточки сотрудников и пропуска с QR-кодом."], ["QR-таблички", "Настольные таблички, наклейки и общий QR организации."]]
+    },
+    tj: {
+      label: "Хизматҳои иловагӣ", title: "Ҳама чиз барои варақаҳо ва QR-кодҳо", text: "Танҳо хизматҳои соҳавии Vizora — бе маҳсулоти чопии бегона", calculate: "Ҳисоб кардани арзиш", request: "Дархост фиристодан",
+      items: [["Варақаи омода", "Менеҷер варақаи шахсӣ ё ташкилотиро пурра омода мекунад."], ["Дизайни инфиродӣ", "Тарҳи варақаи электронӣ ва чопии 85 × 55 мм."], ["Омодагӣ ба чоп", "Тарафҳои пешу қафо, QR-код ва содирот ба PDF ва PNG."], ["Варақаи NFC", "Корти ҷисмонӣ барои зуд кушодани профили рақамӣ."], ["QR-кортҳо ва бейҷҳо", "Кортҳои шахсии кормандон ва иҷозатномаҳо бо QR-код."], ["QR-лавҳаҳо", "Лавҳаҳои рӯимизӣ, часпакҳо ва QR-и умумии ташкилот."]]
+    },
+    en: {
+      label: "Additional services", title: "Everything for business cards and QR codes", text: "Dedicated Vizora solutions without unrelated print services", calculate: "Calculate cost", request: "Send request",
+      items: [["Turnkey business card", "A manager will fully prepare a personal or organization card."], ["Custom design", "Digital and printed business card layout in 85 × 55 mm."], ["Print preparation", "Front and back sides, QR code, PDF and PNG export."], ["NFC card", "A physical card that instantly opens the digital profile."], ["QR cards and badges", "Personal employee cards and passes with QR codes."], ["QR signs", "Desk signs, stickers and a shared organization QR code."]]
+    }
+  }[language];
+  const icons = [Contact, Sparkles, Download, CreditCard, Badge, ScanLine];
+  const services = copy.items.map(([title, text], index) => ({ icon: icons[index], title, text }));
   return (
     <>
       <main>
         <section className="directory-hero">
           <div className="site-container py-16 text-center md:py-24">
-            <span className="section-label">Дополнительные услуги</span>
-            <h1>Всё для визиток и QR-кодов</h1>
-            <p>Только профильные решения Vizora — без посторонней полиграфии</p>
+            <span className="section-label">{copy.label}</span>
+            <h1>{copy.title}</h1>
+            <p>{copy.text}</p>
             <Link to="/support" className="button button-primary button-large mt-8">
-              Рассчитать стоимость
+              {copy.calculate}
             </Link>
           </div>
         </section>
@@ -33,7 +42,7 @@ export default function ServicesPage() {
                   <div><Icon size={23} /></div>
                   <h2>{title}</h2>
                   <p>{text}</p>
-                  <Link to="/support">Оставить заявку <QrCode size={15} /></Link>
+                  <Link to="/support">{copy.request} <QrCode size={15} /></Link>
                 </article>
               ))}
             </div>

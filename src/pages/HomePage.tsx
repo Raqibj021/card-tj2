@@ -25,7 +25,7 @@ import LaunchPromo from "../components/LaunchPromo";
 import type { DigitalCard } from "../types/card";
 
 export default function HomePage() {
-  const { t } = useApp();
+  const { t, language } = useApp();
   const [selectedDesign, setSelectedDesign] = useState<DigitalCard | null>(null);
   const showcaseDesigns = demoCards.slice(0, 8);
 
@@ -62,24 +62,47 @@ export default function HomePage() {
     { number: "03", icon: QrCode, title: t("howThree"), text: t("howThreeText") }
   ];
 
-  const plans = [
-    {
-      name: "Личная визитка",
-      price: "20",
-      features: ["Персональный QR-код", "vCard и готовые шаблоны", "Доступ по ссылке и QR"]
+  const homeCopy = {
+    ru: {
+      cardExample: "Пример электронной визитки", qrReady: "QR готов", saved: "Контакт сохранён", perYear: "сомони / год", pricing: "Тарифы", faq: "Вопросы и ответы",
+      mobileLabel: "Возможности Vizora", mobileTitle: "Всё нужное — в одном месте", mobileText: "Выберите нужный раздел без долгой прокрутки страницы.",
+      readyCard: "Готовая цифровая визитка", directory: "Каталог специалистов", directoryText: "Найдите проверенного исполнителя",
+      forOrganizations: "Для организаций", organizationText: "Тарифы и управление сотрудниками",
+      plans: [
+        ["Личная визитка", ["Персональный QR-код", "vCard и готовые шаблоны", "Доступ по ссылке и QR"]],
+        ["Проверенный специалист", ["Публикация в каталоге", "Проверка документов", "Портфолио и статистика"]],
+        ["Специалист PRO", ["Приоритет в каталоге", "До 20 фотографий", "Индивидуальное оформление"]]
+      ]
     },
-    {
-      name: "Проверенный специалист",
-      price: "50",
-      featured: true,
-      features: ["Публикация в каталоге", "Проверка документов", "Портфолио и статистика"]
+    tj: {
+      cardExample: "Намунаи варақаи рақамӣ", qrReady: "QR омода аст", saved: "Тамос нигоҳ дошта шуд", perYear: "сомонӣ / сол", pricing: "Тарофаҳо", faq: "Саволу ҷавоб",
+      mobileLabel: "Имкониятҳои Vizora", mobileTitle: "Ҳама чизи зарурӣ — дар як ҷой", mobileText: "Бахши лозимиро бе паймоиши тӯлонӣ интихоб кунед.",
+      readyCard: "Варақаи рақамии омода", directory: "Феҳристи мутахассисон", directoryText: "Иҷрокунандаи тасдиқшударо ёбед",
+      forOrganizations: "Барои ташкилотҳо", organizationText: "Тарофаҳо ва идоракунии кормандон",
+      plans: [
+        ["Варақаи шахсӣ", ["QR-коди шахсӣ", "vCard ва қолабҳои омода", "Дастрасӣ тавассути пайванд ва QR"]],
+        ["Мутахассиси тасдиқшуда", ["Нашр дар феҳрист", "Санҷиши ҳуҷҷатҳо", "Портфолио ва омор"]],
+        ["Мутахассиси PRO", ["Афзалият дар феҳрист", "То 20 акс", "Ороиши инфиродӣ"]]
+      ]
     },
-    {
-      name: "Специалист PRO",
-      price: "100",
-      features: ["Приоритет в каталоге", "До 20 фотографий", "Индивидуальное оформление"]
+    en: {
+      cardExample: "Digital business card example", qrReady: "QR ready", saved: "Contact saved", perYear: "somoni / year", pricing: "Pricing", faq: "FAQ",
+      mobileLabel: "Vizora features", mobileTitle: "Everything you need in one place", mobileText: "Choose the section you need without a long scroll.",
+      readyCard: "Ready digital business card", directory: "Specialist directory", directoryText: "Find a verified professional",
+      forOrganizations: "For organizations", organizationText: "Plans and employee management",
+      plans: [
+        ["Personal card", ["Personal QR code", "vCard and ready templates", "Access by link and QR"]],
+        ["Verified specialist", ["Directory listing", "Document verification", "Portfolio and analytics"]],
+        ["Specialist PRO", ["Priority in the directory", "Up to 20 photos", "Custom appearance"]]
+      ]
     }
-  ];
+  }[language];
+  const plans = homeCopy.plans.map(([name, features], index) => ({
+    name: name as string,
+    price: ["20", "50", "100"][index],
+    featured: index === 1,
+    features: features as string[]
+  }));
 
   const faqs = [
     [t("faqOne"), t("faqOneText")],
@@ -129,7 +152,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="hero-showcase" aria-label="Пример электронной визитки">
+            <div className="hero-showcase" aria-label={homeCopy.cardExample}>
               <div className="hero-orbit hero-orbit-one" />
               <div className="hero-orbit hero-orbit-two" />
               <div className="phone-shell">
@@ -138,11 +161,11 @@ export default function HomePage() {
               </div>
               <div className="floating-chip floating-chip-top">
                 <QrCode size={19} />
-                <span>QR готов</span>
+                <span>{homeCopy.qrReady}</span>
               </div>
               <div className="floating-chip floating-chip-bottom">
                 <BadgeCheck size={19} />
-                <span>Контакт сохранён</span>
+                <span>{homeCopy.saved}</span>
               </div>
             </div>
           </div>
@@ -236,38 +259,10 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section overflow-hidden home-desktop-detail">
-          <div className="site-container">
-            <div className="section-heading">
-              <span className="section-label">Templates</span>
-              <h2>{t("examplesTitle")}</h2>
-              <p>{t("examplesText")}</p>
-            </div>
-            <div className="example-grid mt-12">
-              {demoCards.map((card) => (
-                <div key={card.id} className="example-card-wrap">
-                  <CardPreview card={card} />
-                  <Link to={`/card/${card.slug}`} className="text-link mt-5">
-                    {t("openCard")} <ArrowRight size={16} />
-                  </Link>
-                </div>
-              ))}
-              <div className="example-create-card">
-                <div className="example-plus">+</div>
-                <h3>{t("builderTitle")}</h3>
-                <p>{t("builderText")}</p>
-                <Link to="/create" className="button button-primary mt-6">
-                  {t("create")} <ArrowRight size={18} />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="section section-dark home-desktop-detail">
           <div className="site-container">
             <div className="section-heading section-heading-light">
-              <span className="section-label">Pricing</span>
+              <span className="section-label">{homeCopy.pricing}</span>
               <h2>{t("pricingTitle")}</h2>
               <p>{t("pricingText")}</p>
             </div>
@@ -286,7 +281,7 @@ export default function HomePage() {
                   </div>
                   <div className="pricing-price">
                     <strong>{plan.price}</strong>
-                    <span>сомони / год</span>
+                    <span>{homeCopy.perYear}</span>
                   </div>
                   <ul>
                     {plan.features.map((feature) => (
@@ -310,7 +305,7 @@ export default function HomePage() {
         <section className="section home-desktop-detail">
           <div className="site-container grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
             <div className="section-heading !text-left">
-              <span className="section-label">FAQ</span>
+              <span className="section-label">{homeCopy.faq}</span>
               <h2>{t("faqTitle")}</h2>
             </div>
             <div className="faq-list">
@@ -342,24 +337,24 @@ export default function HomePage() {
         <section className="mobile-home-hub">
           <div className="site-container">
             <div className="mobile-home-hub-head">
-              <span className="section-label">Возможности Vizora</span>
-              <h2>Всё нужное — в одном месте</h2>
-              <p>Выберите нужный раздел без долгой прокрутки страницы.</p>
+              <span className="section-label">{homeCopy.mobileLabel}</span>
+              <h2>{homeCopy.mobileTitle}</h2>
+              <p>{homeCopy.mobileText}</p>
             </div>
             <div className="mobile-home-links">
               <Link to="/card/firuz">
                 <QrCode size={21} />
-                <span><strong>{t("example")}</strong><small>Готовая цифровая визитка</small></span>
+                <span><strong>{t("example")}</strong><small>{homeCopy.readyCard}</small></span>
                 <ArrowRight size={17} />
               </Link>
               <Link to="/directory">
                 <LayoutGrid size={21} />
-                <span><strong>Каталог специалистов</strong><small>Найдите проверенного исполнителя</small></span>
+                <span><strong>{homeCopy.directory}</strong><small>{homeCopy.directoryText}</small></span>
                 <ArrowRight size={17} />
               </Link>
               <Link to="/organizations">
                 <Building2 size={21} />
-                <span><strong>Для организаций</strong><small>Тарифы и управление сотрудниками</small></span>
+                <span><strong>{homeCopy.forOrganizations}</strong><small>{homeCopy.organizationText}</small></span>
                 <ArrowRight size={17} />
               </Link>
             </div>

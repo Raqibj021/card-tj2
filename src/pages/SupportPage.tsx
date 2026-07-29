@@ -1,35 +1,43 @@
-import { Headphones, Mail, MessageCircle, Phone, Send } from "lucide-react";
+import { Headphones, Mail, Phone, Send } from "lucide-react";
+import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import Footer from "../components/layout/Footer";
+import { useApp } from "../context/AppContext";
 
 export default function SupportPage() {
+  const { language } = useApp();
+  const copy = {
+    ru: { label: "Поддержка Vizora", title: "Связь с менеджером", text: "Опишите вопрос — обращение получит номер и сохранится в вашем кабинете.", name: "Ваше имя *", namePlaceholder: "Имя и фамилия", phone: "Телефон *", topic: "Тема обращения *", topics: ["Создание визитки", "Регистрация организации", "Тариф и оплата", "Проверка специалиста", "Техническая проблема"], number: "Номер заявки", numberHint: "Если имеется", message: "Сообщение *", messageHint: "Кратко опишите вопрос", send: "Отправить обращение", manager: "Менеджер Vizora", working: "Ответ в рабочее время", email: "Электронная почта", chat: "Открыть чат", write: "Написать менеджеру", call: "Заказать звонок" },
+    tj: { label: "Дастгирии Vizora", title: "Тамос бо менеҷер", text: "Саволи худро шарҳ диҳед — муроҷиат рақам мегирад ва дар кабинети шумо нигоҳ дошта мешавад.", name: "Номи шумо *", namePlaceholder: "Ному насаб", phone: "Телефон *", topic: "Мавзӯи муроҷиат *", topics: ["Сохтани варақа", "Сабти ташкилот", "Тарофа ва пардохт", "Санҷиши мутахассис", "Мушкили техникӣ"], number: "Рақами дархост", numberHint: "Агар мавҷуд бошад", message: "Паём *", messageHint: "Саволро кӯтоҳ шарҳ диҳед", send: "Фиристодани муроҷиат", manager: "Менеҷери Vizora", working: "Ҷавоб дар вақти корӣ", email: "Почтаи электронӣ", chat: "Кушодани чат", write: "Навиштан ба менеҷер", call: "Дархости занг" },
+    en: { label: "Vizora support", title: "Contact a manager", text: "Describe your question. The request will receive a number and be saved in your dashboard.", name: "Your name *", namePlaceholder: "Full name", phone: "Phone *", topic: "Request topic *", topics: ["Creating a business card", "Organization registration", "Plan and payment", "Specialist verification", "Technical issue"], number: "Request number", numberHint: "If available", message: "Message *", messageHint: "Briefly describe your question", send: "Send request", manager: "Vizora manager", working: "Reply during business hours", email: "Email", chat: "Open chat", write: "Message the manager", call: "Request a call" }
+  }[language];
   return (
     <>
       <main className="support-page">
         <div className="site-container py-14 md:py-20">
           <div className="section-heading">
-            <span className="section-label">Поддержка Vizora</span>
-            <h1>Связь с менеджером</h1>
-            <p>Опишите вопрос — обращение получит номер и сохранится в вашем кабинете.</p>
+            <span className="section-label">{copy.label}</span>
+            <h1>{copy.title}</h1>
+            <p>{copy.text}</p>
           </div>
           <div className="support-layout">
             <section className="application-panel">
               <form className="platform-form" onSubmit={(event) => event.preventDefault()}>
                 <div className="form-grid">
-                  <label><span>Ваше имя *</span><input required placeholder="Имя и фамилия" /></label>
-                  <label><span>Телефон *</span><input required type="tel" placeholder="+992" /></label>
-                  <label><span>Тема обращения *</span><select required><option>Создание визитки</option><option>Регистрация организации</option><option>Тариф и оплата</option><option>Проверка специалиста</option><option>Техническая проблема</option></select></label>
-                  <label><span>Номер заявки</span><input placeholder="Если имеется" /></label>
+                  <label><span>{copy.name}</span><input required placeholder={copy.namePlaceholder} /></label>
+                  <label><span>{copy.phone}</span><input required type="tel" placeholder="+992" /></label>
+                  <label><span>{copy.topic}</span><select required>{copy.topics.map((topic) => <option key={topic}>{topic}</option>)}</select></label>
+                  <label><span>{copy.number}</span><input placeholder={copy.numberHint} /></label>
                 </div>
-                <label><span>Сообщение *</span><textarea required rows={6} placeholder="Кратко опишите вопрос" /></label>
-                <button className="button button-primary button-large" type="submit"><Send size={18} /> Отправить обращение</button>
+                <label><span>{copy.message}</span><textarea required rows={6} placeholder={copy.messageHint} /></label>
+                <button className="button button-primary button-large" type="submit"><Send size={18} /> {copy.send}</button>
               </form>
             </section>
             <aside className="support-options">
-              <div className="support-option"><Headphones size={22} /><div><strong>Менеджер Vizora</strong><span>Ответ в рабочее время</span></div></div>
-              <a href="mailto:support@vizora.tj" className="support-option"><Mail size={22} /><div><strong>support@vizora.tj</strong><span>Электронная почта</span></div></a>
-              <button type="button" className="support-option"><MessageCircle size={22} /><div><strong>WhatsApp</strong><span>Открыть чат</span></div></button>
-              <button type="button" className="support-option"><Send size={22} /><div><strong>Telegram</strong><span>Написать менеджеру</span></div></button>
-              <button type="button" className="support-option"><Phone size={22} /><div><strong>Телефон</strong><span>Заказать звонок</span></div></button>
+              <div className="support-option"><Headphones size={22} /><div><strong>{copy.manager}</strong><span>{copy.working}</span></div></div>
+              <a href="mailto:support@vizora.tj" className="support-option"><Mail size={22} /><div><strong>support@vizora.tj</strong><span>{copy.email}</span></div></a>
+              <button type="button" className="support-option"><WhatsAppIcon size={22} /><div><strong>WhatsApp</strong><span>{copy.chat}</span></div></button>
+              <button type="button" className="support-option"><Send size={22} /><div><strong>Telegram</strong><span>{copy.write}</span></div></button>
+              <button type="button" className="support-option"><Phone size={22} /><div><strong>{copy.phone.replace(" *", "")}</strong><span>{copy.call}</span></div></button>
             </aside>
           </div>
         </div>

@@ -38,6 +38,7 @@ import type {
   CardTheme,
   Language
 } from "../types/card";
+import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 
 type FormErrors = Partial<Record<keyof CardDraft, string>>;
 
@@ -125,6 +126,35 @@ export default function CreatePage() {
   const [slugTouched, setSlugTouched] = useState(Boolean(existing));
   const fileInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
+  const builderCopy = {
+    ru: {
+      invalidImage: "Выберите файл изображения", imageFailed: "Не удалось обработать изображение",
+      profileHint: "Основные данные вашего профиля", companyLogo: "Логотип компании", companyLogoHint: "Отдельный логотип для верхней части визитки", uploadLogo: "Загрузить логотип",
+      namePlaceholder: "Фируз Саидов", positionPlaceholder: "Руководитель", companyPlaceholder: "Название компании",
+      descriptionPlaceholder: "Расскажите коротко о своей работе и преимуществах...", contactsHint: "Добавьте удобные способы связи",
+      addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Укажите ссылку или имя пользователя",
+      designHint: "Подберите оформление под свой образ", saving: "Сохранение...",
+      previewHint: "Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран."
+    },
+    tj: {
+      invalidImage: "Файли тасвирро интихоб кунед", imageFailed: "Коркарди тасвир муяссар нашуд",
+      profileHint: "Маълумоти асосии профили шумо", companyLogo: "Логотипи ширкат", companyLogoHint: "Логотипи алоҳида барои қисми болоии варақа", uploadLogo: "Бор кардани логотип",
+      namePlaceholder: "Фирӯз Саидов", positionPlaceholder: "Роҳбар", companyPlaceholder: "Номи ширкат",
+      descriptionPlaceholder: "Дар бораи фаъолият ва афзалиятҳои худ кӯтоҳ нависед...", contactsHint: "Роҳҳои муносиби тамосро илова кунед",
+      addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пайванд ё номи корбарро ворид кунед",
+      designHint: "Ороишро мувофиқи симои худ интихоб кунед", saving: "Нигоҳдорӣ...",
+      previewHint: "Пешнамоиш худкор нав мешавад. Дар телефон варақа дар тамоми экран кушода мешавад."
+    },
+    en: {
+      invalidImage: "Choose an image file", imageFailed: "Could not process the image",
+      profileHint: "Your main profile information", companyLogo: "Company logo", companyLogoHint: "A separate logo for the top of the card", uploadLogo: "Upload logo",
+      namePlaceholder: "Firuz Saidov", positionPlaceholder: "Manager", companyPlaceholder: "Company name",
+      descriptionPlaceholder: "Briefly describe your work and advantages...", contactsHint: "Add convenient ways to contact you",
+      addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Enter a link or username",
+      designHint: "Choose a design that matches your image", saving: "Saving...",
+      previewHint: "The preview updates automatically. On a phone, the card opens full screen."
+    }
+  }[language];
 
   useEffect(() => {
     if (existing) setLanguage(existing.language);
@@ -155,7 +185,7 @@ export default function CreatePage() {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setErrors((current) => ({ ...current, [field]: "Выберите файл изображения" }));
+      setErrors((current) => ({ ...current, [field]: builderCopy.invalidImage }));
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -167,7 +197,7 @@ export default function CreatePage() {
     } catch {
       setErrors((current) => ({
         ...current,
-        [field]: "Не удалось обработать изображение"
+        [field]: builderCopy.imageFailed
       }));
     }
   };
@@ -256,7 +286,7 @@ export default function CreatePage() {
           <section className="form-section">
             <div className="form-section-title">
               <span><UserRound size={19} /></span>
-              <div><h2>{t("formProfile")}</h2><p>Основные данные вашего профиля</p></div>
+              <div><h2>{t("formProfile")}</h2><p>{builderCopy.profileHint}</p></div>
             </div>
 
             <div className="photo-upload">
@@ -308,8 +338,8 @@ export default function CreatePage() {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold">Логотип компании</p>
-                <p className="form-hint mt-1">Отдельный логотип для верхней части визитки</p>
+                <p className="font-semibold">{builderCopy.companyLogo}</p>
+                <p className="form-hint mt-1">{builderCopy.companyLogoHint}</p>
                 {errors.companyLogo && <p className="form-error mt-1">{errors.companyLogo}</p>}
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button
@@ -317,7 +347,7 @@ export default function CreatePage() {
                     className="button button-secondary !min-h-9 !px-3 !text-xs"
                     onClick={() => logoInput.current?.click()}
                   >
-                    <ImagePlus size={16} /> Загрузить логотип
+                    <ImagePlus size={16} /> {builderCopy.uploadLogo}
                   </button>
                   {form.companyLogo && (
                     <button
@@ -349,7 +379,7 @@ export default function CreatePage() {
                   className="form-input"
                   value={form.fullName}
                   onChange={(event) => updateName(event.target.value)}
-                  placeholder="Фируз Саидов"
+                  placeholder={builderCopy.namePlaceholder}
                   autoComplete="name"
                 />
               </Field>
@@ -362,7 +392,7 @@ export default function CreatePage() {
                   className="form-input"
                   value={form.position}
                   onChange={(event) => update("position", event.target.value)}
-                  placeholder="Руководитель"
+                  placeholder={builderCopy.positionPlaceholder}
                 />
               </Field>
               <Field
@@ -373,7 +403,7 @@ export default function CreatePage() {
                   className="form-input"
                   value={form.organization}
                   onChange={(event) => update("organization", event.target.value)}
-                  placeholder="Название компании"
+                  placeholder={builderCopy.companyPlaceholder}
                 />
               </Field>
               <Field
@@ -402,7 +432,7 @@ export default function CreatePage() {
                 value={form.description}
                 maxLength={240}
                 onChange={(event) => update("description", event.target.value)}
-                placeholder="Расскажите коротко о своей работе и преимуществах..."
+                placeholder={builderCopy.descriptionPlaceholder}
               />
               <span className="form-counter">{form.description.length}/240</span>
             </Field>
@@ -411,7 +441,7 @@ export default function CreatePage() {
           <section className="form-section">
             <div className="form-section-title">
               <span><Phone size={19} /></span>
-              <div><h2>{t("formContacts")}</h2><p>Добавьте удобные способы связи</p></div>
+              <div><h2>{t("formContacts")}</h2><p>{builderCopy.contactsHint}</p></div>
             </div>
             <div className="form-grid">
               <Field
@@ -437,7 +467,7 @@ export default function CreatePage() {
                   placeholder="+992 00 000 00 00"
                 />
               </Field>
-              <Field label={t("whatsapp")} icon={<MessageCircle size={16} />}>
+              <Field label={t("whatsapp")} icon={<WhatsAppIcon size={16} />}>
                 <input
                   className="form-input"
                   type="tel"
@@ -461,7 +491,7 @@ export default function CreatePage() {
                   className="form-input"
                   value={form.address}
                   onChange={(event) => update("address", event.target.value)}
-                  placeholder="Душанбе, проспект Рӯдакӣ, 1"
+                  placeholder={builderCopy.addressPlaceholder}
                   autoComplete="street-address"
                 />
               </Field>
@@ -481,7 +511,7 @@ export default function CreatePage() {
           <section className="form-section">
             <div className="form-section-title">
               <span><MessageCircle size={19} /></span>
-              <div><h2>{t("formSocial")}</h2><p>Укажите ссылку или имя пользователя</p></div>
+              <div><h2>{t("formSocial")}</h2><p>{builderCopy.socialHint}</p></div>
             </div>
             <div className="form-grid">
               {(["telegram", "instagram", "facebook"] as const).map((network) => (
@@ -505,7 +535,7 @@ export default function CreatePage() {
           <section className="form-section">
             <div className="form-section-title">
               <span><Palette size={19} /></span>
-              <div><h2>{t("formDesign")}</h2><p>Подберите оформление под свой образ</p></div>
+              <div><h2>{t("formDesign")}</h2><p>{builderCopy.designHint}</p></div>
             </div>
             <div className="grid gap-7">
               <div>
@@ -570,7 +600,7 @@ export default function CreatePage() {
 
           <button type="submit" className="button button-primary button-large w-full" disabled={saving}>
             <Save size={19} />
-            {saving ? "Сохранение..." : existing ? t("updateCard") : t("saveCard")}
+            {saving ? builderCopy.saving : existing ? t("updateCard") : t("saveCard")}
             <ArrowRight size={19} />
           </button>
         </form>
@@ -585,7 +615,7 @@ export default function CreatePage() {
             <CardPreview card={form} />
           </div>
           <p className="mt-4 text-center text-xs leading-5 text-[var(--muted)]">
-            Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран.
+            {builderCopy.previewHint}
           </p>
         </aside>
       </div>

@@ -15,20 +15,24 @@ import { useApp } from "../../context/AppContext";
 import type { Language } from "../../types/card";
 import BrandLogo from "../BrandLogo";
 
-const navItems = [
-  { to: "/", text: "Главная" },
-  { to: "/directory", text: "Специалисты", icon: Search },
-  { to: "/organizations", text: "Организации", icon: Building2 },
-  { to: "/services", text: "Услуги" },
-  { to: "/dashboard", text: "Кабинет", icon: LayoutDashboard },
-  { to: "/dashboard/leads", text: "Лиды" },
-  { to: "/admin", text: "Админ", icon: ShieldCheck }
-];
-
 export default function Header() {
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const copy = {
+    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", admin: "Админ", login: "Войти", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
+    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", admin: "Админ", login: "Ворид шудан", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
+    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", admin: "Admin", login: "Sign in", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
+  }[language];
+  const navItems = [
+    { to: "/", text: copy.home },
+    { to: "/directory", text: copy.directory, icon: Search },
+    { to: "/organizations", text: copy.organizations, icon: Building2 },
+    { to: "/services", text: copy.services },
+    { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
+    { to: "/dashboard/leads", text: copy.leads },
+    { to: "/admin", text: copy.admin, icon: ShieldCheck }
+  ];
 
   useEffect(() => setOpen(false), [location.pathname]);
 
@@ -39,7 +43,7 @@ export default function Header() {
           <BrandLogo />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Основная навигация">
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={copy.mainNav}>
           {navItems.map(({ to, text }) => (
             <NavLink
               key={to}
@@ -82,7 +86,7 @@ export default function Header() {
             <Plus size={17} />
             {t("create")}
           </Link>
-          <Link to="/login" className="button button-secondary !min-h-10 !px-4">Войти</Link>
+          <Link to="/login" className="button button-secondary !min-h-10 !px-4">{copy.login}</Link>
         </div>
 
         <button
@@ -98,7 +102,7 @@ export default function Header() {
 
       {open && (
         <div className="mobile-menu sm:hidden">
-          <nav className="grid gap-1" aria-label="Мобильная навигация">
+          <nav className="grid gap-1" aria-label={copy.mobileNav}>
             {navItems.map(({ to, text, icon: Icon }) => (
               <NavLink
                 key={to}
@@ -138,7 +142,7 @@ export default function Header() {
             <Plus size={18} />
             {t("create")}
           </Link>
-          <Link to="/login" className="button button-secondary mt-2 w-full">Войти</Link>
+          <Link to="/login" className="button button-secondary mt-2 w-full">{copy.login}</Link>
         </div>
       )}
     </header>

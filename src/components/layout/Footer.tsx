@@ -4,7 +4,12 @@ import { useApp } from "../../context/AppContext";
 import BrandLogo from "../BrandLogo";
 
 export default function Footer() {
-  const { t } = useApp();
+  const { t, language } = useApp();
+  const copy = {
+    ru: { directory: "Каталог специалистов", organizations: "Организациям", services: "Визитки и QR-услуги", made: "Сделано в Таджикистане" },
+    tj: { directory: "Феҳристи мутахассисон", organizations: "Барои ташкилотҳо", services: "Варақаҳо ва QR-хизматҳо", made: "Дар Тоҷикистон сохта шудааст" },
+    en: { directory: "Specialist directory", organizations: "For organizations", services: "Business cards and QR services", made: "Made in Tajikistan" }
+  }[language];
 
   return (
     <footer className="border-t border-white/10 bg-[#0b1220] text-white">
@@ -23,9 +28,9 @@ export default function Footer() {
             <Link to="/create">{t("create")}</Link>
             <Link to="/dashboard">{t("dashboard")}</Link>
             <Link to="/card/demo">{t("example")}</Link>
-            <Link to="/directory">Каталог специалистов</Link>
-            <Link to="/organizations">Организациям</Link>
-            <Link to="/services">Визитки и QR-услуги</Link>
+            <Link to="/directory">{copy.directory}</Link>
+            <Link to="/organizations">{copy.organizations}</Link>
+            <Link to="/services">{copy.services}</Link>
           </div>
         </div>
         <div>
@@ -46,7 +51,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="site-container flex flex-col gap-2 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Vizora.tj. {t("rights")}</span>
-          <span>Сделано в Таджикистане</span>
+          <span>{copy.made}</span>
         </div>
       </div>
     </footer>

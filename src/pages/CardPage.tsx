@@ -36,6 +36,7 @@ import type { DigitalCard, Language } from "../types/card";
 import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
+import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 
 type AccentStyle = CSSProperties & {
   "--profile-accent": string;
@@ -209,7 +210,7 @@ export default function CardPage() {
     },
     card.whatsapp && {
       href: `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`,
-      icon: MessageCircle,
+      icon: WhatsAppIcon,
       label: "WhatsApp",
       primary: true
     },
@@ -383,7 +384,6 @@ export default function CardPage() {
               )}
               {card.address && (
                 <a
-                  className="profile-detail-wide"
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`}
                   target="_blank"
                   rel="noreferrer"
@@ -394,7 +394,7 @@ export default function CardPage() {
               )}
             </div>
 
-            {(card.instagram || card.facebook || card.telegram) && (
+            {(card.instagram || card.facebook || card.whatsapp || card.telegram) && (
               <div className="profile-social-row">
                 {card.instagram && (
                   <a href={socialUrl("instagram", card.instagram)} target="_blank" rel="noreferrer" aria-label="Instagram">
@@ -404,6 +404,11 @@ export default function CardPage() {
                 {card.facebook && (
                   <a href={socialUrl("facebook", card.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook">
                     <Facebook size={20} />
+                  </a>
+                )}
+                {card.whatsapp && (
+                  <a href={`https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp">
+                    <WhatsAppIcon size={20} />
                   </a>
                 )}
                 {card.telegram && (

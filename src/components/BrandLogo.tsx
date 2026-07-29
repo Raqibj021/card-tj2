@@ -10,18 +10,20 @@ export default function BrandLogo({
   light = false
 }: BrandLogoProps) {
   const asset = `${import.meta.env.BASE_URL}brand/${compact ? "vizora-mark.webp" : "vizora-logo.webp"}`;
+  const lightAsset = `${import.meta.env.BASE_URL}brand/${compact ? "vizora-mark.webp" : "vizora-logo-silver.png"}`;
 
   return (
     <span className={`vizora-brand ${compact ? "vizora-brand-compact" : ""} ${light ? "vizora-brand-light" : ""} ${className}`}>
       <img
         src={asset}
         alt="VIZORA.TJ"
-        className={compact ? "vizora-brand-mark" : "vizora-brand-full"}
+        className={`${compact ? "vizora-brand-mark" : "vizora-brand-full"} vizora-brand-default-image`}
       />
-      <span
+      <img
+        src={lightAsset}
+        alt=""
         aria-hidden="true"
-        className="vizora-brand-gradient"
-        style={{ WebkitMaskImage: `url("${asset}")`, maskImage: `url("${asset}")` }}
+        className={`${compact ? "vizora-brand-mark" : "vizora-brand-full"} vizora-brand-light-image`}
       />
     </span>
   );

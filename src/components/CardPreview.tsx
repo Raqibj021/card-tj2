@@ -7,7 +7,6 @@ import {
   Instagram,
   Mail,
   MapPin,
-  MessageCircle,
   Phone,
   QrCode,
   Send
@@ -15,6 +14,7 @@ import {
 import { useApp } from "../context/AppContext";
 import { themeColors } from "../lib/cardUtils";
 import type { CardDraft, DigitalCard } from "../types/card";
+import WhatsAppIcon from "./icons/WhatsAppIcon";
 
 interface CardPreviewProps {
   card: CardDraft | DigitalCard;
@@ -38,7 +38,12 @@ export default function CardPreview({
   card,
   compact = false
 }: CardPreviewProps) {
-  const { t } = useApp();
+  const { t, language } = useApp();
+  const copy = {
+    ru: { kicker: "ПРОФЕССИОНАЛЬНЫЙ ПРОФИЛЬ", description: "Кратко расскажите о себе, своей работе и главной ценности для клиента." },
+    tj: { kicker: "ПРОФИЛИ КАСБӢ", description: "Дар бораи худ, фаъолияти худ ва арзиши асосӣ барои муштарӣ кӯтоҳ маълумот диҳед." },
+    en: { kicker: "PROFESSIONAL PROFILE", description: "Briefly introduce yourself, your work and the value you provide to clients." }
+  }[language];
   const palette = themeColors[card.theme];
   const style: AccentStyle = {
     "--card-accent": palette.accent,
@@ -84,7 +89,7 @@ export default function CardPreview({
             <span className="card-preview-verified"><Check size={12} /></span>
           </div>
           <div className="min-w-0">
-            <span className="card-kicker">ПРОФЕССИОНАЛЬНЫЙ ПРОФИЛЬ</span>
+            <span className="card-kicker">{copy.kicker}</span>
             <h3 className="card-name">{card.fullName || t("fullName")}</h3>
             <p className="card-role">{card.position || t("position")}</p>
           </div>
@@ -92,7 +97,7 @@ export default function CardPreview({
 
         <p className="card-description">
           {card.description ||
-            "Кратко расскажите о себе, своей работе и главной ценности для клиента."}
+            copy.description}
         </p>
 
         {!compact && (
@@ -108,7 +113,7 @@ export default function CardPreview({
             <span>{t("call")}</span>
           </div>
           <div className="card-primary-button card-primary-button-light">
-            <MessageCircle size={18} />
+            <WhatsAppIcon size={18} />
             <span>WhatsApp</span>
           </div>
         </div>

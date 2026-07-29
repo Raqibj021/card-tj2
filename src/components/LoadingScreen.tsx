@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useApp } from "../context/AppContext";
 import BrandLogo from "./BrandLogo";
 
 export default function LoadingScreen() {
+  const { language } = useApp();
   const [visible, setVisible] = useState(true);
   const [leaving, setLeaving] = useState(false);
 
@@ -32,7 +34,7 @@ export default function LoadingScreen() {
       <div className="loading-brand">
         <BrandLogo />
         <span className="loading-line" />
-        <p>Цифровые визитки и проверенные контакты</p>
+        <p>{language === "ru" ? "Цифровые визитки и проверенные контакты" : language === "tj" ? "Варақаҳои рақамӣ ва тамосҳои тасдиқшуда" : "Digital business cards and verified contacts"}</p>
       </div>
     </div>
   );
