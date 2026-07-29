@@ -31,6 +31,9 @@ export interface DigitalCard {
   language: Language;
   theme: CardTheme;
   template: CardTemplate;
+  visibility?: "private" | "public" | "organization" | "public_organization";
+  reviewStatus?: "draft" | "pending" | "approved" | "changes_requested" | "rejected" | "suspended";
+  trialExpiresAt?: string | null;
   views: number;
   createdAt: string;
   updatedAt: string;
