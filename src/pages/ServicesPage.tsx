@@ -1,4 +1,4 @@
-import { Badge, Contact, CreditCard, Download, QrCode, ScanLine, Sparkles } from "lucide-react";
+import { Badge, Contact, CreditCard, Download, FileSignature, Printer, QrCode, ScanLine, ShoppingBag, Sparkles } from "lucide-react";
 import { Link } from "react-router";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
@@ -32,6 +32,11 @@ export default function ServicesPage() {
             <Link to="/support" className="button button-primary button-large mt-8">
               {copy.calculate}
             </Link>
+            <div className="service-shortcuts">
+              <Link to="/service-order"><ShoppingBag size={18} /> {copy.request}</Link>
+              <Link to="/print-card"><Printer size={18} /> 85 × 55 мм</Link>
+              <Link to="/contract"><FileSignature size={18} /> Договор</Link>
+            </div>
           </div>
         </section>
         <section className="section">
@@ -42,7 +47,7 @@ export default function ServicesPage() {
                   <div><Icon size={23} /></div>
                   <h2>{title}</h2>
                   <p>{text}</p>
-                  <Link to="/support">{copy.request} <QrCode size={15} /></Link>
+                  <Link to="/service-order">{copy.request} <QrCode size={15} /></Link>
                 </article>
               ))}
             </div>
