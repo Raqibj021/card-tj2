@@ -1,4 +1,5 @@
 import {
+  ArrowLeft,
   ArrowRight,
   BadgeCheck,
   Building2,
@@ -14,17 +15,35 @@ import {
   Sparkles,
   Zap
 } from "lucide-react";
-import type { CSSProperties } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import CardPreview from "../components/CardPreview";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { demoCards } from "../data/demo";
 import LaunchPromo from "../components/LaunchPromo";
-import { themeColors } from "../lib/cardUtils";
+import type { DigitalCard } from "../types/card";
 
 export default function HomePage() {
   const { t } = useApp();
+  const [selectedDesign, setSelectedDesign] = useState<DigitalCard | null>(null);
+  const showcaseDesigns = demoCards.slice(0, 8);
+
+  useEffect(() => {
+    if (!selectedDesign) return;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedDesign(null);
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [selectedDesign]);
 
   const benefits = [
     {
@@ -129,39 +148,38 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mobile-card-gallery" aria-label="Новые шаблоны визиток">
+        <section className="design-showcase-section" aria-label={t("examplesTitle")}>
           <div className="site-container">
-            <div className="mobile-card-gallery-head">
+            <div className="design-showcase-head">
               <div>
-                <span className="section-label">New</span>
-                <h2>Готовые визитки</h2>
+                <span className="section-label">{t("designCount")}</span>
+                <h2>{t("examplesTitle")}</h2>
+                <p>{t("examplesText")}</p>
               </div>
-              <Link to="/create">Создать <ArrowRight size={14} /></Link>
+              <Link to="/create">{t("create")} <ArrowRight size={15} /></Link>
             </div>
-            <div className="mobile-card-gallery-track">
-              {demoCards.slice(0, 4).map((card) => (
-                <Link
-                  key={card.id}
-                  to={`/card/${card.slug}`}
-                  className={`mobile-card-mini mobile-card-mini-${card.template}`}
-                  style={{ "--mini-accent": themeColors[card.theme].accent } as CSSProperties}
+          </div>
+          <div className="design-showcase-marquee">
+            <div className="design-showcase-track">
+              {[...showcaseDesigns, ...showcaseDesigns].map((card, index) => (
+                <button
+                  key={`${card.id}-${index}`}
+                  type="button"
+                  className="design-showcase-item"
+                  onClick={() => setSelectedDesign(card)}
+                  aria-label={`${t("openCard")}: ${card.fullName}`}
                 >
-                  <div className="mobile-card-mini-top">
-                    {card.photo ? (
-                      <img src={card.photo} alt="" />
-                    ) : (
-                      <span>{card.fullName.slice(0, 1)}</span>
-                    )}
-                    <em>{card.template === "minimal" ? "Neon" : card.template === "creative" ? "Atelier" : "Premium"}</em>
-                    <span className="mobile-card-mini-qr"><QrCode size={17} /></span>
+                  <div className="design-showcase-canvas">
+                    <CardPreview card={card} />
                   </div>
-                  <strong>{card.fullName}</strong>
-                  <small>{card.organization}</small>
-                  <div className="mobile-card-mini-actions">
-                    <span>Открыть</span>
-                    <ArrowRight size={14} />
+                  <div className="design-showcase-caption">
+                    <span>
+                      <strong>{card.template === "minimal" ? "Neon" : card.template === "creative" ? "Atelier" : "Premium"}</strong>
+                      <small>{card.organization}</small>
+                    </span>
+                    <ArrowRight size={15} />
                   </div>
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -351,6 +369,33 @@ export default function HomePage() {
           </div>
         </section>
       </main>
+      {selectedDesign && (
+        <div
+          className="design-viewer"
+          role="dialog"
+          aria-modal="true"
+          aria-label={selectedDesign.fullName}
+          onMouseDown={(event) => {
+            if (event.currentTarget === event.target) setSelectedDesign(null);
+          }}
+        >
+          <div className="design-viewer-panel">
+            <button
+              type="button"
+              className="design-viewer-back"
+              onClick={() => setSelectedDesign(null)}
+            >
+              <ArrowLeft size={18} /> {t("back")}
+            </button>
+            <div className="design-viewer-card">
+              <CardPreview card={selectedDesign} />
+            </div>
+            <Link to="/create" className="button button-primary" onClick={() => setSelectedDesign(null)}>
+              {t("chooseDesign")} <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      )}
       <Footer />
     </>
   );

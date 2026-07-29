@@ -40,6 +40,9 @@ const ru = {
   examplesText:
     "Деловая, сдержанная или выразительная — содержание всегда остаётся понятным.",
   openCard: "Открыть визитку",
+  designCount: "8 вариантов дизайна",
+  back: "Назад",
+  chooseDesign: "Выбрать этот дизайн",
   pricingTitle: "Тарифы для любого масштаба",
   pricingText:
     "На этапе MVP тарифы представлены для демонстрации. Оплата пока не подключена.",
@@ -204,6 +207,9 @@ const tj: Record<CopyKey, string> = {
   examplesText:
     "Расмӣ, сода ё ҷолиб — маълумот ҳамеша фаҳмо мемонад.",
   openCard: "Кортро кушодан",
+  designCount: "8 намуди дизайн",
+  back: "Бозгашт",
+  chooseDesign: "Ин дизайнро интихоб кардан",
   pricingTitle: "Нарҳҳо барои ҳар андоза",
   pricingText:
     "Дар марҳилаи MVP нархҳо барои намоиш мебошанд. Пардохт ҳоло пайваст нашудааст.",
@@ -363,6 +369,9 @@ const en: Record<CopyKey, string> = {
   examplesText:
     "Professional, minimal or expressive — your information stays clear.",
   openCard: "Open card",
+  designCount: "8 design options",
+  back: "Back",
+  chooseDesign: "Choose this design",
   pricingTitle: "Plans for every scale",
   pricingText:
     "At the MVP stage, plans are for demonstration only. Payments are not connected yet.",
