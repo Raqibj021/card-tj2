@@ -3,10 +3,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
+import { organizationRepository } from "../lib/organizationRepository";
 
 export default function OrganizationApplyPage() {
   const { language } = useApp();
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
   const c = {
     ru: { label: "Заявка организации", title: "Регистрация в Vizora", intro: "Черновик сохраняется автоматически. После проверки оплаты вы получите код активации.", saved: "Заявка сохранена", demo: "Демонстрационный режим: после подключения Supabase заявка будет доступна по номеру и на другом устройстве.", edit: "Изменить данные", org: "Название организации *", full: "Полное название", type: "Тип организации *", choose: "Выберите", types: ["Компания", "Учебное учреждение", "Государственное учреждение", "Магазин", "Другое"], person: "ФИО ответственного лица *", personHint: "Имя и фамилия", position: "Должность *", positionHint: "Руководитель или администратор", phone: "Телефон *", email: "Электронная почта *", plan: "Выберите тариф", consent: "Я подтверждаю достоверность данных и согласен с правилами платформы.", save: "Сохранить заявку", activation: "Как проходит активация", steps: ["Заполните заявку", "Переведите оплату", "Загрузите подтверждение", "Получите код активации"], requisites: "Реквизиты после заявки", check: "Проверка до 3 часов", kept: "Заявка сохраняется 7 дней", protected: "Защищённые данные", private: "Документы не публикуются" },
@@ -30,19 +33,37 @@ export default function OrganizationApplyPage() {
                 <button type="button" className="button button-primary" onClick={() => setSubmitted(false)}>{c.edit}</button>
               </div>
             ) : (
-              <form className="platform-form" onSubmit={(event) => {
+              <form className="platform-form" onSubmit={async (event) => {
                 event.preventDefault();
-                setSubmitted(true);
+                setBusy(true);
+                setError("");
                 const form = new FormData(event.currentTarget);
-                window.setTimeout(() => navigate(`/payment?plan=${String(form.get("plan") ?? "start")}`), 700);
+                try {
+                  const plan = String(form.get("plan") ?? "start");
+                  const organization = await organizationRepository.createApplication({
+                    name: String(form.get("organizationName")),
+                    type: String(form.get("organizationType")),
+                    contactName: String(form.get("contactName")),
+                    contactPosition: String(form.get("contactPosition")),
+                    phone: String(form.get("phone")),
+                    email: String(form.get("email")),
+                    planCode: plan
+                  });
+                  setSubmitted(true);
+                  window.setTimeout(() => navigate(`/payment?plan=${plan}&organization=${String(organization.id)}`), 700);
+                } catch (caught) {
+                  setError(caught instanceof Error ? caught.message : "Не удалось сохранить заявку.");
+                } finally {
+                  setBusy(false);
+                }
               }}>
                 <div className="form-grid">
-                  <label><span>{c.org}</span><input required placeholder={c.full} /></label>
-                  <label><span>{c.type}</span><select required defaultValue=""><option value="" disabled>{c.choose}</option>{c.types.map((type) => <option key={type}>{type}</option>)}</select></label>
-                  <label><span>{c.person}</span><input required placeholder={c.personHint} /></label>
-                  <label><span>{c.position}</span><input required placeholder={c.positionHint} /></label>
-                  <label><span>{c.phone}</span><input required type="tel" placeholder="+992" /></label>
-                  <label><span>{c.email}</span><input required type="email" placeholder="name@company.tj" /></label>
+                  <label><span>{c.org}</span><input name="organizationName" required placeholder={c.full} /></label>
+                  <label><span>{c.type}</span><select name="organizationType" required defaultValue=""><option value="" disabled>{c.choose}</option>{c.types.map((type) => <option key={type}>{type}</option>)}</select></label>
+                  <label><span>{c.person}</span><input name="contactName" required placeholder={c.personHint} /></label>
+                  <label><span>{c.position}</span><input name="contactPosition" required placeholder={c.positionHint} /></label>
+                  <label><span>{c.phone}</span><input name="phone" required type="tel" placeholder="+992" /></label>
+                  <label><span>{c.email}</span><input name="email" required type="email" placeholder="name@company.tj" /></label>
                 </div>
                 <fieldset>
                   <legend>{c.plan}</legend>
@@ -57,7 +78,8 @@ export default function OrganizationApplyPage() {
                   </div>
                 </fieldset>
                 <label className="consent-row"><input required type="checkbox" /> {c.consent}</label>
-                <button className="button button-primary button-large" type="submit">{c.save}</button>
+                {error && <div className="auth-message">{error}</div>}
+                <button className="button button-primary button-large" type="submit" disabled={busy}>{busy ? "…" : c.save}</button>
               </form>
             )}
           </section>
