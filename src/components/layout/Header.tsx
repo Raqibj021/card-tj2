@@ -7,30 +7,41 @@ import {
   Building2,
   Plus,
   Sun,
+  UserRound,
   X
 } from "lucide-react";
 import { Link, NavLink, useLocation } from "react-router";
 import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
 import type { Language } from "../../types/card";
 import BrandLogo from "../BrandLogo";
 
 export default function Header() {
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
+  const { user, profile, loading: authLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const copy = {
-    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", login: "Войти", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
-    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", login: "Ворид шудан", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
-    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", login: "Sign in", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
+    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", login: "Войти", account: "Личный кабинет", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
+    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", login: "Ворид шудан", account: "Утоқи шахсӣ", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
+    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", login: "Sign in", account: "Personal account", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
   }[language];
   const navItems = [
     { to: "/", text: copy.home },
     { to: "/directory", text: copy.directory, icon: Search },
     { to: "/organizations", text: copy.organizations, icon: Building2 },
     { to: "/services", text: copy.services },
-    { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
-    { to: "/dashboard/leads", text: copy.leads }
+    ...(user
+      ? [
+          { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
+          { to: "/dashboard/leads", text: copy.leads }
+        ]
+      : [])
   ];
+  const accountName =
+    profile?.fullName.trim().split(/\s+/)[0] ||
+    user?.email?.split("@")[0] ||
+    copy.account;
 
   useEffect(() => setOpen(false), [location.pathname]);
 
@@ -84,7 +95,23 @@ export default function Header() {
             <Plus size={17} />
             {t("create")}
           </Link>
-          <Link to="/login" className="button button-secondary !min-h-10 !px-4">{copy.login}</Link>
+          {!authLoading && (
+            user ? (
+              <Link
+                to="/dashboard"
+                className="account-link"
+                aria-label={copy.account}
+                title={copy.account}
+              >
+                <span><UserRound size={17} /></span>
+                <strong>{accountName}</strong>
+              </Link>
+            ) : (
+              <Link to="/login" className="button button-secondary !min-h-10 !px-4">
+                {copy.login}
+              </Link>
+            )
+          )}
         </div>
 
         <button
@@ -140,7 +167,21 @@ export default function Header() {
             <Plus size={18} />
             {t("create")}
           </Link>
-          <Link to="/login" className="button button-secondary mt-2 w-full">{copy.login}</Link>
+          {!authLoading && (
+            user ? (
+              <Link to="/dashboard" className="mobile-account-link">
+                <span><UserRound size={18} /></span>
+                <div>
+                  <small>{copy.account}</small>
+                  <strong>{accountName}</strong>
+                </div>
+              </Link>
+            ) : (
+              <Link to="/login" className="button button-secondary mt-2 w-full">
+                {copy.login}
+              </Link>
+            )
+          )}
         </div>
       )}
     </header>

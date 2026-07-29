@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
 import type { Language } from "../types/card";
 
@@ -151,6 +152,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { language, setLanguage } = useApp();
+  const { user, loading: authLoading } = useAuth();
   const text = authCopy[language];
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -166,6 +168,28 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
     }, 1000);
     return () => window.clearInterval(timer);
   }, [resendCooldown]);
+
+  useEffect(() => {
+    if (authLoading || !user) return;
+    const destination =
+      (location.state as { from?: string } | null)?.from ?? "/dashboard";
+    navigate(destination, { replace: true });
+  }, [authLoading, location.state, navigate, user]);
+
+  if (authLoading || user) {
+    return (
+      <main className="auth-session-loading" aria-live="polite">
+        <span />
+        <p>
+          {language === "ru"
+            ? "Восстанавливаем сохранённый вход…"
+            : language === "tj"
+              ? "Воридшавии нигоҳдошташуда барқарор мешавад…"
+              : "Restoring your saved session…"}
+        </p>
+      </main>
+    );
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

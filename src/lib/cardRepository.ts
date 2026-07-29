@@ -3,6 +3,7 @@ import type { CardDraft, DigitalCard } from "../types/card";
 import { supabase } from "./supabase";
 
 const STORAGE_KEY = "vizora.cards.v1";
+const isDemoCard = (card: DigitalCard) => card.id.startsWith("demo-");
 
 export interface CardRepository {
   list(): DigitalCard[];
@@ -228,15 +229,16 @@ class LocalStorageCardRepository implements CardRepository {
   }
 
   async listRemote() {
-    if (!supabase) return this.list();
+    const localUserCards = this.list().filter((card) => !isDemoCard(card));
+    if (!supabase) return localUserCards;
     const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return this.list();
+    if (!auth.user) return localUserCards;
     const { data, error } = await supabase
       .from("cards")
       .select("*")
       .eq("owner_id", auth.user.id)
       .order("updated_at", { ascending: false });
-    if (error || !data?.length) return this.list();
+    if (error || !data?.length) return localUserCards;
     return data.map((row) => this.fromDatabase(row));
   }
 

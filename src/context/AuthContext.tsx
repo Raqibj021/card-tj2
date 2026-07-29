@@ -75,24 +75,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const client = supabase;
     let active = true;
 
-    void client.auth.getSession().then(async ({ data }) => {
+    const applySession = async (nextSession: Session | null) => {
       if (!active) return;
-      setSession(data.session);
-      setProfile(await loadProfile(data.session?.user ?? null));
+      setSession(nextSession);
+      const nextProfile = await loadProfile(nextSession?.user ?? null);
+      if (!active) return;
+      setProfile(nextProfile);
       setLoading(false);
-    });
+    };
+
+    const restoreStoredSession = async () => {
+      const { data, error } = await client.auth.getSession();
+      if (!active) return;
+      if (error) {
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+      await applySession(data.session);
+    };
+
+    void restoreStoredSession();
 
     const { data: listener } = client.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      void loadProfile(nextSession?.user ?? null).then((nextProfile) => {
-        if (!active) return;
-        setProfile(nextProfile);
-        setLoading(false);
-      });
+      void applySession(nextSession);
     });
+
+    const restoreWhenVisible = () => {
+      if (document.visibilityState === "visible") void restoreStoredSession();
+    };
+    document.addEventListener("visibilitychange", restoreWhenVisible);
+    window.addEventListener("focus", restoreStoredSession);
 
     return () => {
       active = false;
+      document.removeEventListener("visibilitychange", restoreWhenVisible);
+      window.removeEventListener("focus", restoreStoredSession);
       listener.subscription.unsubscribe();
     };
   }, []);
