@@ -9,7 +9,8 @@ import {
   QrCode,
   Trash2,
   MessageSquareText,
-  UsersRound
+  UsersRound,
+  ShieldCheck
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -37,6 +38,11 @@ export default function DashboardPage() {
   const [cards, setCards] = useState<DigitalCard[]>(() => cardRepository.list());
   const [toast, setToast] = useState("");
   const leads = leadRepository.list();
+  const dashboardCopy = {
+    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик" },
+    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Дар санҷиш", approved: "Нашр шудааст", draft: "Нусхаи муваққатӣ" },
+    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Draft" }
+  }[language];
 
   useEffect(() => {
     let active = true;
@@ -94,11 +100,11 @@ export default function DashboardPage() {
             </article>
             <article>
               <span><UsersRound size={20} /></span>
-              <div><strong>{leads.length}</strong><small>Клиенты</small></div>
+              <div><strong>{leads.length}</strong><small>{dashboardCopy.clients}</small></div>
             </article>
             <article>
               <span><MessageSquareText size={20} /></span>
-              <div><strong>{leads.filter((lead) => lead.status === "new").length}</strong><small>Новые лиды</small></div>
+              <div><strong>{leads.filter((lead) => lead.status === "new").length}</strong><small>{dashboardCopy.newLeads}</small></div>
             </article>
           </div>
         </div>
@@ -106,8 +112,12 @@ export default function DashboardPage() {
 
       <section className="site-container py-10 md:py-14">
         <div className="dashboard-crm-banner">
-          <div><MessageSquareText size={22} /><span><strong>Мини-CRM Vizora</strong><small>Обращения из публичных визиток, статусы, заметки и оплата</small></span></div>
-          <Link to="/dashboard/leads" className="button button-secondary">Открыть лиды</Link>
+          <div><MessageSquareText size={22} /><span><strong>{dashboardCopy.crm}</strong><small>{dashboardCopy.crmText}</small></span></div>
+          <Link to="/dashboard/leads" className="button button-secondary">{dashboardCopy.openLeads}</Link>
+        </div>
+        <div className="dashboard-crm-banner mt-3">
+          <div><ShieldCheck size={22} /><span><strong>{language === "ru" ? "Проверка специалиста" : language === "tj" ? "Санҷиши мутахассис" : "Professional verification"}</strong><small>{language === "ru" ? "Подтвердите профессию перед публикацией в открытом каталоге" : language === "tj" ? "Пеш аз нашр касби худро тасдиқ кунед" : "Verify your profession before directory publication"}</small></span></div>
+          <Link to="/verification" className="button button-secondary">{language === "ru" ? "Загрузить документы" : language === "tj" ? "Бор кардани ҳуҷҷатҳо" : "Upload documents"}</Link>
         </div>
         {cards.length ? (
           <div className="grid gap-5 lg:grid-cols-2">
@@ -143,6 +153,9 @@ export default function DashboardPage() {
 
                   <div className="dashboard-card-meta">
                     <span><Eye size={15} /> {card.views.toLocaleString()} {t("views").toLowerCase()}</span>
+                    <span className={`status-pill ${card.reviewStatus === "pending" ? "status-review" : ""}`}>
+                      {card.reviewStatus === "approved" ? dashboardCopy.approved : card.reviewStatus === "pending" ? dashboardCopy.pending : dashboardCopy.draft}
+                    </span>
                     <span>{formatDate(card.updatedAt, language)}</span>
                   </div>
 
@@ -160,6 +173,23 @@ export default function DashboardPage() {
                     >
                       <QrCode size={16} /> QR
                     </button>
+                    {card.reviewStatus !== "approved" && card.reviewStatus !== "pending" && (
+                      <button
+                        type="button"
+                        className="button button-ghost"
+                        onClick={async () => {
+                          const result = await cardRepository.requestPublication(card.id);
+                          notify(result.message);
+                          if (result.ok) {
+                            setCards((items) => items.map((item) =>
+                              item.id === card.id ? { ...item, reviewStatus: "pending" } : item
+                            ));
+                          }
+                        }}
+                      >
+                        <ShieldCheck size={16} /> {dashboardCopy.publish}
+                      </button>
+                    )}
                     <button
                       type="button"
                       className="icon-button text-red-600"
