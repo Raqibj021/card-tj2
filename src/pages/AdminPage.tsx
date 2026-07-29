@@ -61,6 +61,9 @@ export default function AdminPage() {
           <Link to="/admin/payments" className="button button-primary">
             <CreditCard size={17} /> Проверить оплаты
           </Link>
+          <Link to="/admin/moderation" className="button button-secondary">
+            <Info size={17} /> Модерация
+          </Link>
         </div>
 
         <div className="admin-notice mt-8">
