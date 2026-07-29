@@ -28,7 +28,7 @@ export const demoCards: DigitalCard[] = [
   {
     id: "demo-firuz",
     slug: "firuz",
-    photo: `${import.meta.env.BASE_URL}showcase/abdullozoda-abdullo.webp`,
+    photo: `${import.meta.env.BASE_URL}showcase/abdullozoda-abdullo.svg`,
     companyLogo: "",
     fullName: "Абдуллозода Абдулло",
     position: "Муовини сардори раёсат",
