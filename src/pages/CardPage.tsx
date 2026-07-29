@@ -37,6 +37,7 @@ import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
+import ReportCardButton from "../components/ReportCardButton";
 
 type AccentStyle = CSSProperties & {
   "--profile-accent": string;
@@ -64,7 +65,10 @@ const profileCopy = {
     addWallet: "Добавить в Wallet",
     createOwn: "Создайте свою визитку",
     createdOn: "Создано на",
-    loading: "Загружаем визитку…"
+    loading: "Загружаем визитку…",
+    trial: "ДЕМО · НЕ АКТИВИРОВАНО",
+    trialText: "Черновик удалится автоматически, если вы не продолжите оформление.",
+    expiresIn: "Осталось"
   },
   tj: {
     digitalCard: "Варақаи рақамӣ",
@@ -78,7 +82,10 @@ const profileCopy = {
     addWallet: "Илова ба Wallet",
     createOwn: "Варақаи худро созед",
     createdOn: "Сохта шудааст дар",
-    loading: "Варақа бор шуда истодааст…"
+    loading: "Варақа бор шуда истодааст…",
+    trial: "НАМОИШӢ · ФАЪОЛ НЕСТ",
+    trialText: "Агар расмиятдарориро идома надиҳед, нусхаи муваққатӣ худкор нест мешавад.",
+    expiresIn: "Боқӣ мондааст"
   },
   en: {
     digitalCard: "Digital business card",
@@ -92,7 +99,10 @@ const profileCopy = {
     addWallet: "Add to Wallet",
     createOwn: "Create your own card",
     createdOn: "Created with",
-    loading: "Loading business card…"
+    loading: "Loading business card…",
+    trial: "DEMO · NOT ACTIVATED",
+    trialText: "This draft will be deleted automatically unless you continue.",
+    expiresIn: "Time left"
   }
 } as const;
 
@@ -105,6 +115,7 @@ export default function CardPage() {
   );
   const [loading, setLoading] = useState(!card);
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const cardUrl = window.location.href;
   const labels = profileCopy[language];
 
@@ -128,6 +139,27 @@ export default function CardPage() {
       sessionStorage.setItem(viewKey, "1");
     }
   }, [card, setLanguage]);
+
+  useEffect(() => {
+    if (!card?.trialExpiresAt || card.reviewStatus === "approved") {
+      setRemainingSeconds(null);
+      return;
+    }
+    const update = () => {
+      const seconds = Math.max(
+        0,
+        Math.ceil((new Date(card.trialExpiresAt!).getTime() - Date.now()) / 1000)
+      );
+      setRemainingSeconds(seconds);
+      if (seconds === 0) {
+        cardRepository.remove(card.id);
+        setCard(undefined);
+      }
+    };
+    update();
+    const timer = window.setInterval(update, 1000);
+    return () => window.clearInterval(timer);
+  }, [card?.id, card?.reviewStatus, card?.trialExpiresAt]);
 
   if (loading) {
     return (
@@ -157,6 +189,7 @@ export default function CardPage() {
   }
 
   const palette = themeColors[card.theme];
+  const isTrial = card.reviewStatus !== "approved" && Boolean(card.trialExpiresAt);
   const style: AccentStyle = {
     "--profile-accent": palette.accent,
     "--profile-soft": palette.soft
@@ -234,7 +267,7 @@ export default function CardPage() {
   }>;
 
   return (
-    <main className={`profile-page profile-${card.template}`} style={style}>
+    <main className={`profile-page profile-${card.template} ${isTrial ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
@@ -277,6 +310,19 @@ export default function CardPage() {
 
       <div className="profile-layout">
         <section className="profile-main-card">
+          {isTrial && (
+            <>
+              <div className="trial-watermark" aria-hidden="true">{labels.trial}</div>
+              <div className="trial-countdown" role="status">
+                <strong>{labels.trial}</strong>
+                <span>{labels.trialText}</span>
+                {remainingSeconds !== null && (
+                  <em>{labels.expiresIn}: {String(Math.floor(remainingSeconds / 60)).padStart(2, "0")}:{String(remainingSeconds % 60).padStart(2, "0")}</em>
+                )}
+                <Link to="/payment?plan=personal" className="button button-primary">{t("choose")}</Link>
+              </div>
+            </>
+          )}
           <div className="profile-cover">
             <div className="profile-cover-brand">
               <span className={`profile-cover-logo ${card.companyLogo ? "has-company-logo" : ""}`}>
@@ -452,6 +498,7 @@ export default function CardPage() {
       <footer className="profile-footer">
         <span>{labels.createdOn}</span>
         <Link to="/">Vizora.tj</Link>
+        {!isTrial && <ReportCardButton cardId={card.id} />}
       </footer>
 
       {toast && <div className="toast"><Check size={17} /> {toast}</div>}
