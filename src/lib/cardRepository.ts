@@ -13,6 +13,7 @@ export interface CardRepository {
   incrementViews(id: string): void;
   getPublicBySlug(slug: string): Promise<DigitalCard | undefined>;
   listRemote(): Promise<DigitalCard[]>;
+  requestPublication(id: string): Promise<{ ok: boolean; message: string }>;
 }
 
 const createId = () =>
@@ -44,10 +45,31 @@ class LocalStorageCardRepository implements CardRepository {
       language: (row.language as DigitalCard["language"]) ?? "ru",
       theme: (row.theme as DigitalCard["theme"]) ?? "blue",
       template: (row.template as DigitalCard["template"]) ?? "executive",
+      visibility: (row.visibility as DigitalCard["visibility"]) ?? "private",
+      reviewStatus: (row.review_status as DigitalCard["reviewStatus"]) ?? "draft",
+      trialExpiresAt: row.trial_expires_at ? String(row.trial_expires_at) : null,
       views: Number(row.views ?? 0),
       createdAt: String(row.created_at ?? new Date().toISOString()),
       updatedAt: String(row.updated_at ?? new Date().toISOString())
     };
+  }
+
+  private async uploadAsset(
+    userId: string,
+    cardId: string,
+    kind: "photo" | "logo",
+    value: string
+  ) {
+    if (!supabase || !value.startsWith("data:")) return value;
+    const response = await fetch(value);
+    const blob = await response.blob();
+    const extension = blob.type.includes("png") ? "png" : blob.type.includes("jpeg") ? "jpg" : "webp";
+    const path = `${userId}/${cardId}/${kind}.${extension}`;
+    const { error } = await supabase.storage
+      .from("card-assets")
+      .upload(path, blob, { upsert: true, contentType: blob.type, cacheControl: "3600" });
+    if (error) return value;
+    return supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl;
   }
 
   private async saveRemote(card: DigitalCard) {
@@ -57,20 +79,28 @@ class LocalStorageCardRepository implements CardRepository {
 
     const { data: existing } = await supabase
       .from("cards")
-      .select("id")
+      .select("id, visibility, review_status, trial_expires_at")
       .eq("owner_id", auth.user.id)
       .maybeSingle();
 
-    await supabase.from("cards").upsert(
+    const remoteId = String(existing?.id ?? card.id);
+    const photo = await this.uploadAsset(auth.user.id, remoteId, "photo", card.photo);
+    const companyLogo = await this.uploadAsset(auth.user.id, remoteId, "logo", card.companyLogo);
+    const trialExpiresAt =
+      existing?.trial_expires_at ??
+      card.trialExpiresAt ??
+      new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+    const { data: saved } = await supabase.from("cards").upsert(
       {
-        id: existing?.id ?? card.id,
+        id: remoteId,
         owner_id: auth.user.id,
         slug: card.slug,
         full_name: card.fullName,
         position: card.position,
         organization_name: card.organization,
         description: card.description,
-        photo_path: card.photo.startsWith("http") ? card.photo : null,
+        photo_path: photo.startsWith("http") ? photo : null,
         contacts: {
           phone: card.phone,
           secondPhone: card.secondPhone,
@@ -80,18 +110,25 @@ class LocalStorageCardRepository implements CardRepository {
           facebook: card.facebook,
           email: card.email,
           website: card.website,
-          companyLogo: card.companyLogo
+          companyLogo: companyLogo.startsWith("http") ? companyLogo : ""
         },
         address: card.address,
         language: card.language,
         theme: card.theme,
         template: card.template,
-        visibility: "private",
-        review_status: "draft",
+        visibility: existing?.visibility ?? card.visibility ?? "private",
+        review_status: existing?.review_status ?? card.reviewStatus ?? "draft",
+        trial_expires_at: trialExpiresAt,
         updated_at: new Date().toISOString()
       },
       { onConflict: "owner_id" }
-    );
+    ).select("*").single();
+
+    if (saved) {
+      const remoteCard = this.fromDatabase(saved);
+      const localCards = this.read().filter((item) => item.id !== card.id && item.id !== remoteCard.id);
+      this.write([remoteCard, ...localCards]);
+    }
   }
 
   private read(): DigitalCard[] {
@@ -139,7 +176,12 @@ class LocalStorageCardRepository implements CardRepository {
       id: existing?.id ?? createId(),
       views: existing?.views ?? 0,
       createdAt: existing?.createdAt ?? timestamp,
-      updatedAt: timestamp
+      updatedAt: timestamp,
+      visibility: existing?.visibility ?? "private",
+      reviewStatus: existing?.reviewStatus ?? "draft",
+      trialExpiresAt:
+        existing?.trialExpiresAt ??
+        new Date(Date.now() + 15 * 60 * 1000).toISOString()
     };
 
     const nextCards = existing
@@ -172,7 +214,9 @@ class LocalStorageCardRepository implements CardRepository {
 
   async getPublicBySlug(slug: string) {
     const local = this.getBySlug(slug);
-    if (local) return local;
+    if (local && (!local.trialExpiresAt || new Date(local.trialExpiresAt).getTime() > Date.now())) {
+      return local;
+    }
     if (!supabase) return undefined;
     const { data, error } = await supabase
       .from("cards")
@@ -194,6 +238,29 @@ class LocalStorageCardRepository implements CardRepository {
       .order("updated_at", { ascending: false });
     if (error || !data?.length) return this.list();
     return data.map((row) => this.fromDatabase(row));
+  }
+
+  async requestPublication(id: string) {
+    if (!supabase) return { ok: false, message: "Сервер временно недоступен." };
+    const card = this.getById(id);
+    if (!card) return { ok: false, message: "Визитка не найдена." };
+    await this.saveRemote(card);
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) return { ok: false, message: "Сначала войдите в аккаунт." };
+    const { data: remote } = await supabase
+      .from("cards")
+      .select("id")
+      .eq("owner_id", auth.user.id)
+      .maybeSingle();
+    if (!remote) return { ok: false, message: "Не удалось синхронизировать визитку." };
+    const { error } = await supabase.rpc("request_card_review", { target_card_id: remote.id });
+    if (error) return { ok: false, message: error.message };
+    this.write(this.read().map((item) =>
+      item.id === card.id || item.id === remote.id
+        ? { ...item, reviewStatus: "pending" }
+        : item
+    ));
+    return { ok: true, message: "Визитка отправлена на проверку." };
   }
 }
 
