@@ -1,4 +1,4 @@
-import { Download, Facebook, Globe2, ImagePlus, Instagram, Mail, MapPin, MessageCircle, Phone, Printer, QrCode as QrIcon, Send, Shapes } from "lucide-react";
+import { Download, Facebook, Globe2, ImagePlus, Instagram, Mail, MapPin, MessageCircle, Phone, Printer, QrCode as QrIcon, RotateCcw, Send, Shapes, Trash2 } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import Footer from "../components/layout/Footer";
@@ -66,8 +66,8 @@ const drawLogoMark = (ctx: CanvasRenderingContext2D, id: LogoId, x: number, y: n
   ctx.restore();
 };
 
-const drawDecor = (ctx: CanvasRenderingContext2D, layout: TemplateId, side: Side, bg: string, accent: string, light: string) => {
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, 1004, 650);
+const drawDecor = (ctx: CanvasRenderingContext2D, layout: TemplateId, side: Side, bg: string, accent: string, light: string, skipBase = false) => {
+  if (!skipBase) { ctx.fillStyle = bg; ctx.fillRect(0, 0, 1004, 650); }
   ctx.fillStyle = accent;
   if (layout === "executive") ctx.fillRect(0, 0, 42, 650);
   if (layout === "modern") { ctx.beginPath(); ctx.arc(900, 80, 250, 0, Math.PI * 2); ctx.fill(); }
@@ -111,6 +111,9 @@ export default function PrintCardDesignerPage() {
   const [positions, setPositions] = useState<Positions>(() => defaultPositions(false));
   const [sizes, setSizes] = useState<Record<MoveKey, number>>({ brand: 1, person: 1, company: 1, contacts: 1, socials: 1, qr: 1, photo: 1 });
   const [selected, setSelected] = useState<MoveKey>("person");
+  const [visible, setVisible] = useState<Record<MoveKey, boolean>>({ brand: true, person: true, company: true, contacts: true, socials: true, qr: true, photo: true });
+  const [backgroundStyle, setBackgroundStyle] = useState<"clean" | "grid" | "waves" | "dots" | "custom">("clean");
+  const [backgroundImage, setBackgroundImage] = useState("");
 
   const choosePalette = (item: typeof palettes[number]) => { setPalette(item); setColors({ bg: item.bg, accent: item.accent, light: item.light, ink: item.ink }); };
   const useRightPanel = ["ribbon", "orbit", "goldwave", "prism", "mono"].includes(layout);
@@ -139,11 +142,28 @@ export default function PrintCardDesignerPage() {
     className: `print-movable ${selected === key ? "selected" : ""}`
   });
   const movableProps = (key: MoveKey, className: string) => ({ ...dragProps(key), className: `${dragProps(key).className} ${className}` });
+  const patternBackground = backgroundStyle === "custom" && backgroundImage ? `url("${backgroundImage}")`
+    : backgroundStyle === "grid" ? `linear-gradient(45deg,transparent 48%,${colors.accent}33 49% 51%,transparent 52%),linear-gradient(-45deg,transparent 48%,${colors.accent}33 49% 51%,transparent 52%)`
+    : backgroundStyle === "waves" ? `radial-gradient(ellipse at 15% 120%,transparent 52%,${colors.accent}44 53% 56%,transparent 57%),radial-gradient(ellipse at 75% -20%,transparent 54%,${colors.accent}33 55% 58%,transparent 59%)`
+    : backgroundStyle === "dots" ? `radial-gradient(circle,${colors.accent}55 1.5px,transparent 2px)` : "none";
 
   const renderCanvas = async () => {
     const canvas = document.createElement("canvas"); canvas.width = 1004; canvas.height = 650;
     const ctx = canvas.getContext("2d"); if (!ctx) return null;
-    drawDecor(ctx, layout, side, colors.bg, colors.accent, colors.light);
+    ctx.fillStyle = colors.bg; ctx.fillRect(0, 0, 1004, 650);
+    if (backgroundImage && backgroundStyle === "custom") {
+      const image = new Image(); image.src = backgroundImage; await image.decode();
+      const ratio = Math.max(1004 / image.width, 650 / image.height);
+      const width = image.width * ratio, height = image.height * ratio;
+      ctx.drawImage(image, (1004 - width) / 2, (650 - height) / 2, width, height);
+    } else if (backgroundStyle !== "clean") {
+      ctx.save(); ctx.strokeStyle = colors.accent; ctx.fillStyle = colors.accent; ctx.globalAlpha = .2;
+      if (backgroundStyle === "grid") for (let x = -300; x < 1200; x += 65) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 650, 650); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x + 650, 0); ctx.lineTo(x, 650); ctx.stroke(); }
+      if (backgroundStyle === "waves") for (let y = 80; y < 650; y += 90) { ctx.beginPath(); ctx.moveTo(0, y); ctx.bezierCurveTo(250, y - 90, 650, y + 90, 1004, y - 20); ctx.lineWidth = 8; ctx.stroke(); }
+      if (backgroundStyle === "dots") for (let x = 30; x < 1004; x += 38) for (let y = 30; y < 650; y += 38) { ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill(); }
+      ctx.restore();
+    }
+    drawDecor(ctx, layout, side, colors.bg, colors.accent, colors.light, true);
     const textColor = useRightPanel ? "#15171c" : colors.ink;
     const point = (key: MoveKey) => ({ x: positions[key].x / 100 * 1004, y: positions[key].y / 100 * 650, scale: sizes[key] });
     const drawUploadedPhoto = async () => {
@@ -155,23 +175,22 @@ export default function PrintCardDesignerPage() {
     };
     if (side === "front") {
       const brand = point("brand");
-      if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, brand.x, brand.y, 120 * brand.scale, 75 * brand.scale); }
-      else drawLogoMark(ctx, logoMark, brand.x, brand.y, 72 * brand.scale, useRightPanel ? colors.accent : colors.ink);
-      ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px Arial`; ctx.fillText(data.organization, brand.x + 90 * brand.scale, brand.y + 34 * brand.scale);
-      ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px Arial`; ctx.fillText(data.website, brand.x + 90 * brand.scale, brand.y + 61 * brand.scale);
-      await drawUploadedPhoto();
-      const qr = await QRCode.toDataURL(data.qr, { width: 190, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } });
-      const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 150 * qrPoint.scale, 150 * qrPoint.scale);
+      if (visible.brand) {
+        if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, brand.x, brand.y, 120 * brand.scale, 75 * brand.scale); }
+        else drawLogoMark(ctx, logoMark, brand.x, brand.y, 72 * brand.scale, useRightPanel ? colors.accent : colors.ink);
+        ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px Arial`; ctx.fillText(data.organization, brand.x + 90 * brand.scale, brand.y + 34 * brand.scale);
+        ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px Arial`; ctx.fillText(data.website, brand.x + 90 * brand.scale, brand.y + 61 * brand.scale);
+      }
+      if (visible.photo) await drawUploadedPhoto();
+      if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 190, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 150 * qrPoint.scale, 150 * qrPoint.scale); }
     } else {
-      const person = point("person"); ctx.fillStyle = textColor; ctx.font = `700 ${43 * person.scale}px Arial`; ctx.fillText(data.name, person.x, person.y + 38 * person.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${21 * person.scale}px Arial`; ctx.fillText(data.position, person.x, person.y + 70 * person.scale);
+      const person = point("person"); if (visible.person) { ctx.fillStyle = textColor; ctx.font = `700 ${43 * person.scale}px Arial`; ctx.fillText(data.name, person.x, person.y + 38 * person.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${21 * person.scale}px Arial`; ctx.fillText(data.position, person.x, person.y + 70 * person.scale); }
       const company = point("company");
-      if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, company.x, company.y, 72 * company.scale, 55 * company.scale); } else drawLogoMark(ctx, logoMark, company.x, company.y, 55 * company.scale, colors.accent);
-      ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px Arial`; ctx.fillText(data.organization, company.x + 70 * company.scale, company.y + 34 * company.scale);
-      const contacts = point("contacts"); ctx.font = `18px Arial`; const contactLines = [`☎  ${data.phone}`, `✉  ${data.email}`, `●  ${data.website}`, `⌖  ${data.address}`]; contactLines.forEach((line, index) => ctx.fillText(line, contacts.x, contacts.y + index * 35 * contacts.scale));
-      const social = point("socials"); ["I", "f", "T", "W"].forEach((letter, index) => { ctx.fillStyle = colors.accent; ctx.beginPath(); ctx.arc(social.x + index * 47 * social.scale, social.y, 16 * social.scale, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = `700 ${15 * social.scale}px Arial`; ctx.textAlign = "center"; ctx.fillText(letter, social.x + index * 47 * social.scale, social.y + 5 * social.scale); }); ctx.textAlign = "left";
-      await drawUploadedPhoto();
-      const qr = await QRCode.toDataURL(data.qr, { width: 160, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } });
-      const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 140 * qrPoint.scale, 140 * qrPoint.scale);
+      if (visible.company) { if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, company.x, company.y, 72 * company.scale, 55 * company.scale); } else drawLogoMark(ctx, logoMark, company.x, company.y, 55 * company.scale, colors.accent); ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px Arial`; ctx.fillText(data.organization, company.x + 70 * company.scale, company.y + 34 * company.scale); }
+      if (visible.contacts) { const contacts = point("contacts"); ctx.font = `18px Arial`; const contactLines = [`☎  ${data.phone}`, `✉  ${data.email}`, `●  ${data.website}`, `⌖  ${data.address}`]; contactLines.forEach((line, index) => ctx.fillText(line, contacts.x, contacts.y + index * 35 * contacts.scale)); }
+      if (visible.socials) { const social = point("socials"); ["I", "f", "T", "W"].forEach((letter, index) => { ctx.fillStyle = colors.accent; ctx.beginPath(); ctx.arc(social.x + index * 47 * social.scale, social.y, 16 * social.scale, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = `700 ${15 * social.scale}px Arial`; ctx.textAlign = "center"; ctx.fillText(letter, social.x + index * 47 * social.scale, social.y + 5 * social.scale); }); ctx.textAlign = "left"; }
+      if (visible.photo) await drawUploadedPhoto();
+      if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 160, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 140 * qrPoint.scale, 140 * qrPoint.scale); }
     }
     return canvas;
   };
@@ -184,28 +203,31 @@ export default function PrintCardDesignerPage() {
       <h2 className="editor-subtitle">Готовые палитры</h2>
       <div className="color-options">{palettes.map((item) => <button className={palette.id === item.id ? "active" : ""} onClick={() => choosePalette(item)} key={item.id}><i style={{ background: item.bg, borderColor: item.accent }} />{item.name}</button>)}</div>
       <div className="custom-colors"><label>Фон<input type="color" value={colors.bg} onChange={(e) => setColors({ ...colors, bg: e.target.value })} /></label><label>Акцент<input type="color" value={colors.accent} onChange={(e) => setColors({ ...colors, accent: e.target.value })} /></label><label>Светлая зона<input type="color" value={colors.light} onChange={(e) => setColors({ ...colors, light: e.target.value })} /></label><label>Текст<input type="color" value={colors.ink} onChange={(e) => setColors({ ...colors, ink: e.target.value })} /></label></div>
+      <h2 className="editor-subtitle">Фон визитки</h2>
+      <div className="background-picker">{(["clean", "grid", "waves", "dots"] as const).map((value) => <button className={backgroundStyle === value ? "active" : ""} onClick={() => setBackgroundStyle(value)} key={value}><i className={`bg-sample bg-${value}`} />{{ clean: "Чистый", grid: "Сетка", waves: "Волны", dots: "Точки" }[value]}</button>)}<label className={backgroundStyle === "custom" ? "active" : ""}><ImagePlus size={15} /> Свой фон<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void readImage(e.target.files?.[0]).then((image) => { setBackgroundImage(image); setBackgroundStyle("custom"); })} /></label></div>
       <h2 className="editor-subtitle"><Shapes size={16} /> Знак вместо логотипа</h2>
       <div className="logo-library">{logoIds.map((id) => <button className={!logo && logoMark === id ? "active" : ""} onClick={() => { setLogo(""); setLogoMark(id); }} key={id}><LogoMark id={id} /></button>)}</div>
       <div className="asset-upload-pair"><label className="logo-upload"><ImagePlus size={17} /> Собственный логотип<input hidden type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={(e) => void readImage(e.target.files?.[0]).then(setLogo)} /></label><label className="logo-upload"><ImagePlus size={17} /> Фотография<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void readImage(e.target.files?.[0]).then(setPhoto)} /></label></div>
-      <div className="element-size-control"><div><strong>Размер выбранного элемента</strong><span>{({ brand: "Логотип и компания", person: "ФИО и должность", company: "Логотип", contacts: "Контакты", socials: "Социальные сети", qr: "QR-код", photo: "Фотография" } as Record<MoveKey,string>)[selected]}</span></div><input type="range" min=".5" max="2" step=".05" value={sizes[selected]} onChange={(e) => setSizes((value) => ({ ...value, [selected]: Number(e.target.value) }))} /><b>{Math.round(sizes[selected] * 100)}%</b></div>
+      <div className="element-size-control"><div><strong>Выбранный элемент</strong><span>{({ brand: "Логотип и компания", person: "ФИО и должность", company: "Логотип", contacts: "Контакты", socials: "Социальные сети", qr: "QR-код", photo: "Фотография" } as Record<MoveKey,string>)[selected]}</span></div><input type="range" min=".5" max="2" step=".05" value={sizes[selected]} onChange={(e) => setSizes((value) => ({ ...value, [selected]: Number(e.target.value) }))} /><b>{Math.round(sizes[selected] * 100)}%</b><div className="element-actions"><button type="button" onClick={() => setVisible((value) => ({ ...value, [selected]: false }))}><Trash2 size={14} /> Удалить</button><button type="button" onClick={() => { const defaults = defaultPositions(useRightPanel); setVisible((value) => ({ ...value, [selected]: true })); setSizes((value) => ({ ...value, [selected]: 1 })); setPositions((value) => ({ ...value, [selected]: defaults[selected] })); }}><RotateCcw size={14} /> Восстановить</button></div></div>
+      <div className="hidden-elements">{(Object.keys(visible) as MoveKey[]).filter((key) => !visible[key]).map((key) => <button key={key} onClick={() => { setVisible((value) => ({ ...value, [key]: true })); setSelected(key); }}>+ Вернуть {({ brand: "логотип", person: "ФИО", company: "компанию", contacts: "контакты", socials: "соцсети", qr: "QR", photo: "фото" } as Record<MoveKey,string>)[key]}</button>)}</div>
       {Object.entries(data).map(([key, value]) => <label key={key}><span>{({ name: "ФИО", position: "Должность", organization: "Организация", phone: "Телефон", email: "E-mail", website: "Сайт", address: "Адрес", instagram: "Instagram", facebook: "Facebook", telegram: "Telegram", whatsapp: "WhatsApp", qr: "Ссылка QR" } as Record<string,string>)[key]}</span><input value={value} onChange={(e) => setData({ ...data, [key]: e.target.value })} /></label>)}
     </div>
     <div className="print-preview-column">
       <div className="side-switch no-print"><button className={side === "front" ? "active" : ""} onClick={() => setSide("front")}>Лицевая сторона</button><button className={side === "back" ? "active" : ""} onClick={() => setSide("back")}>Обратная сторона</button></div>
-      <div ref={cardRef} className={`physical-card physical-${layout} card-side-${side}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink } as CSSProperties}>
+      <div ref={cardRef} className={`physical-card physical-${layout} card-side-${side} pattern-${backgroundStyle}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink, backgroundImage: patternBackground, backgroundSize: backgroundStyle === "custom" ? "cover" : backgroundStyle === "grid" ? "58px 58px" : backgroundStyle === "dots" ? "24px 24px" : "cover", backgroundPosition: "center" } as CSSProperties}>
         <CardDecor layout={layout} />
         {side === "front" ? <div className="physical-content physical-front-content">
-          <div {...movableProps("brand", "physical-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<span><strong>{data.organization}</strong><small>{data.website}</small></span></div>
-          {photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
-          <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>
+          {visible.brand && <div {...movableProps("brand", "physical-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<span><strong>{data.organization}</strong><small>{data.website}</small></span></div>}
+          {visible.photo && photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
+          {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>}
         </div>
         : <div className="physical-content physical-back-content">
-          <div {...movableProps("person", "physical-person")}><h2>{data.name}</h2><h3>{data.position}</h3></div>
-          <div {...movableProps("company", "physical-contact-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<strong>{data.organization}</strong></div>
-          {photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
-          <div {...movableProps("contacts", "print-contact-list")}><span><Phone />{data.phone}</span><span><Mail />{data.email}</span><span><Globe2 />{data.website}</span><span><MapPin />{data.address}</span></div>
-          <div {...movableProps("socials", "print-social-list")}><span title={data.instagram}><Instagram /></span><span title={data.facebook}><Facebook /></span><span title={data.telegram}><Send /></span><span title={data.whatsapp}><MessageCircle /></span></div>
-          <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>
+          {visible.person && <div {...movableProps("person", "physical-person")}><h2>{data.name}</h2><h3>{data.position}</h3></div>}
+          {visible.company && <div {...movableProps("company", "physical-contact-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<strong>{data.organization}</strong></div>}
+          {visible.photo && photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
+          {visible.contacts && <div {...movableProps("contacts", "print-contact-list")}><span><Phone />{data.phone}</span><span><Mail />{data.email}</span><span><Globe2 />{data.website}</span><span><MapPin />{data.address}</span></div>}
+          {visible.socials && <div {...movableProps("socials", "print-social-list")}><span title={data.instagram}><Instagram /></span><span title={data.facebook}><Facebook /></span><span title={data.telegram}><Send /></span><span title={data.whatsapp}><MessageCircle /></span></div>}
+          {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>}
         </div>}
       </div>
       <p className="print-safe-note">Нажмите на текст, логотип, фото, контакты или QR и перетащите. Выбранный элемент можно увеличить или уменьшить ползунком.</p>
