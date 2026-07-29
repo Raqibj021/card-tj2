@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[color:var(--header)] backdrop-blur-xl">
-      <div className="site-container flex h-18 items-center justify-between gap-4">
+      <div className="site-container flex h-20 items-center justify-between gap-5">
         <Link to="/" className="brand-mark" aria-label="Vizora.tj">
           <BrandLogo />
         </Link>

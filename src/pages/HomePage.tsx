@@ -73,8 +73,8 @@ export default function HomePage() {
         </div>
         <section className="hero-section overflow-hidden">
           <div className="hero-grid-pattern" />
-          <div className="site-container relative grid min-h-[calc(100vh-4.5rem)] items-center gap-14 py-16 lg:grid-cols-[1.06fr_.94fr] lg:py-20">
-            <div className="max-w-2xl">
+          <div className="site-container hero-layout relative grid min-h-[760px] items-center gap-16 py-14 lg:grid-cols-[1.08fr_.92fr] xl:min-h-[800px]">
+            <div className="hero-content">
               <div className="eyebrow">
                 <Sparkles size={15} />
                 {t("heroEyebrow")}
