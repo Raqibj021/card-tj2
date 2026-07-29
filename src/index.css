@@ -1,11 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   color-scheme: light;
-  font-family: "Manrope", "Segoe UI", sans-serif;
+  font-family: "Noto Sans", "Manrope", "Segoe UI", sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   --page: #f0efe9;
@@ -989,7 +989,7 @@ body {
 .physical-card { isolation:isolate; }
 .card-decor { position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none; }
 .card-decor i,.card-decor b { position:absolute;display:block; }
-.physical-content { position:absolute;inset:0;z-index:2;color:var(--card-ink);font-family:var(--card-font,"Manrope"),sans-serif; }
+.physical-content { position:absolute;inset:0;z-index:2;color:var(--card-ink);font-family:var(--card-font,"Noto Sans"),"Manrope",sans-serif; }
 .print-movable { position:absolute!important;z-index:6;touch-action:none;cursor:grab;transform-origin:top left;user-select:none; }
 .print-movable:active { cursor:grabbing; }
 .print-movable.selected:after { position:absolute;z-index:20;inset:-7px;border:1px dashed color-mix(in srgb,var(--card-accent) 85%,#fff);border-radius:8px;content:"";pointer-events:none; }
@@ -5409,7 +5409,7 @@ summary:focus-visible {
 .impact-heading h2,
 .journey-heading h2 {
   margin: 15px 0 0;
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   font-size: clamp(32px, 3.2vw, 48px);
   font-weight: 700;
   letter-spacing: -.055em;
@@ -5525,7 +5525,7 @@ summary:focus-visible {
 }
 
 .impact-stat strong {
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   font-size: clamp(24px, 2.4vw, 34px);
   letter-spacing: -.055em;
   line-height: 1;
@@ -5606,7 +5606,7 @@ summary:focus-visible {
 
 .impact-index {
   color: currentColor;
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   font-size: 8px;
   font-weight: 600;
   letter-spacing: .12em;
@@ -5617,7 +5617,7 @@ summary:focus-visible {
   position: relative;
   z-index: 2;
   margin: auto 0 0;
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   overflow-wrap: anywhere;
   font-size: 14px;
   font-weight: 600;
@@ -5863,7 +5863,7 @@ summary:focus-visible {
 }
 
 .journey-profile-chip strong {
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   font-size: 12px;
   letter-spacing: -.03em;
 }
@@ -5919,7 +5919,7 @@ summary:focus-visible {
 
 .journey-step-number {
   color: #75dfcf;
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: .08em;
@@ -5945,7 +5945,7 @@ summary:focus-visible {
 .journey-step h3 {
   margin: 0;
   color: #fff;
-  font-family: "Unbounded", "Manrope", sans-serif;
+  font-family: "Noto Sans", "Manrope", sans-serif;
   overflow-wrap: anywhere;
   font-size: 14px;
   font-weight: 600;
@@ -7010,5 +7010,184 @@ body,
 
   .design-showcase-canvas {
     height: 224px;
+  }
+}
+
+/* Founder profile in the homepage device */
+.founder-showcase {
+  min-height: 710px;
+}
+
+.founder-showcase .floating-chip {
+  display: none;
+}
+
+.phone-shell-founder {
+  width: min(350px, 84vw);
+  overflow: hidden;
+  border-width: 9px;
+  border-color: #0a111c;
+  border-radius: 46px;
+  background: #0a111c;
+  box-shadow:
+    0 38px 90px rgba(11, 22, 35, .3),
+    0 0 0 1px rgba(255, 255, 255, .08);
+  transform: none;
+}
+
+.phone-shell-founder .phone-speaker {
+  top: 8px;
+  width: 88px;
+  height: 22px;
+  background: #0a111c;
+}
+
+.phone-shell-founder .digital-card {
+  min-height: 650px;
+  border-radius: 37px;
+  font-family: "Noto Sans", "Manrope", sans-serif;
+}
+
+.phone-shell-founder .card-preview-cover {
+  height: 158px;
+  padding: 22px 20px;
+}
+
+.phone-shell-founder .card-preview-brand {
+  max-width: calc(100% - 48px);
+  font-size: 9px;
+}
+
+.phone-shell-founder .card-preview-brand > span {
+  width: 31px;
+  height: 31px;
+}
+
+.phone-shell-founder .card-preview-body {
+  padding: 0 20px 18px;
+}
+
+.phone-shell-founder .digital-card-executive .card-profile {
+  gap: 12px;
+  margin-top: -36px;
+  grid-template-columns: 80px minmax(0, 1fr);
+}
+
+.phone-shell-founder .digital-card-executive .card-profile > div:last-child {
+  min-width: 0;
+  transform: translateY(10px);
+}
+
+.phone-shell-founder .card-preview-body .card-avatar {
+  width: 80px;
+  height: 80px;
+  border-width: 4px;
+  border-radius: 21px;
+  object-position: center 24%;
+}
+
+.phone-shell-founder .card-preview-verified {
+  right: -1px;
+  bottom: 3px;
+  width: 22px;
+  height: 22px;
+}
+
+.phone-shell-founder .card-preview-body .card-kicker {
+  max-width: 100%;
+  font-size: 7px;
+}
+
+.phone-shell-founder .card-preview-body .card-name {
+  margin-top: 4px;
+  font-size: 18px;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+  -webkit-line-clamp: 2;
+}
+
+.phone-shell-founder .card-preview-body .card-role {
+  margin-top: 4px;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.phone-shell-founder .card-preview-body .card-description {
+  min-height: 32px;
+  margin-top: 14px;
+  font-size: 9px;
+  line-height: 1.5;
+  -webkit-line-clamp: 2;
+}
+
+.phone-shell-founder .card-preview-body .card-organization {
+  margin-top: 8px;
+  font-size: 9px;
+}
+
+.phone-shell-founder .card-preview-body .card-primary-actions {
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.phone-shell-founder .card-preview-body .card-primary-button {
+  min-height: 39px;
+  border-radius: 11px;
+  font-size: 9px;
+}
+
+.phone-shell-founder .card-preview-body .card-contact-list {
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.phone-shell-founder .card-preview-body .card-contact-list > div {
+  min-height: 36px;
+  padding: 7px 8px;
+}
+
+.phone-shell-founder .card-preview-body .card-contact-list svg {
+  width: 13px;
+  height: 13px;
+}
+
+.phone-shell-founder .card-preview-body .card-contact-list span {
+  font-size: 8px;
+  line-height: 1.2;
+}
+
+.phone-shell-founder .card-preview-body .card-socials {
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.phone-shell-founder .card-preview-body .card-socials span {
+  gap: 4px;
+  padding: 6px;
+  font-size: 7px;
+}
+
+.phone-shell-founder .card-preview-body .card-socials svg {
+  width: 12px;
+  height: 12px;
+}
+
+.phone-shell-founder .card-preview-body .card-signature {
+  margin-top: 8px;
+  padding-top: 8px;
+  font-size: 8px;
+}
+
+@media (max-width: 1100px) and (min-width: 681px) {
+  .founder-showcase {
+    min-height: 680px;
+  }
+
+  .phone-shell-founder {
+    width: min(330px, 82vw);
+  }
+
+  .phone-shell-founder .digital-card {
+    min-height: 635px;
   }
 }
