@@ -1,5 +1,5 @@
 import { Banknote, CheckCircle2, ChevronRight, Clock3, MessageSquareText, PhoneCall, Search, UserRoundCheck, UsersRound } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { leadRepository, type Lead, type LeadStatus, type PaymentLeadStatus } from "../lib/leadRepository";
 
 const statusLabels: Record<LeadStatus, string> = {
@@ -26,6 +26,16 @@ export default function CrmPage() {
     return matches && (filter === "all" || lead.status === filter);
   }), [leads, query, filter]);
   const refresh = () => setLeads(leadRepository.list());
+
+  useEffect(() => {
+    let active = true;
+    void leadRepository.listRemote().then((items) => {
+      if (!active) return;
+      setLeads(items);
+      setSelectedId((current) => current || items[0]?.id || "");
+    });
+    return () => { active = false; };
+  }, []);
 
   const stats = [
     { title: "Все клиенты", value: leads.length, icon: UsersRound },
