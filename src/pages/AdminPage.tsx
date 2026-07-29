@@ -40,6 +40,7 @@ export default function AdminPage() {
   const [notice, setNotice] = useState("");
   const [confirmText, setConfirmText] = useState("");
   const [search, setSearch] = useState("");
+  const visibleNav = profile?.role === "admin" ? nav : nav.filter((item) => item.id !== "launch");
 
   const refresh = async () => {
     setLoading(true);
@@ -73,13 +74,13 @@ export default function AdminPage() {
     <aside className="admin-console-sidebar">
       <Link to="/" className="admin-console-logo"><BrandLogo light /></Link>
       <div className="admin-console-badge"><ShieldCheck size={15} /><span><b>Панель управления</b><small>{snapshot.status === "live" ? "Платформа запущена" : "Режим подготовки"}</small></span></div>
-      <nav>{nav.map(({ id, label, icon: Icon }) => <button className={section === id ? "active" : ""} onClick={() => setSection(id)} key={id}><Icon size={18} />{label}{id === "launch" && snapshot.status === "prelaunch" && <i />}</button>)}</nav>
+      <nav>{visibleNav.map(({ id, label, icon: Icon }) => <button className={section === id ? "active" : ""} onClick={() => setSection(id)} key={id}><Icon size={18} />{label}{id === "launch" && snapshot.status === "prelaunch" && <i />}</button>)}</nav>
       <div className="admin-console-profile"><span>{profile?.fullName?.slice(0, 1) || "A"}</span><div><b>{profile?.fullName || "Администратор"}</b><small>{profile?.email}</small></div><button onClick={() => void signOut()}>Выйти</button></div>
     </aside>
 
     <section className="admin-console-main">
       <header className="admin-console-header">
-        <div><span>VIZORA CONTROL CENTER</span><h1>{nav.find((item) => item.id === section)?.label}</h1></div>
+        <div><span>VIZORA CONTROL CENTER</span><h1>{visibleNav.find((item) => item.id === section)?.label}</h1></div>
         <div><label><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Поиск в панели" /></label><button className="admin-refresh" onClick={() => void refresh()} disabled={loading}><RefreshCw className={loading ? "spin" : ""} size={17} /> Обновить</button><Link to="/" className="admin-site-link">Открыть сайт <ChevronRight size={16} /></Link></div>
       </header>
       {notice && <div className="admin-console-alert"><ShieldAlert size={18} />{notice}</div>}
