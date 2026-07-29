@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -14,10 +14,14 @@ import {
   Phone,
   Send,
   Share2,
-  UserPlus
+  UserPlus,
+  ClipboardPenLine,
+  PhoneCall,
+  WalletCards
 } from "lucide-react";
 import { Link, useParams } from "react-router";
 import QRCodeImage from "../components/QRCode";
+import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { cardRepository } from "../lib/cardRepository";
 import {
@@ -28,7 +32,10 @@ import {
   socialUrl,
   themeColors
 } from "../lib/cardUtils";
-import type { Language } from "../types/card";
+import type { DigitalCard, Language } from "../types/card";
+import LeadFormModal from "../components/LeadFormModal";
+import type { Lead } from "../lib/leadRepository";
+import { walletAdapter } from "../lib/wallet";
 
 type AccentStyle = CSSProperties & {
   "--profile-accent": string;
@@ -47,8 +54,23 @@ export default function CardPage() {
   const { slug = "" } = useParams();
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const [toast, setToast] = useState("");
-  const card = useMemo(() => cardRepository.getBySlug(slug), [slug]);
+  const [card, setCard] = useState<DigitalCard | undefined>(() =>
+    cardRepository.getBySlug(slug)
+  );
+  const [loading, setLoading] = useState(!card);
+  const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
   const cardUrl = window.location.href;
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    void cardRepository.getPublicBySlug(slug).then((result) => {
+      if (!active) return;
+      setCard(result);
+      setLoading(false);
+    });
+    return () => { active = false; };
+  }, [slug]);
 
   useEffect(() => {
     if (!card) return;
@@ -60,12 +82,20 @@ export default function CardPage() {
     }
   }, [card, setLanguage]);
 
+  if (loading) {
+    return (
+      <main className="card-missing">
+        <BrandLogo />
+        <div className="profile-loading"><span /><p>Загружаем визитку…</p></div>
+      </main>
+    );
+  }
+
   if (!card) {
     return (
       <main className="card-missing">
         <Link to="/" className="brand-mark">
-          <span className="brand-symbol">C</span>
-          <span>Card<span className="text-teal-600">.tj</span></span>
+          <BrandLogo />
         </Link>
         <div className="empty-state mt-8 max-w-xl">
           <div className="empty-state-icon"><Globe2 size={26} /></div>
@@ -113,6 +143,17 @@ export default function CardPage() {
     showToast(t("copied"));
   };
 
+  const addToWallet = async () => {
+    if (!card) return;
+    const apple = /iPhone|iPad|Macintosh/i.test(navigator.userAgent);
+    const result = await walletAdapter.addPass({
+      cardId: card.id,
+      cardSlug: card.slug,
+      platform: apple ? "apple" : "google"
+    });
+    showToast(result.message);
+  };
+
   const actionLinks = [
     card.phone && {
       href: `tel:${sanitizePhone(card.phone)}`,
@@ -150,7 +191,7 @@ export default function CardPage() {
       <div className="profile-background-shape" />
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
-          <span>C</span> Vizora.tj
+          <BrandLogo compact />
         </Link>
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="profile-language">
@@ -245,6 +286,18 @@ export default function CardPage() {
               {t("saveContact")}
             </button>
 
+            <div className="lead-action-grid">
+              <button type="button" onClick={() => setLeadSource("contact")}>
+                <MessageCircle size={18} /><span>Связаться</span>
+              </button>
+              <button type="button" onClick={() => setLeadSource("callback")}>
+                <PhoneCall size={18} /><span>Заказать звонок</span>
+              </button>
+              <button type="button" onClick={() => setLeadSource("request")}>
+                <ClipboardPenLine size={18} /><span>Оставить заявку</span>
+              </button>
+            </div>
+
             <div className="profile-detail-list">
               {card.phone && (
                 <a href={`tel:${sanitizePhone(card.phone)}`}>
@@ -320,6 +373,9 @@ export default function CardPage() {
               >
                 <Download size={17} /> {t("downloadQr")}
               </button>
+              <button type="button" className="button button-ghost w-full" onClick={addToWallet}>
+                <WalletCards size={17} /> Добавить в Wallet
+              </button>
             </div>
           </div>
           <Link to="/create" className="profile-powered">
@@ -335,6 +391,15 @@ export default function CardPage() {
       </footer>
 
       {toast && <div className="toast"><Check size={17} /> {toast}</div>}
+      {leadSource && (
+        <LeadFormModal
+          cardId={card.id}
+          cardSlug={card.slug}
+          ownerName={card.fullName}
+          source={leadSource}
+          onClose={() => setLeadSource(null)}
+        />
+      )}
     </main>
   );
 }

@@ -149,7 +149,11 @@ export default function CreatePage() {
   const handleImage = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 1.5 * 1024 * 1024) {
+    if (!file.type.startsWith("image/")) {
+      setErrors((current) => ({ ...current, photo: "Выберите файл изображения" }));
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
       setErrors((current) => ({ ...current, photo: t("photoLarge") }));
       return;
     }

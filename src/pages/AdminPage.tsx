@@ -58,6 +58,9 @@ export default function AdminPage() {
             <span className="live-dot" />
             Июль 2026
           </div>
+          <Link to="/admin/payments" className="button button-primary">
+            <CreditCard size={17} /> Проверить оплаты
+          </Link>
         </div>
 
         <div className="admin-notice mt-8">

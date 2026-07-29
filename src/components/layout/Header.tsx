@@ -21,6 +21,7 @@ const navItems = [
   { to: "/organizations", text: "Организации", icon: Building2 },
   { to: "/services", text: "Услуги" },
   { to: "/dashboard", text: "Кабинет", icon: LayoutDashboard },
+  { to: "/dashboard/leads", text: "Лиды" },
   { to: "/admin", text: "Админ", icon: ShieldCheck }
 ];
 

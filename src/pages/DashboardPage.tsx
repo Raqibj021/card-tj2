@@ -7,14 +7,17 @@ import {
   MoreHorizontal,
   Plus,
   QrCode,
-  Trash2
+  Trash2,
+  MessageSquareText,
+  UsersRound
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useApp } from "../context/AppContext";
 import { cardRepository } from "../lib/cardRepository";
 import { downloadQrCode, formatDate, themeColors } from "../lib/cardUtils";
 import type { DigitalCard } from "../types/card";
+import { leadRepository } from "../lib/leadRepository";
 
 const getCardUrl = (slug: string) => {
   const base = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -33,6 +36,15 @@ export default function DashboardPage() {
   const { t, language } = useApp();
   const [cards, setCards] = useState<DigitalCard[]>(() => cardRepository.list());
   const [toast, setToast] = useState("");
+  const leads = leadRepository.list();
+
+  useEffect(() => {
+    let active = true;
+    void cardRepository.listRemote().then((result) => {
+      if (active) setCards(result);
+    });
+    return () => { active = false; };
+  }, []);
 
   const totalViews = cards.reduce((sum, card) => sum + card.views, 0);
 
@@ -80,11 +92,23 @@ export default function DashboardPage() {
               <span><Check size={20} /></span>
               <div><strong>{cards.length}</strong><small>{t("activeCards")}</small></div>
             </article>
+            <article>
+              <span><UsersRound size={20} /></span>
+              <div><strong>{leads.length}</strong><small>Клиенты</small></div>
+            </article>
+            <article>
+              <span><MessageSquareText size={20} /></span>
+              <div><strong>{leads.filter((lead) => lead.status === "new").length}</strong><small>Новые лиды</small></div>
+            </article>
           </div>
         </div>
       </section>
 
       <section className="site-container py-10 md:py-14">
+        <div className="dashboard-crm-banner">
+          <div><MessageSquareText size={22} /><span><strong>Мини-CRM Vizora</strong><small>Обращения из публичных визиток, статусы, заметки и оплата</small></span></div>
+          <Link to="/dashboard/leads" className="button button-secondary">Открыть лиды</Link>
+        </div>
         {cards.length ? (
           <div className="grid gap-5 lg:grid-cols-2">
             {cards.map((card) => {
@@ -113,7 +137,7 @@ export default function DashboardPage() {
                   </div>
 
                   <Link to={`/card/${card.slug}`} className="dashboard-card-link">
-                    <span>card.tj/{card.slug}</span>
+                    <span>vizora.tj/{card.slug}</span>
                     <Eye size={16} />
                   </Link>
 

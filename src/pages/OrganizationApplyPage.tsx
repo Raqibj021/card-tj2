@@ -1,9 +1,11 @@
 import { Building2, CheckCircle2, Clock3, CreditCard, LockKeyhole } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import Footer from "../components/layout/Footer";
 
 export default function OrganizationApplyPage() {
   const [submitted, setSubmitted] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -21,7 +23,12 @@ export default function OrganizationApplyPage() {
                 <button type="button" className="button button-primary" onClick={() => setSubmitted(false)}>Изменить данные</button>
               </div>
             ) : (
-              <form className="platform-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true); }}>
+              <form className="platform-form" onSubmit={(event) => {
+                event.preventDefault();
+                setSubmitted(true);
+                const form = new FormData(event.currentTarget);
+                window.setTimeout(() => navigate(`/payment?plan=${String(form.get("plan") ?? "start")}`), 700);
+              }}>
                 <div className="form-grid">
                   <label><span>Название организации *</span><input required placeholder="Полное название" /></label>
                   <label><span>Тип организации *</span><select required defaultValue=""><option value="" disabled>Выберите</option><option>Компания</option><option>Учебное учреждение</option><option>Государственное учреждение</option><option>Магазин</option><option>Другое</option></select></label>
@@ -33,8 +40,12 @@ export default function OrganizationApplyPage() {
                 <fieldset>
                   <legend>Выберите тариф</legend>
                   <div className="plan-radio-grid">
-                    {["Start — до 20 / 200 с.", "Business — до 50 / 300 с.", "Pro — до 100 / 500 с."].map((plan, index) => (
-                      <label key={plan}><input type="radio" name="plan" required defaultChecked={index === 0} /><span>{plan}</span></label>
+                    {[
+                      ["start", "Start — до 20 / 200 с."],
+                      ["business", "Business — до 50 / 300 с."],
+                      ["organization_pro", "Pro — до 100 / 500 с."]
+                    ].map(([value, plan], index) => (
+                      <label key={plan}><input type="radio" name="plan" value={value} required defaultChecked={index === 0} /><span>{plan}</span></label>
                     ))}
                   </div>
                 </fieldset>

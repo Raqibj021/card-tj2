@@ -21,6 +21,7 @@ export default function OrganizationsPage() {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link to="/organization/apply" className="button button-primary button-large">Зарегистрировать организацию <ArrowRight size={18} /></Link>
                 <Link to="/support" className="button button-secondary button-large">Заказать под ключ</Link>
+                <Link to="/organization/dashboard" className="button button-secondary button-large">Демо кабинета</Link>
               </div>
             </div>
             <div className="org-visual">

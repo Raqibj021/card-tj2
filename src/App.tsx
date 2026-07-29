@@ -14,6 +14,10 @@ import SupportPage from "./pages/SupportPage";
 import ServicesPage from "./pages/ServicesPage";
 import AuthPage from "./pages/AuthPage";
 import PromoClaimer from "./components/PromoClaimer";
+import OrganizationDashboardPage from "./pages/OrganizationDashboardPage";
+import PaymentPage from "./pages/PaymentPage";
+import AdminPaymentsPage from "./pages/AdminPaymentsPage";
+import CrmPage from "./pages/CrmPage";
 import LoadingScreen from "./components/LoadingScreen";
 import HelpWidget from "./components/HelpWidget";
 
@@ -43,13 +47,17 @@ export default function App() {
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/organizations" element={<OrganizationsPage />} />
         <Route path="/organization/apply" element={<OrganizationApplyPage />} />
+        <Route path="/organization/dashboard" element={<OrganizationDashboardPage />} />
+        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />
         <Route path="/create" element={<CreatePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/leads" element={<CrmPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/payments" element={<AdminPaymentsPage />} />
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
