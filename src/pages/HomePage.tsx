@@ -1,8 +1,10 @@
 import {
   ArrowRight,
   BadgeCheck,
+  Building2,
   Check,
   ContactRound,
+  LayoutGrid,
   Layers3,
   Link2,
   Palette,
@@ -125,7 +127,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section">
+        <section className="section home-benefits">
           <div className="site-container">
             <div className="section-heading">
               <span className="section-label">Vizora.tj</span>
@@ -144,7 +146,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section section-muted">
+        <section className="section section-muted home-desktop-detail">
           <div className="site-container">
             <div className="section-heading">
               <span className="section-label">01 — 03</span>
@@ -163,7 +165,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section overflow-hidden">
+        <section className="section overflow-hidden home-desktop-detail">
           <div className="site-container">
             <div className="section-heading">
               <span className="section-label">Templates</span>
@@ -191,7 +193,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section section-dark">
+        <section className="section section-dark home-desktop-detail">
           <div className="site-container">
             <div className="section-heading section-heading-light">
               <span className="section-label">Pricing</span>
@@ -234,7 +236,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section">
+        <section className="section home-desktop-detail">
           <div className="site-container grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
             <div className="section-heading !text-left">
               <span className="section-label">FAQ</span>
@@ -251,7 +253,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="pb-20">
+        <section className="pb-20 home-desktop-detail">
           <div className="site-container">
             <div className="cta-panel">
               <div>
@@ -263,6 +265,36 @@ export default function HomePage() {
                 {t("create")} <ArrowRight size={19} />
               </Link>
             </div>
+          </div>
+        </section>
+
+        <section className="mobile-home-hub">
+          <div className="site-container">
+            <div className="mobile-home-hub-head">
+              <span className="section-label">Возможности Vizora</span>
+              <h2>Всё нужное — в одном месте</h2>
+              <p>Выберите нужный раздел без долгой прокрутки страницы.</p>
+            </div>
+            <div className="mobile-home-links">
+              <Link to="/card/firuz">
+                <QrCode size={21} />
+                <span><strong>{t("example")}</strong><small>Готовая цифровая визитка</small></span>
+                <ArrowRight size={17} />
+              </Link>
+              <Link to="/directory">
+                <LayoutGrid size={21} />
+                <span><strong>Каталог специалистов</strong><small>Найдите проверенного исполнителя</small></span>
+                <ArrowRight size={17} />
+              </Link>
+              <Link to="/organizations">
+                <Building2 size={21} />
+                <span><strong>Для организаций</strong><small>Тарифы и управление сотрудниками</small></span>
+                <ArrowRight size={17} />
+              </Link>
+            </div>
+            <Link to="/create" className="button button-primary button-large w-full">
+              {t("create")} <ArrowRight size={18} />
+            </Link>
           </div>
         </section>
       </main>
