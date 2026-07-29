@@ -92,12 +92,6 @@ Deno.serve(async (request) => {
     card.address && { id: "address", header: "АДРЕС", body: String(card.address) }
   ].filter(Boolean);
 
-  const genericClass = {
-    id: classId,
-    issuerName: "Vizora.tj",
-    reviewStatus: "UNDER_REVIEW",
-    hexBackgroundColor: "#0f766e"
-  };
   const genericObject: Record<string, unknown> = {
     id: objectId,
     classId,
@@ -132,7 +126,6 @@ Deno.serve(async (request) => {
         ...(Deno.env.get("VIZORA_WALLET_ORIGIN") ? [Deno.env.get("VIZORA_WALLET_ORIGIN") as string] : [])
       ],
       payload: {
-        genericClasses: [genericClass],
         genericObjects: [genericObject]
       }
     })
