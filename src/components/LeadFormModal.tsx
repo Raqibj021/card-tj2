@@ -51,11 +51,13 @@ export default function LeadFormModal({
   const { language } = useApp();
   const text = modalCopy[language];
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setSending(true);
     const data = new FormData(event.currentTarget);
-    leadRepository.create({
+    await leadRepository.create({
       cardId,
       cardSlug,
       source,
@@ -65,6 +67,7 @@ export default function LeadFormModal({
       service: String(data.get("service")),
       message: String(data.get("message"))
     });
+    setSending(false);
     setSent(true);
   }
 
@@ -92,7 +95,7 @@ export default function LeadFormModal({
             </div>
             <label><span>{text.message}</span><textarea name="message" rows={4} placeholder={text.messageHint} /></label>
             <label className="consent-row"><input type="checkbox" required /><span>{text.consent}</span></label>
-            <button className="button button-primary button-large" type="submit">{source === "callback" ? <PhoneCall size={18} /> : <Send size={18} />} {text.send}</button>
+            <button className="button button-primary button-large" type="submit" disabled={sending}>{source === "callback" ? <PhoneCall size={18} /> : <Send size={18} />} {sending ? "…" : text.send}</button>
           </form>
         )}
       </section>
