@@ -5870,3 +5870,191 @@ body,
     justify-content: center;
   }
 }
+
+/* Digital card proportion and overflow guard */
+.digital-card,
+.digital-card * {
+  box-sizing: border-box;
+}
+
+.card-preview-cover,
+.card-preview-body,
+.card-preview-body .card-profile,
+.card-preview-body .card-profile > div:last-child {
+  min-width: 0;
+}
+
+.card-preview-brand {
+  min-width: 0;
+  max-width: calc(100% - 52px);
+  overflow: hidden;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-preview-brand > span,
+.card-preview-qr,
+.card-avatar-wrap,
+.card-organization svg,
+.card-contact-list svg {
+  flex: 0 0 auto;
+}
+
+.card-preview-body .card-profile {
+  align-items: center;
+  gap: 16px;
+  grid-template-columns: 92px minmax(0, 1fr);
+}
+
+.card-preview-body .card-name {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 100%;
+  margin-top: 5px;
+  font-size: 22px;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card-preview-body .card-role {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 100%;
+  margin-top: 5px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card-preview-body .card-description {
+  min-height: 38px;
+  margin-top: 16px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.card-preview-body .card-organization {
+  min-width: 0;
+  align-items: flex-start;
+  margin-top: 10px;
+  line-height: 1.35;
+}
+
+.card-preview-body .card-organization svg {
+  margin-top: 1px;
+}
+
+.card-preview-body .card-organization span {
+  display: -webkit-box;
+  overflow: hidden;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card-preview-body .card-primary-actions {
+  min-width: 0;
+  margin-top: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card-preview-body .card-primary-button {
+  min-width: 0;
+}
+
+.card-preview-body .card-contact-list {
+  margin-top: 14px;
+}
+
+.card-preview-body .card-contact-list > div {
+  overflow: hidden;
+  min-width: 0;
+  min-height: 40px;
+}
+
+.card-preview-body .card-contact-list span {
+  display: -webkit-box;
+  overflow: hidden;
+  min-width: 0;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.card-preview-body .card-socials {
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.card-preview-body .card-socials span {
+  min-width: 0;
+  padding-inline: 8px;
+}
+
+.card-preview-body .card-signature {
+  min-width: 0;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.card-preview-body .card-signature > span:last-child {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.design-showcase-item {
+  height: 410px;
+}
+
+.design-showcase-canvas {
+  height: 342px;
+}
+
+.design-showcase-canvas .digital-card {
+  width: 445px;
+  min-height: 620px;
+  transform: scale(.53);
+}
+
+@media (max-width: 680px) {
+  .card-preview-body .card-profile {
+    gap: 13px;
+  }
+
+  .card-preview-body .card-name {
+    font-size: 20px;
+  }
+
+  .card-preview-body .card-role {
+    font-size: 10px;
+  }
+
+  .design-showcase-item {
+    height: 270px;
+  }
+
+  .design-showcase-canvas {
+    height: 220px;
+  }
+
+  .design-showcase-canvas .digital-card {
+    width: 445px;
+    transform: scale(.3415);
+  }
+}
