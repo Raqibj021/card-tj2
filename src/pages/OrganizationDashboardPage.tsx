@@ -1,11 +1,12 @@
 import {
   Building2, ChevronRight, Copy, Download, Edit3, FolderTree, Network, Plus, QrCode,
-  Search, ShieldCheck, Trash2, Users, X
+  Search, ShieldCheck, Trash2, Users, X, LogOut, UserRound
 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import QRCodeImage from "../components/QRCode";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 import { downloadQrCode } from "../lib/cardUtils";
 import {
   organizationRepository,
@@ -21,6 +22,8 @@ const publicUrl = (slug: string) => {
 
 export default function OrganizationDashboardPage() {
   const { language } = useApp();
+  const { profile, user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<OrganizationWorkspace | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
@@ -34,9 +37,9 @@ export default function OrganizationDashboardPage() {
   const [editingEmployee, setEditingEmployee] = useState<OrganizationEmployee | null>(null);
   const [message, setMessage] = useState("");
   const copy = {
-    ru: { workspace: "Рабочее пространство", add: "Добавить сотрудника", staff: "Сотрудники", departments: "Структура", scans: "Общий QR", plan: "Тариф", manage: "Управление", search: "Поиск сотрудника", person: "Сотрудник", position: "Должность", department: "Подразделение", status: "Статус", card: "Цифровая визитка", invited: "Приглашён", active: "Активен", review: "На проверке", shared: "Общий QR организации", sharedTitle: "Один код для всей структуры", sharedText: "QR открывает страницу организации с подразделениями и подтверждёнными сотрудниками.", download: "Скачать QR", copy: "Копировать ссылку", noOrg: "Организация ещё не зарегистрирована", register: "Зарегистрировать организацию", newDepartment: "Новое подразделение", departmentName: "Название подразделения", parentDepartment: "Родительское подразделение", rootLevel: "Верхний уровень", save: "Сохранить", fullName: "ФИО", phone: "Телефон", email: "Email", invite: "Отправить приглашение", inviteInfo: "Сотрудник получит код. После подтверждения аккаунта фирменная визитка создастся автоматически.", allEmployees: "Все сотрудники", editDepartment: "Редактировать подразделение", deleteDepartment: "Удалить подразделение", moveEmployee: "Изменить сотрудника", revoke: "Отозвать приглашение", emptyStructure: "Создайте собственную структуру организации: управление, отделы, филиалы или любые другие уровни." },
-    tj: { workspace: "Фазои корӣ", add: "Иловаи корманд", staff: "Кормандон", departments: "Сохтор", scans: "QR-и умумӣ", plan: "Тарофа", manage: "Идоракунӣ", search: "Ҷустуҷӯи корманд", person: "Корманд", position: "Вазифа", department: "Шуъба", status: "Ҳолат", card: "Варақаи рақамӣ", invited: "Даъват шудааст", active: "Фаъол", review: "Дар санҷиш", shared: "QR-и умумии ташкилот", sharedTitle: "Як рамз барои тамоми сохтор", sharedText: "QR саҳифаи ташкилотро бо шуъбаҳо ва кормандони тасдиқшуда мекушояд.", download: "Боргирии QR", copy: "Нусхаи пайванд", noOrg: "Ташкилот ҳоло сабт нашудааст", register: "Сабти ташкилот", newDepartment: "Шуъбаи нав", departmentName: "Номи шуъба", parentDepartment: "Шуъбаи болоӣ", rootLevel: "Сатҳи болоӣ", save: "Нигоҳ доштан", fullName: "Ному насаб", phone: "Телефон", email: "Email", invite: "Фиристодани даъват", inviteInfo: "Корманд рамз мегирад. Пас аз тасдиқ варақаи фирмавӣ худкор сохта мешавад.", allEmployees: "Ҳамаи кормандон", editDepartment: "Тағйири шуъба", deleteDepartment: "Нест кардани шуъба", moveEmployee: "Тағйири корманд", revoke: "Бекор кардани даъват", emptyStructure: "Сохтори дилхоҳи ташкилотро созед: роҳбарият, шуъбаҳо, филиалҳо ё сатҳҳои дигар." },
-    en: { workspace: "Workspace", add: "Add employee", staff: "Employees", departments: "Structure", scans: "Shared QR", plan: "Plan", manage: "Management", search: "Search employee", person: "Employee", position: "Position", department: "Department", status: "Status", card: "Digital card", invited: "Invited", active: "Active", review: "Under review", shared: "Organization shared QR", sharedTitle: "One code for the entire structure", sharedText: "The QR opens the organization page with departments and verified employees.", download: "Download QR", copy: "Copy link", noOrg: "No organization registered yet", register: "Register organization", newDepartment: "New department", departmentName: "Department name", parentDepartment: "Parent department", rootLevel: "Top level", save: "Save", fullName: "Full name", phone: "Phone", email: "Email", invite: "Send invitation", inviteInfo: "The employee receives a code. A branded card is created automatically after confirmation.", allEmployees: "All employees", editDepartment: "Edit department", deleteDepartment: "Delete department", moveEmployee: "Edit employee", revoke: "Revoke invitation", emptyStructure: "Build your own organization structure: management, departments, branches or any other levels." }
+    ru: { workspace: "Рабочее пространство", add: "Добавить сотрудника", staff: "Сотрудники", departments: "Структура", scans: "Общий QR", plan: "Тариф", manage: "Управление", search: "Поиск сотрудника", person: "Сотрудник", position: "Должность", department: "Подразделение", status: "Статус", card: "Цифровая визитка", invited: "Приглашён", active: "Активен", review: "На проверке", shared: "Общий QR организации", sharedTitle: "Один код для всей структуры", sharedText: "QR открывает страницу организации с подразделениями и подтверждёнными сотрудниками.", download: "Скачать QR", copy: "Копировать ссылку", noOrg: "Организация ещё не зарегистрирована", register: "Зарегистрировать организацию", newDepartment: "Новое подразделение", departmentName: "Название подразделения", parentDepartment: "Родительское подразделение", rootLevel: "Верхний уровень", save: "Сохранить", fullName: "ФИО", phone: "Телефон", email: "Email", invite: "Отправить приглашение", inviteInfo: "Сотрудник получит код. После подтверждения аккаунта фирменная визитка создастся автоматически.", allEmployees: "Все сотрудники", editDepartment: "Редактировать подразделение", deleteDepartment: "Удалить подразделение", moveEmployee: "Изменить сотрудника", revoke: "Отозвать приглашение", emptyStructure: "Создайте собственную структуру организации: управление, отделы, филиалы или любые другие уровни.", organizationAccount: "Аккаунт организации", logout: "Выйти" },
+    tj: { workspace: "Фазои корӣ", add: "Иловаи корманд", staff: "Кормандон", departments: "Сохтор", scans: "QR-и умумӣ", plan: "Тарофа", manage: "Идоракунӣ", search: "Ҷустуҷӯи корманд", person: "Корманд", position: "Вазифа", department: "Шуъба", status: "Ҳолат", card: "Варақаи рақамӣ", invited: "Даъват шудааст", active: "Фаъол", review: "Дар санҷиш", shared: "QR-и умумии ташкилот", sharedTitle: "Як рамз барои тамоми сохтор", sharedText: "QR саҳифаи ташкилотро бо шуъбаҳо ва кормандони тасдиқшуда мекушояд.", download: "Боргирии QR", copy: "Нусхаи пайванд", noOrg: "Ташкилот ҳоло сабт нашудааст", register: "Сабти ташкилот", newDepartment: "Шуъбаи нав", departmentName: "Номи шуъба", parentDepartment: "Шуъбаи болоӣ", rootLevel: "Сатҳи болоӣ", save: "Нигоҳ доштан", fullName: "Ному насаб", phone: "Телефон", email: "Email", invite: "Фиристодани даъват", inviteInfo: "Корманд рамз мегирад. Пас аз тасдиқ варақаи фирмавӣ худкор сохта мешавад.", allEmployees: "Ҳамаи кормандон", editDepartment: "Тағйири шуъба", deleteDepartment: "Нест кардани шуъба", moveEmployee: "Тағйири корманд", revoke: "Бекор кардани даъват", emptyStructure: "Сохтори дилхоҳи ташкилотро созед: роҳбарият, шуъбаҳо, филиалҳо ё сатҳҳои дигар.", organizationAccount: "Ҳисоби ташкилот", logout: "Баромадан" },
+    en: { workspace: "Workspace", add: "Add employee", staff: "Employees", departments: "Structure", scans: "Shared QR", plan: "Plan", manage: "Management", search: "Search employee", person: "Employee", position: "Position", department: "Department", status: "Status", card: "Digital card", invited: "Invited", active: "Active", review: "Under review", shared: "Organization shared QR", sharedTitle: "One code for the entire structure", sharedText: "The QR opens the organization page with departments and verified employees.", download: "Download QR", copy: "Copy link", noOrg: "No organization registered yet", register: "Register organization", newDepartment: "New department", departmentName: "Department name", parentDepartment: "Parent department", rootLevel: "Top level", save: "Save", fullName: "Full name", phone: "Phone", email: "Email", invite: "Send invitation", inviteInfo: "The employee receives a code. A branded card is created automatically after confirmation.", allEmployees: "All employees", editDepartment: "Edit department", deleteDepartment: "Delete department", moveEmployee: "Edit employee", revoke: "Revoke invitation", emptyStructure: "Build your own organization structure: management, departments, branches or any other levels.", organizationAccount: "Organization account", logout: "Sign out" }
   }[language];
 
   const refresh = async (organizationId = selectedOrganizationId) => {
@@ -73,9 +76,27 @@ export default function OrganizationDashboardPage() {
 
   const organization = workspace.organization;
   const url = publicUrl(organization.slug ?? "");
+  const accountName = profile?.fullName || user?.email?.split("@")[0] || organization.displayName;
+  const leaveAccount = async () => {
+    await signOut();
+    navigate("/", { replace: true });
+  };
   return (
     <main className="org-dashboard-page">
       <div className="site-container py-10 md:py-14">
+        <div className="org-account-strip">
+          <div>
+            <span><UserRound size={18} /></span>
+            <div>
+              <small>{copy.organizationAccount}</small>
+              <strong>{accountName}</strong>
+              <em>{profile?.email || user?.email}</em>
+            </div>
+          </div>
+          <button type="button" className="button dashboard-logout" onClick={() => void leaveAccount()}>
+            <LogOut size={16} /> {copy.logout}
+          </button>
+        </div>
         <div className="org-workspace-head">
           <div className="org-workspace-brand"><span><Building2 size={22} /></span><div><small>{copy.workspace}</small>{organizations.length > 1 ? <select className="org-switcher" value={organization.id} onChange={(event) => { setSelectedDepartmentId(null); setSelectedOrganizationId(event.target.value); void refresh(event.target.value); }}>{organizations.map((item) => <option value={item.id} key={item.id}>{item.displayName}</option>)}</select> : <h1>{organization.displayName}</h1>}</div></div>
           <div className="flex flex-wrap gap-2"><button className="button button-secondary" onClick={() => { setEditingDepartment(null); setDepartmentParentId(selectedDepartmentId); setShowDepartmentForm(true); }}><Network size={17} /> {copy.newDepartment}</button><button className="button button-primary" onClick={() => setShowEmployeeForm(true)}><Plus size={17} /> {copy.add}</button></div>

@@ -10,12 +10,16 @@ import {
   Trash2,
   MessageSquareText,
   UsersRound,
-  ShieldCheck
-  ,ShoppingBag
+  ShieldCheck,
+  ShoppingBag,
+  Bell,
+  ExternalLink,
+  LogOut
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 import { cardRepository } from "../lib/cardRepository";
 import { downloadQrCode, formatDate, themeColors } from "../lib/cardUtils";
 import type { DigitalCard } from "../types/card";
@@ -34,26 +38,44 @@ const avatarText = (name: string) =>
     .join("")
     .toUpperCase();
 
+const withoutDemoCards = (cards: DigitalCard[]) =>
+  cards.filter((card) => !card.id.startsWith("demo-"));
+
 export default function DashboardPage() {
   const { t, language } = useApp();
-  const [cards, setCards] = useState<DigitalCard[]>(() => cardRepository.list());
+  const { profile, user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [cards, setCards] = useState<DigitalCard[]>(() =>
+    withoutDemoCards(cardRepository.list())
+  );
   const [toast, setToast] = useState("");
   const leads = leadRepository.list();
   const dashboardCopy = {
-    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик" },
-    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Дар санҷиш", approved: "Нашр шудааст", draft: "Нусхаи муваққатӣ" },
-    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Draft" }
+    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
+    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Дар санҷиш", approved: "Нашр шудааст", draft: "Нусхаи муваққатӣ", account: "Ҳисоби шахсӣ", positionEmpty: "Вазифа ҳоло нишон дода нашудааст", organizationEmpty: "Ташкилот ҳоло нишон дода нашудааст", viewCard: "Кушодани варақа", notifications: "Огоҳиномаҳо", logout: "Баромадан", myCards: "Варақаҳои ман", myCardsText: "Варақаҳои электронии худро созед, таҳрир ва идора намоед.", accountEmail: "Почтаи ҳисоб" },
+    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Draft", account: "Personal account", positionEmpty: "Position not specified yet", organizationEmpty: "Organization not specified yet", viewCard: "Open card", notifications: "Notifications", logout: "Sign out", myCards: "My business cards", myCardsText: "Create, edit and manage your digital business cards.", accountEmail: "Account email" }
   }[language];
 
   useEffect(() => {
     let active = true;
     void cardRepository.listRemote().then((result) => {
-      if (active) setCards(result);
+      if (active) setCards(withoutDemoCards(result));
     });
     return () => { active = false; };
   }, []);
 
   const totalViews = cards.reduce((sum, card) => sum + card.views, 0);
+  const primaryCard = cards[0];
+  const accountName =
+    primaryCard?.fullName ||
+    profile?.fullName ||
+    user?.user_metadata?.full_name ||
+    user?.email?.split("@")[0] ||
+    "Vizora";
+  const accountPhoto = primaryCard?.photo ?? "";
+  const accountPosition = primaryCard?.position || dashboardCopy.positionEmpty;
+  const accountOrganization =
+    primaryCard?.organization || dashboardCopy.organizationEmpty;
 
   const notify = (message: string) => {
     setToast(message);
@@ -68,13 +90,47 @@ export default function DashboardPage() {
   const remove = (card: DigitalCard) => {
     if (!window.confirm(t("confirmDelete"))) return;
     cardRepository.remove(card.id);
-    setCards(cardRepository.list());
+    setCards(withoutDemoCards(cardRepository.list()));
+  };
+
+  const leaveAccount = async () => {
+    await signOut();
+    navigate("/", { replace: true });
   };
 
   return (
     <main className="dashboard-page">
       <section className="dashboard-hero">
         <div className="site-container py-12 md:py-16">
+          <div className="dashboard-profile-panel">
+            <div className="dashboard-profile-identity">
+              {accountPhoto ? (
+                <img src={accountPhoto} alt={accountName} />
+              ) : (
+                <span>{avatarText(accountName)}</span>
+              )}
+              <div>
+                <small>{dashboardCopy.account}</small>
+                <h2>{accountName}</h2>
+                <p>{accountPosition} <b>·</b> {accountOrganization}</p>
+                <em>{dashboardCopy.accountEmail}: {profile?.email || user?.email}</em>
+              </div>
+            </div>
+            <div className="dashboard-profile-actions">
+              {primaryCard && (
+                <Link to={`/card/${primaryCard.slug}`} className="button button-secondary">
+                  <ExternalLink size={16} /> {dashboardCopy.viewCard}
+                </Link>
+              )}
+              <Link to="/notifications" className="button button-secondary">
+                <Bell size={16} /> {dashboardCopy.notifications}
+              </Link>
+              <button type="button" className="button dashboard-logout" onClick={() => void leaveAccount()}>
+                <LogOut size={16} /> {dashboardCopy.logout}
+              </button>
+            </div>
+          </div>
+
           <div className="flex flex-col gap-7 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <span className="section-label">{t("dashboardEyebrow")}</span>
@@ -123,6 +179,16 @@ export default function DashboardPage() {
         <div className="dashboard-crm-banner mt-3">
           <div><ShieldCheck size={22} /><span><strong>{language === "ru" ? "Проверка специалиста" : language === "tj" ? "Санҷиши мутахассис" : "Professional verification"}</strong><small>{language === "ru" ? "Подтвердите профессию перед публикацией в открытом каталоге" : language === "tj" ? "Пеш аз нашр касби худро тасдиқ кунед" : "Verify your profession before directory publication"}</small></span></div>
           <Link to="/verification" className="button button-secondary">{language === "ru" ? "Загрузить документы" : language === "tj" ? "Бор кардани ҳуҷҷатҳо" : "Upload documents"}</Link>
+        </div>
+        <div className="dashboard-section-head">
+          <div>
+            <span className="section-label">VIZORA.TJ</span>
+            <h2>{dashboardCopy.myCards}</h2>
+            <p>{dashboardCopy.myCardsText}</p>
+          </div>
+          <Link to="/create" className="button button-primary">
+            <Plus size={17} /> {t("create")}
+          </Link>
         </div>
         {cards.length ? (
           <div className="grid gap-5 lg:grid-cols-2">
