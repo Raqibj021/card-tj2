@@ -1,20 +1,26 @@
 import { Check, Copy, CreditCard, RefreshCw, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { paymentRepository, type PaymentRequest } from "../lib/paymentRepository";
 
 export default function AdminPaymentsPage() {
   const [requests, setRequests] = useState<PaymentRequest[]>(() => paymentRepository.list());
   const [code, setCode] = useState("");
-  const refresh = () => setRequests(paymentRepository.list());
+  const [error, setError] = useState("");
+  const refresh = async () => setRequests(await paymentRepository.listRemote());
+
+  useEffect(() => {
+    void refresh();
+  }, []);
 
   return (
     <main className="admin-page">
       <div className="site-container py-10 md:py-14">
         <div className="platform-section-head">
           <div><span className="section-label">Администратор</span><h1 className="page-title">Проверка оплат</h1><p className="page-copy">Подтверждайте перевод только после проверки банковского поступления.</p></div>
-          <div className="flex gap-2"><button className="button button-secondary" onClick={refresh}><RefreshCw size={16} /> Обновить</button><Link className="button button-secondary" to="/admin">Обзор</Link></div>
+          <div className="flex gap-2"><button className="button button-secondary" onClick={() => void refresh()}><RefreshCw size={16} /> Обновить</button><Link className="button button-secondary" to="/admin">Обзор</Link></div>
         </div>
+        {error && <div className="auth-message">{error}</div>}
         {code && <div className="activation-result"><Check size={18} /><span>Создан код активации: <strong>{code}</strong></span><button onClick={() => navigator.clipboard.writeText(code)}><Copy size={16} /> Копировать</button></div>}
         <section className="admin-panel">
           <div className="admin-panel-heading"><div><h2>Заявки на оплату</h2><p>{requests.length} заявок в демонстрационном хранилище</p></div><CreditCard size={20} /></div>
@@ -28,7 +34,23 @@ export default function AdminPaymentsPage() {
                     <td><div><strong>{item.customerName}</strong><br /><small>{item.phone}</small></div></td>
                     <td>{item.plan}</td><td>{item.amount} с.</td><td>{item.receiptName || "—"}</td>
                     <td><span className={item.status === "active" ? "status-pill" : item.status === "rejected" ? "status-pill status-rejected" : "status-pill status-review"}>{item.status}</span></td>
-                    <td><div className="payment-actions"><button title="Подтвердить" onClick={() => { setCode(paymentRepository.approve(item.id)); refresh(); }}><Check size={17} /></button><button title="Отклонить" onClick={() => { paymentRepository.reject(item.id); refresh(); }}><X size={17} /></button></div></td>
+                    <td><div className="payment-actions"><button title="Подтвердить" onClick={async () => {
+                      setError("");
+                      try {
+                        setCode(await paymentRepository.approve(item.id));
+                        await refresh();
+                      } catch (caught) {
+                        setError(caught instanceof Error ? caught.message : "Ошибка подтверждения");
+                      }
+                    }}><Check size={17} /></button><button title="Отклонить" onClick={async () => {
+                      setError("");
+                      try {
+                        await paymentRepository.reject(item.id);
+                        await refresh();
+                      } catch (caught) {
+                        setError(caught instanceof Error ? caught.message : "Ошибка отклонения");
+                      }
+                    }}><X size={17} /></button></div></td>
                   </tr>
                 ))}
               </tbody>
