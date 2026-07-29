@@ -34,6 +34,18 @@ const initials = (name: string) =>
     .join("")
     .toUpperCase();
 
+const formatDisplayName = (name: string) =>
+  name
+    .trim()
+    .split(/\s+/)
+    .map((part) => {
+      const normalized = part.toLocaleLowerCase();
+      return normalized
+        ? normalized.charAt(0).toLocaleUpperCase() + normalized.slice(1)
+        : "";
+    })
+    .join(" ");
+
 export default function CardPreview({
   card,
   compact = false
@@ -49,6 +61,7 @@ export default function CardPreview({
     "--card-accent": palette.accent,
     "--card-soft": palette.soft
   };
+  const displayName = formatDisplayName(card.fullName || t("fullName"));
 
   return (
     <article
@@ -78,7 +91,7 @@ export default function CardPreview({
             {card.photo ? (
               <img
                 src={card.photo}
-                alt={card.fullName || t("photo")}
+                alt={displayName}
                 className="card-avatar"
               />
             ) : (
@@ -90,7 +103,7 @@ export default function CardPreview({
           </div>
           <div className="min-w-0">
             <span className="card-kicker">{copy.kicker}</span>
-            <h3 className="card-name">{card.fullName || t("fullName")}</h3>
+            <h3 className="card-name">{displayName}</h3>
             <p className="card-role">{card.position || t("position")}</p>
           </div>
         </div>
@@ -148,7 +161,7 @@ export default function CardPreview({
 
         <div className="card-signature">
           <span className="mini-logo">V</span>
-          <span>vizora.tj/{card.slug || "your-name"}</span>
+          <span>vizora.tj/demo</span>
         </div>
       </div>
     </article>
