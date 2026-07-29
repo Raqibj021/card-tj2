@@ -2,6 +2,13 @@ name: Deploy Vizora email function
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/functions/process-email-outbox/**"
+      - "supabase/functions/_shared/emailTemplates.ts"
+      - ".github/workflows/deploy-email-function.yml"
 
 permissions:
   contents: read
@@ -24,3 +31,15 @@ jobs:
           supabase functions deploy process-email-outbox \
             --project-ref "$SUPABASE_PROJECT_REF" \
             --no-verify-jwt
+      - name: Verify email worker
+        env:
+          FUNCTION_URL: ${{ secrets.SUPABASE_MAIL_FUNCTION_URL }}
+          WORKER_SECRET: ${{ secrets.MAIL_WORKER_SECRET }}
+        run: |
+          test -n "$FUNCTION_URL"
+          test -n "$WORKER_SECRET"
+          curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header "x-mail-worker-secret: $WORKER_SECRET" \
+            --header "content-type: application/json" \
+            "$FUNCTION_URL"
