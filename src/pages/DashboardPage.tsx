@@ -11,6 +11,7 @@ import {
   MessageSquareText,
   UsersRound,
   ShieldCheck
+  ,ShoppingBag
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -114,6 +115,10 @@ export default function DashboardPage() {
         <div className="dashboard-crm-banner">
           <div><MessageSquareText size={22} /><span><strong>{dashboardCopy.crm}</strong><small>{dashboardCopy.crmText}</small></span></div>
           <Link to="/dashboard/leads" className="button button-secondary">{dashboardCopy.openLeads}</Link>
+        </div>
+        <div className="dashboard-crm-banner mt-3">
+          <div><ShoppingBag size={22} /><span><strong>{language === "ru" ? "Заказы и договоры" : language === "tj" ? "Фармоишҳо ва шартномаҳо" : "Orders and contracts"}</strong><small>{language === "ru" ? "Статусы изготовления, оплаты и документы" : language === "tj" ? "Ҳолати омодасозӣ, пардохт ва ҳуҷҷатҳо" : "Production, payment status and documents"}</small></span></div>
+          <Link to="/dashboard/orders" className="button button-secondary">{language === "ru" ? "Открыть" : language === "tj" ? "Кушодан" : "Open"}</Link>
         </div>
         <div className="dashboard-crm-banner mt-3">
           <div><ShieldCheck size={22} /><span><strong>{language === "ru" ? "Проверка специалиста" : language === "tj" ? "Санҷиши мутахассис" : "Professional verification"}</strong><small>{language === "ru" ? "Подтвердите профессию перед публикацией в открытом каталоге" : language === "tj" ? "Пеш аз нашр касби худро тасдиқ кунед" : "Verify your profession before directory publication"}</small></span></div>
