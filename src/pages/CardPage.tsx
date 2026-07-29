@@ -191,7 +191,7 @@ export default function CardPage() {
       <div className="profile-background-shape" />
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
-          <BrandLogo compact />
+          <BrandLogo light />
         </Link>
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="profile-language">
@@ -231,8 +231,16 @@ export default function CardPage() {
       <div className="profile-layout">
         <section className="profile-main-card">
           <div className="profile-cover">
-            <span className="profile-cover-logo">C</span>
-            <span>{card.organization || "Vizora.tj"}</span>
+            <div className="profile-cover-brand">
+              <span className="profile-cover-logo">
+                {(card.organization || card.fullName || "V").charAt(0)}
+              </span>
+              <div>
+                <small>Цифровая визитка</small>
+                <strong>{card.organization || "Vizora.tj"}</strong>
+              </div>
+            </div>
+            <span className="profile-status"><Check size={13} /> Профиль подтверждён</span>
           </div>
           <div className="profile-content">
             <div className="profile-avatar-wrap">
@@ -286,16 +294,22 @@ export default function CardPage() {
               {t("saveContact")}
             </button>
 
-            <div className="lead-action-grid">
-              <button type="button" onClick={() => setLeadSource("contact")}>
-                <MessageCircle size={18} /><span>Связаться</span>
-              </button>
-              <button type="button" onClick={() => setLeadSource("callback")}>
-                <PhoneCall size={18} /><span>Заказать звонок</span>
-              </button>
-              <button type="button" onClick={() => setLeadSource("request")}>
-                <ClipboardPenLine size={18} /><span>Оставить заявку</span>
-              </button>
+            <div className="profile-lead-panel">
+              <div>
+                <small>Быстрая заявка</small>
+                <strong>Чем я могу помочь?</strong>
+              </div>
+              <div className="lead-action-grid">
+                <button type="button" onClick={() => setLeadSource("contact")}>
+                  <MessageCircle size={18} /><span>Написать</span>
+                </button>
+                <button type="button" onClick={() => setLeadSource("callback")}>
+                  <PhoneCall size={18} /><span>Заказать звонок</span>
+                </button>
+                <button type="button" onClick={() => setLeadSource("request")}>
+                  <ClipboardPenLine size={18} /><span>Оставить заявку</span>
+                </button>
+              </div>
             </div>
 
             <div className="profile-detail-list">
@@ -325,6 +339,7 @@ export default function CardPage() {
               )}
               {card.address && (
                 <a
+                  className="profile-detail-wide"
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`}
                   target="_blank"
                   rel="noreferrer"

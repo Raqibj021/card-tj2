@@ -212,9 +212,9 @@ export default function CreatePage() {
     title: string;
     detail: string;
   }> = [
-    { id: "executive", title: t("executive"), detail: "Строгий и универсальный" },
-    { id: "minimal", title: t("minimal"), detail: "Лёгкий и чистый" },
-    { id: "creative", title: t("creative"), detail: "Яркий акцент" }
+    { id: "executive", title: "Деловой", detail: "Тёмный верх и плавная волна" },
+    { id: "minimal", title: "Технологичный", detail: "Тёмный неоновый стиль" },
+    { id: "creative", title: "Архитектурный", detail: "Светлый стиль с фирменной полосой" }
   ];
 
   return (

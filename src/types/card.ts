@@ -1,6 +1,14 @@
 export type Language = "ru" | "tj" | "en";
 export type CardTemplate = "executive" | "minimal" | "creative";
-export type CardTheme = "teal" | "blue" | "plum" | "amber" | "graphite";
+export type CardTheme =
+  | "teal"
+  | "blue"
+  | "plum"
+  | "amber"
+  | "graphite"
+  | "navy"
+  | "violet"
+  | "burgundy";
 
 export interface DigitalCard {
   id: string;

@@ -1,11 +1,13 @@
 import type { CSSProperties } from "react";
 import {
   Building2,
+  Check,
   Globe2,
   Mail,
   MapPin,
   MessageCircle,
   Phone,
+  QrCode,
   Send
 } from "lucide-react";
 import { useApp } from "../context/AppContext";
@@ -48,81 +50,92 @@ export default function CardPreview({
       }`}
       style={style}
     >
-      <div className="card-topline" />
-      <div className="card-profile">
-        {card.photo ? (
-          <img
-            src={card.photo}
-            alt={card.fullName || t("photo")}
-            className="card-avatar"
-          />
-        ) : (
-          <div className="card-avatar card-avatar-fallback">
-            {initials(card.fullName)}
+      <div className="card-preview-cover">
+        <div className="card-preview-orb" />
+        <span className="card-preview-brand">
+          <span>{(card.organization || "V").charAt(0)}</span>
+          {card.organization || "VIZORA.TJ"}
+        </span>
+        <span className="card-preview-qr"><QrCode size={18} /></span>
+      </div>
+
+      <div className="card-preview-body">
+        <div className="card-profile">
+          <div className="card-avatar-wrap">
+            {card.photo ? (
+              <img
+                src={card.photo}
+                alt={card.fullName || t("photo")}
+                className="card-avatar"
+              />
+            ) : (
+              <div className="card-avatar card-avatar-fallback">
+                {initials(card.fullName)}
+              </div>
+            )}
+            <span className="card-preview-verified"><Check size={12} /></span>
+          </div>
+          <div className="min-w-0">
+            <span className="card-kicker">ПРОФЕССИОНАЛЬНЫЙ ПРОФИЛЬ</span>
+            <h3 className="card-name">{card.fullName || t("fullName")}</h3>
+            <p className="card-role">{card.position || t("position")}</p>
+          </div>
+        </div>
+
+        <p className="card-description">
+          {card.description ||
+            "Кратко расскажите о себе, своей работе и главной ценности для клиента."}
+        </p>
+
+        {!compact && (
+          <div className="card-organization">
+            <Building2 size={16} />
+            <span>{card.organization || t("organization")}</span>
           </div>
         )}
-        <div className="min-w-0">
-          <span className="card-kicker">
-            {card.organization || "Vizora.tj profile"}
-          </span>
-          <h3 className="card-name">{card.fullName || t("fullName")}</h3>
-          <p className="card-role">{card.position || t("position")}</p>
-        </div>
-      </div>
 
-      <p className="card-description">
-        {card.description ||
-          "Кратко расскажите о себе, своей работе и главной ценности для клиента."}
-      </p>
-
-      {!compact && (
-        <div className="card-organization">
-          <Building2 size={16} />
-          <span>{card.organization || t("organization")}</span>
-        </div>
-      )}
-
-      <div className="card-primary-actions">
-        <div className="card-primary-button">
-          <Phone size={18} />
-          <span>{t("call")}</span>
-        </div>
-        <div className="card-primary-button card-primary-button-light">
-          <MessageCircle size={18} />
-          <span>WhatsApp</span>
-        </div>
-      </div>
-
-      {!compact && (
-        <>
-          <div className="card-contact-list">
-            <div>
-              <Phone size={16} />
-              <span>{card.phone || "+992 00 000 00 00"}</span>
-            </div>
-            <div>
-              <Mail size={16} />
-              <span>{card.email || "name@example.tj"}</span>
-            </div>
-            <div>
-              <Globe2 size={16} />
-              <span>{card.website || "www.example.tj"}</span>
-            </div>
-            <div>
-              <MapPin size={16} />
-              <span>{card.address || t("address")}</span>
-            </div>
+        <div className="card-primary-actions">
+          <div className="card-primary-button">
+            <Phone size={18} />
+            <span>{t("call")}</span>
           </div>
-          <div className="card-socials">
-            <span><Send size={15} /> Telegram</span>
-            <span><MessageCircle size={15} /> Instagram</span>
+          <div className="card-primary-button card-primary-button-light">
+            <MessageCircle size={18} />
+            <span>WhatsApp</span>
           </div>
-        </>
-      )}
+        </div>
 
-      <div className="card-signature">
-        <span className="mini-logo">C</span>
-        <span>card.tj/{card.slug || "your-name"}</span>
+        {!compact && (
+          <>
+            <div className="card-contact-list">
+              <div>
+                <Phone size={16} />
+                <span>{card.phone || "+992 00 000 00 00"}</span>
+              </div>
+              <div>
+                <Mail size={16} />
+                <span>{card.email || "name@example.tj"}</span>
+              </div>
+              <div>
+                <Globe2 size={16} />
+                <span>{card.website || "www.example.tj"}</span>
+              </div>
+              <div>
+                <MapPin size={16} />
+                <span>{card.address || t("address")}</span>
+              </div>
+            </div>
+            <div className="card-socials">
+              <span><Send size={15} /> Telegram</span>
+              <span><MessageCircle size={15} /> Instagram</span>
+            </div>
+          </>
+        )}
+
+        <div className="card-signature">
+          <span className="mini-logo">V</span>
+          <span>vizora.tj/{card.slug || "your-name"}</span>
+        </div>
       </div>
     </article>
   );

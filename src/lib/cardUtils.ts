@@ -6,7 +6,10 @@ export const themeColors = {
   blue: { accent: "#1d4ed8", soft: "#dbeafe", label: "Синяя" },
   plum: { accent: "#7e22ce", soft: "#f3e8ff", label: "Сливовая" },
   amber: { accent: "#b45309", soft: "#fef3c7", label: "Янтарная" },
-  graphite: { accent: "#1f2937", soft: "#e5e7eb", label: "Графитовая" }
+  graphite: { accent: "#1f2937", soft: "#e5e7eb", label: "Графитовая" },
+  navy: { accent: "#123b7a", soft: "#dce9ff", label: "Тёмно-синяя" },
+  violet: { accent: "#6d3be8", soft: "#eee8ff", label: "Фиолетовая" },
+  burgundy: { accent: "#8f2444", soft: "#fae4eb", label: "Бордовая" }
 } as const;
 
 export const sanitizePhone = (phone: string) =>
