@@ -66,6 +66,9 @@ export default function HomePage() {
     ru: {
       cardExample: "Пример электронной визитки", qrReady: "QR готов", saved: "Контакт сохранён", perYear: "сомони / год", pricing: "Тарифы", faq: "Вопросы и ответы",
       mobileLabel: "Возможности Vizora", mobileTitle: "Всё нужное — в одном месте", mobileText: "Выберите нужный раздел без долгой прокрутки страницы.",
+      impactLabel: "Возможности в действии", impactStat: "визиток уже работают", profileLive: "Профиль обновлён",
+      journeyLabel: "От идеи до готового профиля", journeyText: "Заполните данные один раз — Vizora превратит их в красивую визитку, которой удобно делиться.",
+      liveCard: "Живая визитка", linkReady: "Ссылка готова",
       readyCard: "Готовая цифровая визитка", directory: "Каталог специалистов", directoryText: "Найдите проверенного исполнителя",
       forOrganizations: "Для организаций", organizationText: "Тарифы и управление сотрудниками",
       plans: [
@@ -77,6 +80,9 @@ export default function HomePage() {
     tj: {
       cardExample: "Намунаи варақаи рақамӣ", qrReady: "QR омода аст", saved: "Тамос нигоҳ дошта шуд", perYear: "сомонӣ / сол", pricing: "Тарофаҳо", faq: "Саволу ҷавоб",
       mobileLabel: "Имкониятҳои Vizora", mobileTitle: "Ҳама чизи зарурӣ — дар як ҷой", mobileText: "Бахши лозимиро бе паймоиши тӯлонӣ интихоб кунед.",
+      impactLabel: "Имкониятҳо дар амал", impactStat: "варақа аллакай фаъоланд", profileLive: "Профил нав шуд",
+      journeyLabel: "Аз ғоя то профили омода", journeyText: "Маълумотро як бор пур кунед — Vizora онро ба варақаи зебо ва омода барои мубодила табдил медиҳад.",
+      liveCard: "Варақаи зинда", linkReady: "Пайванд омода аст",
       readyCard: "Варақаи рақамии омода", directory: "Феҳристи мутахассисон", directoryText: "Иҷрокунандаи тасдиқшударо ёбед",
       forOrganizations: "Барои ташкилотҳо", organizationText: "Тарофаҳо ва идоракунии кормандон",
       plans: [
@@ -88,6 +94,9 @@ export default function HomePage() {
     en: {
       cardExample: "Digital business card example", qrReady: "QR ready", saved: "Contact saved", perYear: "somoni / year", pricing: "Pricing", faq: "FAQ",
       mobileLabel: "Vizora features", mobileTitle: "Everything you need in one place", mobileText: "Choose the section you need without a long scroll.",
+      impactLabel: "Features in action", impactStat: "cards already live", profileLive: "Profile updated",
+      journeyLabel: "From idea to a ready profile", journeyText: "Enter your details once — Vizora turns them into a beautiful card that is easy to share.",
+      liveCard: "Live business card", linkReady: "Link is ready",
       readyCard: "Ready digital business card", directory: "Specialist directory", directoryText: "Find a verified professional",
       forOrganizations: "For organizations", organizationText: "Plans and employee management",
       plans: [
@@ -208,53 +217,124 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section home-benefits">
+        <section className="section home-benefits impact-section">
           <div className="site-container">
-            <div className="section-heading">
-              <span className="section-label">Vizora.tj</span>
-              <h2>{t("benefitTitle")}</h2>
+            <div className="impact-heading">
+              <div>
+                <span className="section-label">{homeCopy.impactLabel}</span>
+                <h2>{t("benefitTitle")}</h2>
+              </div>
               <p>{t("benefitText")}</p>
             </div>
-            <div className="home-benefits-grid mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {benefits.map(({ icon: Icon, title, text }) => (
-                <article key={title} className="feature-card">
-                  <div className="feature-icon"><Icon size={22} /></div>
+
+            <div className="impact-bento">
+              <article className="impact-card impact-photo-card">
+                <img
+                  src={`${import.meta.env.BASE_URL}images/home/professional-connection.webp`}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="impact-photo-shade" />
+                <div className="impact-live-badge">
+                  <span aria-hidden="true" />
+                  {homeCopy.profileLive}
+                </div>
+                <div className="impact-photo-content">
+                  <div className="impact-avatars" aria-hidden="true">
+                    {[demoCards[3], demoCards[2], demoCards[5]].map((card) => (
+                      <img key={card.id} src={card.photo} alt="" />
+                    ))}
+                    <span>+</span>
+                  </div>
+                  <div className="impact-stat">
+                    <strong>1 240+</strong>
+                    <span>{homeCopy.impactStat}</span>
+                  </div>
+                </div>
+              </article>
+
+              {benefits.map(({ icon: Icon, title, text }, index) => (
+                <article key={title} className={`impact-card impact-benefit impact-benefit-${index + 1}`}>
+                  <div className="impact-benefit-top">
+                    <div className="feature-icon"><Icon size={21} /></div>
+                    <span className="impact-index">0{index + 1}</span>
+                  </div>
+                  <div className={`impact-visual impact-visual-${index + 1}`} aria-hidden="true">
+                    {index === 0 && (
+                      <>
+                        <span /><span /><span />
+                      </>
+                    )}
+                    {index === 1 && (
+                      <>
+                        <i /><i /><i />
+                      </>
+                    )}
+                    {index === 2 && (
+                      <>
+                        <b /><b /><b /><b />
+                      </>
+                    )}
+                    {index === 3 && (
+                      <>
+                        <em>RU</em><em>TJ</em><em>EN</em>
+                      </>
+                    )}
+                  </div>
                   <h3>{title}</h3>
                   <p>{text}</p>
                 </article>
               ))}
-            </div>
-            <div className="mobile-benefits-marquee" aria-label={t("benefitTitle")}>
-              <div className="mobile-benefits-track">
-                {[...benefits, ...benefits].map(({ icon: Icon, title, text }, index) => (
-                  <article key={`${title}-${index}`} className="mobile-benefit-pill">
-                    <div className="feature-icon"><Icon size={17} /></div>
-                    <span>
-                      <strong>{title}</strong>
-                      <small>{text}</small>
-                    </span>
-                  </article>
-                ))}
-              </div>
             </div>
           </div>
         </section>
 
-        <section className="section section-muted home-desktop-detail">
+        <section className="section journey-section">
           <div className="site-container">
-            <div className="section-heading">
-              <span className="section-label">01 — 03</span>
+            <div className="journey-heading">
+              <span className="section-label">{homeCopy.journeyLabel}</span>
               <h2>{t("howTitle")}</h2>
+              <p>{homeCopy.journeyText}</p>
             </div>
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
-              {steps.map(({ number, icon: Icon, title, text }) => (
-                <article key={number} className="step-card">
-                  <span className="step-number">{number}</span>
-                  <div className="feature-icon"><Icon size={22} /></div>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </article>
-              ))}
+
+            <div className="journey-layout">
+              <figure className="journey-visual">
+                <img
+                  src={`${import.meta.env.BASE_URL}images/home/share-profile.webp`}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div className="journey-photo-shade" />
+                <figcaption className="journey-profile-chip">
+                  <span><Sparkles size={16} /></span>
+                  <div>
+                    <strong>{homeCopy.liveCard}</strong>
+                    <small>QR · vCard · Vizora.tj</small>
+                  </div>
+                </figcaption>
+                <div className="journey-ready-chip">
+                  <QrCode size={18} />
+                  {homeCopy.linkReady}
+                </div>
+              </figure>
+
+              <div className="journey-timeline">
+                {steps.map(({ number, icon: Icon, title, text }) => (
+                  <article key={number} className="journey-step">
+                    <span className="journey-step-number">{number}</span>
+                    <div className="journey-step-icon"><Icon size={20} /></div>
+                    <div>
+                      <h3>{title}</h3>
+                      <p>{text}</p>
+                    </div>
+                  </article>
+                ))}
+                <Link to="/create" className="button button-primary button-large journey-cta">
+                  {t("create")} <ArrowRight size={19} />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
