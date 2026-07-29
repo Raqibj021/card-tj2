@@ -129,6 +129,23 @@ const authCopy = {
   }
 } as const;
 
+function readableAuthError(error: unknown, language: Language) {
+  const rawMessage =
+    typeof error === "object" && error !== null && "message" in error
+      ? String((error as { message?: unknown }).message ?? "")
+      : String(error ?? "");
+
+  if (!rawMessage || rawMessage === "{}" || rawMessage === "[object Object]") {
+    return language === "ru"
+      ? "Не удалось отправить письмо. Проверьте настройки SMTP и попробуйте ещё раз."
+      : language === "tj"
+        ? "Ирсоли мактуб муяссар нашуд. Танзимоти SMTP-ро санҷида, дубора кӯшиш кунед."
+        : "The email could not be sent. Check the SMTP settings and try again.";
+  }
+
+  return rawMessage;
+}
+
 export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const isRegister = mode === "register";
   const navigate = useNavigate();
@@ -177,7 +194,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
     setBusy(false);
 
     if (result.error) {
-      setMessage(result.error.message);
+      setMessage(readableAuthError(result.error, language));
       return;
     }
 
@@ -229,7 +246,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
     setBusy(false);
 
     if (error) {
-      setMessage(error.message);
+      setMessage(readableAuthError(error, language));
       return;
     }
 
