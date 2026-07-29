@@ -6,7 +6,6 @@ import {
   Search,
   Building2,
   Plus,
-  ShieldCheck,
   Sun,
   X
 } from "lucide-react";
@@ -20,9 +19,9 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const copy = {
-    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", admin: "Админ", login: "Войти", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
-    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", admin: "Админ", login: "Ворид шудан", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
-    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", admin: "Admin", login: "Sign in", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
+    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", login: "Войти", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
+    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", login: "Ворид шудан", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
+    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", login: "Sign in", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
   }[language];
   const navItems = [
     { to: "/", text: copy.home },
@@ -30,8 +29,7 @@ export default function Header() {
     { to: "/organizations", text: copy.organizations, icon: Building2 },
     { to: "/services", text: copy.services },
     { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
-    { to: "/dashboard/leads", text: copy.leads },
-    { to: "/admin", text: copy.admin, icon: ShieldCheck }
+    { to: "/dashboard/leads", text: copy.leads }
   ];
 
   useEffect(() => setOpen(false), [location.pathname]);
