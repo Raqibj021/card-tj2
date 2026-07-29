@@ -1,4 +1,4 @@
-import { ArrowUpRight, Instagram, Mail } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
 import { Link } from "react-router";
 import { useApp } from "../../context/AppContext";
 import BrandLogo from "../BrandLogo";
@@ -42,9 +42,6 @@ export default function Footer() {
             <a href="https://instagram.com" target="_blank" rel="noreferrer">
               <Instagram size={15} /> Instagram
             </a>
-            <Link to="/admin">
-              {t("admin")} <ArrowUpRight size={15} />
-            </Link>
           </div>
         </div>
       </div>
