@@ -2,7 +2,9 @@ import type { CSSProperties } from "react";
 import {
   Building2,
   Check,
+  Facebook,
   Globe2,
+  Instagram,
   Mail,
   MapPin,
   MessageCircle,
@@ -53,7 +55,7 @@ export default function CardPreview({
       <div className="card-preview-cover">
         <div className="card-preview-orb" />
         <span className="card-preview-brand">
-          <span>
+          <span className={card.companyLogo ? "has-company-logo" : ""}>
             {card.companyLogo ? (
               <img src={card.companyLogo} alt="" />
             ) : (
@@ -133,7 +135,8 @@ export default function CardPreview({
             </div>
             <div className="card-socials">
               <span><Send size={15} /> Telegram</span>
-              <span><MessageCircle size={15} /> Instagram</span>
+              <span><Instagram size={15} /> Instagram</span>
+              <span><Facebook size={15} /> Facebook</span>
             </div>
           </>
         )}

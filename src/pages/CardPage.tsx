@@ -278,7 +278,7 @@ export default function CardPage() {
         <section className="profile-main-card">
           <div className="profile-cover">
             <div className="profile-cover-brand">
-              <span className="profile-cover-logo">
+              <span className={`profile-cover-logo ${card.companyLogo ? "has-company-logo" : ""}`}>
                 {card.companyLogo ? (
                   <img src={card.companyLogo} alt="" />
                 ) : (
