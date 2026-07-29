@@ -917,11 +917,21 @@ body {
 .logo-library svg text,.physical-brand svg text,.physical-contact-brand svg text { fill:currentColor;stroke:none;font:800 62px Arial; }
 .logo-library svg .cut,.physical-brand svg .cut,.physical-contact-brand svg .cut { stroke:white; }
 .logo-upload { display:flex!important;min-height:44px;align-items:center;justify-content:center;gap:8px;border:1px dashed var(--line);border-radius:11px;cursor:pointer;color:var(--ink)!important;font-size:11px!important;text-transform:none!important; }
+.asset-upload-pair { display:grid;gap:8px;grid-template-columns:1fr 1fr; }
+.element-size-control { display:grid;align-items:center;gap:10px;border:1px solid var(--line);border-radius:13px;background:var(--panel-2);padding:11px;grid-template-columns:minmax(120px,1fr) 1.2fr auto; }
+.element-size-control strong,.element-size-control span { display:block; }
+.element-size-control strong { font-size:10px; }
+.element-size-control span { margin-top:3px;color:var(--muted);font-size:8px; }
+.element-size-control input { width:100%;accent-color:#0f9f8d; }
+.element-size-control b { min-width:38px;color:#0f8c7f;font-size:11px; }
 
 .physical-card { isolation:isolate; }
 .card-decor { position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none; }
 .card-decor i,.card-decor b { position:absolute;display:block; }
 .physical-content { position:absolute;inset:0;z-index:2;color:var(--card-ink); }
+.print-movable { position:absolute!important;z-index:6;touch-action:none;cursor:grab;transform-origin:top left;user-select:none; }
+.print-movable:active { cursor:grabbing; }
+.print-movable.selected:after { position:absolute;z-index:20;inset:-7px;border:1px dashed color-mix(in srgb,var(--card-accent) 85%,#fff);border-radius:8px;content:"";pointer-events:none; }
 .physical-brand { position:absolute;top:18%;left:10%;display:flex;width:50%;align-items:center;gap:10px; }
 .physical-brand>svg,.physical-brand>img { width:19%;max-height:55px;object-fit:contain;color:var(--card-accent); }
 .physical-brand span,.physical-brand strong,.physical-brand small { display:block; }
@@ -937,6 +947,16 @@ body {
 .physical-back-content ul { position:absolute;bottom:12%;left:10%;margin:0;padding:0;list-style:none;font-size:clamp(7px,1.1vw,12px);line-height:1.75; }
 .physical-back-content li:before { margin-right:7px;color:var(--card-accent);content:"●";font-size:.55em; }
 .physical-back-content>.physical-qr { position:absolute;right:8%;bottom:10%;width:17%;border-radius:5px; }
+.qr-movable { width:17%; }
+.qr-movable .physical-qr { display:block;width:100%;border-radius:5px; }
+.print-photo { overflow:hidden;width:18%;aspect-ratio:1;border:3px solid var(--card-accent);border-radius:50%;background:var(--card-light);box-shadow:0 8px 22px rgba(0,0,0,.2); }
+.print-photo img { width:100%;height:100%;object-fit:cover;pointer-events:none; }
+.print-contact-list { display:grid;width:42%;gap:5px;color:inherit;font-size:clamp(7px,1.1vw,12px); }
+.print-contact-list span { display:flex;min-width:0;align-items:center;gap:7px;white-space:nowrap; }
+.print-contact-list svg { width:1.15em;height:1.15em;flex:0 0 auto;color:var(--card-accent);stroke-width:2; }
+.print-social-list { display:flex;gap:6px; }
+.print-social-list span { display:grid;width:25px;aspect-ratio:1;place-items:center;border:1px solid currentColor;border-radius:50%;color:var(--card-accent);background:color-mix(in srgb,var(--card-light) 8%,transparent); }
+.print-social-list svg { width:55%;height:55%;stroke-width:2; }
 
 .decor-ribbon:after { position:absolute;inset:0 0 0 61%;background:var(--card-light);content:""; }
 .decor-ribbon i:nth-child(1) { top:-20%;left:37%;width:24%;height:145%;background:var(--card-accent);transform:rotate(-17deg); }
@@ -962,6 +982,7 @@ body {
 .physical-goldwave .physical-brand,.physical-goldwave .physical-person,.physical-goldwave .physical-contact-brand,.physical-goldwave .physical-back-content ul,
 .physical-prism .physical-brand,.physical-prism .physical-person,.physical-prism .physical-contact-brand,.physical-prism .physical-back-content ul,
 .physical-mono .physical-brand,.physical-mono .physical-person,.physical-mono .physical-contact-brand,.physical-mono .physical-back-content ul { left:67%;width:28%; }
+.physical-ribbon .print-contact-list,.physical-orbit .print-contact-list,.physical-goldwave .print-contact-list,.physical-prism .print-contact-list,.physical-mono .print-contact-list { width:29%; }
 .physical-ribbon .physical-back-content>.physical-qr,.physical-orbit .physical-back-content>.physical-qr,.physical-goldwave .physical-back-content>.physical-qr,.physical-prism .physical-back-content>.physical-qr,.physical-mono .physical-back-content>.physical-qr { right:auto;left:12%; }
 .physical-ribbon .physical-front-content>.physical-qr,.physical-orbit .physical-front-content>.physical-qr,.physical-goldwave .physical-front-content>.physical-qr,.physical-prism .physical-front-content>.physical-qr,.physical-mono .physical-front-content>.physical-qr { right:auto;left:14%; }
 .physical-chevron .physical-brand,.physical-chevron .physical-person,.physical-chevron .physical-contact-brand,.physical-chevron .physical-back-content ul { width:48%; }
@@ -970,7 +991,29 @@ body {
   .template-picker { grid-template-columns:repeat(3,1fr); }
   .custom-colors { grid-template-columns:1fr 1fr; }
   .logo-library { grid-template-columns:repeat(4,1fr); }
+  .asset-upload-pair { grid-template-columns:1fr; }
+  .element-size-control { grid-template-columns:1fr auto; }
+  .element-size-control input { grid-column:1/-1; }
 }
+
+/* The creative card remains an ivory brand surface in both site themes. */
+.dark .profile-creative .profile-main-card {
+  border-color:#d9dee6;
+  background:linear-gradient(90deg,transparent 64%,rgba(196,160,94,.06)),#fff;
+  color:#111827;
+}
+.dark .profile-creative .profile-identity h1,
+.dark .profile-creative .profile-company,
+.dark .profile-creative .profile-description { color:#111827; }
+.dark .profile-creative .profile-action {
+  border-color:#dce4ee;
+  background:#fff;
+  color:#182235;
+}
+.dark .profile-creative .profile-lead-panel { background:#f1f5f9;color:#111827; }
+.dark .profile-creative .profile-lead-panel .lead-action-grid button { border-color:#dce4ee;background:#fff;color:#182235; }
+.dark .profile-creative .profile-detail-list>a { border-color:#e2e8f0;background:#fff;color:#111827; }
+.dark .profile-creative .profile-social-row a { border-color:#dce4ee;background:#fff;color:#111827; }
 
 button,
 input,
