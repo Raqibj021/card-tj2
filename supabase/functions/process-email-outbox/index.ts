@@ -80,11 +80,19 @@ Deno.serve(async (request) => {
   const from = Deno.env.get("VIZORA_FROM_EMAIL") ?? "Vizora.tj <noreply@vizora.tj>";
   const replyTo = Deno.env.get("VIZORA_REPLY_TO") ?? "support@vizora.tj";
   const siteUrl = Deno.env.get("VIZORA_SITE_URL") ?? "https://raqibj021.github.io/card-tj2";
-  const providerReady = providerName === "google_apps_script"
-    ? Boolean(googleAppsScriptUrl && googleAppsScriptSecret)
-    : Boolean(resendKey);
-  if (!supabaseUrl || !serviceKey || !providerReady) {
-    return json({ error: "Email worker is not configured" }, 503);
+  const missing: string[] = [];
+  if (!supabaseUrl) missing.push("SUPABASE_URL");
+  if (!serviceKey) missing.push("SUPABASE_SECRET_KEYS");
+  if (providerName === "google_apps_script") {
+    if (!googleAppsScriptUrl) missing.push("GOOGLE_APPS_SCRIPT_URL");
+    if (!googleAppsScriptSecret) missing.push("GOOGLE_APPS_SCRIPT_SECRET");
+  } else if (providerName === "resend") {
+    if (!resendKey) missing.push("RESEND_API_KEY");
+  } else {
+    missing.push("MAIL_PROVIDER (use google_apps_script or resend)");
+  }
+  if (missing.length) {
+    return json({ error: "Email worker is not configured", provider: providerName, missing }, 503);
   }
 
   const client = createClient(supabaseUrl, serviceKey, {
