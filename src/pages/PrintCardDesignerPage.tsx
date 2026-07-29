@@ -31,6 +31,15 @@ const palettes = [
 ];
 
 const logoIds: LogoId[] = ["orbit", "peak", "link", "spark", "frame", "leaf", "monogram", "diamond"];
+const fontOptions = [
+  { name: "Manrope", value: "Manrope" },
+  { name: "Arial", value: "Arial" },
+  { name: "Georgia", value: "Georgia" },
+  { name: "Times", value: "Times New Roman" },
+  { name: "Trebuchet", value: "Trebuchet MS" },
+  { name: "Verdana", value: "Verdana" },
+  { name: "Courier", value: "Courier New" }
+];
 const defaultPositions = (right: boolean): Positions => ({
   brand: { x: right ? 67 : 10, y: 17 },
   person: { x: right ? 67 : 10, y: 20 },
@@ -66,30 +75,27 @@ const drawLogoMark = (ctx: CanvasRenderingContext2D, id: LogoId, x: number, y: n
   ctx.restore();
 };
 
-const drawDecor = (ctx: CanvasRenderingContext2D, layout: TemplateId, side: Side, bg: string, accent: string, light: string, skipBase = false) => {
+const drawDecor = (ctx: CanvasRenderingContext2D, layout: TemplateId, side: Side, bg: string, accent: string, _light: string, skipBase = false) => {
   if (!skipBase) { ctx.fillStyle = bg; ctx.fillRect(0, 0, 1004, 650); }
   ctx.fillStyle = accent;
   if (layout === "executive") ctx.fillRect(0, 0, 42, 650);
   if (layout === "modern") { ctx.beginPath(); ctx.arc(900, 80, 250, 0, Math.PI * 2); ctx.fill(); }
   if (layout === "minimal") ctx.fillRect(0, 0, 1004, 14);
   if (layout === "ribbon") {
-    ctx.fillStyle = light; ctx.fillRect(590, 0, 414, 650); ctx.fillStyle = accent;
+    ctx.fillStyle = accent;
     ctx.beginPath(); ctx.moveTo(320, 0); ctx.bezierCurveTo(430, 170, 390, 320, 610, 650); ctx.lineTo(760, 650); ctx.bezierCurveTo(520, 290, 570, 150, 470, 0); ctx.closePath(); ctx.fill();
   }
   if (layout === "orbit") {
-    ctx.fillStyle = light; ctx.beginPath(); ctx.ellipse(side === "front" ? 120 : 755, 320, 300, 500, 0, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = accent; ctx.lineWidth = 42; ctx.beginPath(); ctx.ellipse(450, 325, 185, 420, -.55, 0, Math.PI * 2); ctx.stroke();
   }
   if (layout === "goldwave") {
-    ctx.fillStyle = light; ctx.beginPath(); ctx.moveTo(1004, 90); ctx.bezierCurveTo(700, 130, 700, 510, 430, 650); ctx.lineTo(1004, 650); ctx.closePath(); ctx.fill();
     ctx.strokeStyle = accent; [0, 1, 2].forEach((n) => { ctx.lineWidth = 26 - n * 6; ctx.beginPath(); ctx.moveTo(0, 480 + n * 45); ctx.bezierCurveTo(400, 700 - n * 30, 590, 180 + n * 45, 1004, 100 + n * 60); ctx.stroke(); });
   }
   if (layout === "prism") {
-    ctx.fillStyle = light; ctx.fillRect(650, 0, 354, 650); ctx.fillStyle = accent;
+    ctx.fillStyle = accent;
     [0, 1, 2].forEach((n) => { ctx.globalAlpha = .22 + n * .16; ctx.beginPath(); ctx.moveTo(500 + n * 55, 0); ctx.lineTo(710 + n * 55, 325); ctx.lineTo(500 + n * 55, 650); ctx.lineTo(430 + n * 55, 650); ctx.lineTo(640 + n * 55, 325); ctx.lineTo(430 + n * 55, 0); ctx.closePath(); ctx.fill(); }); ctx.globalAlpha = 1;
   }
   if (layout === "mono") {
-    ctx.fillStyle = light; ctx.fillRect(side === "front" ? 0 : 0, 0, side === "front" ? 1004 : 540, 650);
     ctx.fillStyle = accent; roundedRect(ctx, side === "front" ? 0 : 500, 190, 90, 270, 28);
   }
   if (layout === "chevron") {
@@ -114,6 +120,7 @@ export default function PrintCardDesignerPage() {
   const [visible, setVisible] = useState<Record<MoveKey, boolean>>({ brand: true, person: true, company: true, contacts: true, socials: true, qr: true, photo: true });
   const [backgroundStyle, setBackgroundStyle] = useState<"clean" | "grid" | "waves" | "dots" | "custom">("clean");
   const [backgroundImage, setBackgroundImage] = useState("");
+  const [fontFamily, setFontFamily] = useState("Manrope");
 
   const choosePalette = (item: typeof palettes[number]) => { setPalette(item); setColors({ bg: item.bg, accent: item.accent, light: item.light, ink: item.ink }); };
   const useRightPanel = ["ribbon", "orbit", "goldwave", "prism", "mono"].includes(layout);
@@ -148,6 +155,7 @@ export default function PrintCardDesignerPage() {
     : backgroundStyle === "dots" ? `radial-gradient(circle,${colors.accent}55 1.5px,transparent 2px)` : "none";
 
   const renderCanvas = async () => {
+    await document.fonts.ready;
     const canvas = document.createElement("canvas"); canvas.width = 1004; canvas.height = 650;
     const ctx = canvas.getContext("2d"); if (!ctx) return null;
     ctx.fillStyle = colors.bg; ctx.fillRect(0, 0, 1004, 650);
@@ -164,7 +172,8 @@ export default function PrintCardDesignerPage() {
       ctx.restore();
     }
     drawDecor(ctx, layout, side, colors.bg, colors.accent, colors.light, true);
-    const textColor = useRightPanel ? "#15171c" : colors.ink;
+    const textColor = colors.ink;
+    const canvasFont = fontFamily.includes(" ") ? `"${fontFamily}"` : fontFamily;
     const point = (key: MoveKey) => ({ x: positions[key].x / 100 * 1004, y: positions[key].y / 100 * 650, scale: sizes[key] });
     const drawUploadedPhoto = async () => {
       if (!photo) return;
@@ -178,19 +187,19 @@ export default function PrintCardDesignerPage() {
       if (visible.brand) {
         if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, brand.x, brand.y, 120 * brand.scale, 75 * brand.scale); }
         else drawLogoMark(ctx, logoMark, brand.x, brand.y, 72 * brand.scale, useRightPanel ? colors.accent : colors.ink);
-        ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px Arial`; ctx.fillText(data.organization, brand.x + 90 * brand.scale, brand.y + 34 * brand.scale);
-        ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px Arial`; ctx.fillText(data.website, brand.x + 90 * brand.scale, brand.y + 61 * brand.scale);
+        ctx.fillStyle = textColor; ctx.font = `700 ${34 * brand.scale}px ${canvasFont}`; ctx.fillText(data.organization, brand.x + 90 * brand.scale, brand.y + 34 * brand.scale);
+        ctx.fillStyle = colors.accent; ctx.font = `600 ${17 * brand.scale}px ${canvasFont}`; ctx.fillText(data.website, brand.x + 90 * brand.scale, brand.y + 61 * brand.scale);
       }
       if (visible.photo) await drawUploadedPhoto();
-      if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 190, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 150 * qrPoint.scale, 150 * qrPoint.scale); }
+      if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 190, margin: 1, color: { dark: textColor, light: colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 150 * qrPoint.scale, 150 * qrPoint.scale); }
     } else {
-      const person = point("person"); if (visible.person) { ctx.fillStyle = textColor; ctx.font = `700 ${43 * person.scale}px Arial`; ctx.fillText(data.name, person.x, person.y + 38 * person.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${21 * person.scale}px Arial`; ctx.fillText(data.position, person.x, person.y + 70 * person.scale); }
+      const person = point("person"); if (visible.person) { ctx.fillStyle = textColor; ctx.font = `700 ${43 * person.scale}px ${canvasFont}`; ctx.fillText(data.name, person.x, person.y + 38 * person.scale); ctx.fillStyle = colors.accent; ctx.font = `600 ${21 * person.scale}px ${canvasFont}`; ctx.fillText(data.position, person.x, person.y + 70 * person.scale); }
       const company = point("company");
-      if (visible.company) { if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, company.x, company.y, 72 * company.scale, 55 * company.scale); } else drawLogoMark(ctx, logoMark, company.x, company.y, 55 * company.scale, colors.accent); ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px Arial`; ctx.fillText(data.organization, company.x + 70 * company.scale, company.y + 34 * company.scale); }
-      if (visible.contacts) { const contacts = point("contacts"); ctx.font = `18px Arial`; const contactLines = [`☎  ${data.phone}`, `✉  ${data.email}`, `●  ${data.website}`, `⌖  ${data.address}`]; contactLines.forEach((line, index) => ctx.fillText(line, contacts.x, contacts.y + index * 35 * contacts.scale)); }
+      if (visible.company) { if (logo) { const image = new Image(); image.src = logo; await image.decode(); ctx.drawImage(image, company.x, company.y, 72 * company.scale, 55 * company.scale); } else drawLogoMark(ctx, logoMark, company.x, company.y, 55 * company.scale, colors.accent); ctx.fillStyle = textColor; ctx.font = `700 ${17 * company.scale}px ${canvasFont}`; ctx.fillText(data.organization, company.x + 70 * company.scale, company.y + 34 * company.scale); }
+      if (visible.contacts) { const contacts = point("contacts"); ctx.font = `18px ${canvasFont}`; const contactLines = [`☎  ${data.phone}`, `✉  ${data.email}`, `●  ${data.website}`, `⌖  ${data.address}`]; contactLines.forEach((line, index) => ctx.fillText(line, contacts.x, contacts.y + index * 35 * contacts.scale)); }
       if (visible.socials) { const social = point("socials"); ["I", "f", "T", "W"].forEach((letter, index) => { ctx.fillStyle = colors.accent; ctx.beginPath(); ctx.arc(social.x + index * 47 * social.scale, social.y, 16 * social.scale, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#fff"; ctx.font = `700 ${15 * social.scale}px Arial`; ctx.textAlign = "center"; ctx.fillText(letter, social.x + index * 47 * social.scale, social.y + 5 * social.scale); }); ctx.textAlign = "left"; }
       if (visible.photo) await drawUploadedPhoto();
-      if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 160, margin: 1, color: { dark: textColor, light: useRightPanel ? colors.light : colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 140 * qrPoint.scale, 140 * qrPoint.scale); }
+      if (visible.qr) { const qr = await QRCode.toDataURL(data.qr, { width: 160, margin: 1, color: { dark: textColor, light: colors.bg } }); const qrImage = new Image(); qrImage.src = qr; await qrImage.decode(); const qrPoint = point("qr"); ctx.drawImage(qrImage, qrPoint.x, qrPoint.y, 140 * qrPoint.scale, 140 * qrPoint.scale); }
     }
     return canvas;
   };
@@ -202,7 +211,9 @@ export default function PrintCardDesignerPage() {
       <div className="template-picker">{templates.map((item) => <button className={layout === item.id ? "active" : ""} onClick={() => setLayout(item.id)} key={item.id}><span className={`template-mini mini-${item.id}`} style={{ "--mini-bg": colors.bg, "--mini-accent": colors.accent, "--mini-light": colors.light } as CSSProperties}><i /><b /></span><strong>{item.name}</strong></button>)}</div>
       <h2 className="editor-subtitle">Готовые палитры</h2>
       <div className="color-options">{palettes.map((item) => <button className={palette.id === item.id ? "active" : ""} onClick={() => choosePalette(item)} key={item.id}><i style={{ background: item.bg, borderColor: item.accent }} />{item.name}</button>)}</div>
-      <div className="custom-colors"><label>Фон<input type="color" value={colors.bg} onChange={(e) => setColors({ ...colors, bg: e.target.value })} /></label><label>Акцент<input type="color" value={colors.accent} onChange={(e) => setColors({ ...colors, accent: e.target.value })} /></label><label>Светлая зона<input type="color" value={colors.light} onChange={(e) => setColors({ ...colors, light: e.target.value })} /></label><label>Текст<input type="color" value={colors.ink} onChange={(e) => setColors({ ...colors, ink: e.target.value })} /></label></div>
+      <div className="custom-colors"><label>Фон<input type="color" value={colors.bg} onChange={(e) => setColors({ ...colors, bg: e.target.value })} /></label><label>Акцент<input type="color" value={colors.accent} onChange={(e) => setColors({ ...colors, accent: e.target.value })} /></label><label>Текст<input type="color" value={colors.ink} onChange={(e) => setColors({ ...colors, ink: e.target.value })} /></label></div>
+      <h2 className="editor-subtitle">Шрифт визитки</h2>
+      <div className="font-picker">{fontOptions.map((font) => <button type="button" className={fontFamily === font.value ? "active" : ""} style={{ fontFamily: font.value }} onClick={() => setFontFamily(font.value)} key={font.value}>{font.name}</button>)}</div>
       <h2 className="editor-subtitle">Фон визитки</h2>
       <div className="background-picker">{(["clean", "grid", "waves", "dots"] as const).map((value) => <button className={backgroundStyle === value ? "active" : ""} onClick={() => setBackgroundStyle(value)} key={value}><i className={`bg-sample bg-${value}`} />{{ clean: "Чистый", grid: "Сетка", waves: "Волны", dots: "Точки" }[value]}</button>)}<label className={backgroundStyle === "custom" ? "active" : ""}><ImagePlus size={15} /> Свой фон<input hidden type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void readImage(e.target.files?.[0]).then((image) => { setBackgroundImage(image); setBackgroundStyle("custom"); })} /></label></div>
       <h2 className="editor-subtitle"><Shapes size={16} /> Знак вместо логотипа</h2>
@@ -214,12 +225,12 @@ export default function PrintCardDesignerPage() {
     </div>
     <div className="print-preview-column">
       <div className="side-switch no-print"><button className={side === "front" ? "active" : ""} onClick={() => setSide("front")}>Лицевая сторона</button><button className={side === "back" ? "active" : ""} onClick={() => setSide("back")}>Обратная сторона</button></div>
-      <div ref={cardRef} className={`physical-card physical-${layout} card-side-${side} pattern-${backgroundStyle}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink, backgroundImage: patternBackground, backgroundSize: backgroundStyle === "custom" ? "cover" : backgroundStyle === "grid" ? "58px 58px" : backgroundStyle === "dots" ? "24px 24px" : "cover", backgroundPosition: "center" } as CSSProperties}>
+      <div ref={cardRef} className={`physical-card physical-${layout} card-side-${side} pattern-${backgroundStyle}`} style={{ "--card-bg": colors.bg, "--card-accent": colors.accent, "--card-light": colors.light, "--card-ink": colors.ink, "--card-font": fontFamily, backgroundImage: patternBackground, backgroundSize: backgroundStyle === "custom" ? "cover" : backgroundStyle === "grid" ? "58px 58px" : backgroundStyle === "dots" ? "24px 24px" : "cover", backgroundPosition: "center" } as CSSProperties}>
         <CardDecor layout={layout} />
         {side === "front" ? <div className="physical-content physical-front-content">
           {visible.brand && <div {...movableProps("brand", "physical-brand")}>{logo ? <img src={logo} alt="" /> : <LogoMark id={logoMark} />}<span><strong>{data.organization}</strong><small>{data.website}</small></span></div>}
           {visible.photo && photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
-          {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>}
+          {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={colors.ink} light={colors.bg} /></div>}
         </div>
         : <div className="physical-content physical-back-content">
           {visible.person && <div {...movableProps("person", "physical-person")}><h2>{data.name}</h2><h3>{data.position}</h3></div>}
@@ -227,7 +238,7 @@ export default function PrintCardDesignerPage() {
           {visible.photo && photo && <div {...movableProps("photo", "print-photo")}><img src={photo} alt="" /></div>}
           {visible.contacts && <div {...movableProps("contacts", "print-contact-list")}><span><Phone />{data.phone}</span><span><Mail />{data.email}</span><span><Globe2 />{data.website}</span><span><MapPin />{data.address}</span></div>}
           {visible.socials && <div {...movableProps("socials", "print-social-list")}><span title={data.instagram}><Instagram /></span><span title={data.facebook}><Facebook /></span><span title={data.telegram}><Send /></span><span title={data.whatsapp}><MessageCircle /></span></div>}
-          {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={useRightPanel ? "#15171c" : colors.ink} light={useRightPanel ? colors.light : colors.bg} /></div>}
+          {visible.qr && <div {...movableProps("qr", "qr-movable")}><QRCodePreview value={data.qr} dark={colors.ink} light={colors.bg} /></div>}
         </div>}
       </div>
       <p className="print-safe-note">Нажмите на текст, логотип, фото, контакты или QR и перетащите. Выбранный элемент можно увеличить или уменьшить ползунком.</p>
