@@ -1,5 +1,5 @@
 import { CheckCircle2, Clock3, Copy, CreditCard, FileCheck2, LockKeyhole, ShieldCheck, Upload } from "lucide-react";
-import { useMemo, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import Footer from "../components/layout/Footer";
 import { paymentRepository, type PaymentRequest } from "../lib/paymentRepository";
@@ -21,7 +21,9 @@ export default function PaymentPage() {
     organization_pro: { name: c.planNames[5], amount: 500 }
   };
   const [params] = useSearchParams();
-  const planKey = params.get("plan") as keyof typeof plans;
+  const requestedPlan = params.get("plan");
+  const planKey: keyof typeof plans =
+    requestedPlan && requestedPlan in plans ? requestedPlan as keyof typeof plans : "personal";
   const organizationId = params.get("organization") ?? undefined;
   const plan = plans[planKey] ?? plans.personal;
   const [created, setCreated] = useState<PaymentRequest | null>(null);
@@ -30,8 +32,6 @@ export default function PaymentPage() {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const orderDraft = useMemo(() => `VZ-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`, []);
-
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!receiptFile) return;
@@ -43,8 +43,7 @@ export default function PaymentPage() {
         customerName: String(data.get("customerName")),
         phone: String(data.get("phone")),
         plan: plan.name,
-        planCode: planKey || "personal",
-        amount: plan.amount,
+        planCode: planKey,
         payerName: String(data.get("payerName")),
         receiptFile,
         organizationId
@@ -80,13 +79,13 @@ export default function PaymentPage() {
                 <div className="payment-details">
                   <div><CreditCard size={21} /><span><small>DC Bank / Alif Bank</small><strong>929213537</strong></span><button type="button" onClick={async () => { await navigator.clipboard.writeText("929213537"); setCopied(true); }}><Copy size={17} /> {copied ? c.copied : c.copy}</button></div>
                   <div><FileCheck2 size={21} /><span><small>{c.amount}</small><strong>{plan.amount} {c.currency}</strong></span></div>
-                  <div><LockKeyhole size={21} /><span><small>{c.order}</small><strong>{orderDraft}</strong></span></div>
+                  <div><LockKeyhole size={21} /><span><small>{c.order}</small><strong>{language === "ru" ? "После отправки" : language === "tj" ? "Пас аз фиристодан" : "Assigned after submission"}</strong></span></div>
                 </div>
                 <form className="platform-form mt-7" onSubmit={submit}>
                   <div className="form-grid">
-                    <label><span>{c.customer}</span><input name="customerName" required /></label>
-                    <label><span>{c.phone}</span><input name="phone" type="tel" required placeholder="+992" /></label>
-                    <label><span>{c.payer}</span><input name="payerName" required /></label>
+                    <label><span>{c.customer}</span><input name="customerName" required minLength={2} maxLength={100} pattern="[\p{L}\p{M} .'-]{2,100}" /></label>
+                    <label><span>{c.phone}</span><input name="phone" type="tel" inputMode="tel" required placeholder="+992" pattern="\+?[0-9 ()-]{9,20}" /></label>
+                    <label><span>{c.payer}</span><input name="payerName" required minLength={2} maxLength={100} pattern="[\p{L}\p{M} .'-]{2,100}" /></label>
                     <label><span>{c.selected}</span><input value={`${plan.name} — ${plan.amount} ${c.currency}`} readOnly /></label>
                   </div>
                   <label className="receipt-upload">
