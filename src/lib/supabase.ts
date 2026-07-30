@@ -18,3 +18,19 @@ export const supabase = isSupabaseConfigured
       }
     })
   : null;
+
+
+/**
+ * The administration area deliberately uses its own auth storage.
+ * Signing in or out here must never replace the customer's website session.
+ */
+export const adminSupabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabasePublishableKey, {
+      auth: {
+        storageKey: "vizora-admin-auth",
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: false
+      }
+    })
+  : null;
