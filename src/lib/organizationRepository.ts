@@ -68,29 +68,19 @@ export const organizationRepository = {
     if (!supabase) throw new Error("Сервер временно недоступен.");
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
-    const employeeLimit = data.planCode === "start" ? 20 : data.planCode === "business" ? 50 : 100;
     const baseSlug = createSlug(data.name) || `organization-${Date.now()}`;
-    const { data: created, error } = await supabase
-      .from("organizations")
-      .insert({
-        owner_id: auth.user.id,
-        slug: `${baseSlug}-${String(Date.now()).slice(-4)}`,
-        legal_name: data.name,
-        display_name: data.name,
-        organization_type: data.type,
-        phone: data.phone,
-        email: data.email,
-        plan_code: data.planCode,
-        employee_limit: employeeLimit,
-        review_status: "pending",
-        description: JSON.stringify({
-          contactName: data.contactName,
-          contactPosition: data.contactPosition
-        })
-      })
-      .select("*")
-      .single();
-    if (error) throw error;
+    const { data: created, error } = await supabase.rpc("submit_organization_application", {
+      organization_name: data.name.trim(),
+      organization_type: data.type.trim(),
+      contact_name: data.contactName.trim(),
+      contact_position: data.contactPosition.trim(),
+      contact_phone: data.phone.trim(),
+      contact_email: data.email.trim(),
+      selected_plan: data.planCode,
+      requested_slug: baseSlug
+    });
+    if (error) throw new Error(error.message || "Не удалось сохранить заявку.");
+    if (!created) throw new Error("Сервер не вернул созданную заявку.");
     return created as Record<string, unknown>;
   },
 
