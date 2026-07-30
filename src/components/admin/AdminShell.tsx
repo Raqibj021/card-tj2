@@ -11,7 +11,7 @@ import {
 import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router";
 import BrandLogo from "../BrandLogo";
-import { useAuth } from "../../context/AuthContext";
+import { useAdminAuth } from "../../context/AdminAuthContext";
 import "./AdminTypography.css";
 
 const navigation = [
@@ -34,7 +34,7 @@ export default function AdminShell({
   description: string;
   actions?: ReactNode;
 }) {
-  const { profile, signOut } = useAuth();
+  const { profile, signOut } = useAdminAuth();
 
   return (
     <main className="admin-workspace">
