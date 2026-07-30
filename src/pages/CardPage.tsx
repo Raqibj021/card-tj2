@@ -73,7 +73,11 @@ const profileCopy = {
     continueCheckout: "Продолжить оформление",
     trial: "ДЕМО · НЕ АКТИВИРОВАНО",
     trialText: "Черновик удалится автоматически, если вы не продолжите оформление.",
-    expiresIn: "Осталось"
+    expiresIn: "Осталось",
+    pending: "ОЖИДАЕТ ПРОВЕРКИ",
+    pendingText: "Визитка сохранена. Администратор проверит данные и одобрит её в ближайшее время.",
+    pendingQrTitle: "QR-код появится после проверки",
+    pendingQrText: "До одобрения администратора QR-код, ссылка и контактные действия не работают."
   },
   tj: {
     digitalCard: "Варақаи рақамӣ",
@@ -94,7 +98,11 @@ const profileCopy = {
     continueCheckout: "Идомаи расмиятдарорӣ",
     trial: "НАМОИШӢ · ФАЪОЛ НЕСТ",
     trialText: "Агар расмиятдарориро идома надиҳед, нусхаи муваққатӣ худкор нест мешавад.",
-    expiresIn: "Боқӣ мондааст"
+    expiresIn: "Боқӣ мондааст",
+    pending: "ИНТИЗОРИ САНҶИШ",
+    pendingText: "Варақа нигоҳ дошта шуд. Администратор маълумотро месанҷад ва ба наздикӣ онро тасдиқ мекунад.",
+    pendingQrTitle: "QR-код пас аз санҷиш пайдо мешавад",
+    pendingQrText: "То тасдиқи администратор QR-код, пайванд ва амалҳои тамос кор намекунанд."
   },
   en: {
     digitalCard: "Digital business card",
@@ -115,7 +123,11 @@ const profileCopy = {
     continueCheckout: "Continue checkout",
     trial: "DEMO · NOT ACTIVATED",
     trialText: "This draft will be deleted automatically unless you continue.",
-    expiresIn: "Time left"
+    expiresIn: "Time left",
+    pending: "AWAITING REVIEW",
+    pendingText: "The card has been saved. An administrator will review and approve it shortly.",
+    pendingQrTitle: "QR code will appear after review",
+    pendingQrText: "The QR code, public link and contact actions remain disabled until administrator approval."
   }
 } as const;
 
@@ -202,7 +214,8 @@ export default function CardPage() {
   }
 
   const palette = themeColors[card.theme];
-  const isTrial = card.reviewStatus !== "approved" && Boolean(card.trialExpiresAt);
+  const isLocked = card.reviewStatus !== "approved";
+  const isTimedTrial = isLocked && Boolean(card.trialExpiresAt);
   const style: AccentStyle = {
     "--profile-accent": palette.accent,
     "--profile-soft": palette.soft
@@ -280,7 +293,7 @@ export default function CardPage() {
   }>;
 
   return (
-    <main className={`profile-page profile-${card.template} ${isTrial ? "profile-trial" : ""}`} style={style}>
+    <main className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
@@ -313,9 +326,9 @@ export default function CardPage() {
           <button
             type="button"
             className="profile-toolbar-button"
-            onClick={() => isTrial ? showToast(labels.trialQrText) : void share()}
+            onClick={() => isLocked ? showToast(labels.pendingQrText) : void share()}
             aria-label={t("share")}
-            title={isTrial ? labels.trialQrText : t("share")}
+            title={isLocked ? labels.pendingQrText : t("share")}
           >
             <Share2 size={18} />
           </button>
@@ -324,16 +337,16 @@ export default function CardPage() {
 
       <div className="profile-layout">
         <section className="profile-main-card">
-          {isTrial && (
+          {isLocked && (
             <>
-              <div className="trial-watermark" aria-hidden="true">{labels.trial}</div>
+              <div className="trial-watermark" aria-hidden="true">{isTimedTrial ? labels.trial : labels.pending}</div>
               <div className="trial-countdown" role="status">
-                <strong>{labels.trial}</strong>
-                <span>{labels.trialText}</span>
-                {remainingSeconds !== null && (
+                <strong>{isTimedTrial ? labels.trial : labels.pending}</strong>
+                <span>{isTimedTrial ? labels.trialText : labels.pendingText}</span>
+                {isTimedTrial && remainingSeconds !== null && (
                   <em>{labels.expiresIn}: {String(Math.floor(remainingSeconds / 60)).padStart(2, "0")}:{String(remainingSeconds % 60).padStart(2, "0")}</em>
                 )}
-                <Link to="/payment?plan=personal" className="button button-primary">{t("choose")}</Link>
+                {isTimedTrial && <Link to="/payment?plan=personal" className="button button-primary">{t("choose")}</Link>}
               </div>
             </>
           )}
@@ -351,9 +364,9 @@ export default function CardPage() {
                 <strong>{card.organization || "Vizora.tj"}</strong>
               </div>
             </div>
-            <span className={`profile-status ${isTrial ? "is-preview" : ""}`}>
-              {isTrial ? <LockKeyhole size={13} /> : <Check size={13} />}
-              {isTrial ? labels.preview : labels.verified}
+            <span className={`profile-status ${isLocked ? "is-preview" : ""}`}>
+              {isLocked ? <LockKeyhole size={13} /> : <Check size={13} />}
+              {isLocked ? (isTimedTrial ? labels.preview : labels.pending) : labels.verified}
             </span>
           </div>
           <div className="profile-content">
@@ -365,7 +378,7 @@ export default function CardPage() {
                   {initials(card.fullName)}
                 </div>
               )}
-              {!isTrial && (
+              {!isLocked && (
                 <span className="profile-verified" title={labels.verified}>
                   <Check size={15} />
                 </span>
@@ -389,9 +402,11 @@ export default function CardPage() {
             <div className="profile-action-grid">
               {actionLinks.map(({ href, icon: Icon, label, primary }) => (
                 <a
-                  href={href}
+                  href={isLocked ? undefined : href}
                   key={label}
-                  className={`profile-action ${primary ? "profile-action-primary" : ""}`}
+                  className={`profile-action ${primary ? "profile-action-primary" : ""} ${isLocked ? "is-disabled" : ""}`}
+                  aria-disabled={isLocked}
+                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
                   target={href.startsWith("http") ? "_blank" : undefined}
                   rel="noreferrer"
                 >
@@ -404,7 +419,8 @@ export default function CardPage() {
             <button
               type="button"
               className="profile-save-button"
-              onClick={() => void openVCardSaveDialog(card)}
+              disabled={isLocked}
+              onClick={() => isLocked ? showToast(labels.pendingQrText) : void openVCardSaveDialog(card)}
             >
               <UserPlus size={20} />
               {t("saveContact")}
@@ -416,13 +432,13 @@ export default function CardPage() {
                 <strong>{labels.howHelp}</strong>
               </div>
               <div className="lead-action-grid">
-                <button type="button" onClick={() => setLeadSource("contact")}>
+                <button type="button" disabled={isLocked} onClick={() => setLeadSource("contact")}>
                   <MessageCircle size={18} /><span>{labels.write}</span>
                 </button>
-                <button type="button" onClick={() => setLeadSource("callback")}>
+                <button type="button" disabled={isLocked} onClick={() => setLeadSource("callback")}>
                   <PhoneCall size={18} /><span>{labels.callback}</span>
                 </button>
-                <button type="button" onClick={() => setLeadSource("request")}>
+                <button type="button" disabled={isLocked} onClick={() => setLeadSource("request")}>
                   <ClipboardPenLine size={18} /><span>{labels.request}</span>
                 </button>
               </div>
@@ -487,17 +503,19 @@ export default function CardPage() {
         </section>
 
         <aside className="profile-side">
-          {isTrial ? (
+          {isLocked ? (
             <div className="profile-qr-card profile-qr-card-locked">
               <div className="trial-qr-placeholder" aria-hidden="true">
                 <LockKeyhole size={44} />
                 <span>DEMO</span>
               </div>
-              <h2>{labels.trialQrTitle}</h2>
-              <p>{labels.trialQrText}</p>
-              <Link to="/payment?plan=personal" className="button button-primary mt-5 w-full">
-                {labels.continueCheckout}
-              </Link>
+              <h2>{isTimedTrial ? labels.trialQrTitle : labels.pendingQrTitle}</h2>
+              <p>{isTimedTrial ? labels.trialQrText : labels.pendingQrText}</p>
+              {isTimedTrial && (
+                <Link to="/payment?plan=personal" className="button button-primary mt-5 w-full">
+                  {labels.continueCheckout}
+                </Link>
+              )}
             </div>
           ) : (
             <div className="profile-qr-card">
@@ -531,7 +549,7 @@ export default function CardPage() {
       <footer className="profile-footer">
         <span>{labels.createdOn}</span>
         <Link to="/">Vizora.tj</Link>
-        {!isTrial && <ReportCardButton cardId={card.id} />}
+        {!isLocked && <ReportCardButton cardId={card.id} />}
       </footer>
 
       {toast && <div className="toast"><Check size={17} /> {toast}</div>}
