@@ -58,8 +58,8 @@ export default function AdminSupportPage() {
       {notice && <div className="admin-notice mt-6"><Mail size={18} />{notice}</div>}
       <section className="admin-panel mt-6">
         <div className="admin-panel-heading"><div><h2>Очередь поддержки</h2><p>{tickets.filter((item) => !["closed","resolved"].includes(item.status)).length} открытых обращений</p></div><MessageSquareReply size={21} /></div>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
+        <div className="admin-table-wrap admin-support-table-wrap">
+          <table className="admin-table admin-support-table">
             <thead><tr><th>Номер</th><th>Пользователь</th><th>Тема</th><th>Статус</th><th>Дата</th><th /></tr></thead>
             <tbody>{tickets.map((ticket) => <tr key={ticket.id}>
               <td><strong>{ticket.ticket_number}</strong></td>
