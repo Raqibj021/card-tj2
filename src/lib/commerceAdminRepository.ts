@@ -43,13 +43,13 @@ export const commerceAdminRepository = {
   async approvePayment(id: string, note: string) {
     if (!supabase) throw new Error("Supabase не подключён");
     const { data, error } = await supabase.rpc("admin_approve_payment", { target_order_id: id, note });
-    if (error) throw error;
+    if (error) throw new Error(error.message || "Сервер не смог подтвердить оплату.");
     return String(data);
   },
   async rejectPayment(id: string, reason: string) {
     if (!supabase) throw new Error("Supabase не подключён");
     const { error } = await supabase.rpc("admin_reject_payment", { target_order_id: id, reason });
-    if (error) throw error;
+    if (error) throw new Error(error.message || "Сервер не смог отклонить оплату.");
   },
   async updateServiceOrder(id: string, status: string, paymentStatus: string, comment: string) {
     if (!supabase) throw new Error("Supabase не подключён");
