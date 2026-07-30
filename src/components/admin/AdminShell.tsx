@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { Link, NavLink } from "react-router";
 import BrandLogo from "../BrandLogo";
 import { useAuth } from "../../context/AuthContext";
+import "./AdminTypography.css";
 
 const navigation = [
   { to: "/admin", label: "Главная", icon: LayoutDashboard, end: true },
