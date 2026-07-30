@@ -1,6 +1,6 @@
 import {
   Activity, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Phone, RefreshCw,
-  Search, ShieldCheck, UserRound, WalletCards, X
+  Search, ShieldCheck, Trash2, UserRound, WalletCards, X
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
@@ -60,6 +60,26 @@ export default function AdminCardsPage() {
     }
   };
 
+  const deleteForever = async (card: AdminCardDetails) => {
+    const confirmed = window.confirm(
+      `Удалить визитку «${card.fullName || card.slug}» навсегда? Будут удалены QR-ссылка, данные визитки и загруженные изображения. Восстановить их будет невозможно.`
+    );
+    if (!confirmed) return;
+    const repeated = window.prompt(`Для подтверждения введите адрес визитки: ${card.slug}`);
+    if (repeated?.trim().toLowerCase() !== card.slug.toLowerCase()) {
+      setNotice("Удаление отменено: адрес визитки введён неверно.");
+      return;
+    }
+    try {
+      await adminCardsRepository.deleteForever(card.id);
+      setDetails(null);
+      await refresh();
+      setNotice("Визитка и связанные файлы удалены навсегда.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Не удалось удалить визитку.");
+    }
+  };
+
   const stats = workspace?.stats ?? { total: 0, public: 0, private: 0, pending: 0, approved: 0, views: 0 };
   return (
     <AdminShell title="Все визитки" description="Единый реестр открытых и закрытых визиток. Просмотр полных данных автоматически фиксируется в защищённом журнале."
@@ -111,7 +131,7 @@ export default function AdminCardsPage() {
         {!workspace?.accessHistory.length && <p>Журнал пока пуст.</p>}
       </section>
 
-      {details && <CardDrawer card={details} onClose={() => setDetails(null)} />}
+      {details && <CardDrawer card={details} onClose={() => setDetails(null)} onDelete={() => void deleteForever(details)} />}
       {details && <button aria-label="Закрыть" className="admin-drawer-backdrop" onClick={() => setDetails(null)} />}
     </AdminShell>
   );
@@ -121,7 +141,7 @@ function Kpi({ icon: Icon, label, value }: { icon: typeof WalletCards; label: st
   return <article><span><Icon size={19} /></span><div><strong>{value.toLocaleString("ru-RU")}</strong><small>{label}</small></div></article>;
 }
 
-function CardDrawer({ card, onClose }: { card: AdminCardDetails; onClose: () => void }) {
+function CardDrawer({ card, onClose, onDelete }: { card: AdminCardDetails; onClose: () => void; onDelete: () => void }) {
   const contacts = Object.entries(card.contacts ?? {}).filter(([key, value]) => key !== "companyLogo" && String(value).trim());
   return <aside className="admin-card-drawer">
     <button className="admin-drawer-close" onClick={onClose}><X size={18} /></button>
@@ -154,6 +174,9 @@ function CardDrawer({ card, onClose }: { card: AdminCardDetails; onClose: () => 
       <span><small>Просмотры</small><strong>{card.views}</strong></span>
     </div>
     <div className="admin-card-drawer-foot"><FileCheck2 size={17} /> Данные доступны только главному администратору</div>
+    <button type="button" className="admin-card-delete-forever" onClick={onDelete}>
+      <Trash2 size={17} /> Удалить визитку навсегда
+    </button>
   </aside>;
 }
 
