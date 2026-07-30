@@ -6118,6 +6118,117 @@ summary:focus-visible {
   }
 }
 
+/* Keep the benefits and steps moving on wide screens too. */
+@media (min-width: 681px) {
+  .home-benefits,
+  .home-steps-section {
+    overflow: hidden;
+  }
+
+  .home-benefits-grid,
+  .home-steps-grid {
+    display: none;
+  }
+
+  .mobile-benefits-marquee,
+  .mobile-steps-marquee {
+    display: block;
+    overflow: hidden;
+    width: 100vw;
+    margin-top: 46px;
+    margin-left: calc(50% - 50vw);
+    mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+  }
+
+  .mobile-benefits-track,
+  .mobile-steps-track {
+    display: flex;
+    width: max-content;
+    gap: 18px;
+    padding-right: 18px;
+    will-change: transform;
+  }
+
+  .mobile-benefits-track {
+    animation: mobile-benefits-scroll 30s linear infinite;
+  }
+
+  .mobile-steps-track {
+    animation: mobile-benefits-scroll 27s linear infinite reverse;
+  }
+
+  .mobile-benefits-track:hover,
+  .mobile-steps-track:hover {
+    animation-play-state: paused;
+  }
+
+  .mobile-benefit-pill,
+  .mobile-step-pill {
+    position: relative;
+    display: grid;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--panel);
+    box-shadow: var(--shadow-sm);
+    grid-template-columns: auto 1fr;
+  }
+
+  .mobile-benefit-pill {
+    width: 360px;
+    min-height: 132px;
+    gap: 18px;
+    padding: 22px 25px;
+  }
+
+  .mobile-step-pill {
+    width: 430px;
+    min-height: 142px;
+    gap: 18px;
+    overflow: hidden;
+    padding: 24px 28px 24px 62px;
+    background:
+      radial-gradient(circle at 0 0, rgba(15,118,110,.13), transparent 58%),
+      var(--panel);
+  }
+
+  .mobile-benefit-pill .feature-icon,
+  .mobile-step-pill .feature-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .mobile-benefit-pill strong,
+  .mobile-benefit-pill small,
+  .mobile-step-pill strong,
+  .mobile-step-pill small {
+    display: block;
+  }
+
+  .mobile-benefit-pill strong,
+  .mobile-step-pill strong {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+
+  .mobile-benefit-pill small,
+  .mobile-step-pill small {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .mobile-step-number {
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    color: rgba(15,118,110,.52);
+    font-size: 12px;
+    font-weight: 950;
+  }
+}
+
 /* Extra-compact mobile landing: strip banners, side phone and animated story rows */
 @media (max-width: 680px) {
   .home-promo-wrap {
