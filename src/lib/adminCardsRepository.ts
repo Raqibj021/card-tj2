@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { adminSupabase as supabase } from "./supabase";
 
 export type AdminCardSummary = {
   id: string; ownerId: string; ownerName: string; ownerEmail: string; slug: string;
