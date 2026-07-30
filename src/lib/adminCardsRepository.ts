@@ -35,6 +35,13 @@ export const adminCardsRepository = {
     if (error) throw error;
     return { ...empty, ...(data as AdminCardWorkspace) };
   },
+  async deleteForever(cardId: string): Promise<void> {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { error } = await supabase.rpc("admin_delete_card_permanently", {
+      target_card_id: cardId
+    });
+    if (error) throw error;
+  },
   async details(cardId: string, reason = "administrative_review"): Promise<AdminCardDetails> {
     if (!supabase) throw new Error("Supabase не подключён.");
     const { data, error } = await supabase.rpc("admin_open_card_details", {
