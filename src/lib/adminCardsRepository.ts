@@ -42,6 +42,15 @@ export const adminCardsRepository = {
     });
     if (error) throw error;
   },
+  async review(cardId: string, decision: "approved" | "changes_requested" | "rejected", note = ""): Promise<void> {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { error } = await supabase.rpc("admin_review_card", {
+      target_card_id: cardId,
+      decision,
+      note
+    });
+    if (error) throw error;
+  },
   async details(cardId: string, reason = "administrative_review"): Promise<AdminCardDetails> {
     if (!supabase) throw new Error("Supabase не подключён.");
     const { data, error } = await supabase.rpc("admin_open_card_details", {
@@ -52,4 +61,3 @@ export const adminCardsRepository = {
     return data as AdminCardDetails;
   }
 };
-
