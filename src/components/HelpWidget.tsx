@@ -13,9 +13,9 @@ export default function HelpWidget() {
       topics: [
         ["Как создать визитку?", "Откройте конструктор, заполните контакты, выберите оформление и сохраните визитку."],
         ["Как зарегистрировать организацию?", "В разделе «Организации» выберите тариф и заполните заявку уполномоченного лица."],
-        ["Как проходит оплата?", "После выбора тарифа вы увидите реквизиты. Загрузите чек — менеджер проверит оплату и система отправит код активации."],
+        ["Как проходит оплата?", "После выбора тарифа вы увидите реквизиты. Загрузите чек — администратор проверит оплату, после чего тариф активируется автоматически."],
         ["Как попасть в каталог?", "Нужно подтвердить телефон, личность и профессию. После проверки визитка появится в открытом каталоге."],
-        ["Почему QR не открывается?", "Публичный QR работает после сохранения визитки в системе и её активации."]
+        ["Почему QR не открывается?", "Публичный QR работает после сохранения визитки и одобрения администратором."]
       ]
     },
     tj: {
@@ -33,7 +33,7 @@ export default function HelpWidget() {
       topics: [
         ["How do I create a card?", "Open the builder, enter your contacts, choose a design and save the card."],
         ["How do I register an organization?", "Choose a plan in Organizations and complete the authorized representative’s application."],
-        ["How does payment work?", "After choosing a plan, you will see the payment details. Upload the receipt; a manager will verify it and the system will send an activation code."],
+        ["How does payment work?", "After choosing a plan, you will see the payment details. Upload the receipt; an administrator will verify it and the plan will activate automatically."],
         ["How do I appear in the directory?", "Verify your phone, identity and profession. After review, the card will appear in the public directory."],
         ["Why does the QR code not open?", "The public QR code works after the card is saved and activated."]
       ]
