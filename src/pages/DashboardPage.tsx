@@ -45,15 +45,13 @@ export default function DashboardPage() {
   const { t, language } = useApp();
   const { profile, user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [cards, setCards] = useState<DigitalCard[]>(() =>
-    withoutDemoCards(cardRepository.list())
-  );
+  const [cards, setCards] = useState<DigitalCard[]>([]);
   const [toast, setToast] = useState("");
   const leads = leadRepository.list();
   const dashboardCopy = {
-    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
-    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Дар санҷиш", approved: "Нашр шудааст", draft: "Нусхаи муваққатӣ", account: "Ҳисоби шахсӣ", positionEmpty: "Вазифа ҳоло нишон дода нашудааст", organizationEmpty: "Ташкилот ҳоло нишон дода нашудааст", viewCard: "Кушодани варақа", notifications: "Огоҳиномаҳо", logout: "Баромадан", myCards: "Варақаҳои ман", myCardsText: "Варақаҳои электронии худро созед, таҳрир ва идора намоед.", accountEmail: "Почтаи ҳисоб" },
-    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Draft", account: "Personal account", positionEmpty: "Position not specified yet", organizationEmpty: "Organization not specified yet", viewCard: "Open card", notifications: "Notifications", logout: "Sign out", myCards: "My business cards", myCardsText: "Create, edit and manage your digital business cards.", accountEmail: "Account email" }
+    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик", changesRequested: "Требуются исправления", rejected: "Отклонена", suspended: "Заблокирована", lockedActions: "QR-код и публичная ссылка появятся после одобрения.", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
+    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Дар санҷиш", approved: "Нашр шудааст", draft: "Нусхаи муваққатӣ", changesRequested: "Ислоҳ талаб мешавад", rejected: "Рад шудааст", suspended: "Манъ шудааст", lockedActions: "QR-код ва пайванди оммавӣ пас аз тасдиқ дастрас мешаванд.", account: "Ҳисоби шахсӣ", positionEmpty: "Вазифа ҳоло нишон дода нашудааст", organizationEmpty: "Ташкилот ҳоло нишон дода нашудааст", viewCard: "Кушодани варақа", notifications: "Огоҳиномаҳо", logout: "Баромадан", myCards: "Варақаҳои ман", myCardsText: "Варақаҳои электронии худро созед, таҳрир ва идора намоед.", accountEmail: "Почтаи ҳисоб" },
+    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Draft", changesRequested: "Changes required", rejected: "Rejected", suspended: "Suspended", lockedActions: "The QR code and public link will become available after approval.", account: "Personal account", positionEmpty: "Position not specified yet", organizationEmpty: "Organization not specified yet", viewCard: "Open card", notifications: "Notifications", logout: "Sign out", myCards: "My business cards", myCardsText: "Create, edit and manage your digital business cards.", accountEmail: "Account email" }
   }[language];
 
   useEffect(() => {
@@ -65,6 +63,7 @@ export default function DashboardPage() {
   }, []);
 
   const totalViews = cards.reduce((sum, card) => sum + card.views, 0);
+  const activeCards = cards.filter((card) => card.reviewStatus === "approved").length;
   const primaryCard = cards[0];
   const accountName =
     primaryCard?.fullName ||
@@ -89,9 +88,20 @@ export default function DashboardPage() {
 
   const remove = async (card: DigitalCard) => {
     if (!window.confirm(t("confirmDelete"))) return;
-    setCards((items) => items.filter((item) => item.id !== card.id));
     const result = await cardRepository.remove(card.id);
+    if (result.ok) {
+      setCards((items) => items.filter((item) => item.id !== card.id));
+    }
     notify(result.message);
+  };
+
+  const statusLabel = (status: DigitalCard["reviewStatus"]) => {
+    if (status === "approved") return dashboardCopy.approved;
+    if (status === "pending") return dashboardCopy.pending;
+    if (status === "changes_requested") return dashboardCopy.changesRequested;
+    if (status === "rejected") return dashboardCopy.rejected;
+    if (status === "suspended") return dashboardCopy.suspended;
+    return dashboardCopy.draft;
   };
 
   const leaveAccount = async () => {
@@ -158,7 +168,7 @@ export default function DashboardPage() {
             </article>
             <article>
               <span><Check size={20} /></span>
-              <div><strong>{cards.length}</strong><small>{t("activeCards")}</small></div>
+              <div><strong>{activeCards}</strong><small>{t("activeCards")}</small></div>
             </article>
             <article>
               <span><UsersRound size={20} /></span>
@@ -234,7 +244,7 @@ export default function DashboardPage() {
                   <div className="dashboard-card-meta">
                     <span><Eye size={15} /> {card.views.toLocaleString()} {t("views").toLowerCase()}</span>
                     <span className={`status-pill ${card.reviewStatus === "pending" ? "status-review" : ""}`}>
-                      {card.reviewStatus === "approved" ? dashboardCopy.approved : card.reviewStatus === "pending" ? dashboardCopy.pending : dashboardCopy.draft}
+                      {statusLabel(card.reviewStatus)}
                     </span>
                     <span>{formatDate(card.updatedAt, language)}</span>
                   </div>
@@ -243,16 +253,24 @@ export default function DashboardPage() {
                     <Link to={`/create?edit=${card.id}`} className="button button-secondary">
                       <Edit3 size={16} /> {t("edit")}
                     </Link>
-                    <button type="button" className="button button-ghost" onClick={() => copyLink(card)}>
-                      <Copy size={16} /> {t("copyLink")}
-                    </button>
-                    <button
-                      type="button"
-                      className="button button-ghost"
-                      onClick={() => downloadQrCode(getCardUrl(card.slug), card.slug)}
-                    >
-                      <QrCode size={16} /> QR
-                    </button>
+                    {card.reviewStatus === "approved" ? (
+                      <>
+                        <button type="button" className="button button-ghost" onClick={() => copyLink(card)}>
+                          <Copy size={16} /> {t("copyLink")}
+                        </button>
+                        <button
+                          type="button"
+                          className="button button-ghost"
+                          onClick={() => downloadQrCode(getCardUrl(card.slug), card.slug)}
+                        >
+                          <QrCode size={16} /> QR
+                        </button>
+                      </>
+                    ) : (
+                      <span className="inline-flex max-w-[280px] items-center gap-2 text-xs font-bold leading-relaxed text-slate-500">
+                        <ShieldCheck size={16} /> {dashboardCopy.lockedActions}
+                      </span>
+                    )}
                     {card.reviewStatus !== "approved" && card.reviewStatus !== "pending" && (
                       <button
                         type="button"
