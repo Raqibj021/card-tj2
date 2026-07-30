@@ -13,7 +13,6 @@ import OrganizationApplyPage from "./pages/OrganizationApplyPage";
 import SupportPage from "./pages/SupportPage";
 import ServicesPage from "./pages/ServicesPage";
 import AuthPage from "./pages/AuthPage";
-import PromoClaimer from "./components/PromoClaimer";
 import OrganizationDashboardPage from "./pages/OrganizationDashboardPage";
 import PaymentPage from "./pages/PaymentPage";
 import AdminPaymentsPage from "./pages/AdminPaymentsPage";
@@ -57,7 +56,6 @@ export default function App() {
   return (
     <div className="app-shell min-h-screen text-[var(--ink)]">
       <LoadingScreen />
-      <PromoClaimer />
       <ScrollToTop />
       {!standaloneCard && !standaloneAuth && !standaloneAdmin && <Header />}
       <Routes>
