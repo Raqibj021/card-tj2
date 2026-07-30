@@ -44,7 +44,7 @@ export const commerceAdminRepository = {
     if (!supabase) throw new Error("Supabase не подключён");
     const { data, error } = await supabase.rpc("admin_approve_payment", { target_order_id: id, note });
     if (error) throw new Error(error.message || "Сервер не смог подтвердить оплату.");
-    return String(data);
+    return data;
   },
   async rejectPayment(id: string, reason: string) {
     if (!supabase) throw new Error("Supabase не подключён");
