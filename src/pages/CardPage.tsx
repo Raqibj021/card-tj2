@@ -8,6 +8,7 @@ import {
   Facebook,
   Globe2,
   Instagram,
+  LockKeyhole,
   Mail,
   MapPin,
   MessageCircle,
@@ -66,6 +67,10 @@ const profileCopy = {
     createOwn: "Создайте свою визитку",
     createdOn: "Создано на",
     loading: "Загружаем визитку…",
+    preview: "Предпросмотр профиля",
+    trialQrTitle: "QR-код пока недоступен",
+    trialQrText: "Это демо-версия. Продолжите оформление и активируйте визитку, чтобы получить рабочий QR-код.",
+    continueCheckout: "Продолжить оформление",
     trial: "ДЕМО · НЕ АКТИВИРОВАНО",
     trialText: "Черновик удалится автоматически, если вы не продолжите оформление.",
     expiresIn: "Осталось"
@@ -83,6 +88,10 @@ const profileCopy = {
     createOwn: "Варақаи худро созед",
     createdOn: "Сохта шудааст дар",
     loading: "Варақа бор шуда истодааст…",
+    preview: "Пешнамоиши профил",
+    trialQrTitle: "QR-код ҳоло дастрас нест",
+    trialQrText: "Ин нусхаи намоишӣ аст. Барои гирифтани QR-коди фаъол расмиятдарориро идома дода, варақаро фаъол намоед.",
+    continueCheckout: "Идомаи расмиятдарорӣ",
     trial: "НАМОИШӢ · ФАЪОЛ НЕСТ",
     trialText: "Агар расмиятдарориро идома надиҳед, нусхаи муваққатӣ худкор нест мешавад.",
     expiresIn: "Боқӣ мондааст"
@@ -100,6 +109,10 @@ const profileCopy = {
     createOwn: "Create your own card",
     createdOn: "Created with",
     loading: "Loading business card…",
+    preview: "Profile preview",
+    trialQrTitle: "QR code is not available yet",
+    trialQrText: "This is a demo. Continue checkout and activate the card to receive a working QR code.",
+    continueCheckout: "Continue checkout",
     trial: "DEMO · NOT ACTIVATED",
     trialText: "This draft will be deleted automatically unless you continue.",
     expiresIn: "Time left"
@@ -300,8 +313,9 @@ export default function CardPage() {
           <button
             type="button"
             className="profile-toolbar-button"
-            onClick={share}
+            onClick={() => isTrial ? showToast(labels.trialQrText) : void share()}
             aria-label={t("share")}
+            title={isTrial ? labels.trialQrText : t("share")}
           >
             <Share2 size={18} />
           </button>
@@ -337,7 +351,10 @@ export default function CardPage() {
                 <strong>{card.organization || "Vizora.tj"}</strong>
               </div>
             </div>
-            <span className="profile-status"><Check size={13} /> {labels.verified}</span>
+            <span className={`profile-status ${isTrial ? "is-preview" : ""}`}>
+              {isTrial ? <LockKeyhole size={13} /> : <Check size={13} />}
+              {isTrial ? labels.preview : labels.verified}
+            </span>
           </div>
           <div className="profile-content">
             <div className="profile-avatar-wrap">
@@ -348,9 +365,11 @@ export default function CardPage() {
                   {initials(card.fullName)}
                 </div>
               )}
-              <span className="profile-verified" title="Проверенный профиль">
-                <Check size={15} />
-              </span>
+              {!isTrial && (
+                <span className="profile-verified" title={labels.verified}>
+                  <Check size={15} />
+                </span>
+              )}
             </div>
 
             <div className="profile-identity">
@@ -468,26 +487,40 @@ export default function CardPage() {
         </section>
 
         <aside className="profile-side">
-          <div className="profile-qr-card">
-            <QRCodeImage value={cardUrl} size={210} className="mx-auto rounded-2xl" />
-            <h2>{labels.qrCode}</h2>
-            <p>{t("scanQr")}</p>
-            <div className="mt-5 grid gap-2">
-              <button type="button" className="button button-secondary w-full" onClick={copyLink}>
-                <Share2 size={17} /> {t("copyLink")}
-              </button>
-              <button
-                type="button"
-                className="button button-ghost w-full"
-                onClick={() => downloadQrCode(cardUrl, card.slug)}
-              >
-                <Download size={17} /> {t("downloadQr")}
-              </button>
-              <button type="button" className="button button-ghost w-full" onClick={addToWallet}>
-                <WalletCards size={17} /> {labels.addWallet}
-              </button>
+          {isTrial ? (
+            <div className="profile-qr-card profile-qr-card-locked">
+              <div className="trial-qr-placeholder" aria-hidden="true">
+                <LockKeyhole size={44} />
+                <span>DEMO</span>
+              </div>
+              <h2>{labels.trialQrTitle}</h2>
+              <p>{labels.trialQrText}</p>
+              <Link to="/payment?plan=personal" className="button button-primary mt-5 w-full">
+                {labels.continueCheckout}
+              </Link>
             </div>
-          </div>
+          ) : (
+            <div className="profile-qr-card">
+              <QRCodeImage value={cardUrl} size={210} className="mx-auto rounded-2xl" />
+              <h2>{labels.qrCode}</h2>
+              <p>{t("scanQr")}</p>
+              <div className="mt-5 grid gap-2">
+                <button type="button" className="button button-secondary w-full" onClick={copyLink}>
+                  <Share2 size={17} /> {t("copyLink")}
+                </button>
+                <button
+                  type="button"
+                  className="button button-ghost w-full"
+                  onClick={() => downloadQrCode(cardUrl, card.slug)}
+                >
+                  <Download size={17} /> {t("downloadQr")}
+                </button>
+                <button type="button" className="button button-ghost w-full" onClick={addToWallet}>
+                  <WalletCards size={17} /> {labels.addWallet}
+                </button>
+              </div>
+            </div>
+          )}
           <Link to="/create" className="profile-powered">
             <span>{labels.createOwn}</span>
             <ArrowLeft className="rotate-180" size={17} />
