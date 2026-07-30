@@ -2,24 +2,24 @@ import { LockKeyhole, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { Navigate, useNavigate } from "react-router";
 import BrandLogo from "../components/BrandLogo";
-import { useAuth } from "../context/AuthContext";
-import { supabase } from "../lib/supabase";
+import { useAdminAuth } from "../context/AdminAuthContext";
+import { adminSupabase } from "../lib/supabase";
 
 export default function AdminLoginPage() {
-  const { user, profile, loading } = useAuth();
+  const { user, isAdmin, loading } = useAdminAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
-  if (!loading && user && profile?.role === "admin") return <Navigate to="/admin" replace />;
+  if (!loading && user && isAdmin) return <Navigate to="/admin" replace />;
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!supabase) return setError("Сервер авторизации недоступен.");
+    if (!adminSupabase) return setError("Сервер авторизации недоступен.");
     setBusy(true);
     setError("");
     const form = new FormData(event.currentTarget);
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
+    const { data, error: signInError } = await adminSupabase.auth.signInWithPassword({
       email: String(form.get("email")).trim(),
       password: String(form.get("password"))
     });
@@ -27,9 +27,9 @@ export default function AdminLoginPage() {
       setBusy(false);
       return setError("Неверная почта или пароль.");
     }
-    const { data: account } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+    const { data: account } = await adminSupabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
     if (account?.role !== "admin") {
-      await supabase.auth.signOut();
+      await adminSupabase.auth.signOut();
       setBusy(false);
       return setError("Этот аккаунт не имеет доступа к администрированию.");
     }
