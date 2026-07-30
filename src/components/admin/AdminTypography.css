@@ -64,6 +64,15 @@
 .moderation-history strong{font-size:15px!important}
 .moderation-history p{font-size:13px!important}
 .moderation-history small{font-size:11px!important}
+.commerce-kpis strong{font-size:27px!important}
+.commerce-kpis small,.commerce-kpis span{font-size:12px!important}
+.commerce-tabs button{font-size:13px!important}
+.commerce-section h2{font-size:22px!important}
+.commerce-section header p{font-size:13px!important}
+.commerce-payment-main h3{font-size:15px!important}
+.commerce-payment-list>article>div>strong{font-size:14px!important}
+.commerce-order-list header strong{font-size:16px!important}
+.commerce-order-list header b{font-size:18px!important}
 .admin-mobile-bar{display:none}
 
 @media(max-width:720px){
