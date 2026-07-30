@@ -48,8 +48,14 @@ export default function AdminPaymentsPage() {
     finally { setBusy(""); }
   };
   const reject = async (id: string) => {
-    const reason = window.prompt("Укажите причину отклонения. Она будет отправлена клиенту:");
-    if (!reason) return;
+    const reason = window.prompt(
+      "Укажите причину отклонения. Она будет отправлена клиенту:",
+      "Оплата не подтверждена. Пожалуйста, проверьте данные и загрузите корректный чек."
+    )?.trim();
+    if (!reason || reason.length < 3) {
+      setNotice("Укажите понятную причину отклонения — не менее 3 символов.");
+      return;
+    }
     setBusy(id);
     try { await commerceAdminRepository.rejectPayment(id, reason); await refresh(); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка отклонения"); }
