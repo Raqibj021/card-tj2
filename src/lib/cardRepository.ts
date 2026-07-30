@@ -5,6 +5,11 @@ import { supabase } from "./supabase";
 const STORAGE_KEY = "vizora.cards.v1";
 const REMOVED_CARDS_KEY = "vizora.removed-cards.v1";
 const isDemoCard = (card: DigitalCard) => card.id.startsWith("demo-");
+const asLockedLocalPreview = (card: DigitalCard): DigitalCard => ({
+  ...card,
+  reviewStatus: "draft",
+  visibility: "private"
+});
 
 export interface CardRepository {
   list(): DigitalCard[];
@@ -37,6 +42,12 @@ class LocalStorageCardRepository implements CardRepository {
   private markRemoved(id: string) {
     const removed = this.removedIds();
     removed.add(id);
+    localStorage.setItem(REMOVED_CARDS_KEY, JSON.stringify([...removed]));
+  }
+
+  private unmarkRemoved(id: string) {
+    const removed = this.removedIds();
+    removed.delete(id);
     localStorage.setItem(REMOVED_CARDS_KEY, JSON.stringify([...removed]));
   }
 
@@ -231,16 +242,19 @@ class LocalStorageCardRepository implements CardRepository {
   }
 
   async remove(id: string) {
-    this.markRemoved(id);
-    this.write(this.read().filter((item) => item.id !== id));
-
     if (!supabase || id.startsWith("demo-")) {
+      this.markRemoved(id);
+      this.write(this.read().filter((item) => item.id !== id));
       return { ok: true, message: "Визитка удалена навсегда." };
     }
 
+    // Stop an already queued save from recreating the card while deletion is
+    // being confirmed by the server.
+    this.markRemoved(id);
     await Promise.allSettled([...this.pendingRemoteSaves]);
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) {
+      this.write(this.read().filter((item) => item.id !== id));
       return { ok: true, message: "Визитка удалена с этого устройства." };
     }
 
@@ -252,12 +266,14 @@ class LocalStorageCardRepository implements CardRepository {
       .eq("owner_id", auth.user.id);
 
     if (error) {
+      this.unmarkRemoved(id);
       return {
         ok: false,
-        message: "Визитка скрыта, но сервер не подтвердил удаление. Повторите попытку."
+        message: "Сервер не подтвердил удаление. Визитка сохранена — повторите попытку."
       };
     }
 
+    this.write(this.read().filter((item) => item.id !== id));
     return { ok: true, message: "Визитка удалена навсегда." };
   }
 
@@ -278,17 +294,60 @@ class LocalStorageCardRepository implements CardRepository {
 
   async getPublicBySlug(slug: string) {
     const local = this.getBySlug(slug);
-    if (local && (!local.trialExpiresAt || new Date(local.trialExpiresAt).getTime() > Date.now())) {
-      return local;
+    const localTrialIsActive = Boolean(
+      local?.trialExpiresAt &&
+      new Date(local.trialExpiresAt).getTime() > Date.now()
+    );
+
+    if (!supabase) {
+      return local && localTrialIsActive
+        ? asLockedLocalPreview(local)
+        : undefined;
     }
-    if (!supabase) return undefined;
+
+    // A completed save must reach Supabase before the card page decides which
+    // status is authoritative.
+    await Promise.allSettled([...this.pendingRemoteSaves]);
+    const { data: auth } = await supabase.auth.getUser();
     const { data, error } = await supabase
       .from("cards")
       .select("*")
       .eq("slug", slug.toLowerCase())
       .maybeSingle();
-    if (error || !data) return undefined;
-    return this.fromDatabase(data);
+
+    if (!error && data) {
+      const remoteCard = this.fromDatabase(data);
+      const next = this.read().filter(
+        (item) => item.id !== remoteCard.id && item.slug.toLowerCase() !== slug.toLowerCase()
+      );
+      this.write([remoteCard, ...next]);
+      return remoteCard;
+    }
+
+    // A temporary network or Supabase error must never erase the owner's
+    // local draft. Hide it for this request, but keep it available for retry.
+    if (error) {
+      return auth.user
+        ? undefined
+        : local && localTrialIsActive
+          ? asLockedLocalPreview(local)
+          : undefined;
+    }
+
+    // For a signed-in owner, an absent/rejected server row must never be
+    // resurrected from localStorage after an admin action or deletion.
+    if (auth.user) {
+      if (local && !isDemoCard(local)) {
+        this.write(this.read().filter((item) => item.id !== local.id));
+      }
+      return undefined;
+    }
+
+    // Anonymous visitors may preview only a live 15-minute local draft. Force
+    // it to remain locked even if localStorage has been manually modified.
+    return local && localTrialIsActive
+      ? asLockedLocalPreview(local)
+      : undefined;
   }
 
   async listRemote() {
@@ -299,15 +358,19 @@ class LocalStorageCardRepository implements CardRepository {
     if (!supabase) return localUserCards;
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) return localUserCards;
+    await Promise.allSettled([...this.pendingRemoteSaves]);
     const { data, error } = await supabase
       .from("cards")
       .select("*")
       .eq("owner_id", auth.user.id)
       .order("updated_at", { ascending: false });
-    if (error || !data?.length) return localUserCards;
-    return data
+    if (error) return [];
+    const remoteCards = (data ?? [])
       .map((row) => this.fromDatabase(row))
       .filter((card) => !removed.has(card.id));
+    const demo = this.read().filter(isDemoCard);
+    this.write([...remoteCards, ...demo]);
+    return remoteCards;
   }
 
   async requestPublication(id: string) {
