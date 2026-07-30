@@ -65,7 +65,7 @@ export default function CardPreview({
 
   return (
     <article
-      data-card-id={card.id}
+      data-card-id={"id" in card ? card.id : undefined}
       className={`digital-card digital-card-${card.template} ${
         compact ? "digital-card-compact" : ""
       }`}
