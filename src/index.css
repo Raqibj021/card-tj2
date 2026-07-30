@@ -1734,33 +1734,94 @@ summary:focus-visible {
 }
 
 .phone-shell-3d {
+  width: min(350px, 78vw);
   overflow: visible;
-  border-width: 9px;
-  background: linear-gradient(145deg, #17263a, #050a12 55%, #26364b);
+  border: 7px solid #11151b;
+  border-radius: 53px;
+  background: linear-gradient(145deg, #656c76, #11151b 18%, #05070a 62%, #77808a);
   box-shadow:
-    -25px 38px 70px rgba(15,23,42,.24),
+    -22px 38px 70px rgba(15,23,42,.25),
     18px 12px 35px rgba(8,25,48,.12),
-    inset 2px 0 rgba(255,255,255,.25);
-  transform: perspective(1200px) rotateY(-7deg) rotateX(2deg) rotateZ(2deg);
+    inset 2px 0 rgba(255,255,255,.38),
+    inset -2px 0 rgba(255,255,255,.12);
+  transform: perspective(1250px) rotateY(-7deg) rotateX(2deg) rotateZ(1.5deg);
   transform-style: preserve-3d;
 }
 
 .phone-shell-3d::before {
   position: absolute;
   z-index: -1;
-  inset: 13px -15px -13px 13px;
-  border-radius: 35px;
-  background: linear-gradient(155deg, #33435a, #050910);
+  inset: 12px -12px -12px 12px;
+  border-radius: 49px;
+  background: linear-gradient(155deg, #7d858f, #11151a 17%, #030507);
   content: "";
-  transform: translateZ(-16px);
+  transform: translateZ(-14px);
 }
 
 .phone-story-screen {
   position: relative;
-  min-height: 625px;
+  min-height: 710px;
   overflow: hidden;
-  border-radius: 28px;
+  border-radius: 45px;
   background: #f5f8fb;
+}
+
+.phone-shell-3d .phone-speaker {
+  top: 11px;
+  width: 92px;
+  height: 25px;
+  border: 1px solid rgba(255,255,255,.06);
+  background: #030508;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025), 0 1px 4px rgba(0,0,0,.28);
+}
+
+.phone-shell-3d .phone-speaker::after {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #294b68, #050b11 64%);
+  box-shadow: 0 0 4px rgba(46,113,162,.28);
+  content: "";
+}
+
+.iphone-side-button {
+  position: absolute;
+  z-index: -1;
+  width: 4px;
+  border-radius: 3px 0 0 3px;
+  background: linear-gradient(90deg, #343b44, #8b939c);
+  box-shadow: inset 1px 0 rgba(255,255,255,.35);
+}
+
+.iphone-action-button {
+  top: 105px;
+  left: -10px;
+  height: 34px;
+}
+
+.iphone-volume-up {
+  top: 158px;
+  left: -10px;
+  height: 58px;
+}
+
+.iphone-volume-down {
+  top: 229px;
+  left: -10px;
+  height: 58px;
+}
+
+.iphone-power-button {
+  z-index: -1;
+  top: 177px;
+  right: -10px;
+  width: 4px;
+  height: 88px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, #8b939c, #343b44);
 }
 
 .phone-scene {
@@ -1853,7 +1914,7 @@ summary:focus-visible {
 }
 
 .phone-scene-card .digital-card {
-  min-height: 625px;
+  min-height: 710px;
   border-radius: 0;
 }
 
@@ -2173,20 +2234,22 @@ summary:focus-visible {
   }
 
   .phone-shell-3d {
-    width: min(320px, 86vw);
+    width: min(316px, 82vw);
+    border-radius: 48px;
     transform: perspective(1100px) rotateY(-5deg) rotateX(1deg) rotateZ(1.4deg);
   }
 
   .phone-story-screen,
   .phone-scene-card .digital-card {
-    min-height: 500px;
+    min-height: 640px;
+    border-radius: 40px;
   }
 
   .phone-scene-card .digital-card {
-    transform: scale(.805);
+    transform: scale(.87);
     transform-origin: top center;
-    width: 124%;
-    margin-left: -12%;
+    width: 115%;
+    margin-left: -7.5%;
   }
 
   .phone-story .hero-orbit-one { width: 390px; height: 390px; }

@@ -58,6 +58,10 @@ export default function HomePhoneStory({ card }: { card: DigitalCard }) {
       <span className="phone-story-particle particle-two"><Share2 size={18} /></span>
       <span className="phone-story-particle particle-three"><ContactRound size={19} /></span>
       <div className="phone-shell phone-shell-founder phone-shell-3d">
+        <span className="iphone-side-button iphone-action-button" aria-hidden="true" />
+        <span className="iphone-side-button iphone-volume-up" aria-hidden="true" />
+        <span className="iphone-side-button iphone-volume-down" aria-hidden="true" />
+        <span className="iphone-side-button iphone-power-button" aria-hidden="true" />
         <div className="phone-speaker" />
         <div className="phone-story-screen">
           <section className={`phone-scene phone-scene-launch${scene === 0 ? " is-active" : ""}`}>

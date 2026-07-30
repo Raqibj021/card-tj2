@@ -102,6 +102,7 @@ export default function HomePage() {
       impactLabel: "Возможности в действии", impactStat: "визиток уже работают",
       journeyLabel: "От идеи до готового профиля", journeyText: "Заполните данные один раз — Vizora превратит их в красивую визитку, которой удобно делиться.",
       liveCard: "Живая визитка", linkReady: "Ссылка готова",
+      oneLink: "Одна ссылка для всех контактов",
       readyCard: "Готовая цифровая визитка", directory: "Каталог специалистов", directoryText: "Найдите проверенного исполнителя",
       forOrganizations: "Для организаций", organizationText: "Тарифы и управление сотрудниками",
       plans: [
@@ -116,6 +117,7 @@ export default function HomePage() {
       impactLabel: "Имкониятҳо дар амал", impactStat: "варақа аллакай фаъоланд",
       journeyLabel: "Аз ғоя то профили омода", journeyText: "Маълумотро як бор пур кунед — Vizora онро ба варақаи зебо ва омода барои мубодила табдил медиҳад.",
       liveCard: "Варақаи зинда", linkReady: "Пайванд омода аст",
+      oneLink: "Як пайванд барои ҳамаи тамосҳо",
       readyCard: "Варақаи рақамии омода", directory: "Феҳристи мутахассисон", directoryText: "Иҷрокунандаи тасдиқшударо ёбед",
       forOrganizations: "Барои ташкилотҳо", organizationText: "Тарофаҳо ва идоракунии кормандон",
       plans: [
@@ -130,6 +132,7 @@ export default function HomePage() {
       impactLabel: "Features in action", impactStat: "cards already live",
       journeyLabel: "From idea to a ready profile", journeyText: "Enter your details once — Vizora turns them into a beautiful card that is easy to share.",
       liveCard: "Live business card", linkReady: "Link is ready",
+      oneLink: "One link for every contact",
       readyCard: "Ready digital business card", directory: "Specialist directory", directoryText: "Find a verified professional",
       forOrganizations: "For organizations", organizationText: "Plans and employee management",
       plans: [
@@ -174,9 +177,6 @@ export default function HomePage() {
                   {t("create")}
                   <ArrowRight size={19} />
                 </Link>
-                <Link to="/card/firuz" className="button button-secondary button-large">
-                  {t("example")}
-                </Link>
               </div>
               <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm text-[var(--muted)]">
                 <span className="inline-flex items-center gap-2">
@@ -189,7 +189,7 @@ export default function HomePage() {
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <Link2 size={18} className="text-teal-600" />
-                  1 240+ {t("cardsCreated")}
+                  {homeCopy.oneLink}
                 </span>
               </div>
             </div>

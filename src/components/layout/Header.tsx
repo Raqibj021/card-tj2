@@ -5,7 +5,6 @@ import {
   Moon,
   Search,
   Building2,
-  Plus,
   Sun,
   UserRound,
   X
@@ -91,10 +90,6 @@ export default function Header() {
           >
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
-          <Link to="/create" className="button button-primary !min-h-10 !px-4">
-            <Plus size={17} />
-            {t("create")}
-          </Link>
           {!authLoading && (
             user ? (
               <Link
@@ -163,10 +158,6 @@ export default function Header() {
               {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
             </button>
           </div>
-          <Link to="/create" className="button button-primary mt-3 w-full">
-            <Plus size={18} />
-            {t("create")}
-          </Link>
           {!authLoading && (
             user ? (
               <Link to="/dashboard" className="mobile-account-link">
