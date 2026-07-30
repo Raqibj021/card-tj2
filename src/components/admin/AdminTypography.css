@@ -1,87 +1,76 @@
-/* Comfortable typography for the standalone administrator workspace. */
-.admin-workspace-role strong{font-size:39px!important}
-.admin-workspace-role small{font-size:33px!important;line-height:1.4}
-.admin-workspace-sidebar nav a{font-size:42px!important}
-.admin-workspace-account strong{font-size:36px!important}
-.admin-workspace-account small{font-size:30px!important}
-.admin-workspace-header small{font-size:33px!important}
-.admin-workspace-header h1{font-size:102px!important}
-.admin-workspace-header p{font-size:42px!important;line-height:1.6}
-.admin-workspace-actions>a,.admin-toolbar-button{font-size:36px!important}
-.admin-workspace-notice{font-size:39px!important}
-.admin-command-hero>div:first-child>span{font-size:30px!important}
-.admin-command-hero h2{font-size:90px!important}
-.admin-command-hero p{font-size:42px!important}
-.admin-command-promo small,.admin-command-promo span{font-size:33px!important}
-.admin-command-promo strong{font-size:87px!important}
-.admin-command-stats small{font-size:33px!important}
-.admin-command-stats strong{font-size:75px!important}
-.admin-command-stats p{font-size:30px!important}
-.admin-command-panel>header small{font-size:30px!important}
-.admin-command-panel>header h2{font-size:60px!important}
-.admin-command-panel>header>strong{font-size:45px!important}
-.admin-command-actions strong{font-size:39px!important}
-.admin-command-actions small{font-size:33px!important}
-.admin-command-actions b{font-size:42px!important}
-.admin-auto-row strong{font-size:36px!important}
-.admin-auto-row small,.admin-auto-row i{font-size:30px!important}
-.admin-launch>p{font-size:36px!important}
-.admin-launch-counts span,.admin-launch label{font-size:33px!important}
-.admin-launch-actions button{font-size:33px!important}
-.admin-panel-heading h2{font-size:60px!important}
-.admin-panel-heading p{font-size:36px!important}
-.admin-table th{font-size:33px!important}
-.admin-table td{font-size:36px!important}
-.status-pill{font-size:30px!important}
-.table-empty{font-size:36px!important}
-.payment-reference-note{font-size:39px!important}
-.payment-code-policy strong{font-size:39px!important}
-.payment-code-policy span{font-size:33px!important}
-.admin-account-stats article strong{font-size:72px!important}
-.admin-account-stats article small{font-size:33px!important}
-.admin-account-tabs button{font-size:36px!important}
-.admin-accounts-console input{font-size:36px!important}
-.admin-account-person strong{font-size:39px!important}
-.admin-account-person small{font-size:33px!important}
-.admin-account-list>button>span>small{font-size:30px!important}
-.admin-account-list>button>span>b{font-size:39px!important}
-.admin-risk{font-size:33px!important}
-.admin-account-status{font-size:30px!important}
-.admin-detail-drawer>small{font-size:30px!important}
-.admin-detail-drawer h2{font-size:84px!important}
-.admin-detail-drawer>p{font-size:36px!important}
-.admin-drawer-grid small{font-size:30px!important}
-.admin-drawer-grid strong{font-size:36px!important}
-.admin-drawer-warning strong{font-size:36px!important}
-.admin-drawer-warning span{font-size:33px!important}
-.admin-drawer-reason small{font-size:30px!important}
-.admin-drawer-reason p{font-size:36px!important}
-.admin-detail-drawer>button.block,.admin-detail-drawer>button.restore{font-size:36px!important}
-.admin-detail-drawer h3{font-size:45px!important}
-.admin-structure-list span{font-size:36px!important}
-.admin-structure-list b{font-size:33px!important}
-.admin-member-list strong{font-size:36px!important}
-.admin-member-list small,.admin-member-list>div>span:last-child{font-size:30px!important}
-.moderation-stats strong{font-size:66px!important}
-.moderation-stats small{font-size:30px!important}
-.moderation-tabs button{font-size:33px!important}
-.moderation-tabs b{font-size:27px!important}
-.moderation-main strong{font-size:39px!important}
-.moderation-main p{font-size:30px!important}
-.moderation-main small{font-size:27px!important}
-.moderation-flags span{font-size:27px!important}
-.moderation-actions button,.moderation-actions a,.moderation-documents button{font-size:27px!important}
-.moderation-report-text{font-size:30px!important}
-.moderation-empty p{font-size:33px!important}
-.moderation-history strong{font-size:36px!important}
-.moderation-history p{font-size:30px!important}
-.moderation-history small{font-size:27px!important}
+/* Readable, balanced typography for the standalone administrator workspace. */
+.admin-workspace-role strong{font-size:13px!important}
+.admin-workspace-role small{font-size:11px!important;line-height:1.4}
+.admin-workspace-sidebar nav a{font-size:14px!important}
+.admin-workspace-account strong{font-size:12px!important}
+.admin-workspace-account small{font-size:10px!important}
+.admin-workspace-header small{font-size:11px!important}
+.admin-workspace-header h1{font-size:42px!important;line-height:1.08}
+.admin-workspace-header p{font-size:16px!important;line-height:1.55}
+.admin-workspace-actions>a,.admin-toolbar-button{font-size:13px!important}
+.admin-workspace-notice{font-size:14px!important}
+.admin-command-hero>div:first-child>span{font-size:11px!important}
+.admin-command-hero h2{font-size:42px!important;line-height:1.08}
+.admin-command-hero p{font-size:17px!important;line-height:1.55}
+.admin-command-promo small,.admin-command-promo span{font-size:13px!important}
+.admin-command-promo strong{font-size:38px!important}
+.admin-command-stats small{font-size:12px!important}
+.admin-command-stats strong{font-size:32px!important}
+.admin-command-stats p{font-size:12px!important}
+.admin-command-panel>header small{font-size:11px!important}
+.admin-command-panel>header h2{font-size:25px!important}
+.admin-command-panel>header>strong{font-size:18px!important}
+.admin-command-actions strong{font-size:15px!important}
+.admin-command-actions small{font-size:12px!important}
+.admin-command-actions b{font-size:16px!important}
+.admin-auto-row strong{font-size:14px!important}
+.admin-auto-row small,.admin-auto-row i{font-size:12px!important}
+.admin-launch>p{font-size:14px!important}
+.admin-launch-counts span,.admin-launch label,.admin-launch-actions button{font-size:13px!important}
+.admin-panel-heading h2{font-size:25px!important}
+.admin-panel-heading p{font-size:14px!important}
+.admin-table th{font-size:12px!important}
+.admin-table td{font-size:13px!important}
+.status-pill{font-size:11px!important}
+.table-empty{font-size:14px!important}
+.payment-reference-note{font-size:14px!important}
+.payment-code-policy strong{font-size:14px!important}
+.payment-code-policy span{font-size:12px!important}
+.admin-account-stats article strong{font-size:30px!important}
+.admin-account-stats article small{font-size:12px!important}
+.admin-account-tabs button{font-size:14px!important}
+.admin-accounts-console input{font-size:14px!important}
+.admin-account-person strong{font-size:15px!important}
+.admin-account-person small{font-size:12px!important}
+.admin-account-list>button>span>small{font-size:11px!important}
+.admin-account-list>button>span>b{font-size:14px!important}
+.admin-risk,.admin-account-status{font-size:11px!important}
+.admin-detail-drawer>small,.admin-drawer-grid small,.admin-drawer-reason small{font-size:11px!important}
+.admin-detail-drawer h2{font-size:29px!important}
+.admin-detail-drawer>p,.admin-drawer-grid strong,.admin-drawer-warning strong,.admin-drawer-reason p{font-size:14px!important}
+.admin-drawer-warning span,.admin-structure-list b,.admin-member-list small,.admin-member-list>div>span:last-child{font-size:12px!important}
+.admin-detail-drawer>button.block,.admin-detail-drawer>button.restore,.admin-structure-list span,.admin-member-list strong{font-size:14px!important}
+.admin-detail-drawer h3{font-size:19px!important}
+.moderation-stats strong{font-size:28px!important}
+.moderation-stats small{font-size:12px!important}
+.moderation-tabs button{font-size:13px!important}
+.moderation-tabs b{font-size:11px!important}
+.moderation-main strong{font-size:15px!important}
+.moderation-main p{font-size:12px!important}
+.moderation-main small{font-size:11px!important}
+.moderation-flags span,.moderation-actions button,.moderation-actions a,.moderation-documents button{font-size:12px!important}
+.moderation-report-text{font-size:13px!important}
+.moderation-empty p{font-size:14px!important}
+.moderation-history strong{font-size:15px!important}
+.moderation-history p{font-size:13px!important}
+.moderation-history small{font-size:11px!important}
 .admin-mobile-bar{display:none}
 
 @media(max-width:720px){
   .admin-workspace{padding-top:64px!important;padding-bottom:82px!important}
   .admin-mobile-bar{position:fixed;z-index:50;top:0;right:0;left:0;height:64px;display:flex;align-items:center;border-bottom:1px solid #223149;background:#07111f;padding:0 14px;color:#fff}
-  .admin-mobile-bar>a{display:flex;align-items:center}.admin-mobile-bar img{width:116px;height:38px;object-fit:contain;object-position:left center}
+  .admin-mobile-bar>a{display:flex;align-items:center}
+  .admin-mobile-bar img{width:116px;height:38px;object-fit:contain;object-position:left center}
   .admin-mobile-bar>span{margin-left:10px;border-left:1px solid #33435a;padding-left:10px;color:#7d90aa;font-size:10px!important;font-weight:900;letter-spacing:.15em}
   .admin-mobile-bar>button{display:flex;min-height:38px;align-items:center;gap:7px;margin-left:auto;border:1px solid #2a3b53;border-radius:10px;background:#101f33;padding:0 11px;color:#cbd6e4;font-size:12px!important;font-weight:800}
   .admin-workspace-sidebar{height:74px!important;padding:7px 6px!important}
@@ -90,46 +79,21 @@
   .admin-workspace-sidebar nav a svg{width:20px;height:20px}
   .admin-workspace-body{padding:0 14px 28px!important}
   .admin-workspace-header{min-height:0!important;display:grid!important;gap:14px!important;padding:22px 0 18px!important}
-  .admin-workspace-header small{font-size:11px!important}
-  .admin-workspace-header h1{margin-top:8px!important;font-size:34px!important;line-height:1.06}
-  .admin-workspace-header p{font-size:15px!important;line-height:1.5}
+  .admin-workspace-header small{font-size:10px!important}
+  .admin-workspace-header h1{margin-top:7px!important;font-size:30px!important}
+  .admin-workspace-header p{font-size:14px!important;line-height:1.5}
   .admin-workspace-actions{justify-content:flex-start!important}
   .admin-toolbar-button{width:auto!important;min-height:42px!important;padding:0 13px!important;font-size:13px!important}
-  .admin-workspace-notice{font-size:14px!important;line-height:1.45}
+  .admin-workspace-notice{font-size:13px!important;line-height:1.45}
   .admin-command-hero{padding:18px!important}
-  .admin-command-hero>div:first-child>span{font-size:11px!important}
-  .admin-command-hero h2{font-size:31px!important;line-height:1.08}
-  .admin-command-hero p{font-size:15px!important;line-height:1.5}
-  .admin-command-promo small,.admin-command-promo span{font-size:13px!important}
-  .admin-command-promo strong{font-size:34px!important}
-  .admin-command-stats small{font-size:12px!important}
-  .admin-command-stats strong{font-size:29px!important}
-  .admin-command-stats p{font-size:12px!important}
-  .admin-command-panel>header small{font-size:11px!important}
-  .admin-command-panel>header h2,.admin-panel-heading h2{font-size:25px!important}
-  .admin-command-panel>header>strong{font-size:18px!important}
-  .admin-command-actions strong,.admin-auto-row strong{font-size:15px!important}
-  .admin-command-actions small,.admin-auto-row small,.admin-auto-row i{font-size:12px!important}
-  .admin-command-actions b{font-size:16px!important}
-  .admin-launch>p,.admin-panel-heading p{font-size:14px!important}
-  .admin-launch-counts span,.admin-launch label,.admin-launch-actions button{font-size:13px!important}
-  .admin-table{min-width:680px}.admin-table th{font-size:12px!important}.admin-table td{font-size:13px!important}
-  .status-pill{font-size:11px!important}.table-empty{font-size:14px!important}
-  .payment-reference-note,.payment-code-policy strong{font-size:14px!important}.payment-code-policy span{font-size:12px!important}
-  .admin-account-stats article strong{font-size:29px!important}.admin-account-stats article small{font-size:12px!important}
-  .admin-account-tabs button,.admin-accounts-console input{font-size:14px!important}
-  .admin-account-person strong{font-size:15px!important}.admin-account-person small{font-size:12px!important}
-  .admin-account-list>button>span>small{font-size:11px!important}.admin-account-list>button>span>b{font-size:14px!important}
-  .admin-risk,.admin-account-status{font-size:11px!important}
-  .admin-detail-drawer>small,.admin-drawer-grid small,.admin-drawer-reason small{font-size:11px!important}
-  .admin-detail-drawer h2{font-size:28px!important}.admin-detail-drawer>p,.admin-drawer-grid strong,.admin-drawer-warning strong,.admin-drawer-reason p{font-size:14px!important}
-  .admin-drawer-warning span,.admin-structure-list b,.admin-member-list small,.admin-member-list>div>span:last-child{font-size:12px!important}
-  .admin-detail-drawer>button.block,.admin-detail-drawer>button.restore,.admin-structure-list span,.admin-member-list strong{font-size:14px!important}
-  .admin-detail-drawer h3{font-size:19px!important}
-  .moderation-stats strong{font-size:28px!important}.moderation-stats small{font-size:12px!important}
-  .moderation-tabs button{font-size:13px!important}.moderation-tabs b{font-size:11px!important}
-  .moderation-main strong{font-size:16px!important}.moderation-main p{font-size:13px!important;white-space:normal!important}.moderation-main small{font-size:12px!important}
-  .moderation-flags span,.moderation-actions button,.moderation-actions a,.moderation-documents button{font-size:12px!important}
-  .moderation-report-text,.moderation-history p{font-size:13px!important}.moderation-empty p{font-size:14px!important}
-  .moderation-history strong{font-size:15px!important}.moderation-history small{font-size:11px!important}
+  .admin-command-hero h2{font-size:30px!important}
+  .admin-command-hero p{font-size:14px!important}
+  .admin-command-promo strong{font-size:30px!important}
+  .admin-command-stats strong{font-size:27px!important}
+  .admin-command-panel>header h2,.admin-panel-heading h2{font-size:22px!important}
+  .admin-table{min-width:680px}
+  .admin-account-stats article strong{font-size:27px!important}
+  .admin-account-tabs button,.admin-accounts-console input{font-size:13px!important}
+  .admin-detail-drawer h2{font-size:26px!important}
+  .moderation-main p{white-space:normal!important}
 }
