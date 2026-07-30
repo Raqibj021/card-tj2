@@ -1,6 +1,7 @@
 import {
   Banknote,
   Building2,
+  ContactRound,
   Headphones,
   LayoutDashboard,
   LogOut,
@@ -16,6 +17,7 @@ import "./AdminTypography.css";
 const navigation = [
   { to: "/admin", label: "Главная", icon: LayoutDashboard, end: true },
   { to: "/admin/accounts", label: "Аккаунты", icon: Building2 },
+  { to: "/admin/cards", label: "Визитки", icon: ContactRound },
   { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck },
   { to: "/admin/payments", label: "Оплаты и заказы", icon: Banknote },
   { to: "/admin/support", label: "Поддержка", icon: Headphones }
