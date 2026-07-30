@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { supabase } from "../lib/supabase";
+import { authRedirectUrl } from "../lib/siteUrl";
 
 export default function PasswordRecoveryPage({ reset = false }: { reset?: boolean }) {
   const { language } = useApp();
@@ -25,7 +26,7 @@ export default function PasswordRecoveryPage({ reset = false }: { reset?: boolea
     const result = reset
       ? await supabase.auth.updateUser({ password: String(data.get("password")) })
       : await supabase.auth.resetPasswordForEmail(String(data.get("email")), {
-          redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}reset-password`
+          redirectTo: authRedirectUrl("/reset-password")
         });
     setBusy(false);
     if (result.error) {
