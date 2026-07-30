@@ -45,7 +45,7 @@ MAIL_WORKER_SECRET=отдельная_длинная_случайная_стро
 GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
 GOOGLE_APPS_SCRIPT_SECRET=значение_VIZORA_GATEWAY_SECRET
 VIZORA_REPLY_TO=vizora.platform.tj@gmail.com
-VIZORA_SITE_URL=https://raqibj021.github.io/card-tj2
+VIZORA_SITE_URL=https://vizora.tj
 ```
 
 `SUPABASE_URL` и `SUPABASE_SERVICE_ROLE_KEY` Edge Function получает
