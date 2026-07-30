@@ -42,7 +42,7 @@ begin
       'inProgress',(select count(*) from support_tickets where status='in_progress'),
       'closedTickets',(select count(*) from support_tickets where status in ('closed','resolved')),
       'urgentTickets',(select count(*) from support_tickets where priority='urgent' and status not in ('closed','resolved')),
-      'unresolvedReports',(select count(*) from reports where status in ('new','open','reviewing')),
+      'unresolvedReports',(select count(*) from reports where status in ('new','reviewing')),
       'queuedEmails',(select count(*) from email_outbox where status in ('queued','sending')),
       'failedEmails',(select count(*) from email_outbox where status='failed'),
       'sentToday',(select count(*) from email_outbox where status='sent' and sent_at>=date_trunc('day',now())),
@@ -134,7 +134,7 @@ begin
     where p.marketing_consent is true and nullif(p.email,'') is not null
       and (campaign_language='all' or coalesce(p.preferred_language,'ru')=campaign_language)
       and (campaign_audience='marketing'
-        or (campaign_audience='active' and exists(select 1 from subscriptions s where s.user_id=p.id and s.status='active'))
+        or (campaign_audience='active' and exists(select 1 from subscriptions s where s.profile_id=p.id and s.expires_at>now()))
         or (campaign_audience='organizations' and exists(select 1 from organizations o where o.owner_id=p.id)))
   loop
     perform public.queue_transactional_email(person.email,'news_campaign',
