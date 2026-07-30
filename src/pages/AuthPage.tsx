@@ -5,6 +5,7 @@ import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
+import { authRedirectUrl } from "../lib/siteUrl";
 import type { Language } from "../types/card";
 
 const authCopy = {
@@ -211,7 +212,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
           password,
           options: {
             data: { full_name: fullName },
-            emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`
+            emailRedirectTo: authRedirectUrl()
           }
         })
       : await supabase.auth.signInWithPassword({ email, password });
@@ -264,7 +265,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
       type: "signup",
       email: pendingEmail,
       options: {
-        emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`
+        emailRedirectTo: authRedirectUrl()
       }
     });
     setBusy(false);
