@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { adminSupabase as supabase } from "./supabase";
 
 export interface AdminSnapshot {
   status: "prelaunch" | "live";
