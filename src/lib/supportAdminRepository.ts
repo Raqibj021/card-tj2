@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { adminSupabase as supabase } from "./supabase";
 
 export type SupportTicketAdmin = {
   id: string; ticketNumber: string; category: string; subject: string; message: string;
