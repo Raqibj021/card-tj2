@@ -14,7 +14,6 @@ export interface PaymentRequest {
   receiptName: string;
   receiptPath?: string;
   status: PaymentStatus;
-  activationCode?: string;
   createdAt: string;
 }
 
@@ -122,13 +121,6 @@ export const paymentRepository = {
     return item;
   },
 
-  approve: async (id: string) => {
-    if (!supabase) throw new Error("Сервер недоступен.");
-    const { data, error } = await supabase.rpc("approve_order", { target_order_id: id });
-    if (error) throw error;
-    return String(data);
-  },
-
   reject: async (id: string) => {
     if (!supabase) throw new Error("Сервер недоступен.");
     const { error } = await supabase
@@ -137,11 +129,4 @@ export const paymentRepository = {
       .eq("id", id);
     if (error) throw error;
   },
-
-  activate: async (code: string) => {
-    if (!supabase) throw new Error("Сервер недоступен.");
-    const { data, error } = await supabase.rpc("activate_plan", { plain_code: code });
-    if (error) throw error;
-    return String(data);
-  }
 };
