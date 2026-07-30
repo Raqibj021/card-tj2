@@ -1,4 +1,4 @@
-import { Banknote, Check, ClipboardList, Copy, ExternalLink, FileSignature, History, RefreshCw, ShieldCheck, X } from "lucide-react";
+import { Banknote, Check, ClipboardList, ExternalLink, FileSignature, History, RefreshCw, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
 import { commerceAdminRepository, type CommerceWorkspace } from "../lib/commerceAdminRepository";
@@ -30,7 +30,6 @@ export default function AdminPaymentsPage() {
   const [filter, setFilter] = useState("all");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState("");
-  const [code, setCode] = useState("");
   const refresh = async () => {
     setBusy("refresh");
     try { setData(await commerceAdminRepository.workspace()); setNotice(""); }
@@ -42,9 +41,9 @@ export default function AdminPaymentsPage() {
 
   const approve = async (id: string) => {
     const note = window.prompt("Комментарий администратора (необязательно):", "") ?? "";
-    if (!window.confirm("Вы проверили поступление денег, тариф, сумму и чек? После подтверждения будет создан код активации.")) return;
-    setBusy(id); setCode("");
-    try { const next = await commerceAdminRepository.approvePayment(id, note); setCode(next); await navigator.clipboard.writeText(next); await refresh(); }
+    if (!window.confirm("Вы проверили поступление денег, тариф, сумму и чек? После подтверждения тариф активируется автоматически — код не потребуется.")) return;
+    setBusy(id);
+    try { await commerceAdminRepository.approvePayment(id, note); await refresh(); setNotice("Оплата подтверждена. Тариф активирован автоматически."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка подтверждения"); }
     finally { setBusy(""); }
   };
@@ -65,7 +64,6 @@ export default function AdminPaymentsPage() {
     actions={<button className="admin-toolbar-button" disabled={busy === "refresh"} onClick={() => void refresh()}><RefreshCw size={16}/> Обновить</button>}>
     <div className="admin-subpage commerce-console">
       {notice && <div className="commerce-alert">{notice}<button onClick={() => setNotice("")}><X size={16}/></button></div>}
-      {code && <div className="commerce-code"><ShieldCheck size={22}/><div><small>Код создан только после подтверждения оплаты</small><strong>{code}</strong></div><button onClick={() => void navigator.clipboard.writeText(code)}><Copy size={16}/> Копировать</button></div>}
 
       <div className="commerce-kpis">
         <article><small>Ждут решения</small><strong>{data.stats.pendingPayments}</strong><span>оплат</span></article>
