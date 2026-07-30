@@ -86,8 +86,13 @@ export default function AdminCardsPage() {
       changes_requested: "Напишите, что нужно исправить",
       rejected: "Укажите причину отклонения"
     };
-    const note = window.prompt(prompts[decision], "") ?? "";
-    if (decision !== "approved" && !note.trim()) {
+    const defaults = {
+      approved: "",
+      changes_requested: "Исправьте указанные данные визитки и отправьте её на повторную проверку.",
+      rejected: "Данные визитки не прошли проверку. Уточните информацию и отправьте заявку повторно."
+    };
+    const note = window.prompt(prompts[decision], defaults[decision])?.trim() ?? "";
+    if (decision !== "approved" && note.length < 3) {
       setNotice("Для исправления или отклонения обязательно укажите причину.");
       return;
     }
