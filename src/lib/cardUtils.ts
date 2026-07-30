@@ -121,16 +121,37 @@ export const buildVCard = (card: DigitalCard) => {
   return lines.filter(Boolean).join("\r\n");
 };
 
-export const downloadVCard = (card: DigitalCard) => {
-  const blob = new Blob([buildVCard(card)], {
-    type: "text/vcard;charset=utf-8"
-  });
-  const url = URL.createObjectURL(blob);
+export const openVCardSaveDialog = async (card: DigitalCard) => {
+  const file = new File(
+    [buildVCard(card)],
+    `${card.slug || "contact"}.vcf`,
+    { type: "text/vcard;charset=utf-8" }
+  );
+
+  if (
+    typeof navigator.share === "function" &&
+    typeof navigator.canShare === "function" &&
+    navigator.canShare({ files: [file] })
+  ) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: card.fullName,
+        text: card.organization || card.position || undefined
+      });
+      return;
+    } catch (error) {
+      if ((error as Error).name === "AbortError") return;
+    }
+  }
+
+  const url = URL.createObjectURL(file);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `${card.slug || "contact"}.vcf`;
+  anchor.target = "_blank";
+  anchor.rel = "noopener noreferrer";
   anchor.click();
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
 };
 
 export const downloadQrCode = async (value: string, filename: string) => {
