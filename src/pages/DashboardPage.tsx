@@ -26,6 +26,16 @@ import type { DigitalCard } from "../types/card";
 import { leadRepository } from "../lib/leadRepository";
 import { publicSiteUrl } from "../lib/siteUrl";
 import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
+import { supabase } from "../lib/supabase";
+
+interface DashboardNotification {
+  id: string;
+  title: string;
+  body: string;
+  kind: string;
+  action_url: string | null;
+  read_at: string | null;
+}
 
 const getCardUrl = (slug: string) => {
   return publicSiteUrl(`/card/${slug}`);
@@ -49,6 +59,7 @@ export default function DashboardPage() {
   const [cards, setCards] = useState<DigitalCard[]>([]);
   const [toast, setToast] = useState("");
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
+  const [latestNotification, setLatestNotification] = useState<DashboardNotification | null>(null);
   const leads = leadRepository.list();
   const dashboardCopy = {
     ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик", changesRequested: "Требуются исправления", rejected: "Отклонена", suspended: "Заблокирована", lockedActions: "QR-код и публичная ссылка появятся после одобрения.", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
@@ -64,6 +75,18 @@ export default function DashboardPage() {
     void promoRepository.status().then((result) => {
       if (active) setPromo(result);
     }).catch(() => undefined);
+    if (supabase) {
+      void supabase
+        .from("notifications")
+        .select("id,title,body,kind,action_url,read_at")
+        .eq("kind", "card_review")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (active && data) setLatestNotification(data as DashboardNotification);
+        });
+    }
     return () => { active = false; };
   }, []);
 
@@ -154,11 +177,11 @@ export default function DashboardPage() {
               <p className="page-copy">{t("dashboardText")}</p>
             </div>
             <Link
-              to={primaryCard ? `/create?edit=${primaryCard.id}` : "/create"}
+              to="/create"
               className="button button-primary button-large shrink-0"
             >
-              {primaryCard ? <Edit3 size={19} /> : <Plus size={19} />}
-              {primaryCard ? t("edit") : t("create")}
+              {primaryCard ? <ShieldCheck size={19} /> : <Plus size={19} />}
+              {primaryCard ? statusLabel(primaryCard.reviewStatus) : t("create")}
             </Link>
           </div>
 
@@ -188,6 +211,30 @@ export default function DashboardPage() {
       </section>
 
       <section className="site-container py-10 md:py-14">
+        {latestNotification && !latestNotification.read_at && (
+          <div className="dashboard-review-notice">
+            <span><Bell size={22} /></span>
+            <div>
+              <strong>{latestNotification.title}</strong>
+              <p>{latestNotification.body}</p>
+            </div>
+            <Link
+              to={latestNotification.action_url || "/notifications"}
+              className="button button-secondary"
+              onClick={() => {
+                if (supabase) {
+                  void supabase
+                    .from("notifications")
+                    .update({ read_at: new Date().toISOString() })
+                    .eq("id", latestNotification.id);
+                }
+                setLatestNotification((item) => item ? { ...item, read_at: new Date().toISOString() } : item);
+              }}
+            >
+              {language === "ru" ? "Посмотреть" : language === "tj" ? "Дидан" : "View"}
+            </Link>
+          </div>
+        )}
         <div className="dashboard-crm-banner">
           <div><MessageSquareText size={22} /><span><strong>{dashboardCopy.crm}</strong><small>{dashboardCopy.crmText}</small></span></div>
           <Link to="/dashboard/leads" className="button button-secondary">{dashboardCopy.openLeads}</Link>
@@ -207,11 +254,11 @@ export default function DashboardPage() {
             <p>{dashboardCopy.myCardsText}</p>
           </div>
           <Link
-            to={primaryCard ? `/create?edit=${primaryCard.id}` : "/create"}
+            to="/create"
             className="button button-primary"
           >
-            {primaryCard ? <Edit3 size={17} /> : <Plus size={17} />}
-            {primaryCard ? t("edit") : t("create")}
+            {primaryCard ? <ShieldCheck size={17} /> : <Plus size={17} />}
+            {primaryCard ? statusLabel(primaryCard.reviewStatus) : t("create")}
           </Link>
         </div>
         {cards.length ? (
