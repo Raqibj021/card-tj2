@@ -42,6 +42,29 @@ import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 
 type FormErrors = Partial<Record<keyof CardDraft, string>>;
 
+const NAME_PATTERN = /^[\p{L}][\p{L}'’ʼ-]{1,}(?:\s+[\p{L}][\p{L}'’ʼ-]{1,})+$/u;
+const PHONE_CHARACTERS = /^[+\d\s()-]+$/;
+const SOCIAL_PATTERN = /^(?:https?:\/\/)?(?:www\.)?[\w.-]+(?:\/[\w.@+-]*)*\/?$|^@?[a-zA-Z0-9._-]{3,}$/;
+
+const normalizePhoneInput = (value: string) =>
+  value.replace(/[^\d+()\s-]/g, "").replace(/(?!^)\+/g, "");
+
+const isValidTajikPhone = (value: string) => {
+  if (!PHONE_CHARACTERS.test(value.trim())) return false;
+  const digits = value.replace(/\D/g, "");
+  return /^992\d{9}$/.test(digits) && !/^992(\d)\1{8}$/.test(digits);
+};
+
+const isValidWebsite = (value: string) => {
+  try {
+    const candidate = /^https?:\/\//i.test(value) ? value : `https://${value}`;
+    const url = new URL(candidate);
+    return Boolean(url.hostname.includes(".") && !/\s/.test(value));
+  } catch {
+    return false;
+  }
+};
+
 interface FieldProps {
   label: string;
   icon: ReactNode;
@@ -134,7 +157,14 @@ export default function CreatePage() {
       descriptionPlaceholder: "Расскажите коротко о своей работе и преимуществах...", contactsHint: "Добавьте удобные способы связи",
       addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Укажите ссылку или имя пользователя",
       designHint: "Подберите оформление под свой образ", saving: "Сохранение...",
-      previewHint: "Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран."
+      previewHint: "Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран.",
+      invalidName: "Введите имя и фамилию буквами, например: Фируз Саидов.",
+      invalidPosition: "Укажите настоящую должность (минимум 2 буквы).",
+      invalidOrganization: "Укажите место работы или название организации.",
+      invalidPhone: "Введите полный номер: +992 и 9 цифр номера.",
+      invalidWebsite: "Введите корректный сайт, например: example.tj.",
+      invalidSocial: "Введите корректное имя пользователя или ссылку.",
+      invalidAddress: "Введите корректный адрес (минимум 5 символов)."
     },
     tj: {
       invalidImage: "Файли тасвирро интихоб кунед", imageFailed: "Коркарди тасвир муяссар нашуд",
@@ -143,7 +173,14 @@ export default function CreatePage() {
       descriptionPlaceholder: "Дар бораи фаъолият ва афзалиятҳои худ кӯтоҳ нависед...", contactsHint: "Роҳҳои муносиби тамосро илова кунед",
       addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пайванд ё номи корбарро ворид кунед",
       designHint: "Ороишро мувофиқи симои худ интихоб кунед", saving: "Нигоҳдорӣ...",
-      previewHint: "Пешнамоиш худкор нав мешавад. Дар телефон варақа дар тамоми экран кушода мешавад."
+      previewHint: "Пешнамоиш худкор нав мешавад. Дар телефон варақа дар тамоми экран кушода мешавад.",
+      invalidName: "Ном ва насабро бо ҳарфҳо нависед, масалан: Фирӯз Саидов.",
+      invalidPosition: "Вазифаи воқеиро нависед (на кам аз 2 ҳарф).",
+      invalidOrganization: "Ҷойи кор ё номи ташкилотро нависед.",
+      invalidPhone: "Рақами пурраро ворид кунед: +992 ва 9 рақами телефон.",
+      invalidWebsite: "Суроғаи дурусти сомонаро нависед, масалан: example.tj.",
+      invalidSocial: "Номи корбар ё пайванди дурустро ворид кунед.",
+      invalidAddress: "Суроғаи дурустро ворид кунед (на кам аз 5 аломат)."
     },
     en: {
       invalidImage: "Choose an image file", imageFailed: "Could not process the image",
@@ -152,7 +189,14 @@ export default function CreatePage() {
       descriptionPlaceholder: "Briefly describe your work and advantages...", contactsHint: "Add convenient ways to contact you",
       addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Enter a link or username",
       designHint: "Choose a design that matches your image", saving: "Saving...",
-      previewHint: "The preview updates automatically. On a phone, the card opens full screen."
+      previewHint: "The preview updates automatically. On a phone, the card opens full screen.",
+      invalidName: "Enter first and last name using letters, for example: Firuz Saidov.",
+      invalidPosition: "Enter a real job title (at least 2 letters).",
+      invalidOrganization: "Enter your workplace or organization name.",
+      invalidPhone: "Enter the complete number: +992 followed by 9 digits.",
+      invalidWebsite: "Enter a valid website, for example: example.tj.",
+      invalidSocial: "Enter a valid username or link.",
+      invalidAddress: "Enter a valid address (at least 5 characters)."
     }
   }[language];
 
@@ -205,9 +249,15 @@ export default function CreatePage() {
   const validate = () => {
     const next: FormErrors = {};
     if (!form.fullName.trim()) next.fullName = t("required");
+    else if (!NAME_PATTERN.test(form.fullName.trim())) next.fullName = builderCopy.invalidName;
     if (!form.position.trim()) next.position = t("required");
+    else if ((form.position.match(/\p{L}/gu) ?? []).length < 2) next.position = builderCopy.invalidPosition;
     if (!form.organization.trim()) next.organization = t("required");
+    else if ((form.organization.match(/[\p{L}\d]/gu) ?? []).length < 2) next.organization = builderCopy.invalidOrganization;
     if (!form.phone.trim()) next.phone = t("required");
+    else if (!isValidTajikPhone(form.phone)) next.phone = builderCopy.invalidPhone;
+    if (form.secondPhone && !isValidTajikPhone(form.secondPhone)) next.secondPhone = builderCopy.invalidPhone;
+    if (form.whatsapp && !isValidTajikPhone(form.whatsapp)) next.whatsapp = builderCopy.invalidPhone;
     if (!form.slug.trim()) {
       next.slug = t("required");
     } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(form.slug)) {
@@ -219,6 +269,13 @@ export default function CreatePage() {
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       next.email = t("invalidEmail");
     }
+    if (form.website && !isValidWebsite(form.website)) next.website = builderCopy.invalidWebsite;
+    if (form.address && form.address.trim().length < 5) next.address = builderCopy.invalidAddress;
+    (["telegram", "instagram", "facebook"] as const).forEach((network) => {
+      if (form[network] && !SOCIAL_PATTERN.test(form[network].trim())) {
+        next[network] = builderCopy.invalidSocial;
+      }
+    });
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -454,27 +511,30 @@ export default function CreatePage() {
                 <input
                   className="form-input"
                   type="tel"
+                  inputMode="tel"
                   value={form.phone}
-                  onChange={(event) => update("phone", event.target.value)}
+                  onChange={(event) => update("phone", normalizePhoneInput(event.target.value))}
                   placeholder="+992 00 000 00 00"
                   autoComplete="tel"
                 />
               </Field>
-              <Field label={t("secondPhone")} icon={<Phone size={16} />}>
+              <Field label={t("secondPhone")} icon={<Phone size={16} />} error={errors.secondPhone}>
                 <input
                   className="form-input"
                   type="tel"
+                  inputMode="tel"
                   value={form.secondPhone}
-                  onChange={(event) => update("secondPhone", event.target.value)}
+                  onChange={(event) => update("secondPhone", normalizePhoneInput(event.target.value))}
                   placeholder="+992 00 000 00 00"
                 />
               </Field>
-              <Field label={t("whatsapp")} icon={<WhatsAppIcon size={16} />}>
+              <Field label={t("whatsapp")} icon={<WhatsAppIcon size={16} />} error={errors.whatsapp}>
                 <input
                   className="form-input"
                   type="tel"
+                  inputMode="tel"
                   value={form.whatsapp}
-                  onChange={(event) => update("whatsapp", event.target.value)}
+                  onChange={(event) => update("whatsapp", normalizePhoneInput(event.target.value))}
                   placeholder="+992000000000"
                 />
               </Field>
@@ -488,7 +548,7 @@ export default function CreatePage() {
                   autoComplete="email"
                 />
               </Field>
-              <Field label={t("address")} icon={<MapPin size={16} />}>
+              <Field label={t("address")} icon={<MapPin size={16} />} error={errors.address}>
                 <input
                   className="form-input"
                   value={form.address}
@@ -497,7 +557,7 @@ export default function CreatePage() {
                   autoComplete="street-address"
                 />
               </Field>
-              <Field label={t("website")} icon={<Globe2 size={16} />}>
+              <Field label={t("website")} icon={<Globe2 size={16} />} error={errors.website}>
                 <input
                   className="form-input"
                   type="url"
@@ -521,6 +581,7 @@ export default function CreatePage() {
                   key={network}
                   label={t(network)}
                   icon={<AtSign size={16} />}
+                  error={errors[network]}
                 >
                   <input
                     className="form-input"
