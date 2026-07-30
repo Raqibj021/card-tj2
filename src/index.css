@@ -6173,3 +6173,32 @@ body,
     height: 224px;
   }
 }
+
+
+/* Accent patterns for light card headers */
+.digital-card-creative:not([data-card-id="demo-shabnam"]) .card-preview-cover {
+  background:
+    radial-gradient(circle at 86% 14%,
+      transparent 0 34px,
+      color-mix(in srgb, var(--card-accent) 24%, transparent) 35px 36px,
+      transparent 37px 62px,
+      color-mix(in srgb, var(--card-accent) 16%, transparent) 63px 64px,
+      transparent 65px),
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--card-accent) 10%, var(--panel)),
+      var(--panel) 68%);
+}
+
+.digital-card-creative:not([data-card-id="demo-shabnam"]) .card-preview-orb {
+  border-color: color-mix(in srgb, var(--card-accent) 34%, transparent);
+  box-shadow:
+    0 0 0 24px color-mix(in srgb, var(--card-accent) 7%, transparent),
+    0 0 0 48px color-mix(in srgb, var(--card-accent) 5%, transparent);
+}
+
+.digital-card[data-card-id="demo-shabnam"] .card-preview-orb {
+  border-color: rgba(255, 255, 255, .28);
+  box-shadow:
+    0 0 0 24px rgba(255, 255, 255, .07),
+    0 0 0 48px rgba(255, 255, 255, .045);
+}
