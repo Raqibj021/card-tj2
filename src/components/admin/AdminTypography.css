@@ -87,6 +87,14 @@
 .support-campaign-note{font-size:13px!important}
 .support-history strong{font-size:14px!important}
 .support-history p{font-size:12px!important}
+.admin-card-kpis strong{font-size:28px!important}
+.admin-card-kpis small{font-size:12px!important}
+.admin-card-identity strong{font-size:15px!important}
+.admin-card-identity small,.admin-card-list article>div>b{font-size:12px!important}
+.admin-card-list article>button{font-size:11px!important}
+.admin-card-drawer-head h2{font-size:27px!important}
+.admin-card-drawer-head p,.admin-card-description{font-size:13px!important}
+.admin-full-contacts strong{font-size:12px!important}
 .admin-mobile-bar{display:none}
 
 @media(max-width:720px){
