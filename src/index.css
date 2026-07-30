@@ -6097,8 +6097,21 @@ body,
 }
 
 .card-preview-qr svg {
-  width: 28px;
-  height: 28px;
+  width: 38px;
+  height: 38px;
+}
+
+.digital-card[data-card-id="demo-shabnam"] .card-preview-cover {
+  background:
+    radial-gradient(circle at 82% 18%, rgba(255, 255, 255, .24), transparent 28%),
+    linear-gradient(135deg, #1d4ed8 0%, #4338ca 52%, #6d28d9 100%);
+  color: #fff;
+}
+
+.digital-card[data-card-id="demo-shabnam"] .card-preview-brand > span,
+.digital-card[data-card-id="demo-shabnam"] .card-preview-qr {
+  border-color: rgba(255, 255, 255, .32);
+  background: rgba(255, 255, 255, .16);
 }
 
 .card-preview-body .card-profile {
