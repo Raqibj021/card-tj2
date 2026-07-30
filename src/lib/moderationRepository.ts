@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { adminSupabase as supabase } from "./supabase";
 
 export type ModerationDecision = "approved" | "changes_requested" | "rejected" | "suspended";
 
