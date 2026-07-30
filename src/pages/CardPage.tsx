@@ -27,7 +27,7 @@ import { useApp } from "../context/AppContext";
 import { cardRepository } from "../lib/cardRepository";
 import {
   downloadQrCode,
-  downloadVCard,
+  openVCardSaveDialog,
   normalizeUrl,
   sanitizePhone,
   socialUrl,
@@ -404,7 +404,7 @@ export default function CardPage() {
             <button
               type="button"
               className="profile-save-button"
-              onClick={() => downloadVCard(card)}
+              onClick={() => void openVCardSaveDialog(card)}
             >
               <UserPlus size={20} />
               {t("saveContact")}
