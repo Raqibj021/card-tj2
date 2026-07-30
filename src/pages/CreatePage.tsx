@@ -206,6 +206,7 @@ export default function CreatePage() {
     const next: FormErrors = {};
     if (!form.fullName.trim()) next.fullName = t("required");
     if (!form.position.trim()) next.position = t("required");
+    if (!form.organization.trim()) next.organization = t("required");
     if (!form.phone.trim()) next.phone = t("required");
     if (!form.slug.trim()) {
       next.slug = t("required");
@@ -396,8 +397,9 @@ export default function CreatePage() {
                 />
               </Field>
               <Field
-                label={t("organization")}
+                label={`${t("organization")} *`}
                 icon={<Building2 size={16} />}
+                error={errors.organization}
               >
                 <input
                   className="form-input"
@@ -407,7 +409,7 @@ export default function CreatePage() {
                 />
               </Field>
               <Field
-                label={`${t("slug")} *`}
+                label={t("slug")}
                 icon={<Link2 size={16} />}
                 error={errors.slug}
                 hint={t("slugHint")}
