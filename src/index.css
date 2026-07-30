@@ -7269,3 +7269,130 @@ body,
     0 0 0 24px rgba(255, 255, 255, .07),
     0 0 0 48px rgba(255, 255, 255, .045);
 }
+
+/* Keep the compact mobile hero inside the viewport without reserving full phone height. */
+@media (max-width: 680px) {
+  .home-promo-carousel,
+  .home-promo-stage,
+  .home-promo-slide,
+  .home-promo-content {
+    height: 98px;
+    min-height: 98px;
+  }
+
+  .home-promo-content {
+    gap: 7px;
+    padding: 9px 10px 17px;
+    grid-template-columns: 25px minmax(0, 1fr) auto;
+  }
+
+  .home-promo-icon {
+    width: 25px;
+    height: 25px;
+    border-radius: 8px;
+  }
+
+  .home-promo-content > div {
+    min-width: 0;
+    padding-right: 0;
+  }
+
+  .home-promo-eyebrow {
+    overflow: hidden;
+    max-width: 100%;
+    font-size: 5.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-promo-content h2 {
+    display: -webkit-box;
+    overflow: hidden;
+    max-width: 100%;
+    margin-top: 2px;
+    font-size: 10px;
+    line-height: 1.15;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .home-promo-action {
+    max-width: 92px;
+    min-height: 28px;
+    overflow: hidden;
+    padding: 0 7px;
+    font-size: 6.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-promo-controls {
+    bottom: 6px;
+    left: 42px;
+  }
+
+  .hero-section {
+    min-height: 0;
+  }
+
+  .hero-layout {
+    position: relative;
+    min-height: 342px !important;
+    align-items: start;
+    padding-block: 17px 23px !important;
+    grid-template-columns: minmax(0, 1fr) 132px;
+  }
+
+  .hero-content {
+    align-self: start;
+    padding-top: 6px;
+  }
+
+  .hero-showcase.phone-story {
+    position: relative;
+    align-self: start;
+    width: 132px;
+    height: 302px;
+    min-height: 302px;
+    overflow: visible;
+  }
+
+  .hero-showcase.phone-story .phone-shell-3d {
+    position: absolute;
+    top: -151px;
+    left: 50%;
+    width: 316px;
+    margin: 0;
+    transform: translateX(-50%) scale(.4) rotateY(-5deg) rotateX(1deg) rotateZ(1.4deg);
+    transform-origin: center;
+  }
+
+  .phone-story::before {
+    width: 164px;
+    transform: translateY(52px);
+  }
+
+  .phone-story .hero-orbit-one,
+  .phone-story .hero-orbit-two {
+    top: 72px;
+  }
+
+  .phone-story-dots {
+    bottom: 1px;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-layout {
+    gap: 1px !important;
+    grid-template-columns: minmax(0, 1fr) 118px;
+  }
+
+  .hero-showcase.phone-story {
+    width: 118px;
+  }
+
+  .hero-showcase.phone-story .phone-shell-3d {
+    transform: translateX(-50%) scale(.36) rotateY(-5deg) rotateX(1deg) rotateZ(1.4deg);
+  }
+}
