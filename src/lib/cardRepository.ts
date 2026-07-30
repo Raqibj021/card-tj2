@@ -5,12 +5,6 @@ import { supabase } from "./supabase";
 const STORAGE_KEY = "vizora.cards.v1";
 const REMOVED_CARDS_KEY = "vizora.removed-cards.v1";
 const isDemoCard = (card: DigitalCard) => card.id.startsWith("demo-");
-const asLockedLocalPreview = (card: DigitalCard): DigitalCard => ({
-  ...card,
-  reviewStatus: "draft",
-  visibility: "private"
-});
-
 export interface CardRepository {
   list(): DigitalCard[];
   getById(id: string): DigitalCard | undefined;
@@ -115,7 +109,7 @@ class LocalStorageCardRepository implements CardRepository {
 
     const { data: existing } = await supabase
       .from("cards")
-      .select("id, visibility, review_status, trial_expires_at")
+      .select("id, visibility, review_status")
       .eq("owner_id", auth.user.id)
       .maybeSingle();
 
@@ -123,11 +117,6 @@ class LocalStorageCardRepository implements CardRepository {
     const photo = await this.uploadAsset(auth.user.id, remoteId, "photo", card.photo);
     const companyLogo = await this.uploadAsset(auth.user.id, remoteId, "logo", card.companyLogo);
     if (this.removedIds().has(card.id) || this.removedIds().has(remoteId)) return;
-    const trialExpiresAt =
-      existing?.trial_expires_at ??
-      card.trialExpiresAt ??
-      new Date(Date.now() + 15 * 60 * 1000).toISOString();
-
     const { data: saved } = await supabase.from("cards").upsert(
       {
         id: remoteId,
@@ -161,7 +150,7 @@ class LocalStorageCardRepository implements CardRepository {
           existing?.review_status === "approved"
             ? "pending"
             : existing?.review_status ?? card.reviewStatus ?? "draft",
-        trial_expires_at: trialExpiresAt,
+        trial_expires_at: null,
         updated_at: new Date().toISOString()
       },
       { onConflict: "owner_id" }
@@ -228,9 +217,7 @@ class LocalStorageCardRepository implements CardRepository {
       updatedAt: timestamp,
       visibility: existing?.reviewStatus === "approved" ? "private" : existing?.visibility ?? "private",
       reviewStatus: existing?.reviewStatus === "approved" ? "pending" : existing?.reviewStatus ?? "draft",
-      trialExpiresAt:
-        existing?.trialExpiresAt ??
-        new Date(Date.now() + 15 * 60 * 1000).toISOString()
+      trialExpiresAt: null
     };
 
     const nextCards = existing
@@ -294,15 +281,9 @@ class LocalStorageCardRepository implements CardRepository {
 
   async getPublicBySlug(slug: string) {
     const local = this.getBySlug(slug);
-    const localTrialIsActive = Boolean(
-      local?.trialExpiresAt &&
-      new Date(local.trialExpiresAt).getTime() > Date.now()
-    );
 
     if (!supabase) {
-      return local && localTrialIsActive
-        ? asLockedLocalPreview(local)
-        : undefined;
+      return local;
     }
 
     // A completed save must reach Supabase before the card page decides which
@@ -326,13 +307,7 @@ class LocalStorageCardRepository implements CardRepository {
 
     // A temporary network or Supabase error must never erase the owner's
     // local draft. Hide it for this request, but keep it available for retry.
-    if (error) {
-      return auth.user
-        ? undefined
-        : local && localTrialIsActive
-          ? asLockedLocalPreview(local)
-          : undefined;
-    }
+    if (error) return auth.user ? local : undefined;
 
     // For a signed-in owner, an absent/rejected server row must never be
     // resurrected from localStorage after an admin action or deletion.
@@ -343,11 +318,9 @@ class LocalStorageCardRepository implements CardRepository {
       return undefined;
     }
 
-    // Anonymous visitors may preview only a live 15-minute local draft. Force
-    // it to remain locked even if localStorage has been manually modified.
-    return local && localTrialIsActive
-      ? asLockedLocalPreview(local)
-      : undefined;
+    // Unapproved cards are available only to their authenticated owner through
+    // Supabase RLS. Never expose a local draft to an anonymous visitor.
+    return undefined;
   }
 
   async listRemote() {
