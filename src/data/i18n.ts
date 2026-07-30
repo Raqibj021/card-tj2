@@ -72,7 +72,7 @@ const ru = {
     "Да. В демонстрационной версии изменения сохраняются в браузере через localStorage.",
   faqFour: "Работают ли QR-код и сохранение контакта?",
   faqFourText:
-    "Да. QR-код генерируется бесплатно, а контакт скачивается в стандартном формате vCard.",
+    "Да. QR-код генерируется бесплатно, а кнопка сохранения открывает системное окно добавления контакта в формате vCard.",
   footerText:
     "Современные электронные визитки для людей и компаний Таджикистана.",
   product: "Продукт",
@@ -238,7 +238,7 @@ const tj: Record<CopyKey, string> = {
     "Бале. Дар версияи намоишӣ тағйирот дар браузер тавассути localStorage нигоҳ дошта мешавад.",
   faqFour: "QR-код ва нигоҳдории тамос кор мекунанд?",
   faqFourText:
-    "Бале. QR-код ройгон сохта мешавад ва тамос дар формати стандартии vCard боргирӣ мегардад.",
+    "Бале. QR-код ройгон сохта мешавад ва тугмаи нигоҳдорӣ равзанаи системавии илова кардани тамосро дар формати vCard мекушояд.",
   footerText:
     "Кортҳои рақамии муосир барои шахсон ва ширкатҳои Тоҷикистон.",
   product: "Маҳсулот",
@@ -397,9 +397,9 @@ const en: Record<CopyKey, string> = {
   faqThree: "Can I edit information after publishing?",
   faqThreeText:
     "Yes. In the demo version, changes are stored in your browser using localStorage.",
-  faqFour: "Do the QR code and contact download work?",
+  faqFour: "Do the QR code and contact saving work?",
   faqFourText:
-    "Yes. The QR code is generated for free and contacts download as a standard vCard.",
+    "Yes. The QR code is generated for free and the save button opens the system contact dialog with a standard vCard.",
   footerText: "Modern digital business cards for people and teams in Tajikistan.",
   product: "Product",
   resources: "Features",
