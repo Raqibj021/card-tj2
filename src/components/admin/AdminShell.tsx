@@ -60,6 +60,11 @@ export default function AdminShell({
       </aside>
 
       <section className="admin-workspace-body">
+        <div className="admin-mobile-bar">
+          <Link to="/admin" aria-label="Vizora Admin"><BrandLogo light /></Link>
+          <span>ADMIN</span>
+          <button type="button" onClick={() => void signOut()}><LogOut size={20} /><span>Выйти</span></button>
+        </div>
         <header className="admin-workspace-header">
           <div><small>VIZORA ADMINISTRATION</small><h1>{title}</h1><p>{description}</p></div>
           <div className="admin-workspace-actions">{actions}<Link to="/" target="_blank">Открыть сайт</Link></div>
