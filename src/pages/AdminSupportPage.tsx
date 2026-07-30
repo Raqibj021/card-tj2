@@ -1,86 +1,63 @@
-import { CheckCircle2, Mail, MessageSquareReply, RefreshCw, Send } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { CheckCircle2, History, Mail, Megaphone, MessageSquareReply, RefreshCw, RotateCcw, Send, ShieldAlert, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router";
 import AdminShell from "../components/admin/AdminShell";
+import { supportAdminRepository, type SupportTicketAdmin, type SupportWorkspace } from "../lib/supportAdminRepository";
+import "./AdminSupportPage.css";
 
-interface SupportTicket {
-  id: string;
-  ticket_number: string;
-  category: string;
-  subject: string;
-  message: string;
-  status: string;
-  staff_reply: string;
-  created_at: string;
-  contact_snapshot: { name?: string; phone?: string; email?: string } | null;
-}
+const initial: SupportWorkspace = {
+  stats: { newTickets: 0, inProgress: 0, closedTickets: 0, urgentTickets: 0, unresolvedReports: 0, queuedEmails: 0, failedEmails: 0, sentToday: 0, marketingAudience: 0 },
+  tickets: [], outbox: [], campaigns: [], history: []
+};
+const statusNames: Record<string,string> = { new:"Новое", open:"Открыто", in_progress:"В работе", resolved:"Решено", closed:"Закрыто", queued:"В очереди", sending:"Отправляется", sent:"Отправлено", failed:"Ошибка", cancelled:"Отменено" };
+const priorityNames: Record<string,string> = { low:"Низкий", normal:"Обычный", high:"Высокий", urgent:"Срочный" };
 
 export default function AdminSupportPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [selected, setSelected] = useState<SupportTicket | null>(null);
-  const [reply, setReply] = useState("");
-  const [notice, setNotice] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  const refresh = async () => {
-    if (!supabase) return;
-    setBusy(true);
-    const { data, error } = await supabase
-      .from("support_tickets")
-      .select("id,ticket_number,category,subject,message,status,staff_reply,created_at,contact_snapshot")
-      .order("created_at", { ascending: false })
-      .limit(100);
-    setBusy(false);
-    if (error) setNotice(error.message);
-    else setTickets((data ?? []) as SupportTicket[]);
-  };
-
-  useEffect(() => { void refresh(); }, []);
-
-  const sendReply = async (closed: boolean) => {
-    if (!supabase || !selected || reply.trim().length < 2) return;
-    setBusy(true);
-    const { error } = await supabase.rpc("reply_support_ticket", {
-      target_ticket_id: selected.id,
-      reply_text: reply.trim(),
-      close_ticket: closed
-    });
-    setBusy(false);
-    if (error) return setNotice(error.message);
-    setNotice("Ответ сохранён и добавлен в очередь автоматической отправки.");
-    setSelected(null);
-    setReply("");
-    await refresh();
-  };
-
-  return <AdminShell title="Поддержка и жалобы" description="Ответ сохраняется в кабинете и автоматически ставится в очередь отправки пользователю." actions={<button className="admin-toolbar-button" onClick={() => void refresh()}><RefreshCw className={busy ? "spin" : ""} size={16} /> Обновить</button>}>
-    <div className="admin-subpage">
-      {notice && <div className="admin-notice mt-6"><Mail size={18} />{notice}</div>}
-      <section className="admin-panel mt-6">
-        <div className="admin-panel-heading"><div><h2>Очередь поддержки</h2><p>{tickets.filter((item) => !["closed","resolved"].includes(item.status)).length} открытых обращений</p></div><MessageSquareReply size={21} /></div>
-        <div className="admin-table-wrap admin-support-table-wrap">
-          <table className="admin-table admin-support-table">
-            <thead><tr><th>Номер</th><th>Пользователь</th><th>Тема</th><th>Статус</th><th>Дата</th><th /></tr></thead>
-            <tbody>{tickets.map((ticket) => <tr key={ticket.id}>
-              <td><strong>{ticket.ticket_number}</strong></td>
-              <td>{ticket.contact_snapshot?.name || "Пользователь"}<br /><small>{ticket.contact_snapshot?.phone || ticket.contact_snapshot?.email || "—"}</small></td>
-              <td>{ticket.subject}<br /><small>{ticket.message.slice(0, 90)}</small></td>
-              <td><span className={`status-pill ${ticket.status === "closed" ? "" : "status-review"}`}>{ticket.status}</span></td>
-              <td>{new Date(ticket.created_at).toLocaleDateString("ru-RU")}</td>
-              <td><button className="admin-secondary-action" onClick={() => { setSelected(ticket); setReply(ticket.staff_reply || ""); }}>Ответить</button></td>
-            </tr>)}</tbody>
-          </table>
-          {!tickets.length && <div className="table-empty">Обращений пока нет.</div>}
-        </div>
-      </section>
+  const [data,setData]=useState(initial);
+  const [tab,setTab]=useState<"tickets"|"outbox"|"campaigns"|"history">("tickets");
+  const [ticketFilter,setTicketFilter]=useState("active");
+  const [emailFilter,setEmailFilter]=useState("all");
+  const [selected,setSelected]=useState<SupportTicketAdmin|null>(null);
+  const [reply,setReply]=useState(""); const [note,setNote]=useState(""); const [status,setStatus]=useState("in_progress"); const [priority,setPriority]=useState("normal");
+  const [notice,setNotice]=useState(""); const [busy,setBusy]=useState("");
+  const [campaign,setCampaign]=useState({title:"",subject:"",message:"",audience:"marketing",language:"all"});
+  const refresh=async()=>{setBusy("refresh");try{setData(await supportAdminRepository.workspace());setNotice("");}catch(e){setNotice(e instanceof Error?e.message:"Не удалось загрузить данные");}finally{setBusy("");}};
+  useEffect(()=>{void refresh();},[]);
+  const tickets=useMemo(()=>data.tickets.filter(t=>ticketFilter==="all"||(ticketFilter==="active"?!["closed","resolved"].includes(t.status):t.status===ticketFilter)),[data.tickets,ticketFilter]);
+  const emails=useMemo(()=>data.outbox.filter(e=>emailFilter==="all"||e.status===emailFilter),[data.outbox,emailFilter]);
+  const openTicket=(t:SupportTicketAdmin)=>{setSelected(t);setReply(t.staffReply||"");setNote(t.internalNote||"");setStatus(["closed","resolved"].includes(t.status)?t.status:"in_progress");setPriority(t.priority||"normal");};
+  const saveReply=async()=>{if(!selected)return;setBusy(selected.id);try{await supportAdminRepository.reply(selected.id,reply.trim(),status,priority,note.trim());setSelected(null);setNotice(reply.trim()?"Ответ поставлен в автоматическую очередь отправки.":"Обращение обновлено.");await refresh();}catch(e){setNotice(e instanceof Error?e.message:"Ошибка сохранения");}finally{setBusy("");}};
+  const sendCampaign=async()=>{if(campaign.title.trim().length<3||campaign.subject.trim().length<3||campaign.message.trim().length<10)return setNotice("Заполните название, тему и текст рассылки.");if(!window.confirm("Поставить рассылку в очередь? Получат только пользователи, согласившиеся на новости."))return;setBusy("campaign");try{const count=await supportAdminRepository.sendCampaign(campaign.title.trim(),campaign.subject.trim(),campaign.message.trim(),campaign.audience,campaign.language);setNotice(`Рассылка поставлена в очередь: ${count} получателей.`);setCampaign({title:"",subject:"",message:"",audience:"marketing",language:"all"});await refresh();}catch(e){setNotice(e instanceof Error?e.message:"Ошибка рассылки");}finally{setBusy("");}};
+  return <AdminShell title="Поддержка и уведомления" description="Обращения, служебная почта и добровольные рассылки. Система отправляет письма автоматически — администратор принимает только решения."
+    actions={<button className="admin-toolbar-button" disabled={busy==="refresh"} onClick={()=>void refresh()}><RefreshCw className={busy==="refresh"?"spin":""} size={16}/> Обновить</button>}>
+    <div className="admin-subpage support-console">
+      {notice&&<div className="support-alert"><Mail size={18}/>{notice}<button onClick={()=>setNotice("")}><X size={16}/></button></div>}
+      <div className="support-kpis">
+        <article><small>Новые обращения</small><strong>{data.stats.newTickets}</strong><span>{data.stats.inProgress} в работе</span></article>
+        <article className={data.stats.urgentTickets?"attention":""}><small>Срочные</small><strong>{data.stats.urgentTickets}</strong><span>требуют внимания</span></article>
+        <article className={data.stats.unresolvedReports?"attention":""}><small>Жалобы</small><strong>{data.stats.unresolvedReports}</strong><Link className="support-moderation-link" to="/admin/moderation">Открыть проверки</Link></article>
+        <article><small>Очередь писем</small><strong>{data.stats.queuedEmails}</strong><span>{data.stats.failedEmails} с ошибкой</span></article>
+        <article><small>Отправлено сегодня</small><strong>{data.stats.sentToday}</strong><span>{data.stats.marketingAudience} подписчиков</span></article>
+      </div>
+      <nav className="support-tabs">
+        <button className={tab==="tickets"?"active":""} onClick={()=>setTab("tickets")}><MessageSquareReply size={17}/> Обращения <b>{data.tickets.length}</b></button>
+        <button className={tab==="outbox"?"active":""} onClick={()=>setTab("outbox")}><Mail size={17}/> Почтовая очередь <b>{data.stats.queuedEmails+data.stats.failedEmails}</b></button>
+        <button className={tab==="campaigns"?"active":""} onClick={()=>setTab("campaigns")}><Megaphone size={17}/> Рассылки</button>
+        <button className={tab==="history"?"active":""} onClick={()=>setTab("history")}><History size={17}/> История</button>
+      </nav>
+      {tab==="tickets"&&<section className="support-section"><header><div><h2>Обращения пользователей</h2><p>Контакт, сообщение, приоритет и ответ находятся в одной карточке.</p></div><div className="support-filters"><select value={ticketFilter} onChange={e=>setTicketFilter(e.target.value)}><option value="active">Требуют работы</option><option value="new">Новые</option><option value="in_progress">В работе</option><option value="closed">Закрытые</option><option value="all">Все</option></select></div></header>
+        <div className="support-ticket-list">{tickets.map(t=><article key={t.id} className={`support-ticket-card ${t.priority==="urgent"?"urgent":""}`}><div className="support-ticket-person"><strong>{t.contact?.name||"Пользователь"}</strong><small>{t.contact?.phone||t.contact?.email||"Контакт не указан"}</small><small>{t.ticketNumber} · {t.category}</small></div><div className="support-ticket-message"><strong>{t.subject||"Без темы"}</strong><p>{t.message}</p></div><div className="support-ticket-meta"><span className={`support-status ${t.status}`}>{statusNames[t.status]||t.status}</span><span>{priorityNames[t.priority]||t.priority}</span><time>{new Date(t.createdAt).toLocaleString("ru-RU")}</time></div><button onClick={()=>openTicket(t)}>Открыть</button></article>)}{!tickets.length&&<div className="table-empty">Обращений с таким статусом нет.</div>}</div>
+      </section>}
+      {tab==="outbox"&&<section className="support-section"><header><div><h2>Автоматическая отправка писем</h2><p>Ошибочные письма можно безопасно вернуть в очередь.</p></div><div className="support-filters"><select value={emailFilter} onChange={e=>setEmailFilter(e.target.value)}><option value="all">Все</option><option value="queued">В очереди</option><option value="sent">Отправлены</option><option value="failed">Ошибки</option><option value="cancelled">Отменены</option></select></div></header>
+        <div className="support-outbox-list">{emails.map(m=><article className="support-outbox-row" key={m.id}><div><strong>{m.recipient}</strong><small>{m.subject||m.template}</small></div><div><span>{m.template}</span>{m.lastError&&<small className="support-outbox-error">{m.lastError}</small>}</div><span className={`support-status ${m.status}`}>{statusNames[m.status]||m.status}</span><div><strong>{m.attempts}</strong><small>попыток</small></div><div className="support-outbox-actions">{["failed","cancelled"].includes(m.status)&&<button onClick={async()=>{setBusy(m.id);try{await supportAdminRepository.retryEmail(m.id);await refresh();}catch(e){setNotice(e instanceof Error?e.message:"Ошибка");}finally{setBusy("");}}}><RotateCcw size={14}/> Повторить</button>}{["queued","failed"].includes(m.status)&&<button className="cancel" onClick={async()=>{await supportAdminRepository.cancelEmail(m.id);await refresh();}}>Отменить</button>}</div></article>)}{!emails.length&&<div className="table-empty">Писем с таким статусом нет.</div>}</div>
+      </section>}
+      {tab==="campaigns"&&<section className="support-section"><header><div><h2>Новости и акции</h2><p>Ручная рассылка только пользователям, давшим согласие.</p></div></header><div className="support-campaign">
+        <label>Внутреннее название<input value={campaign.title} onChange={e=>setCampaign({...campaign,title:e.target.value})} placeholder="Например: Запуск Vizora"/></label><label>Тема письма<input value={campaign.subject} onChange={e=>setCampaign({...campaign,subject:e.target.value})} placeholder="Первые 50 визиток бесплатно"/></label>
+        <label>Аудитория<select value={campaign.audience} onChange={e=>setCampaign({...campaign,audience:e.target.value})}><option value="marketing">Все подписчики</option><option value="active">Клиенты с активным тарифом</option><option value="organizations">Владельцы организаций</option></select></label><label>Язык<select value={campaign.language} onChange={e=>setCampaign({...campaign,language:e.target.value})}><option value="all">Язык пользователя</option><option value="ru">Только русский</option><option value="tj">Только таджикский</option><option value="en">Только английский</option></select></label>
+        <label className="wide">Текст сообщения<textarea value={campaign.message} onChange={e=>setCampaign({...campaign,message:e.target.value})} placeholder="Короткое, понятное сообщение без паролей и конфиденциальных данных."/></label><div className="support-campaign-note"><ShieldAlert size={17}/> Получатели без согласия на рекламные письма автоматически исключаются. Служебные письма работают отдельно.</div><button disabled={busy==="campaign"} onClick={()=>void sendCampaign()}><Send size={17}/> Поставить рассылку в очередь</button>
+      </div><div className="support-campaigns">{data.campaigns.map(c=><article key={c.id}><div><strong>{c.title}</strong><small>{c.subject}</small></div><span>{c.recipientCount} получателей</span><span className={`support-status ${c.status}`}>{statusNames[c.status]||c.status}</span></article>)}</div></section>}
+      {tab==="history"&&<section className="support-section"><header><div><h2>История решений</h2><p>Ответы, повторы писем и запуски рассылок записываются автоматически.</p></div></header><div className="support-history">{data.history.map(h=><article key={h.id}><span><History size={15}/></span><div><strong>{h.action.replaceAll("_"," ")}</strong><p>{String(h.details.ticketNumber??h.details.recipient??h.details.title??"Действие администратора")}</p></div><time>{new Date(h.createdAt).toLocaleString("ru-RU")}</time></article>)}{!data.history.length&&<div className="table-empty">История пока пуста.</div>}</div></section>}
     </div>
-    {selected && <div className="modal-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
-      <section className="modal-card" role="dialog" aria-modal="true" onMouseDown={(event) => event.stopPropagation()}>
-        <div className="modal-head"><div><span className="section-label">{selected.ticket_number}</span><h2>Ответ службы поддержки</h2></div><button type="button" onClick={() => setSelected(null)}>×</button></div>
-        <p className="modal-note">{selected.message}</p>
-        <label className="form-field"><span className="form-label">Ответ пользователю</span><textarea className="form-input min-h-36 resize-y" value={reply} onChange={(event) => setReply(event.target.value)} autoFocus /></label>
-        <div className="mt-5 flex flex-wrap justify-end gap-2"><button className="button button-secondary" disabled={busy || reply.trim().length < 2} onClick={() => void sendReply(false)}><Send size={17} /> Отправить</button><button className="button button-primary" disabled={busy || reply.trim().length < 2} onClick={() => void sendReply(true)}><CheckCircle2 size={17} /> Ответить и закрыть</button></div>
-      </section>
-    </div>}
+    {selected&&<div className="modal-backdrop" role="presentation" onMouseDown={()=>setSelected(null)}><section className="modal-card" role="dialog" aria-modal="true" onMouseDown={e=>e.stopPropagation()}><div className="modal-head"><div><span className="section-label">{selected.ticketNumber}</span><h2>Работа с обращением</h2></div><button onClick={()=>setSelected(null)}>×</button></div><div className="support-ticket-contact"><strong>{selected.contact?.name||"Пользователь"}</strong><span>{selected.contact?.phone||"Телефон не указан"}</span><span>{selected.contact?.email||"Email не указан"}</span></div><p className="modal-note">{selected.message}</p><div className="support-ticket-editor"><label>Статус<select value={status} onChange={e=>setStatus(e.target.value)}><option value="new">Новое</option><option value="in_progress">В работе</option><option value="resolved">Решено</option><option value="closed">Закрыто</option></select></label><label>Приоритет<select value={priority} onChange={e=>setPriority(e.target.value)}><option value="low">Низкий</option><option value="normal">Обычный</option><option value="high">Высокий</option><option value="urgent">Срочный</option></select></label><label className="wide">Внутренняя заметка<textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="Видит только администратор"/></label><label className="wide">Ответ пользователю<textarea value={reply} onChange={e=>setReply(e.target.value)} placeholder="Если оставить пустым, письмо не отправится."/></label></div><div className="support-modal-actions"><button className="button button-secondary" onClick={()=>setSelected(null)}>Отмена</button><button className="button button-primary" disabled={busy===selected.id} onClick={()=>void saveReply()}>{reply.trim()?<Send size={16}/>:<CheckCircle2 size={16}/>} Сохранить</button></div></section></div>}
   </AdminShell>;
 }
