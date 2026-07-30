@@ -87,10 +87,11 @@ export default function DashboardPage() {
     notify(t("copied"));
   };
 
-  const remove = (card: DigitalCard) => {
+  const remove = async (card: DigitalCard) => {
     if (!window.confirm(t("confirmDelete"))) return;
-    cardRepository.remove(card.id);
-    setCards(withoutDemoCards(cardRepository.list()));
+    setCards((items) => items.filter((item) => item.id !== card.id));
+    const result = await cardRepository.remove(card.id);
+    notify(result.message);
   };
 
   const leaveAccount = async () => {
@@ -137,8 +138,12 @@ export default function DashboardPage() {
               <h1 className="page-title">{t("dashboardTitle")}</h1>
               <p className="page-copy">{t("dashboardText")}</p>
             </div>
-            <Link to="/create" className="button button-primary button-large shrink-0">
-              <Plus size={19} /> {t("create")}
+            <Link
+              to={primaryCard ? `/create?edit=${primaryCard.id}` : "/create"}
+              className="button button-primary button-large shrink-0"
+            >
+              {primaryCard ? <Edit3 size={19} /> : <Plus size={19} />}
+              {primaryCard ? t("edit") : t("create")}
             </Link>
           </div>
 
@@ -186,8 +191,12 @@ export default function DashboardPage() {
             <h2>{dashboardCopy.myCards}</h2>
             <p>{dashboardCopy.myCardsText}</p>
           </div>
-          <Link to="/create" className="button button-primary">
-            <Plus size={17} /> {t("create")}
+          <Link
+            to={primaryCard ? `/create?edit=${primaryCard.id}` : "/create"}
+            className="button button-primary"
+          >
+            {primaryCard ? <Edit3 size={17} /> : <Plus size={17} />}
+            {primaryCard ? t("edit") : t("create")}
           </Link>
         </div>
         {cards.length ? (
@@ -264,7 +273,7 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       className="icon-button text-red-600"
-                      onClick={() => remove(card)}
+                      onClick={() => void remove(card)}
                       aria-label={t("delete")}
                     >
                       <Trash2 size={17} />
