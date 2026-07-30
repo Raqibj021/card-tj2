@@ -149,14 +149,14 @@ begin
     updated_at=now()
   where id=target_card_id;
 
-  insert into public.notifications(user_id,type,title,message,metadata)
+  insert into public.notifications(user_id,kind,title,body,action_url)
   values(target.owner_id,'card_review',
     case decision when 'approved' then 'Визитка одобрена'
       when 'changes_requested' then 'Нужно исправить визитку'
       when 'rejected' then 'Визитка отклонена' else 'Визитка приостановлена' end,
     case decision when 'approved' then 'QR-код и публичная ссылка активированы.'
       else coalesce(nullif(trim(note),''),'Откройте личный кабинет, чтобы посмотреть статус.') end,
-    jsonb_build_object('cardId',target_card_id,'decision',decision,'note',trim(note)));
+    '/dashboard');
 
   insert into public.admin_audit_log(admin_id,action,details)
   values(auth.uid(),'moderation_card_decision',jsonb_build_object(
