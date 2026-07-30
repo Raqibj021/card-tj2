@@ -14,10 +14,10 @@ import {
   type OrganizationEmployee,
   type OrganizationWorkspace
 } from "../lib/organizationRepository";
+import { publicSiteUrl } from "../lib/siteUrl";
 
 const publicUrl = (slug: string) => {
-  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-  return `${window.location.origin}${base}/organization/${slug}`;
+  return publicSiteUrl(`/organization/${slug}`);
 };
 
 export default function OrganizationDashboardPage() {
