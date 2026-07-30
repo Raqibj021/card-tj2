@@ -117,8 +117,14 @@ class LocalStorageCardRepository implements CardRepository {
         language: card.language,
         theme: card.theme,
         template: card.template,
-        visibility: existing?.visibility ?? card.visibility ?? "private",
-        review_status: existing?.review_status ?? card.reviewStatus ?? "draft",
+        visibility:
+          existing?.review_status === "approved"
+            ? "private"
+            : existing?.visibility ?? card.visibility ?? "private",
+        review_status:
+          existing?.review_status === "approved"
+            ? "pending"
+            : existing?.review_status ?? card.reviewStatus ?? "draft",
         trial_expires_at: trialExpiresAt,
         updated_at: new Date().toISOString()
       },
@@ -178,8 +184,8 @@ class LocalStorageCardRepository implements CardRepository {
       views: existing?.views ?? 0,
       createdAt: existing?.createdAt ?? timestamp,
       updatedAt: timestamp,
-      visibility: existing?.visibility ?? "private",
-      reviewStatus: existing?.reviewStatus ?? "draft",
+      visibility: existing?.reviewStatus === "approved" ? "private" : existing?.visibility ?? "private",
+      reviewStatus: existing?.reviewStatus === "approved" ? "pending" : existing?.reviewStatus ?? "draft",
       trialExpiresAt:
         existing?.trialExpiresAt ??
         new Date(Date.now() + 15 * 60 * 1000).toISOString()
