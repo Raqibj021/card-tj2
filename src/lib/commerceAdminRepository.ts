@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { adminSupabase as supabase } from "./supabase";
 
 export type AdminPayment = {
   id: string; orderNumber: string; planCode: string; amount: number; payerName: string;
