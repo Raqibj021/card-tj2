@@ -532,6 +532,88 @@ body {
 .notification-list small, .notification-list time { color: var(--muted); font-size: 9px; }
 .notification-list h2 { margin: 3px 0; font-size: 15px; }
 .notification-list p { margin: 0; color: var(--muted); font-size: 11px; }
+
+.card-status-page {
+  min-height: calc(100vh - 76px);
+  display: grid;
+  place-items: center;
+  padding: 32px 18px;
+}
+
+.card-status-panel {
+  width: min(680px, 100%);
+  padding: clamp(28px, 6vw, 56px);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, .12);
+  text-align: center;
+}
+
+.card-status-icon {
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 22px;
+  background: var(--soft);
+  color: var(--accent);
+}
+
+.card-status-panel h1 {
+  margin: 10px 0 14px;
+  font-size: clamp(28px, 5vw, 46px);
+  line-height: 1.08;
+}
+
+.card-status-panel > p {
+  max-width: 540px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.card-status-actions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.dashboard-review-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--soft) 62%, var(--surface));
+}
+
+.dashboard-review-notice > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--accent);
+  color: white;
+}
+
+.dashboard-review-notice strong { display: block; font-size: 15px; }
+.dashboard-review-notice p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 640px) {
+  .card-status-actions { display: grid; }
+  .card-status-actions .button { width: 100%; }
+  .dashboard-review-notice { grid-template-columns: auto 1fr; }
+  .dashboard-review-notice .button { grid-column: 1 / -1; width: 100%; }
+}
 @media (min-width: 700px) { .trial-countdown { grid-template-columns: 1fr auto auto; } .trial-countdown .button { grid-column: 3; grid-row: 1 / span 2; margin-top: 0; } .trial-countdown em { grid-column: 2; } }
 .org-dashboard-page { min-height: 100vh; background: var(--page); }
 .org-workspace-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
