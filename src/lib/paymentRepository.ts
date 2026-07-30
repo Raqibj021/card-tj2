@@ -17,19 +17,6 @@ export interface PaymentRequest {
   createdAt: string;
 }
 
-const KEY = "vizora.payment-requests.v1";
-
-const read = (): PaymentRequest[] => {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]") as PaymentRequest[];
-  } catch {
-    return [];
-  }
-};
-
-const write = (items: PaymentRequest[]) =>
-  localStorage.setItem(KEY, JSON.stringify(items));
-
 const fromDatabase = (row: Record<string, unknown>): PaymentRequest => ({
   id: String(row.id),
   orderNumber: String(row.order_number),
@@ -46,18 +33,14 @@ const fromDatabase = (row: Record<string, unknown>): PaymentRequest => ({
 });
 
 export const paymentRepository = {
-  list: () => read().sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
-
   listRemote: async () => {
-    if (!supabase) return read().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    if (!supabase) throw new Error("Сервер оплаты временно недоступен.");
     const { data, error } = await supabase
       .from("orders")
       .select("*")
       .order("created_at", { ascending: false });
-    if (error) return read().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    const items = (data ?? []).map((row) => fromDatabase(row as Record<string, unknown>));
-    write(items);
-    return items;
+    if (error) throw error;
+    return (data ?? []).map((row) => fromDatabase(row as Record<string, unknown>));
   },
 
   create: async (data: {
@@ -65,68 +48,41 @@ export const paymentRepository = {
     phone: string;
     plan: string;
     planCode: string;
-    amount: number;
     payerName: string;
     receiptFile: File;
     organizationId?: string;
   }) => {
-    const orderNumber = `VZ-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`;
-    if (supabase) {
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
-      const safeName = data.receiptFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-      const receiptPath = `${auth.user.id}/${orderNumber}/${safeName}`;
-      const { error: uploadError } = await supabase.storage
-        .from("payment-receipts")
-        .upload(receiptPath, data.receiptFile, {
-          upsert: true,
-          contentType: data.receiptFile.type
-        });
-      if (uploadError) throw uploadError;
-      const { data: inserted, error } = await supabase
-        .from("orders")
-        .insert({
-          user_id: auth.user.id,
-          organization_id: data.organizationId ?? null,
-          order_number: orderNumber,
-          plan_code: data.planCode,
-          amount_somoni: data.amount,
-          payer_name: data.payerName,
-          receipt_path: receiptPath,
-          customer_snapshot: { fullName: data.customerName, phone: data.phone },
-          status: "payment_review"
-        })
-        .select("*")
-        .single();
-      if (error) throw error;
-      const item = fromDatabase(inserted as Record<string, unknown>);
-      write([item, ...read().filter((order) => order.id !== item.id)]);
-      return item;
+    if (!supabase) throw new Error("Сервер оплаты временно недоступен.");
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
+    if (data.receiptFile.size > 5 * 1024 * 1024) throw new Error("Размер чека не должен превышать 5 МБ.");
+    if (!["image/png", "image/jpeg", "application/pdf"].includes(data.receiptFile.type)) {
+      throw new Error("Разрешены только JPG, PNG и PDF.");
     }
 
-    const item: PaymentRequest = {
-      id: crypto.randomUUID(),
-      orderNumber,
-      customerName: data.customerName,
-      phone: data.phone,
-      plan: data.plan,
-      planCode: data.planCode,
-      amount: data.amount,
-      payerName: data.payerName,
-      receiptName: data.receiptFile.name,
-      status: "payment_review",
-      createdAt: new Date().toISOString()
-    };
-    write([item, ...read()]);
-    return item;
-  },
+    const uploadId = crypto.randomUUID();
+    const safeName = data.receiptFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+    const receiptPath = `${auth.user.id}/${uploadId}/${safeName}`;
+    const { error: uploadError } = await supabase.storage
+      .from("payment-receipts")
+      .upload(receiptPath, data.receiptFile, {
+        upsert: false,
+        contentType: data.receiptFile.type
+      });
+    if (uploadError) throw uploadError;
 
-  reject: async (id: string) => {
-    if (!supabase) throw new Error("Сервер недоступен.");
-    const { error } = await supabase
-      .from("orders")
-      .update({ status: "rejected", updated_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) throw error;
-  },
+    const { data: inserted, error } = await supabase.rpc("submit_payment_request", {
+      customer_name: data.customerName,
+      customer_phone: data.phone,
+      selected_plan: data.planCode,
+      payment_sender_name: data.payerName,
+      uploaded_receipt_path: receiptPath,
+      target_organization_id: data.organizationId ?? null
+    });
+    if (error) {
+      await supabase.storage.from("payment-receipts").remove([receiptPath]);
+      throw new Error(error.message);
+    }
+    return fromDatabase(inserted as Record<string, unknown>);
+  }
 };
