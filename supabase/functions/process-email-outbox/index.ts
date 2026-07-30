@@ -99,7 +99,7 @@ Deno.serve(async (request) => {
     ?? (googleAppsScriptUrl ? "google_apps_script" : "resend");
   const from = Deno.env.get("VIZORA_FROM_EMAIL") ?? "Vizora.tj <noreply@vizora.tj>";
   const replyTo = setting("VIZORA_REPLY_TO") ?? "support@vizora.tj";
-  const siteUrl = setting("VIZORA_SITE_URL") ?? "https://raqibj021.github.io/card-tj2";
+  const siteUrl = (setting("VIZORA_SITE_URL") ?? "https://vizora.tj").replace(/\/+$/, "");
   const missing: string[] = [];
   if (!supabaseUrl) missing.push("SUPABASE_URL");
   if (!serviceKey) missing.push("SUPABASE_SECRET_KEYS");
