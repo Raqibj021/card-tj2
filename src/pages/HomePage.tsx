@@ -249,120 +249,63 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section home-benefits impact-section">
+        <section className="section home-benefits">
           <div className="site-container">
-            <div className="impact-heading">
-              <div>
-                <span className="section-label">{homeCopy.impactLabel}</span>
-                <h2>{t("benefitTitle")}</h2>
-              </div>
+            <div className="section-heading">
+              <span className="section-label">{homeCopy.impactLabel}</span>
+              <h2>{t("benefitTitle")}</h2>
               <p>{t("benefitText")}</p>
             </div>
 
-            <div className="impact-bento">
-              <article className="impact-card impact-photo-card">
-                <img
-                  src={`${import.meta.env.BASE_URL}images/home/professional-connection.webp`}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="impact-photo-shade" />
-                <div className="impact-photo-content">
-                  <div className="impact-avatars" aria-hidden="true">
-                    {[demoCards[3], demoCards[2], demoCards[5]].map((card) => (
-                      <img key={card.id} src={card.photo} alt="" />
-                    ))}
-                    <span>+</span>
-                  </div>
-                  <div className="impact-stat">
-                    <strong>1 240+</strong>
-                    <span>{homeCopy.impactStat}</span>
-                  </div>
-                </div>
-              </article>
-
-              {benefits.map(({ icon: Icon, title, text }, index) => (
-                <article key={title} className={`impact-card impact-benefit impact-benefit-${index + 1}`}>
-                  <div className="impact-benefit-top">
-                    <div className="feature-icon"><Icon size={21} /></div>
-                    <span className="impact-index">0{index + 1}</span>
-                  </div>
-                  <div className={`impact-visual impact-visual-${index + 1}`} aria-hidden="true">
-                    {index === 0 && (
-                      <>
-                        <span /><span /><span />
-                      </>
-                    )}
-                    {index === 1 && (
-                      <>
-                        <i /><i /><i />
-                      </>
-                    )}
-                    {index === 2 && (
-                      <>
-                        <b /><b /><b /><b />
-                      </>
-                    )}
-                    {index === 3 && (
-                      <>
-                        <em>RU</em><em>TJ</em><em>EN</em>
-                      </>
-                    )}
-                  </div>
+            <div className="home-benefits-grid mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {benefits.map(({ icon: Icon, title, text }) => (
+                <article key={title} className="feature-card">
+                  <div className="feature-icon"><Icon size={22} /></div>
                   <h3>{title}</h3>
                   <p>{text}</p>
                 </article>
               ))}
             </div>
+
+            <div className="mobile-benefits-marquee" aria-label={t("benefitTitle")}>
+              <div className="mobile-benefits-track">
+                {[...benefits, ...benefits].map(({ icon: Icon, title, text }, index) => (
+                  <article key={`${title}-${index}`} className="mobile-benefit-pill">
+                    <div className="feature-icon"><Icon size={17} /></div>
+                    <span>
+                      <strong>{title}</strong>
+                      <small>{text}</small>
+                    </span>
+                  </article>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="section journey-section">
+        <section className="section section-muted home-steps-section">
           <div className="site-container">
-            <div className="journey-heading">
+            <div className="section-heading">
               <span className="section-label">{homeCopy.journeyLabel}</span>
               <h2>{t("howTitle")}</h2>
               <p>{homeCopy.journeyText}</p>
             </div>
 
-            <div className="journey-layout">
-              <figure className="journey-visual">
-                <img
-                  src={`${import.meta.env.BASE_URL}images/home/share-profile.webp`}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div className="journey-photo-shade" />
-                <figcaption className="journey-profile-chip">
-                  <span><Sparkles size={16} /></span>
-                  <div>
-                    <strong>{homeCopy.liveCard}</strong>
-                    <small>QR · vCard · Vizora.tj</small>
-                  </div>
-                </figcaption>
-                <div className="journey-ready-chip">
-                  <QrCode size={18} />
-                  {homeCopy.linkReady}
-                </div>
-              </figure>
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+              {steps.map(({ number, icon: Icon, title, text }) => (
+                <article key={number} className="step-card">
+                  <span className="step-number">{number}</span>
+                  <div className="feature-icon"><Icon size={22} /></div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </article>
+              ))}
+            </div>
 
-              <div className="journey-timeline">
-                {steps.map(({ number, icon: Icon, title, text }) => (
-                  <article key={number} className="journey-step">
-                    <span className="journey-step-number">{number}</span>
-                    <div className="journey-step-icon"><Icon size={20} /></div>
-                    <div>
-                      <h3>{title}</h3>
-                      <p>{text}</p>
-                    </div>
-                  </article>
-                ))}
-                <Link to="/create" className="button button-primary button-large journey-cta">
-                  {t("create")} <ArrowRight size={19} />
-                </Link>
-              </div>
+            <div className="mt-8 flex justify-center">
+              <Link to="/create" className="button button-primary button-large">
+                {t("create")} <ArrowRight size={19} />
+              </Link>
             </div>
           </div>
         </section>
