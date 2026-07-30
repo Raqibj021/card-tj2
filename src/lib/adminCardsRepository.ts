@@ -28,11 +28,71 @@ const empty: AdminCardWorkspace = {
   accessHistory: []
 };
 
+const countContacts = (contacts: unknown) =>
+  Object.values((contacts && typeof contacts === "object" ? contacts : {}) as Record<string, unknown>)
+    .filter((value) => typeof value === "string" && value.trim()).length;
+
+async function loadWorkspaceDirectly(): Promise<AdminCardWorkspace> {
+  if (!supabase) return empty;
+  const { data: rows, error } = await supabase
+    .from("cards")
+    .select("id,owner_id,slug,full_name,position,organization_name,visibility,review_status,language,views,photo_path,contacts,created_at,updated_at")
+    .order("updated_at", { ascending: false })
+    .limit(500);
+  if (error) throw error;
+
+  const ownerIds = [...new Set((rows ?? []).map((row) => String(row.owner_id)))];
+  const ownerMap = new Map<string, { full_name?: string; email?: string }>();
+  if (ownerIds.length) {
+    const { data: owners, error: ownersError } = await supabase
+      .from("profiles")
+      .select("id,full_name,email")
+      .in("id", ownerIds);
+    if (ownersError) throw ownersError;
+    (owners ?? []).forEach((owner) => ownerMap.set(String(owner.id), owner));
+  }
+
+  const cards: AdminCardSummary[] = (rows ?? []).map((row) => {
+    const owner = ownerMap.get(String(row.owner_id));
+    return {
+      id: String(row.id),
+      ownerId: String(row.owner_id),
+      ownerName: String(owner?.full_name ?? ""),
+      ownerEmail: String(owner?.email ?? ""),
+      slug: String(row.slug ?? ""),
+      fullName: String(row.full_name ?? ""),
+      position: String(row.position ?? ""),
+      organization: String(row.organization_name ?? ""),
+      visibility: String(row.visibility ?? "private"),
+      reviewStatus: String(row.review_status ?? "draft"),
+      language: String(row.language ?? "ru"),
+      views: Number(row.views ?? 0),
+      photo: String(row.photo_path ?? ""),
+      contactsCount: countContacts(row.contacts),
+      createdAt: String(row.created_at ?? ""),
+      updatedAt: String(row.updated_at ?? "")
+    };
+  });
+
+  return {
+    stats: {
+      total: cards.length,
+      public: cards.filter((card) => ["public", "public_organization"].includes(card.visibility)).length,
+      private: cards.filter((card) => !["public", "public_organization"].includes(card.visibility)).length,
+      pending: cards.filter((card) => card.reviewStatus === "pending").length,
+      approved: cards.filter((card) => card.reviewStatus === "approved").length,
+      views: cards.reduce((sum, card) => sum + card.views, 0)
+    },
+    cards,
+    accessHistory: []
+  };
+}
+
 export const adminCardsRepository = {
   async workspace(): Promise<AdminCardWorkspace> {
     if (!supabase) return empty;
     const { data, error } = await supabase.rpc("get_admin_cards_workspace");
-    if (error) throw error;
+    if (error) return loadWorkspaceDirectly();
     return { ...empty, ...(data as AdminCardWorkspace) };
   },
   async deleteForever(cardId: string): Promise<void> {
