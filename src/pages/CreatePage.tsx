@@ -15,6 +15,7 @@ import {
   Palette,
   Phone,
   Save,
+  ShieldCheck,
   Trash2,
   UserRound
 } from "lucide-react";
@@ -29,6 +30,7 @@ import {
 import { Link, useNavigate, useSearchParams } from "react-router";
 import CardPreview from "../components/CardPreview";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 import { emptyCard } from "../data/demo";
 import { cardRepository } from "../lib/cardRepository";
 import { createSlug, themeColors } from "../lib/cardUtils";
@@ -36,6 +38,7 @@ import type {
   CardDraft,
   CardTemplate,
   CardTheme,
+  DigitalCard,
   Language
 } from "../types/card";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
@@ -112,6 +115,7 @@ const compressImage = (file: File) =>
 
 export default function CreatePage() {
   const { t, language, setLanguage } = useApp();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get("edit") ?? "";
@@ -146,6 +150,8 @@ export default function CreatePage() {
   );
   const [errors, setErrors] = useState<FormErrors>({});
   const [saving, setSaving] = useState(false);
+  const [accountCard, setAccountCard] = useState<DigitalCard | null>(null);
+  const [checkingCard, setCheckingCard] = useState(Boolean(user));
   const [slugTouched, setSlugTouched] = useState(Boolean(existing));
   const fileInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
@@ -203,6 +209,152 @@ export default function CreatePage() {
   useEffect(() => {
     if (existing) setLanguage(existing.language);
   }, [existing, setLanguage]);
+
+  useEffect(() => {
+    let active = true;
+    if (!user) {
+      setCheckingCard(false);
+      return () => { active = false; };
+    }
+    setCheckingCard(true);
+    void cardRepository.listRemote()
+      .then((cards) => {
+        if (active) setAccountCard(cards.find((card) => !card.id.startsWith("demo-")) ?? null);
+      })
+      .finally(() => {
+        if (active) setCheckingCard(false);
+      });
+    return () => { active = false; };
+  }, [user]);
+
+  const statusCard = accountCard ?? existing ?? null;
+  const shouldShowStatus =
+    Boolean(statusCard) &&
+    (!editId || statusCard?.reviewStatus === "pending");
+
+  const statusCopy = {
+    ru: {
+      checking: "Проверяем вашу визитку…",
+      pendingTitle: "Ваша визитка находится на проверке",
+      pendingText: "Данные сохранены. После решения администратора уведомление появится в личном кабинете.",
+      approvedTitle: "У вас уже есть одобренная визитка",
+      approvedText: "Повторно создавать визитку не нужно. Откройте готовую визитку или измените существующую.",
+      rejectedTitle: "Визитка отклонена",
+      rejectedText: "Откройте уведомления, посмотрите причину и исправьте существующую визитку.",
+      changesTitle: "Требуются исправления",
+      changesText: "Администратор оставил замечания. Исправьте существующую визитку и повторно отправьте её на проверку.",
+      draftTitle: "У вас уже есть сохранённая визитка",
+      draftText: "Продолжите оформление существующей визитки — повторная форма не создаётся.",
+      suspendedTitle: "Визитка временно заблокирована",
+      suspendedText: "Подробности доступны в уведомлениях личного кабинета.",
+      notifications: "Открыть уведомления",
+      dashboard: "В личный кабинет",
+      open: "Открыть визитку",
+      edit: "Изменить визитку"
+    },
+    tj: {
+      checking: "Варақаи шуморо месанҷем…",
+      pendingTitle: "Варақаи шумо дар санҷиш аст",
+      pendingText: "Маълумот нигоҳ дошта шуд. Пас аз қарори маъмур огоҳинома дар ҳисоби шахсӣ пайдо мешавад.",
+      approvedTitle: "Шумо аллакай варақаи тасдиқшуда доред",
+      approvedText: "Варақаи нав сохтан лозим нест. Варақаи тайёрро кушоед ё онро таҳрир кунед.",
+      rejectedTitle: "Варақа рад карда шуд",
+      rejectedText: "Огоҳиномаро кушоед, сабабро бинед ва варақаи мавҷударо ислоҳ кунед.",
+      changesTitle: "Ислоҳ талаб мешавад",
+      changesText: "Маъмур шарҳ гузошт. Варақаро ислоҳ карда, дубора ба санҷиш фиристед.",
+      draftTitle: "Шумо аллакай варақаи нигоҳдошташуда доред",
+      draftText: "Ороиши варақаи мавҷударо идома диҳед — шакли нав сохта намешавад.",
+      suspendedTitle: "Варақа муваққатан баста шудааст",
+      suspendedText: "Тафсилот дар огоҳиномаҳои ҳисоби шахсӣ дастрас аст.",
+      notifications: "Кушодани огоҳиномаҳо",
+      dashboard: "Ба ҳисоби шахсӣ",
+      open: "Кушодани варақа",
+      edit: "Таҳрири варақа"
+    },
+    en: {
+      checking: "Checking your card…",
+      pendingTitle: "Your card is under review",
+      pendingText: "Your data is saved. A notification will appear in your dashboard after the administrator decides.",
+      approvedTitle: "You already have an approved card",
+      approvedText: "There is no need to create another card. Open your existing card or edit it.",
+      rejectedTitle: "Card rejected",
+      rejectedText: "Open notifications, review the reason and correct your existing card.",
+      changesTitle: "Changes are required",
+      changesText: "The administrator left comments. Correct the existing card and submit it again.",
+      draftTitle: "You already have a saved card",
+      draftText: "Continue your existing card — a second form will not be created.",
+      suspendedTitle: "Card temporarily suspended",
+      suspendedText: "Details are available in your dashboard notifications.",
+      notifications: "Open notifications",
+      dashboard: "Go to dashboard",
+      open: "Open card",
+      edit: "Edit card"
+    }
+  }[language];
+
+  if (checkingCard) {
+    return (
+      <main className="builder-page card-status-page">
+        <section className="card-status-panel">
+          <span className="card-status-icon"><ShieldCheck size={30} /></span>
+          <h1>{statusCopy.checking}</h1>
+        </section>
+      </main>
+    );
+  }
+
+  if (shouldShowStatus && statusCard) {
+    const status = statusCard.reviewStatus;
+    const title =
+      status === "pending" ? statusCopy.pendingTitle :
+      status === "approved" ? statusCopy.approvedTitle :
+      status === "rejected" ? statusCopy.rejectedTitle :
+      status === "changes_requested" ? statusCopy.changesTitle :
+      status === "suspended" ? statusCopy.suspendedTitle :
+      statusCopy.draftTitle;
+    const text =
+      status === "pending" ? statusCopy.pendingText :
+      status === "approved" ? statusCopy.approvedText :
+      status === "rejected" ? statusCopy.rejectedText :
+      status === "changes_requested" ? statusCopy.changesText :
+      status === "suspended" ? statusCopy.suspendedText :
+      statusCopy.draftText;
+    const canEdit = status !== "pending" && status !== "suspended";
+    return (
+      <main className="builder-page card-status-page">
+        <section className={`card-status-panel card-status-${status}`}>
+          <span className="card-status-icon"><ShieldCheck size={30} /></span>
+          <span className="section-label">
+            {status === "pending"
+              ? (language === "ru" ? "НА ПРОВЕРКЕ" : language === "tj" ? "ДАР САНҶИШ" : "UNDER REVIEW")
+              : "VIZORA.TJ"}
+          </span>
+          <h1>{title}</h1>
+          <p>{text}</p>
+          <div className="card-status-actions">
+            {status === "approved" && (
+              <Link to={`/card/${statusCard.slug}`} className="button button-primary">
+                {statusCopy.open}
+              </Link>
+            )}
+            {canEdit && (
+              <Link to={`/create?edit=${statusCard.id}`} className="button button-secondary">
+                {statusCopy.edit}
+              </Link>
+            )}
+            {(status === "pending" || status === "rejected" || status === "changes_requested" || status === "suspended") && (
+              <Link to="/notifications" className="button button-secondary">
+                {statusCopy.notifications}
+              </Link>
+            )}
+            <Link to="/dashboard" className="button button-ghost">
+              {statusCopy.dashboard}
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   const update = <K extends keyof CardDraft>(key: K, value: CardDraft[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
