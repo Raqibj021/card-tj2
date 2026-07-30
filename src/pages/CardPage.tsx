@@ -24,7 +24,9 @@ import { Link, useParams } from "react-router";
 import QRCodeImage from "../components/QRCode";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 import { cardRepository } from "../lib/cardRepository";
+import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import {
   downloadQrCode,
   openVCardSaveDialog,
@@ -72,8 +74,12 @@ const profileCopy = {
     trialQrText: "Это демо-версия. Продолжите оформление и активируйте визитку, чтобы получить рабочий QR-код.",
     continueCheckout: "Продолжить оформление",
     trial: "ДЕМО · НЕ АКТИВИРОВАНО",
-    trialText: "Черновик удалится автоматически, если вы не продолжите оформление.",
-    expiresIn: "Осталось",
+    trialText: "Данные сохранены. Выберите бесплатную акцию или оплату, чтобы отправить визитку на проверку.",
+    promoButton: "Использовать бесплатную акцию",
+    promoPlaces: "Осталось бесплатных мест",
+    payButton: "Оплатить и отправить чек",
+    activating: "Отправляем…",
+    submitReview: "Отправить на проверку",
     pending: "ОЖИДАЕТ ПРОВЕРКИ",
     pendingText: "Визитка сохранена. Администратор проверит данные и одобрит её в ближайшее время.",
     pendingQrTitle: "QR-код появится после проверки",
@@ -97,8 +103,12 @@ const profileCopy = {
     trialQrText: "Ин нусхаи намоишӣ аст. Барои гирифтани QR-коди фаъол расмиятдарориро идома дода, варақаро фаъол намоед.",
     continueCheckout: "Идомаи расмиятдарорӣ",
     trial: "НАМОИШӢ · ФАЪОЛ НЕСТ",
-    trialText: "Агар расмиятдарориро идома надиҳед, нусхаи муваққатӣ худкор нест мешавад.",
-    expiresIn: "Боқӣ мондааст",
+    trialText: "Маълумот нигоҳ дошта шуд. Барои фиристодан ба санҷиш аксияи ройгон ё пардохтро интихоб кунед.",
+    promoButton: "Истифодаи аксияи ройгон",
+    promoPlaces: "Ҷойҳои ройгони боқимонда",
+    payButton: "Пардохт ва фиристодани расид",
+    activating: "Фиристода истодааст…",
+    submitReview: "Ба санҷиш фиристодан",
     pending: "ИНТИЗОРИ САНҶИШ",
     pendingText: "Варақа нигоҳ дошта шуд. Администратор маълумотро месанҷад ва ба наздикӣ онро тасдиқ мекунад.",
     pendingQrTitle: "QR-код пас аз санҷиш пайдо мешавад",
@@ -122,8 +132,12 @@ const profileCopy = {
     trialQrText: "This is a demo. Continue checkout and activate the card to receive a working QR code.",
     continueCheckout: "Continue checkout",
     trial: "DEMO · NOT ACTIVATED",
-    trialText: "This draft will be deleted automatically unless you continue.",
-    expiresIn: "Time left",
+    trialText: "Your data is saved. Choose the free launch offer or payment to submit the card for review.",
+    promoButton: "Use the free launch offer",
+    promoPlaces: "Free places remaining",
+    payButton: "Pay and upload receipt",
+    activating: "Submitting…",
+    submitReview: "Submit for review",
     pending: "AWAITING REVIEW",
     pendingText: "The card has been saved. An administrator will review and approve it shortly.",
     pendingQrTitle: "QR code will appear after review",
@@ -134,13 +148,15 @@ const profileCopy = {
 export default function CardPage() {
   const { slug = "" } = useParams();
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
+  const { user } = useAuth();
   const [toast, setToast] = useState("");
   const [card, setCard] = useState<DigitalCard | undefined>(() =>
     cardRepository.getBySlug(slug)
   );
   const [loading, setLoading] = useState(!card);
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
-  const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+  const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
+  const [activating, setActivating] = useState(false);
   const cardUrl = window.location.href;
   const labels = profileCopy[language];
 
@@ -167,25 +183,9 @@ export default function CardPage() {
   }, [card, setLanguage]);
 
   useEffect(() => {
-    if (!card?.trialExpiresAt || card.reviewStatus === "approved") {
-      setRemainingSeconds(null);
-      return;
-    }
-    const update = () => {
-      const seconds = Math.max(
-        0,
-        Math.ceil((new Date(card.trialExpiresAt!).getTime() - Date.now()) / 1000)
-      );
-      setRemainingSeconds(seconds);
-      if (seconds === 0) {
-        cardRepository.remove(card.id);
-        setCard(undefined);
-      }
-    };
-    update();
-    const timer = window.setInterval(update, 1000);
-    return () => window.clearInterval(timer);
-  }, [card?.id, card?.reviewStatus, card?.trialExpiresAt]);
+    if (!user || !card || card.reviewStatus !== "draft") return;
+    void promoRepository.status().then(setPromo).catch(() => setPromo(null));
+  }, [card, user]);
 
   if (loading) {
     return (
@@ -216,7 +216,7 @@ export default function CardPage() {
 
   const palette = themeColors[card.theme];
   const isLocked = card.reviewStatus !== "approved";
-  const isTimedTrial = isLocked && Boolean(card.trialExpiresAt);
+  const needsActivation = card.reviewStatus === "draft";
   const style: AccentStyle = {
     "--profile-accent": palette.accent,
     "--profile-soft": palette.soft
@@ -225,6 +225,31 @@ export default function CardPage() {
   const showToast = (message: string) => {
     setToast(message);
     window.setTimeout(() => setToast(""), 2300);
+  };
+
+  const claimPromo = async () => {
+    setActivating(true);
+    try {
+      const result = await promoRepository.claim(card.id);
+      setPromo(result);
+      setCard({ ...card, reviewStatus: "pending", trialExpiresAt: null });
+      showToast(labels.pendingText);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Не удалось применить акцию.");
+    } finally {
+      setActivating(false);
+    }
+  };
+
+  const submitForReview = async () => {
+    setActivating(true);
+    try {
+      const result = await cardRepository.requestPublication(card.id);
+      showToast(result.message);
+      if (result.ok) setCard({ ...card, reviewStatus: "pending", trialExpiresAt: null });
+    } finally {
+      setActivating(false);
+    }
   };
 
   const share = async () => {
@@ -340,14 +365,21 @@ export default function CardPage() {
         <section className="profile-main-card">
           {isLocked && (
             <>
-              <div className="trial-watermark" aria-hidden="true">{isTimedTrial ? labels.trial : labels.pending}</div>
+              <div className="trial-watermark" aria-hidden="true">{needsActivation ? labels.trial : labels.pending}</div>
               <div className="trial-countdown" role="status">
-                <strong>{isTimedTrial ? labels.trial : labels.pending}</strong>
-                <span>{isTimedTrial ? labels.trialText : labels.pendingText}</span>
-                {isTimedTrial && remainingSeconds !== null && (
-                  <em>{labels.expiresIn}: {String(Math.floor(remainingSeconds / 60)).padStart(2, "0")}:{String(remainingSeconds % 60).padStart(2, "0")}</em>
+                <strong>{needsActivation ? labels.trial : labels.pending}</strong>
+                <span>{needsActivation ? labels.trialText : labels.pendingText}</span>
+                {needsActivation && promo?.eligible && !promo.hasEntitlement && promo.remaining > 0 && (
+                  <button type="button" disabled={activating} className="button button-primary" onClick={() => void claimPromo()}>
+                    {activating ? labels.activating : labels.promoButton}
+                    {!activating && <em>{promo.remaining}/{promo.limit}</em>}
+                  </button>
                 )}
-                {isTimedTrial && <Link to="/payment?plan=personal" className="button button-primary">{t("choose")}</Link>}
+                {needsActivation && promo?.hasEntitlement ? (
+                  <button type="button" disabled={activating} className="button button-primary" onClick={() => void submitForReview()}>
+                    {activating ? labels.activating : labels.submitReview}
+                  </button>
+                ) : needsActivation && <Link to="/payment?plan=personal" className="button button-secondary">{labels.payButton}</Link>}
               </div>
             </>
           )}
@@ -367,7 +399,7 @@ export default function CardPage() {
             </div>
             <span className={`profile-status ${isLocked ? "is-preview" : ""}`}>
               {isLocked ? <LockKeyhole size={13} /> : <Check size={13} />}
-              {isLocked ? (isTimedTrial ? labels.preview : labels.pending) : labels.verified}
+              {isLocked ? (needsActivation ? labels.preview : labels.pending) : labels.verified}
             </span>
           </div>
           <div className="profile-content">
@@ -530,13 +562,18 @@ export default function CardPage() {
                 <LockKeyhole size={44} />
                 <span>DEMO</span>
               </div>
-              <h2>{isTimedTrial ? labels.trialQrTitle : labels.pendingQrTitle}</h2>
-              <p>{isTimedTrial ? labels.trialQrText : labels.pendingQrText}</p>
-              {isTimedTrial && (
-                <Link to="/payment?plan=personal" className="button button-primary mt-5 w-full">
-                  {labels.continueCheckout}
-                </Link>
+              <h2>{needsActivation ? labels.trialQrTitle : labels.pendingQrTitle}</h2>
+              <p>{needsActivation ? labels.trialQrText : labels.pendingQrText}</p>
+              {needsActivation && promo?.eligible && !promo.hasEntitlement && promo.remaining > 0 && (
+                <button type="button" disabled={activating} className="button button-primary mt-5 w-full" onClick={() => void claimPromo()}>
+                  {activating ? labels.activating : labels.promoButton}
+                </button>
               )}
+              {needsActivation && promo?.hasEntitlement ? (
+                <button type="button" disabled={activating} className="button button-primary mt-3 w-full" onClick={() => void submitForReview()}>
+                  {activating ? labels.activating : labels.submitReview}
+                </button>
+              ) : needsActivation && <Link to="/payment?plan=personal" className="button button-secondary mt-3 w-full">{labels.payButton}</Link>}
             </div>
           ) : (
             <div className="profile-qr-card">
