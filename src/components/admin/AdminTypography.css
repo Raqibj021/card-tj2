@@ -76,6 +76,7 @@
 .admin-mobile-bar{display:none}
 
 @media(max-width:720px){
+  .admin-workspace,.admin-workspace-body,.admin-subpage,.admin-panel{width:100%;max-width:100%;min-width:0}
   .admin-workspace{padding-top:64px!important;padding-bottom:82px!important}
   .admin-mobile-bar{position:fixed;z-index:50;top:0;right:0;left:0;height:64px;display:flex;align-items:center;border-bottom:1px solid #223149;background:#07111f;padding:0 14px;color:#fff}
   .admin-mobile-bar>a{display:flex;align-items:center}
@@ -100,7 +101,24 @@
   .admin-command-promo strong{font-size:30px!important}
   .admin-command-stats strong{font-size:27px!important}
   .admin-command-panel>header h2,.admin-panel-heading h2{font-size:22px!important}
+  .admin-table-wrap{max-width:100%;min-width:0}
   .admin-table{min-width:680px}
+  .admin-support-table-wrap{margin:18px 0 0!important;overflow:visible!important}
+  .admin-support-table{display:block;width:100%;min-width:0!important}
+  .admin-support-table thead{display:none}
+  .admin-support-table tbody{display:grid;gap:10px}
+  .admin-support-table tr{display:grid;min-width:0;gap:8px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:13px;grid-template-columns:minmax(0,1fr) auto}
+  .admin-support-table td{display:block;min-width:0;border:0!important;padding:0!important;overflow-wrap:anywhere}
+  .admin-support-table td:nth-child(1){color:var(--ink);font-size:13px!important;font-weight:900}
+  .admin-support-table td:nth-child(2){text-align:right}
+  .admin-support-table td:nth-child(2) small{display:block;margin-top:2px}
+  .admin-support-table td:nth-child(3){grid-column:1/-1;border-top:1px solid var(--line)!important;padding-top:9px!important;color:var(--ink)}
+  .admin-support-table td:nth-child(3) small{display:-webkit-box;overflow:hidden;margin-top:4px;color:var(--muted);line-height:1.4;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  .admin-support-table td:nth-child(4),.admin-support-table td:nth-child(5){align-self:center}
+  .admin-support-table td:nth-child(5){text-align:right}
+  .admin-support-table td:nth-child(6){grid-column:1/-1}
+  .admin-support-table td:nth-child(6) button{width:100%;min-height:40px;justify-content:center}
+  .admin-support-table-wrap>.table-empty{padding:28px 12px}
   .admin-account-stats article strong{font-size:27px!important}
   .admin-account-tabs button,.admin-accounts-console input{font-size:13px!important}
   .admin-detail-drawer h2{font-size:26px!important}
