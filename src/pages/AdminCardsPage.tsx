@@ -1,6 +1,6 @@
 import {
-  Activity, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Phone, RefreshCw,
-  Search, ShieldCheck, Trash2, UserRound, WalletCards, X
+  Activity, CheckCircle2, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Phone, RefreshCw,
+  RotateCcw, Search, ShieldCheck, Trash2, UserRound, WalletCards, X, XCircle
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
@@ -80,6 +80,27 @@ export default function AdminCardsPage() {
     }
   };
 
+  const review = async (card: AdminCardDetails, decision: "approved" | "changes_requested" | "rejected") => {
+    const prompts = {
+      approved: "Комментарий к одобрению (необязательно)",
+      changes_requested: "Напишите, что нужно исправить",
+      rejected: "Укажите причину отклонения"
+    };
+    const note = window.prompt(prompts[decision], "") ?? "";
+    if (decision !== "approved" && !note.trim()) {
+      setNotice("Для исправления или отклонения обязательно укажите причину.");
+      return;
+    }
+    try {
+      await adminCardsRepository.review(card.id, decision, note);
+      setDetails(null);
+      await refresh();
+      setNotice(decision === "approved" ? "Визитка одобрена. QR-код активирован." : "Решение сохранено и отправлено пользователю.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Не удалось сохранить решение.");
+    }
+  };
+
   const stats = workspace?.stats ?? { total: 0, public: 0, private: 0, pending: 0, approved: 0, views: 0 };
   return (
     <AdminShell title="Все визитки" description="Единый реестр открытых и закрытых визиток. Просмотр полных данных автоматически фиксируется в защищённом журнале."
@@ -131,7 +152,7 @@ export default function AdminCardsPage() {
         {!workspace?.accessHistory.length && <p>Журнал пока пуст.</p>}
       </section>
 
-      {details && <CardDrawer card={details} onClose={() => setDetails(null)} onDelete={() => void deleteForever(details)} />}
+      {details && <CardDrawer card={details} onClose={() => setDetails(null)} onDelete={() => void deleteForever(details)} onReview={(decision) => void review(details, decision)} />}
       {details && <button aria-label="Закрыть" className="admin-drawer-backdrop" onClick={() => setDetails(null)} />}
     </AdminShell>
   );
@@ -141,7 +162,12 @@ function Kpi({ icon: Icon, label, value }: { icon: typeof WalletCards; label: st
   return <article><span><Icon size={19} /></span><div><strong>{value.toLocaleString("ru-RU")}</strong><small>{label}</small></div></article>;
 }
 
-function CardDrawer({ card, onClose, onDelete }: { card: AdminCardDetails; onClose: () => void; onDelete: () => void }) {
+function CardDrawer({ card, onClose, onDelete, onReview }: {
+  card: AdminCardDetails;
+  onClose: () => void;
+  onDelete: () => void;
+  onReview: (decision: "approved" | "changes_requested" | "rejected") => void;
+}) {
   const contacts = Object.entries(card.contacts ?? {}).filter(([key, value]) => key !== "companyLogo" && String(value).trim());
   return <aside className="admin-card-drawer">
     <button className="admin-drawer-close" onClick={onClose}><X size={18} /></button>
@@ -174,9 +200,21 @@ function CardDrawer({ card, onClose, onDelete }: { card: AdminCardDetails; onClo
       <span><small>Просмотры</small><strong>{card.views}</strong></span>
     </div>
     <div className="admin-card-drawer-foot"><FileCheck2 size={17} /> Данные доступны только главному администратору</div>
+    {card.reviewStatus !== "approved" && (
+      <div className="admin-card-review-actions">
+        <button type="button" className="button button-primary" onClick={() => onReview("approved")}>
+          <CheckCircle2 size={17} /> Одобрить и активировать QR
+        </button>
+        <button type="button" className="button button-secondary" onClick={() => onReview("changes_requested")}>
+          <RotateCcw size={17} /> Вернуть на исправление
+        </button>
+        <button type="button" className="button button-secondary text-red-600" onClick={() => onReview("rejected")}>
+          <XCircle size={17} /> Отклонить
+        </button>
+      </div>
+    )}
     <button type="button" className="admin-card-delete-forever" onClick={onDelete}>
       <Trash2 size={17} /> Удалить визитку навсегда
     </button>
   </aside>;
 }
-
