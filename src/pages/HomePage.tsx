@@ -21,7 +21,8 @@ import CardPreview from "../components/CardPreview";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { demoCards } from "../data/demo";
-import LaunchPromo from "../components/LaunchPromo";
+import HomePhoneStory from "../components/HomePhoneStory";
+import HomePromoCarousel from "../components/HomePromoCarousel";
 import type { DigitalCard } from "../types/card";
 
 export default function HomePage() {
@@ -155,8 +156,8 @@ export default function HomePage() {
   return (
     <>
       <main>
-        <div className="site-container pt-4">
-          <LaunchPromo compact />
+        <div className="site-container home-promo-wrap">
+          <HomePromoCarousel />
         </div>
         <section className="hero-section overflow-hidden">
           <div className="hero-grid-pattern" />
@@ -193,22 +194,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="hero-showcase founder-showcase" aria-label={homeCopy.cardExample}>
-              <div className="hero-orbit hero-orbit-one" />
-              <div className="hero-orbit hero-orbit-two" />
-              <div className="phone-shell phone-shell-founder">
-                <div className="phone-speaker" />
-                <CardPreview card={founderCard} />
-              </div>
-              <div className="floating-chip floating-chip-top">
-                <QrCode size={19} />
-                <span>{homeCopy.qrReady}</span>
-              </div>
-              <div className="floating-chip floating-chip-bottom">
-                <BadgeCheck size={19} />
-                <span>{homeCopy.saved}</span>
-              </div>
-            </div>
+            <HomePhoneStory card={founderCard} />
           </div>
         </section>
 
