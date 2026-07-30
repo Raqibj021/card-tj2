@@ -158,6 +158,7 @@ export default function CardPage() {
   useEffect(() => {
     if (!card) return;
     setLanguage(card.language);
+    if (card.reviewStatus !== "approved") return;
     const viewKey = `vizora.viewed.${card.id}`;
     if (!sessionStorage.getItem(viewKey)) {
       cardRepository.incrementViews(card.id);
@@ -446,28 +447,48 @@ export default function CardPage() {
 
             <div className="profile-detail-list">
               {card.phone && (
-                <a href={`tel:${sanitizePhone(card.phone)}`}>
+                <a
+                  href={isLocked ? undefined : `tel:${sanitizePhone(card.phone)}`}
+                  aria-disabled={isLocked}
+                  className={isLocked ? "is-disabled" : undefined}
+                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
+                >
                   <span><Phone size={18} /></span>
                   <div><small>{t("phone")}</small><strong>{card.phone}</strong></div>
                 </a>
               )}
               {card.secondPhone && (
-                <a href={`tel:${sanitizePhone(card.secondPhone)}`}>
+                <a
+                  href={isLocked ? undefined : `tel:${sanitizePhone(card.secondPhone)}`}
+                  aria-disabled={isLocked}
+                  className={isLocked ? "is-disabled" : undefined}
+                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
+                >
                   <span><Phone size={18} /></span>
                   <div><small>{t("secondPhone")}</small><strong>{card.secondPhone}</strong></div>
                 </a>
               )}
               {card.website && (
-                <a href={normalizeUrl(card.website)} target="_blank" rel="noreferrer">
+                <a
+                  href={isLocked ? undefined : normalizeUrl(card.website)}
+                  target={isLocked ? undefined : "_blank"}
+                  rel="noreferrer"
+                  aria-disabled={isLocked}
+                  className={isLocked ? "is-disabled" : undefined}
+                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
+                >
                   <span><Globe2 size={18} /></span>
                   <div><small>{t("website")}</small><strong>{card.website.replace(/^https?:\/\//, "")}</strong></div>
                 </a>
               )}
               {card.address && (
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`}
-                  target="_blank"
+                  href={isLocked ? undefined : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`}
+                  target={isLocked ? undefined : "_blank"}
                   rel="noreferrer"
+                  aria-disabled={isLocked}
+                  className={isLocked ? "is-disabled" : undefined}
+                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
                 >
                   <span><MapPin size={18} /></span>
                   <div><small>{t("address")}</small><strong>{card.address}</strong><em>{t("map")}</em></div>
@@ -478,22 +499,22 @@ export default function CardPage() {
             {(card.instagram || card.facebook || card.whatsapp || card.telegram) && (
               <div className="profile-social-row">
                 {card.instagram && (
-                  <a href={socialUrl("instagram", card.instagram)} target="_blank" rel="noreferrer" aria-label="Instagram">
+                  <a href={isLocked ? undefined : socialUrl("instagram", card.instagram)} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="Instagram" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
                     <Instagram size={20} />
                   </a>
                 )}
                 {card.facebook && (
-                  <a href={socialUrl("facebook", card.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook">
+                  <a href={isLocked ? undefined : socialUrl("facebook", card.facebook)} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="Facebook" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
                     <Facebook size={20} />
                   </a>
                 )}
                 {card.whatsapp && (
-                  <a href={`https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp">
+                  <a href={isLocked ? undefined : `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="WhatsApp" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
                     <WhatsAppIcon size={20} />
                   </a>
                 )}
                 {card.telegram && (
-                  <a href={socialUrl("telegram", card.telegram)} target="_blank" rel="noreferrer" aria-label="Telegram">
+                  <a href={isLocked ? undefined : socialUrl("telegram", card.telegram)} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="Telegram" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
                     <Send size={20} />
                   </a>
                 )}
