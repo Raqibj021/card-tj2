@@ -24,10 +24,10 @@ import { cardRepository } from "../lib/cardRepository";
 import { downloadQrCode, formatDate, themeColors } from "../lib/cardUtils";
 import type { DigitalCard } from "../types/card";
 import { leadRepository } from "../lib/leadRepository";
+import { publicSiteUrl } from "../lib/siteUrl";
 
 const getCardUrl = (slug: string) => {
-  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
-  return `${window.location.origin}${base}/card/${slug}`;
+  return publicSiteUrl(`/card/${slug}`);
 };
 
 const avatarText = (name: string) =>
