@@ -10,6 +10,9 @@ export default function SupportPage() {
   const [ticket, setTicket] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const managerPhone = "+992084785555";
+  const managerPhoneLabel = "+992 08 478 55 55";
+  const managerTelegram = "mert_mert";
   const copy = {
     ru: { label: "Поддержка Vizora", title: "Связь с менеджером", text: "Опишите вопрос — обращение получит номер и сохранится в вашем кабинете.", name: "Ваше имя *", namePlaceholder: "Имя и фамилия", phone: "Телефон *", topic: "Тема обращения *", topics: ["Создание визитки", "Регистрация организации", "Тариф и оплата", "Проверка специалиста", "Техническая проблема"], number: "Номер заявки", numberHint: "Если имеется", message: "Сообщение *", messageHint: "Кратко опишите вопрос", send: "Отправить обращение", manager: "Менеджер Vizora", working: "Ответ в рабочее время", email: "Электронная почта *", chat: "Открыть чат", write: "Написать менеджеру", call: "Заказать звонок" },
     tj: { label: "Дастгирии Vizora", title: "Тамос бо менеҷер", text: "Саволи худро шарҳ диҳед — муроҷиат рақам мегирад ва дар кабинети шумо нигоҳ дошта мешавад.", name: "Номи шумо *", namePlaceholder: "Ному насаб", phone: "Телефон *", topic: "Мавзӯи муроҷиат *", topics: ["Сохтани варақа", "Сабти ташкилот", "Тарофа ва пардохт", "Санҷиши мутахассис", "Мушкили техникӣ"], number: "Рақами дархост", numberHint: "Агар мавҷуд бошад", message: "Паём *", messageHint: "Саволро кӯтоҳ шарҳ диҳед", send: "Фиристодани муроҷиат", manager: "Менеҷери Vizora", working: "Ҷавоб дар вақти корӣ", email: "Почтаи электронӣ *", chat: "Кушодани чат", write: "Навиштан ба менеҷер", call: "Дархости занг" },
@@ -63,9 +66,9 @@ export default function SupportPage() {
             <aside className="support-options">
               <div className="support-option"><Headphones size={22} /><div><strong>{copy.manager}</strong><span>{copy.working}</span></div></div>
               <a href="mailto:support@vizora.tj" className="support-option"><Mail size={22} /><div><strong>support@vizora.tj</strong><span>{copy.email}</span></div></a>
-              <button type="button" className="support-option"><WhatsAppIcon size={22} /><div><strong>WhatsApp</strong><span>{copy.chat}</span></div></button>
-              <button type="button" className="support-option"><Send size={22} /><div><strong>Telegram</strong><span>{copy.write}</span></div></button>
-              <button type="button" className="support-option"><Phone size={22} /><div><strong>{copy.phone.replace(" *", "")}</strong><span>{copy.call}</span></div></button>
+              <a href={`https://wa.me/${managerPhone.replace("+", "")}`} target="_blank" rel="noreferrer" className="support-option"><WhatsAppIcon size={22} /><div><strong>{managerPhoneLabel}</strong><span>WhatsApp · {copy.chat}</span></div></a>
+              <a href={`https://t.me/${managerTelegram}`} target="_blank" rel="noreferrer" className="support-option"><Send size={22} /><div><strong>@{managerTelegram}</strong><span>Telegram · {copy.write}</span></div></a>
+              <a href={`tel:${managerPhone}`} className="support-option"><Phone size={22} /><div><strong>{managerPhoneLabel}</strong><span>{copy.call}</span></div></a>
             </aside>
           </div>
         </div>
