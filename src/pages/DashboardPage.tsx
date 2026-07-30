@@ -25,6 +25,7 @@ import { downloadQrCode, formatDate, themeColors } from "../lib/cardUtils";
 import type { DigitalCard } from "../types/card";
 import { leadRepository } from "../lib/leadRepository";
 import { publicSiteUrl } from "../lib/siteUrl";
+import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 
 const getCardUrl = (slug: string) => {
   return publicSiteUrl(`/card/${slug}`);
@@ -47,6 +48,7 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [cards, setCards] = useState<DigitalCard[]>([]);
   const [toast, setToast] = useState("");
+  const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
   const leads = leadRepository.list();
   const dashboardCopy = {
     ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик", changesRequested: "Требуются исправления", rejected: "Отклонена", suspended: "Заблокирована", lockedActions: "QR-код и публичная ссылка появятся после одобрения.", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
@@ -59,6 +61,9 @@ export default function DashboardPage() {
     void cardRepository.listRemote().then((result) => {
       if (active) setCards(withoutDemoCards(result));
     });
+    void promoRepository.status().then((result) => {
+      if (active) setPromo(result);
+    }).catch(() => undefined);
     return () => { active = false; };
   }, []);
 
@@ -271,7 +276,49 @@ export default function DashboardPage() {
                         <ShieldCheck size={16} /> {dashboardCopy.lockedActions}
                       </span>
                     )}
-                    {card.reviewStatus !== "approved" && card.reviewStatus !== "pending" && (
+                    {card.reviewStatus === "draft" && promo?.eligible && !promo.hasEntitlement && promo.remaining > 0 && (
+                      <button
+                        type="button"
+                        className="button button-primary"
+                        onClick={async () => {
+                          try {
+                            const result = await promoRepository.claim(card.id);
+                            setPromo(result);
+                            setCards((items) => items.map((item) =>
+                              item.id === card.id ? { ...item, reviewStatus: "pending" } : item
+                            ));
+                            notify(dashboardCopy.pending);
+                          } catch (error) {
+                            notify(error instanceof Error ? error.message : "Не удалось применить акцию.");
+                          }
+                        }}
+                      >
+                        <ShieldCheck size={16} /> {language === "ru" ? "Использовать акцию" : language === "tj" ? "Истифодаи аксия" : "Use launch offer"}
+                      </button>
+                    )}
+                    {card.reviewStatus === "draft" && !promo?.hasEntitlement && (
+                      <Link to="/payment?plan=personal" className="button button-secondary">
+                        {language === "ru" ? "Оплатить 20 с." : language === "tj" ? "Пардохт 20 с." : "Pay 20 TJS"}
+                      </Link>
+                    )}
+                    {card.reviewStatus === "draft" && promo?.hasEntitlement && (
+                      <button
+                        type="button"
+                        className="button button-primary"
+                        onClick={async () => {
+                          const result = await cardRepository.requestPublication(card.id);
+                          notify(result.message);
+                          if (result.ok) {
+                            setCards((items) => items.map((item) =>
+                              item.id === card.id ? { ...item, reviewStatus: "pending" } : item
+                            ));
+                          }
+                        }}
+                      >
+                        <ShieldCheck size={16} /> {dashboardCopy.publish}
+                      </button>
+                    )}
+                    {card.reviewStatus !== "approved" && card.reviewStatus !== "pending" && card.reviewStatus !== "draft" && (
                       <button
                         type="button"
                         className="button button-ghost"
