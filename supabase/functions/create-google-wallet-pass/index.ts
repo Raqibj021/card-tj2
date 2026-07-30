@@ -83,7 +83,8 @@ Deno.serve(async (request) => {
   const objectId = `${issuerId}.${String(card.id).replaceAll("-", "_")}`;
   const classId = `${issuerId}.vizora_digital_card`;
   const website = normalizeUrl(contacts.website);
-  const cardUrl = `${Deno.env.get("VIZORA_SITE_URL") ?? "https://raqibj021.github.io/card-tj2"}/card/${card.slug}`;
+  const siteUrl = (Deno.env.get("VIZORA_SITE_URL") ?? "https://vizora.tj").replace(/\/+$/, "");
+  const cardUrl = `${siteUrl}/card/${card.slug}`;
   const textModulesData = [
     card.position && { id: "position", header: "ДОЛЖНОСТЬ", body: String(card.position) },
     card.organization_name && { id: "organization", header: "ОРГАНИЗАЦИЯ", body: String(card.organization_name) },
@@ -121,10 +122,13 @@ Deno.serve(async (request) => {
     const privateKey = await importPKCS8(credentials.private_key, "RS256");
     const token = await new SignJWT({
       typ: "savetowallet",
-      origins: [
-        "https://raqibj021.github.io",
-        ...(Deno.env.get("VIZORA_WALLET_ORIGIN") ? [Deno.env.get("VIZORA_WALLET_ORIGIN") as string] : [])
-      ],
+      origins: Array.from(new Set([
+        new URL(siteUrl).origin,
+        ...(Deno.env.get("VIZORA_WALLET_ORIGIN") ?? "")
+          .split(",")
+          .map((value) => value.trim().replace(/\/+$/, ""))
+          .filter(Boolean)
+      ])),
       payload: {
         genericObjects: [genericObject]
       }
