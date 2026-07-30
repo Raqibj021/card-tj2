@@ -34,6 +34,50 @@ export interface LaunchPreview {
   tickets: number;
 }
 
+export interface AdminAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  role: string;
+  status: "active" | "blocked";
+  statusReason: string;
+  identityVerified: boolean;
+  cards: number;
+  organizations: number;
+  duplicateSignals: number;
+  createdAt: string;
+}
+
+export interface AdminOrganization {
+  id: string;
+  name: string;
+  legalName: string;
+  slug: string;
+  status: string;
+  ownerName: string;
+  ownerEmail: string;
+  employees: number;
+  departments: number;
+  cards: number;
+  activeUntil: string | null;
+  createdAt: string;
+}
+
+export interface AdminOrganizationDetail extends AdminOrganization {
+  structure: Array<{ id: string; name: string; parentId: string | null; employees: number }>;
+  members: Array<{
+    id: string;
+    name: string;
+    email: string;
+    position: string;
+    department: string;
+    cardSlug: string;
+    cardStatus: string;
+    isPublic: boolean;
+  }>;
+}
+
 const emptySnapshot: AdminSnapshot = {
   status: "prelaunch",
   officialLaunchAt: null,
@@ -120,5 +164,32 @@ export const adminRepository = {
     const { data, error } = await supabase.rpc("begin_official_launch", { confirmation });
     if (error) throw error;
     return String(data);
+  },
+
+  async accounts(search = "") {
+    if (!supabase) return { accounts: [] as AdminAccount[], organizations: [] as AdminOrganization[] };
+    const { data, error } = await supabase.rpc("get_admin_accounts_workspace", { search_text: search });
+    if (error) throw error;
+    const value = (data ?? {}) as { accounts?: AdminAccount[]; organizations?: AdminOrganization[] };
+    return { accounts: value.accounts ?? [], organizations: value.organizations ?? [] };
+  },
+
+  async organizationDetail(organizationId: string) {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { data, error } = await supabase.rpc("get_admin_organization_detail", {
+      target_organization_id: organizationId
+    });
+    if (error) throw error;
+    return data as AdminOrganizationDetail;
+  },
+
+  async setAccountStatus(profileId: string, status: "active" | "blocked", reason: string) {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { error } = await supabase.rpc("admin_set_account_status", {
+      target_profile_id: profileId,
+      target_status: status,
+      reason: reason.trim()
+    });
+    if (error) throw error;
   }
 };
