@@ -122,6 +122,28 @@ export const buildVCard = (card: DigitalCard) => {
 };
 
 export const openVCardSaveDialog = async (card: DigitalCard) => {
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  if (isAndroid) {
+    const contactExtras = [
+      ["name", card.fullName],
+      ["phone", sanitizePhone(card.phone)],
+      ["email", card.email],
+      ["company", card.organization],
+      ["job_title", card.position]
+    ]
+      .filter(([, value]) => Boolean(value))
+      .map(([key, value]) => `S.${key}=${encodeURIComponent(value)}`)
+      .join(";");
+
+    // Chrome on Android passes this intent directly to the system Contacts app,
+    // opening the native "create contact" screen instead of downloading a file.
+    window.location.href =
+      `intent:#Intent;action=android.intent.action.INSERT;` +
+      `type=vnd.android.cursor.dir/contact;${contactExtras};end`;
+    return;
+  }
+
   const file = new File(
     [buildVCard(card)],
     `${card.slug || "contact"}.vcf`,
@@ -145,13 +167,10 @@ export const openVCardSaveDialog = async (card: DigitalCard) => {
     }
   }
 
-  const url = URL.createObjectURL(file);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.target = "_blank";
-  anchor.rel = "noopener noreferrer";
-  anchor.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  // iOS/Safari understands a vCard opened in the current tab and displays the
+  // native contact preview with the "Create New Contact" action.
+  window.location.href =
+    `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(card))}`;
 };
 
 export const downloadQrCode = async (value: string, filename: string) => {
