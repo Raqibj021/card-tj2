@@ -5487,7 +5487,8 @@ summary:focus-visible {
 }
 
 .mobile-card-gallery,
-.mobile-benefits-marquee {
+.mobile-benefits-marquee,
+.mobile-steps-marquee {
   display: none;
 }
 
@@ -6111,8 +6112,331 @@ summary:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .design-showcase-track,
-  .mobile-benefits-track {
+  .mobile-benefits-track,
+  .mobile-steps-track {
     animation-play-state: paused;
+  }
+}
+
+/* Extra-compact mobile landing: strip banners, side phone and animated story rows */
+@media (max-width: 680px) {
+  .home-promo-wrap {
+    padding-top: 5px;
+  }
+
+  .home-promo-stage,
+  .home-promo-content {
+    min-height: 106px;
+  }
+
+  .home-promo-photo {
+    left: auto;
+    width: 43%;
+    opacity: .42;
+  }
+
+  .home-promo-content {
+    display: grid;
+    min-height: 106px;
+    align-items: center;
+    gap: 9px;
+    padding: 11px 13px 18px;
+    grid-template-columns: 29px minmax(0,1fr) auto;
+  }
+
+  .home-promo-icon {
+    width: 29px;
+    height: 29px;
+    margin: 0;
+    border-radius: 9px;
+  }
+
+  .home-promo-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .home-promo-content h2 {
+    max-width: 230px;
+    margin-top: 3px;
+    font-size: 13px;
+    line-height: 1.18;
+  }
+
+  .home-promo-eyebrow {
+    font-size: 6px;
+    letter-spacing: .08em;
+  }
+
+  .home-promo-content p,
+  .home-promo-badge {
+    display: none;
+  }
+
+  .home-promo-action {
+    position: static;
+    min-height: 30px;
+    border-radius: 9px;
+    padding: 0 9px;
+    font-size: 7px;
+  }
+
+  .home-promo-action svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .home-promo-controls {
+    right: auto;
+    bottom: 7px;
+    left: 51px;
+  }
+
+  .home-promo-controls button {
+    width: 14px;
+    height: 3px;
+  }
+
+  .home-promo-controls button.is-active {
+    width: 27px;
+  }
+
+  .hero-layout {
+    display: grid !important;
+    min-height: 360px !important;
+    align-items: center;
+    gap: 4px !important;
+    padding-block: 27px 30px !important;
+    grid-template-columns: minmax(0,1fr) 142px;
+  }
+
+  .hero-content {
+    min-width: 0;
+  }
+
+  .hero-title {
+    max-width: 235px;
+    margin-top: 11px;
+    font-size: clamp(28px, 8.4vw, 35px);
+    letter-spacing: -.055em;
+    line-height: 1.01;
+  }
+
+  .hero-copy {
+    max-width: 235px;
+    margin-top: 11px;
+    font-size: 11px;
+    line-height: 1.48;
+  }
+
+  .hero-content .eyebrow {
+    gap: 5px;
+    font-size: 6px;
+    letter-spacing: .08em;
+  }
+
+  .hero-content .eyebrow svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  .hero-content .button-large {
+    min-height: 38px;
+    padding-inline: 12px;
+    font-size: 9px;
+  }
+
+  .hero-content > .mt-8 {
+    margin-top: 15px !important;
+  }
+
+  .hero-content > div:last-child {
+    display: none;
+  }
+
+  .hero-showcase.phone-story {
+    display: grid;
+    width: 142px;
+    min-height: 322px;
+    margin: 0;
+    place-items: center;
+  }
+
+  .phone-story::before {
+    width: 185px;
+  }
+
+  .phone-shell-3d {
+    width: 316px;
+    border-radius: 48px;
+    transform: perspective(1100px) scale(.43) rotateY(-5deg) rotateX(1deg) rotateZ(1.4deg);
+    transform-origin: center;
+  }
+
+  .phone-story-screen,
+  .phone-scene-card .digital-card {
+    min-height: 640px;
+  }
+
+  .phone-story .hero-orbit-one {
+    width: 180px;
+    height: 180px;
+  }
+
+  .phone-story .hero-orbit-two {
+    width: 145px;
+    height: 145px;
+  }
+
+  .phone-story-particle,
+  .phone-story .floating-chip {
+    display: none;
+  }
+
+  .phone-story-dots {
+    bottom: 4px;
+    transform: scale(.7);
+  }
+
+  .home-benefits {
+    padding-block: 28px 30px;
+  }
+
+  .home-benefits .section-heading h2,
+  .home-steps-section .section-heading h2 {
+    margin-top: 7px;
+    font-size: 23px;
+    line-height: 1.08;
+  }
+
+  .home-benefits .section-heading p,
+  .home-steps-section .section-heading p {
+    margin-top: 8px;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .home-benefits .section-label,
+  .home-steps-section .section-label {
+    font-size: 7px;
+  }
+
+  .mobile-benefits-marquee {
+    margin-top: 17px;
+  }
+
+  .mobile-benefits-track {
+    gap: 7px;
+    padding-right: 7px;
+    animation-duration: 22s;
+  }
+
+  .mobile-benefit-pill {
+    width: 205px;
+    min-height: 61px;
+    gap: 8px;
+    border-radius: 14px;
+    padding: 8px 10px;
+  }
+
+  .mobile-benefit-pill .feature-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .mobile-benefit-pill strong {
+    font-size: 10px;
+  }
+
+  .mobile-benefit-pill small {
+    margin-top: 2px;
+    font-size: 8px;
+    line-height: 1.25;
+  }
+
+  .home-steps-section {
+    padding-block: 27px 30px;
+  }
+
+  .home-steps-grid {
+    display: none;
+  }
+
+  .mobile-steps-marquee {
+    display: block;
+    overflow: hidden;
+    width: calc(100% + var(--page-pad) * 2);
+    margin: 17px calc(var(--page-pad) * -1) 0;
+  }
+
+  .mobile-steps-track {
+    display: flex;
+    width: max-content;
+    gap: 7px;
+    padding-right: 7px;
+    animation: mobile-benefits-scroll 20s linear infinite reverse;
+  }
+
+  .mobile-step-pill {
+    position: relative;
+    display: grid;
+    width: 218px;
+    min-height: 66px;
+    align-items: center;
+    gap: 7px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    background:
+      radial-gradient(circle at 0 0, rgba(15,118,110,.12), transparent 55%),
+      var(--panel);
+    padding: 8px 10px 8px 30px;
+    grid-template-columns: auto 1fr;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .mobile-step-number {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    color: rgba(15,118,110,.48);
+    font-size: 8px;
+    font-weight: 950;
+  }
+
+  .mobile-step-pill .feature-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .mobile-step-pill strong,
+  .mobile-step-pill small {
+    display: block;
+  }
+
+  .mobile-step-pill strong {
+    font-size: 10px;
+  }
+
+  .mobile-step-pill small {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 8px;
+    line-height: 1.25;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .home-steps-action {
+    margin-top: 15px !important;
+  }
+
+  .home-steps-action .button {
+    min-height: 39px;
+    padding-inline: 14px;
+    font-size: 9px;
   }
 }
 

@@ -277,7 +277,7 @@ export default function HomePage() {
               <p>{homeCopy.journeyText}</p>
             </div>
 
-            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+            <div className="home-steps-grid mt-12 grid gap-5 lg:grid-cols-3">
               {steps.map(({ number, icon: Icon, title, text }) => (
                 <article key={number} className="step-card">
                   <span className="step-number">{number}</span>
@@ -288,7 +288,22 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="mt-8 flex justify-center">
+            <div className="mobile-steps-marquee" aria-label={t("howTitle")}>
+              <div className="mobile-steps-track">
+                {[...steps, ...steps].map(({ number, icon: Icon, title, text }, index) => (
+                  <article key={`${number}-${index}`} className="mobile-step-pill">
+                    <span className="mobile-step-number">{number}</span>
+                    <div className="feature-icon"><Icon size={16} /></div>
+                    <span>
+                      <strong>{title}</strong>
+                      <small>{text}</small>
+                    </span>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="home-steps-action mt-8 flex justify-center">
               <Link to="/create" className="button button-primary button-large">
                 {t("create")} <ArrowRight size={19} />
               </Link>
