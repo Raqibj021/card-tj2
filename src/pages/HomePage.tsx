@@ -379,11 +379,6 @@ export default function HomePage() {
               <p>{homeCopy.mobileText}</p>
             </div>
             <div className="mobile-home-links">
-              <Link to="/card/firuz">
-                <QrCode size={21} />
-                <span><strong>{t("example")}</strong><small>{homeCopy.readyCard}</small></span>
-                <ArrowRight size={17} />
-              </Link>
               <Link to="/directory">
                 <LayoutGrid size={21} />
                 <span><strong>{homeCopy.directory}</strong><small>{homeCopy.directoryText}</small></span>

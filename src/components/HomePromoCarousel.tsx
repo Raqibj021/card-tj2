@@ -15,7 +15,7 @@ const slideCopy = {
       eyebrow: "Знакомьтесь быстрее",
       title: "Покажите QR-код — и ваш профиль уже у клиента",
       text: "Телефон, мессенджеры, соцсети, адрес и сайт доступны без установки приложения.",
-      action: "Посмотреть пример"
+      action: "Открыть каталог"
     },
     {
       eyebrow: "Всегда актуально",
@@ -42,7 +42,7 @@ const slideCopy = {
       eyebrow: "Зудтар шинос шавед",
       title: "QR-кодро нишон диҳед — профили шумо аллакай назди муштарӣ аст",
       text: "Телефон, паёмрасонҳо, шабакаҳои иҷтимоӣ, суроға ва сомона бе барнома дастрасанд.",
-      action: "Дидани намуна"
+      action: "Кушодани феҳрист"
     },
     {
       eyebrow: "Ҳамеша нав",
@@ -69,7 +69,7 @@ const slideCopy = {
       eyebrow: "Connect faster",
       title: "Show your QR code — your profile is already with the client",
       text: "Phone, messengers, social media, address and website with no app required.",
-      action: "View an example"
+      action: "Open directory"
     },
     {
       eyebrow: "Always up to date",
@@ -122,7 +122,7 @@ export default function HomePromoCarousel() {
                 </div>
                 {"badge" in slide && slide.badge && <strong className="home-promo-badge"><Users size={15} />{slide.badge}</strong>}
                 <Link
-                  to={index === 1 ? "/card/firuz" : index === 2 ? "/services" : "/create"}
+                  to={index === 1 ? "/directory" : index === 2 ? "/services" : "/create"}
                   className={isOffer ? "home-promo-action home-promo-action-offer" : "home-promo-action"}
                   tabIndex={active === index ? 0 : -1}
                 >

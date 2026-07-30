@@ -27,7 +27,6 @@ export default function Footer() {
           <div className="footer-links">
             <Link to="/create">{t("create")}</Link>
             <Link to="/dashboard">{t("dashboard")}</Link>
-            <Link to="/card/demo">{t("example")}</Link>
             <Link to="/directory">{copy.directory}</Link>
             <Link to="/organizations">{copy.organizations}</Link>
             <Link to="/services">{copy.services}</Link>
