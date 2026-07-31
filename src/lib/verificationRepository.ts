@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { createUuid } from "./id";
 
 export interface ProfessionCategory {
   id: string;
@@ -30,7 +31,7 @@ export const verificationRepository = {
     const paths: string[] = [];
     for (const file of files) {
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
-      const path = `${auth.user.id}/${cardId}/${crypto.randomUUID()}-${safeName}`;
+      const path = `${auth.user.id}/${cardId}/${createUuid()}-${safeName}`;
       const { error } = await supabase.storage
         .from("verification-documents")
         .upload(path, file, { contentType: file.type });
