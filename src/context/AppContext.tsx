@@ -23,11 +23,13 @@ const AppContext = createContext<AppContextValue | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    const stored = localStorage.getItem("vizora.language");
+    let stored: string | null = null;
+    try { stored = localStorage.getItem("vizora.language"); } catch { /* storage can be unavailable */ }
     return stored === "tj" || stored === "en" ? stored : "ru";
   });
   const [theme, setTheme] = useState<ThemeMode>(() => {
-    const stored = localStorage.getItem("vizora.theme");
+    let stored: string | null = null;
+    try { stored = localStorage.getItem("vizora.theme"); } catch { /* storage can be unavailable */ }
     if (stored === "dark" || stored === "light") return stored;
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -36,12 +38,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("vizora.theme", theme);
+    try { localStorage.setItem("vizora.theme", theme); } catch { /* keep the interface usable */ }
   }, [theme]);
 
   useEffect(() => {
     document.documentElement.lang = language;
-    localStorage.setItem("vizora.language", language);
+    try { localStorage.setItem("vizora.language", language); } catch { /* keep the interface usable */ }
   }, [language]);
 
   const value = useMemo<AppContextValue>(
