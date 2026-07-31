@@ -16,6 +16,7 @@ export default function OrganizationPublicPage() {
   const { language } = useApp();
   const [data, setData] = useState<PublicOrganization | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [query, setQuery] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const copy = {
@@ -26,9 +27,19 @@ export default function OrganizationPublicPage() {
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return; }
-    void supabase.rpc("get_public_organization", { target_slug: slug }).then(({ data: result }) => {
-      setData(result as PublicOrganization | null); setLoading(false);
-    });
+    let active = true;
+    const timer = window.setTimeout(() => {
+      if (active) { setLoadError(copy.missing); setLoading(false); }
+    }, 12000);
+    void Promise.resolve(supabase.rpc("get_public_organization", { target_slug: slug }))
+      .then(({ data: result, error }) => {
+        if (!active) return;
+        if (error) setLoadError(error.message);
+        else setData(result as PublicOrganization | null);
+      })
+      .catch(() => { if (active) setLoadError(copy.missing); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; window.clearTimeout(timer); };
   }, [slug]);
 
   const visibleDepartmentIds = useMemo(() => {
@@ -49,7 +60,7 @@ export default function OrganizationPublicPage() {
   ), [data, query, visibleDepartmentIds]);
 
   if (loading) return <main className="route-loading"><span /><p>...</p></main>;
-  if (!data) return <main className="card-missing"><BrandLogo /><div className="empty-state"><Building2 size={30} /><h1>{copy.missing}</h1></div></main>;
+  if (!data) return <main className="card-missing"><BrandLogo /><div className="empty-state"><Building2 size={30} /><h1>{copy.missing}</h1>{loadError && <p>{loadError}</p>}</div></main>;
   return <main className="organization-public-page">
     <header className="profile-toolbar"><Link to="/"><BrandLogo light /></Link></header>
     <section className="directory-hero"><div className="site-container py-14 text-center md:py-20">
