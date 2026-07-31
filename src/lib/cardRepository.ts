@@ -27,7 +27,8 @@ class LocalStorageCardRepository implements CardRepository {
 
   private removedIds() {
     try {
-      return new Set<string>(JSON.parse(localStorage.getItem(REMOVED_CARDS_KEY) ?? "[]"));
+      const value: unknown = JSON.parse(localStorage.getItem(REMOVED_CARDS_KEY) ?? "[]");
+      return new Set<string>(Array.isArray(value) ? value.filter((id): id is string => typeof id === "string") : []);
     } catch {
       return new Set<string>();
     }
@@ -175,7 +176,14 @@ class LocalStorageCardRepository implements CardRepository {
     }
 
     try {
-      return JSON.parse(stored) as DigitalCard[];
+      const value: unknown = JSON.parse(stored);
+      if (!Array.isArray(value)) return [];
+      return value.filter(
+        (card): card is DigitalCard =>
+          Boolean(card) &&
+          typeof card === "object" &&
+          typeof (card as Partial<DigitalCard>).id === "string"
+      );
     } catch {
       this.write(demoCards);
       return demoCards;
