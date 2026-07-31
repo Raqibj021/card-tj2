@@ -29,8 +29,15 @@ export function useNotificationCounts() {
     window.addEventListener(notificationChangedEvent, onChange);
     window.addEventListener("focus", onChange);
     const timer = window.setInterval(onChange, 45_000);
-    const channel = supabase && user
-      ? supabase.channel(`notification-counts-${user.id}`)
+    // React StrictMode can mount, clean up, and immediately mount this effect
+    // again while Supabase is still removing the previous channel. A unique
+    // topic prevents the new subscription from reusing an already subscribed
+    // Realtime channel and throwing "cannot add postgres_changes callbacks".
+    const channelTopic = user
+      ? `notification-counts-${user.id}-${crypto.randomUUID()}`
+      : null;
+    const channel = supabase && user && channelTopic
+      ? supabase.channel(channelTopic)
           .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, onChange)
           .subscribe()
       : null;
@@ -44,4 +51,3 @@ export function useNotificationCounts() {
 
   return { counts, refresh };
 }
-
