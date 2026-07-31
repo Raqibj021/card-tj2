@@ -153,7 +153,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { language, setLanguage } = useApp();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshSession } = useAuth();
   const text = authCopy[language];
   const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -206,33 +206,52 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
 
     setBusy(true);
     setMessage("");
-    const result = isRegister
-      ? await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName },
-            emailRedirectTo: authRedirectUrl()
-          }
-        })
-      : await supabase.auth.signInWithPassword({ email, password });
-    setBusy(false);
+    try {
+      const result = isRegister
+        ? await supabase.auth.signUp({
+            email: email.trim().toLowerCase(),
+            password,
+            options: {
+              data: { full_name: fullName.trim() },
+              emailRedirectTo: authRedirectUrl()
+            }
+          })
+        : await supabase.auth.signInWithPassword({
+            email: email.trim().toLowerCase(),
+            password
+          });
 
-    if (result.error) {
-      setMessage(readableAuthError(result.error, language));
-      return;
-    }
+      if (result.error) {
+        setMessage(readableAuthError(result.error, language));
+        return;
+      }
 
-    if (isRegister && !result.data.session) {
-      setPendingEmail(email);
-      setVerificationCode("");
-      setResendCooldown(60);
-      setMessage(text.checkEmail);
-    } else if (isRegister) {
-      navigate("/dashboard", { replace: true });
-    } else {
+      if (isRegister && !result.data.session) {
+        setPendingEmail(email.trim().toLowerCase());
+        setVerificationCode("");
+        setResendCooldown(60);
+        setMessage(text.checkEmail);
+        return;
+      }
+
+      const confirmedSession = await refreshSession();
+      if (!confirmedSession) {
+        setMessage(
+          language === "ru"
+            ? "Вход подтверждён, но сессия не сохранилась. Обновите страницу и войдите ещё раз."
+            : language === "tj"
+              ? "Воридшавӣ тасдиқ шуд, аммо сессия нигоҳ дошта нашуд. Саҳифаро нав карда, дубора ворид шавед."
+              : "Sign-in succeeded, but the session was not saved. Refresh the page and sign in again."
+        );
+        return;
+      }
+
       const destination = (location.state as { from?: string } | null)?.from ?? "/dashboard";
       navigate(destination, { replace: true });
+    } catch (error) {
+      setMessage(readableAuthError(error, language));
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -254,6 +273,7 @@ export default function AuthPage({ mode }: { mode: "login" | "register" }) {
       return;
     }
 
+    await refreshSession();
     navigate("/dashboard", { replace: true });
   }
 
