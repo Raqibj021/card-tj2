@@ -37,6 +37,7 @@ export interface DigitalCard {
   views: number;
   createdAt: string;
   updatedAt: string;
+  organizationManaged?: boolean;
 }
 
 export type CardDraft = Omit<
