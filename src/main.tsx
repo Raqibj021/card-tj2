@@ -5,6 +5,7 @@ import App from "./App";
 import { AppProvider } from "./context/AppContext";
 import { AuthProvider } from "./context/AuthContext";
 import { AdminAuthProvider } from "./context/AdminAuthContext";
+import AppErrorBoundary from "./components/AppErrorBoundary";
 import "./index.css";
 
 const basename = import.meta.env.BASE_URL === "/"
@@ -17,7 +18,9 @@ createRoot(document.getElementById("root")!).render(
       <AppProvider>
         <AuthProvider>
           <AdminAuthProvider>
-            <App />
+            <AppErrorBoundary>
+              <App />
+            </AppErrorBoundary>
           </AdminAuthProvider>
         </AuthProvider>
       </AppProvider>
