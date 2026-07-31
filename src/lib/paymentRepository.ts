@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { createUuid } from "./id";
 
 export type PaymentStatus = "draft" | "payment_pending" | "payment_review" | "active" | "rejected" | "expired";
 
@@ -86,7 +87,7 @@ export const paymentRepository = {
       throw new Error("Разрешены только JPG, PNG и PDF.");
     }
 
-    const uploadId = crypto.randomUUID();
+    const uploadId = createUuid();
     const safeName = data.receiptFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
     const receiptPath = `${auth.user.id}/${uploadId}/${safeName}`;
     const { error: uploadError } = await supabase.storage
