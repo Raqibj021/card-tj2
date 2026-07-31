@@ -165,7 +165,7 @@ export default function OrganizationApplyPage() {
                 <ol>{copy.steps.map((step, index) => <li key={step}><span>{index + 1}</span> {step}</li>)}</ol>
                 <div className="payment-note"><LockKeyhole size={18} /><div><strong>{copy.protected}</strong><span>{copy.private}</span></div></div>
                 <div className="payment-note"><ShieldCheck size={18} /><div><strong>{copy.responsibility}</strong><span>{copy.responsibilityText}</span></div></div>
-                <div className="payment-note"><CreditCard size={18} /><div><strong>DC Bank / Alif Bank</strong><span>{lang === "ru" ? "Реквизиты указаны на странице оплаты" : lang === "tj" ? "Реквизитҳо дар саҳифаи пардохт нишон дода шудаанд" : "Payment details are shown on the payment page"}</span></div></div>
+                <div className="payment-note"><CreditCard size={18} /><div><strong>DC Bank / Alif Bank</strong><span>{language === "ru" ? "Реквизиты указаны на странице оплаты" : language === "tj" ? "Реквизитҳо дар саҳифаи пардохт нишон дода шудаанд" : "Payment details are shown on the payment page"}</span></div></div>
               </aside>
             </div>
           )}
