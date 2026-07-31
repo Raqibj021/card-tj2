@@ -10,13 +10,36 @@ export interface OrganizationApplication {
 }
 export interface OrganizationDepartment { id: string; name: string; parentId: string | null; }
 export interface OrganizationEmployee {
-  id: string; kind: "assignment" | "invitation"; profileId?: string; name: string;
-  email: string; phone?: string; position: string; departmentId: string | null;
-  department: string; status: string; cardSlug?: string;
+  id: string; kind: "assignment"; profileId?: string; name: string;
+  email: string; phone: string; secondPhone: string; whatsapp: string; position: string;
+  departmentId: string | null; department: string; status: string; cardSlug: string;
+  website: string; address: string; telegram: string; instagram: string; facebook: string;
+  description: string; photo: string; companyLogo: string; language: string; theme: string; template: string;
+}
+export interface OrganizationEmployeeDraft {
+  organizationId: string; name: string; position: string; phone: string; whatsapp: string;
+  departmentId: string | null; secondPhone?: string; email?: string; website?: string;
+  address?: string; telegram?: string; instagram?: string; facebook?: string;
+  description?: string; photo?: string; companyLogo?: string; language?: string;
+  theme?: string; template?: string;
 }
 export interface OrganizationWorkspace {
   organization: OrganizationApplication; departments: OrganizationDepartment[]; employees: OrganizationEmployee[];
 }
+
+const uploadEmployeeAsset = async (organizationId: string, kind: "photo" | "logo", value: string) => {
+  if (!supabase || !value.startsWith("data:")) return value;
+  const { data: auth } = await supabase.auth.getUser();
+  if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
+  const blob = await (await fetch(value)).blob();
+  const extension = blob.type.includes("png") ? "png" : blob.type.includes("jpeg") ? "jpg" : "webp";
+  const path = `${auth.user.id}/organizations/${organizationId}/${kind}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
+  const { error } = await supabase.storage.from("card-assets").upload(path, blob, {
+    contentType: blob.type, cacheControl: "31536000", upsert: false
+  });
+  if (error) throw new Error("Не удалось загрузить изображение.");
+  return supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl;
+};
 
 const mapOrganization = (row: Record<string, unknown>): OrganizationApplication => {
   let applicationDetails: Record<string, unknown> = {};
@@ -130,22 +153,21 @@ export const organizationRepository = {
     const { data, error } = await supabase.rpc("get_organization_workspace", { target_organization_id: organization.id });
     if (error) throw new Error(error.message || "Не удалось загрузить рабочий кабинет организации.");
     if (!data) throw new Error("Сервер не вернул данные организации.");
-    const payload = data as { organization: Record<string, unknown>; departments: Array<Record<string, unknown>>; employees: Array<Record<string, unknown>>; invitations: Array<Record<string, unknown>>; };
+    const payload = data as { organization: Record<string, unknown>; departments: Array<Record<string, unknown>>; employees: Array<Record<string, unknown>>; };
     const departments = (payload.departments ?? []).map((item) => ({ id: String(item.id), name: String(item.name), parentId: item.parent_id ? String(item.parent_id) : null }));
     const accepted = (payload.employees ?? []).map((item) => ({
       id: String(item.id), kind: "assignment" as const, profileId: String(item.profileId ?? ""),
       name: String(item.name ?? ""), email: String(item.email ?? ""), phone: String(item.phone ?? ""),
+      secondPhone: String(item.secondPhone ?? ""), whatsapp: String(item.whatsapp ?? ""),
       position: String(item.position ?? ""),
       departmentId: item.departmentId ? String(item.departmentId) : null,
-      department: String(item.department ?? "—"), status: String(item.cardStatus ?? "pending"), cardSlug: String(item.cardSlug ?? "")
+      department: String(item.department ?? "—"), status: String(item.cardStatus ?? "approved"), cardSlug: String(item.cardSlug ?? ""),
+      website: String(item.website ?? ""), address: String(item.address ?? ""), telegram: String(item.telegram ?? ""),
+      instagram: String(item.instagram ?? ""), facebook: String(item.facebook ?? ""), description: String(item.description ?? ""),
+      photo: String(item.photo ?? ""), companyLogo: String(item.companyLogo ?? ""), language: String(item.language ?? "ru"),
+      theme: String(item.theme ?? "teal"), template: String(item.template ?? "executive")
     }));
-    const invited = (payload.invitations ?? []).map((item) => ({
-      id: String(item.id), kind: "invitation" as const, name: String(item.name ?? ""),
-      email: String(item.email ?? ""), phone: String(item.phone ?? ""), position: String(item.position ?? ""),
-      departmentId: item.departmentId ? String(item.departmentId) : null,
-      department: departments.find((department) => department.id === item.departmentId)?.name ?? "—", status: "invited"
-    }));
-    return { organization: mapOrganization(payload.organization), departments, employees: [...accepted, ...invited] };
+    return { organization: mapOrganization(payload.organization), departments, employees: accepted };
   },
 
   addDepartment: async (organizationId: string, name: string, parentId: string | null = null) => {
@@ -167,15 +189,26 @@ export const organizationRepository = {
     const { error } = await supabase.rpc("delete_organization_department", { target_department_id: departmentId });
     if (error) throw error;
   },
-  inviteEmployee: async (data: { organizationId: string; email: string; name: string; phone: string; position: string; departmentId: string | null; }) => {
+  createEmployee: async (data: OrganizationEmployeeDraft) => {
     if (!supabase) throw new Error("Сервер недоступен.");
-    const { data: code, error } = await supabase.rpc("invite_organization_employee", {
-      target_organization_id: data.organizationId, employee_email: data.email,
-      employee_name: data.name, employee_phone: data.phone, employee_position: data.position,
-      target_department_id: data.departmentId
+    const [photo, companyLogo] = await Promise.all([
+      uploadEmployeeAsset(data.organizationId, "photo", data.photo ?? ""),
+      uploadEmployeeAsset(data.organizationId, "logo", data.companyLogo ?? "")
+    ]);
+    const { data: created, error } = await supabase.rpc("create_organization_employee_card", {
+      target_organization_id: data.organizationId, employee_name: data.name.trim(),
+      employee_position: data.position.trim(), employee_phone: data.phone.trim(),
+      employee_whatsapp: data.whatsapp.trim(), target_department_id: data.departmentId,
+      employee_second_phone: data.secondPhone?.trim() ?? "", employee_email: data.email?.trim() ?? "",
+      employee_website: data.website?.trim() ?? "", employee_address: data.address?.trim() ?? "",
+      employee_telegram: data.telegram?.trim() ?? "", employee_instagram: data.instagram?.trim() ?? "",
+      employee_facebook: data.facebook?.trim() ?? "", employee_description: data.description?.trim() ?? "",
+      employee_photo: photo, employee_company_logo: companyLogo,
+      employee_language: data.language ?? "ru", employee_theme: data.theme ?? "teal",
+      employee_template: data.template ?? "executive"
     });
     if (error) throw error;
-    return String(code);
+    return created;
   },
   acceptInvitation: async (code: string) => {
     if (!supabase) throw new Error("Сервер недоступен.");
@@ -194,17 +227,30 @@ export const organizationRepository = {
     if (error) throw error;
   },
   updateEmployee: async (data: {
-    assignmentId: string; name: string; position: string; phone: string;
-    email: string; departmentId?: string | null; isPublic?: boolean;
+    assignmentId: string; organizationId: string; name: string; position: string; phone: string; whatsapp: string;
+    email: string; departmentId?: string | null; isPublic?: boolean; secondPhone?: string;
+    website?: string; address?: string; telegram?: string; instagram?: string; facebook?: string;
+    description?: string; photo?: string; companyLogo?: string; language?: string; theme?: string; template?: string;
   }) => {
     if (!supabase) throw new Error("Сервер недоступен.");
+    const [photo, companyLogo] = await Promise.all([
+      uploadEmployeeAsset(data.organizationId, "photo", data.photo ?? ""),
+      uploadEmployeeAsset(data.organizationId, "logo", data.companyLogo ?? "")
+    ]);
     const { error } = await supabase.rpc("update_organization_employee_card", {
       target_assignment_id: data.assignmentId,
       employee_name: data.name.trim(),
       employee_position: data.position.trim(),
       employee_phone: data.phone.trim(),
+      employee_whatsapp: data.whatsapp.trim(),
       employee_email: data.email.trim(),
       target_department_id: data.departmentId ?? null,
+      employee_second_phone: data.secondPhone?.trim() ?? "", employee_website: data.website?.trim() ?? "",
+      employee_address: data.address?.trim() ?? "", employee_telegram: data.telegram?.trim() ?? "",
+      employee_instagram: data.instagram?.trim() ?? "", employee_facebook: data.facebook?.trim() ?? "",
+      employee_description: data.description?.trim() ?? "", employee_photo: photo,
+      employee_company_logo: companyLogo, employee_language: data.language ?? "ru",
+      employee_theme: data.theme ?? "teal", employee_template: data.template ?? "executive",
       employee_is_public: data.isPublic ?? true
     });
     if (error) throw error;
