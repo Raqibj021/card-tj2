@@ -673,6 +673,14 @@ body {
 .org-search { display: flex; width: min(260px, 100%); align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 11px; padding: 0 10px; }
 .org-search svg { color: var(--muted); }
 .org-search input { width: 100%; min-height: 38px; border: 0; background: transparent; color: var(--ink); font-size: 11px; outline: 0; }
+.organization-directory-filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.organization-directory-filters select { min-height: 40px; max-width: 280px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); padding: 0 34px 0 12px; color: var(--ink); font-size: 11px; }
+.employee-card-form { max-height: min(62vh, 680px); overflow: auto; margin: 0 -6px; padding: 0 6px 4px; }
+.employee-card-form + .modal-note { margin-top: 14px; }
+.profile-detail-list > button { display: flex; width: 100%; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); padding: 13px; color: var(--muted); text-align: left; cursor: pointer; }
+.profile-detail-list > button > span { display: grid; place-items: center; }
+.profile-detail-list > button small, .profile-detail-list > button strong { display: block; }
+.profile-detail-list > button strong { margin-top: 3px; font-size: 11px; }
 .status-review { background: #fff7df !important; color: #926100 !important; }
 .dark .status-review { background: rgba(202,139,4,.15) !important; color: #f5c95e !important; }
 .table-action { border: 0; background: transparent; color: var(--muted); cursor: pointer; }
