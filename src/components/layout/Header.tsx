@@ -37,7 +37,7 @@ export default function Header() {
     ...(user ? [{ to: "/dashboard/leads", text: copy.leads }] : [])
   ];
   const accountName =
-    profile?.fullName.trim().split(/\s+/)[0] ||
+    String(profile?.fullName ?? "").trim().split(/\s+/)[0] ||
     user?.email?.split("@")[0] ||
     copy.account;
 
@@ -91,20 +91,20 @@ export default function Header() {
           </button>
           {user && <Link to="/notifications" className="site-notification-link" aria-label={copy.notifications} title={copy.notifications}><Bell size={18} />{counts.all > 0 && <b>{counts.all > 99 ? "99+" : counts.all}</b>}</Link>}
           {user ? (
-            <Link
-              to="/dashboard"
-              className="account-link"
-              aria-label={copy.account}
-              title={copy.account}
-            >
-              <span><UserRound size={17} /></span>
-              <strong>{accountName}</strong>
-            </Link>
-          ) : (
-            <Link to="/login" className="button button-secondary !min-h-10 !px-4">
-              {authLoading ? `${copy.login}…` : copy.login}
-            </Link>
-          )}
+              <Link
+                to="/dashboard"
+                className="account-link"
+                aria-label={copy.account}
+                title={copy.account}
+              >
+                <span><UserRound size={17} /></span>
+                <strong>{accountName}</strong>
+              </Link>
+            ) : (
+              <Link to="/login" className="button button-secondary !min-h-10 !px-4">
+                {authLoading ? `${copy.login}…` : copy.login}
+              </Link>
+            )}
         </div>
 
         <button
@@ -158,18 +158,18 @@ export default function Header() {
             </button>
           </div>
           {user ? (
-            <Link to="/dashboard" className="mobile-account-link">
-              <span><UserRound size={18} /></span>
-              <div>
-                <small>{copy.account}</small>
-                <strong>{accountName}</strong>
-              </div>
-            </Link>
-          ) : (
-            <Link to="/login" className="button button-secondary mt-2 w-full">
-              {authLoading ? `${copy.login}…` : copy.login}
-            </Link>
-          )}
+              <Link to="/dashboard" className="mobile-account-link">
+                <span><UserRound size={18} /></span>
+                <div>
+                  <small>{copy.account}</small>
+                  <strong>{accountName}</strong>
+                </div>
+              </Link>
+            ) : (
+              <Link to="/login" className="button button-secondary mt-2 w-full">
+                {authLoading ? `${copy.login}…` : copy.login}
+              </Link>
+            )}
         </div>
       )}
     </header>
