@@ -33,12 +33,8 @@ export default function Header() {
     { to: "/directory", text: copy.directory, icon: Search },
     { to: "/organizations", text: copy.organizations, icon: Building2 },
     { to: "/services", text: copy.services },
-    ...(user
-      ? [
-          { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
-          { to: "/dashboard/leads", text: copy.leads }
-        ]
-      : [])
+    { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
+    ...(user ? [{ to: "/dashboard/leads", text: copy.leads }] : [])
   ];
   const accountName =
     profile?.fullName.trim().split(/\s+/)[0] ||
@@ -94,22 +90,20 @@ export default function Header() {
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
           {user && <Link to="/notifications" className="site-notification-link" aria-label={copy.notifications} title={copy.notifications}><Bell size={18} />{counts.all > 0 && <b>{counts.all > 99 ? "99+" : counts.all}</b>}</Link>}
-          {!authLoading && (
-            user ? (
-              <Link
-                to="/dashboard"
-                className="account-link"
-                aria-label={copy.account}
-                title={copy.account}
-              >
-                <span><UserRound size={17} /></span>
-                <strong>{accountName}</strong>
-              </Link>
-            ) : (
-              <Link to="/login" className="button button-secondary !min-h-10 !px-4">
-                {copy.login}
-              </Link>
-            )
+          {user ? (
+            <Link
+              to="/dashboard"
+              className="account-link"
+              aria-label={copy.account}
+              title={copy.account}
+            >
+              <span><UserRound size={17} /></span>
+              <strong>{accountName}</strong>
+            </Link>
+          ) : (
+            <Link to="/login" className="button button-secondary !min-h-10 !px-4">
+              {authLoading ? `${copy.login}…` : copy.login}
+            </Link>
           )}
         </div>
 
@@ -163,20 +157,18 @@ export default function Header() {
               {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
             </button>
           </div>
-          {!authLoading && (
-            user ? (
-              <Link to="/dashboard" className="mobile-account-link">
-                <span><UserRound size={18} /></span>
-                <div>
-                  <small>{copy.account}</small>
-                  <strong>{accountName}</strong>
-                </div>
-              </Link>
-            ) : (
-              <Link to="/login" className="button button-secondary mt-2 w-full">
-                {copy.login}
-              </Link>
-            )
+          {user ? (
+            <Link to="/dashboard" className="mobile-account-link">
+              <span><UserRound size={18} /></span>
+              <div>
+                <small>{copy.account}</small>
+                <strong>{accountName}</strong>
+              </div>
+            </Link>
+          ) : (
+            <Link to="/login" className="button button-secondary mt-2 w-full">
+              {authLoading ? `${copy.login}…` : copy.login}
+            </Link>
           )}
         </div>
       )}
