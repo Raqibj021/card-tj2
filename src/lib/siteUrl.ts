@@ -15,4 +15,14 @@ export const publicSiteUrl = (path = "") => {
   return `${window.location.origin}${normalizedBasePath()}${cleanPath}`;
 };
 
-export const authRedirectUrl = (path = "") => publicSiteUrl(path);
+/**
+ * Authentication links must return to the origin that is actually serving
+ * the application. This keeps password recovery working on the temporary
+ * Cloudflare domain and switches to vizora.tj automatically once that domain
+ * is connected. Public card links can still use VITE_PUBLIC_SITE_URL.
+ */
+export const authRedirectUrl = (path = "") => {
+  if (typeof window === "undefined") return publicSiteUrl(path);
+  const cleanPath = path ? `/${path.replace(/^\/+/, "")}` : "";
+  return `${window.location.origin}${normalizedBasePath()}${cleanPath}`;
+};
