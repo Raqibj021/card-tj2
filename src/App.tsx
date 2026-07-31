@@ -12,7 +12,7 @@ import OrganizationsPage from "./pages/OrganizationsPage";
 import OrganizationApplyPage from "./pages/OrganizationApplyPage";
 import SupportPage from "./pages/SupportPage";
 import ServicesPage from "./pages/ServicesPage";
-import AuthPage from "./pages/AuthPage";
+import UserAuthPage from "./pages/UserAuthPage";
 import OrganizationDashboardPage from "./pages/OrganizationDashboardPage";
 import PaymentPage from "./pages/PaymentPage";
 import AdminPaymentsPage from "./pages/AdminPaymentsPage";
@@ -73,8 +73,8 @@ export default function App() {
         <Route path="/service-order" element={<ProtectedRoute><ServiceOrderPage /></ProtectedRoute>} />
         <Route path="/contract" element={<ProtectedRoute><ContractPage /></ProtectedRoute>} />
         <Route path="/print-card" element={<PrintCardDesignerPage />} />
-        <Route path="/login" element={<AuthPage mode="login" />} />
-        <Route path="/register" element={<AuthPage mode="register" />} />
+        <Route path="/login" element={<UserAuthPage mode="login" />} />
+        <Route path="/register" element={<UserAuthPage mode="register" />} />
         <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
         <Route path="/reset-password" element={<PasswordRecoveryPage reset />} />
         <Route path="/create" element={<CreatePage />} />
