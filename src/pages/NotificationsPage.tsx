@@ -42,8 +42,13 @@ export default function NotificationsPage() {
     void refresh();
     const onChange = () => void refresh();
     window.addEventListener(notificationChangedEvent, onChange);
-    const channel = supabase && user
-      ? supabase.channel(`notifications-page-${user.id}`)
+    // Keep every effect instance isolated. In development/StrictMode the
+    // previous channel may still be closing when this effect subscribes again.
+    const channelTopic = user
+      ? `notifications-page-${user.id}-${crypto.randomUUID()}`
+      : null;
+    const channel = supabase && user && channelTopic
+      ? supabase.channel(channelTopic)
           .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` }, onChange)
           .subscribe()
       : null;
