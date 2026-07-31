@@ -39,22 +39,7 @@ jobs:
       - name: Add GitHub Pages SPA fallback
         run: cp deployment/github-pages-404.html dist/404.html
 
-      - name: Configure vizora.tj custom domain
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.request("PUT /repos/{owner}/{repo}/pages", {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              cname: "vizora.tj",
-              build_type: "workflow",
-              headers: {
-                "X-GitHub-Api-Version": "2022-11-28"
-              }
-            })
-
-      - name: Configure Pages
+      - name: Add custom domain marker\n        run: echo "vizora.tj" > dist/CNAME\n\n      - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
