@@ -1,6 +1,21 @@
 import { createSlug } from "./cardUtils";
 import { supabase } from "./supabase";
 
+const REQUEST_TIMEOUT_MS = 12000;
+const withTimeout = async <T>(request: PromiseLike<T>, message: string): Promise<T> => {
+  let timer: number | undefined;
+  try {
+    return await Promise.race([
+      Promise.resolve(request),
+      new Promise<T>((_, reject) => {
+        timer = window.setTimeout(() => reject(new Error(message)), REQUEST_TIMEOUT_MS);
+      })
+    ]);
+  } finally {
+    if (timer !== undefined) window.clearTimeout(timer);
+  }
+};
+
 export interface OrganizationApplication {
   id: string; displayName: string; legalName: string; organizationType: string;
   phone: string; email: string; planCode: string; employeeLimit: number;
@@ -147,10 +162,11 @@ export const organizationRepository = {
 
   getWorkspace: async (organizationId?: string): Promise<OrganizationWorkspace | null> => {
     if (!supabase) return null;
-    const organizations = await organizationRepository.listMine();
-    const organization = organizations.find((item) => item.id === organizationId) ?? organizations[0];
-    if (!organization) return null;
-    const { data, error } = await supabase.rpc("get_organization_workspace", { target_organization_id: organization.id });
+    if (!organizationId) return null;
+    const { data, error } = await withTimeout(
+      supabase.rpc("get_organization_workspace", { target_organization_id: organizationId }),
+      "Сервер слишком долго загружает организацию. Обновите страницу."
+    );
     if (error) throw new Error(error.message || "Не удалось загрузить рабочий кабинет организации.");
     if (!data) throw new Error("Сервер не вернул данные организации.");
     const payload = data as { organization: Record<string, unknown>; departments: Array<Record<string, unknown>>; employees: Array<Record<string, unknown>>; };
@@ -195,7 +211,7 @@ export const organizationRepository = {
       uploadEmployeeAsset(data.organizationId, "photo", data.photo ?? ""),
       uploadEmployeeAsset(data.organizationId, "logo", data.companyLogo ?? "")
     ]);
-    const { data: created, error } = await supabase.rpc("create_organization_employee_card", {
+    const { data: created, error } = await withTimeout(supabase.rpc("create_organization_employee_card", {
       target_organization_id: data.organizationId, employee_name: data.name.trim(),
       employee_position: data.position.trim(), employee_phone: data.phone.trim(),
       employee_whatsapp: data.whatsapp.trim(), target_department_id: data.departmentId,
@@ -206,8 +222,13 @@ export const organizationRepository = {
       employee_photo: photo, employee_company_logo: companyLogo,
       employee_language: data.language ?? "ru", employee_theme: data.theme ?? "teal",
       employee_template: data.template ?? "executive"
-    });
-    if (error) throw error;
+    }), "Сервер не ответил. Повторите создание сотрудника.");
+    if (error) {
+      if (error.message.includes("create_organization_employee_card")) {
+        throw new Error("Функция сотрудников ещё не активирована в Supabase. Выполните миграцию 031.");
+      }
+      throw new Error(error.message || "Не удалось создать визитку сотрудника.");
+    }
     return created;
   },
   acceptInvitation: async (code: string) => {
