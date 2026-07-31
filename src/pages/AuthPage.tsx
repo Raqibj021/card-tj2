@@ -137,6 +137,22 @@ function readableAuthError(error: unknown, language: Language) {
       ? String((error as { message?: unknown }).message ?? "")
       : String(error ?? "");
 
+  const normalizedMessage = rawMessage.toLowerCase();
+  if (normalizedMessage.includes("invalid login credentials")) {
+    return language === "ru"
+      ? "Неверная электронная почта или пароль. Проверьте данные либо восстановите пароль."
+      : language === "tj"
+        ? "Почтаи электронӣ ё рамз нодуруст аст. Маълумотро санҷед ё рамзро барқарор намоед."
+        : "Incorrect email or password. Check your details or recover your password.";
+  }
+  if (normalizedMessage.includes("email not confirmed")) {
+    return language === "ru"
+      ? "Электронная почта ещё не подтверждена. Откройте письмо с кодом подтверждения."
+      : language === "tj"
+        ? "Почтаи электронӣ ҳанӯз тасдиқ нашудааст. Мактуби рамзи тасдиқро кушоед."
+        : "Your email has not been confirmed yet. Open the confirmation email.";
+  }
+
   if (!rawMessage || rawMessage === "{}" || rawMessage === "[object Object]") {
     return language === "ru"
       ? "Не удалось отправить письмо. Проверьте настройки SMTP и попробуйте ещё раз."
