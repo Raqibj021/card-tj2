@@ -1,5 +1,5 @@
 import { CheckCircle2, Clock3, Copy, CreditCard, FileCheck2, LockKeyhole, ShieldCheck, Upload } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useSearchParams } from "react-router";
 import Footer from "../components/layout/Footer";
 import { paymentRepository, type PaymentRequest } from "../lib/paymentRepository";
@@ -31,7 +31,26 @@ export default function PaymentPage() {
   const [receiptName, setReceiptName] = useState("");
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [checkingExisting, setCheckingExisting] = useState(true);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    setCheckingExisting(true);
+    setError("");
+    paymentRepository.findPending(planKey, organizationId)
+      .then((existing) => {
+        if (active) setCreated(existing);
+      })
+      .catch((caught) => {
+        if (active) setError(caught instanceof Error ? caught.message : "Не удалось проверить статус оплаты.");
+      })
+      .finally(() => {
+        if (active) setCheckingExisting(false);
+      });
+    return () => { active = false; };
+  }, [planKey, organizationId]);
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!receiptFile) return;
@@ -60,7 +79,9 @@ export default function PaymentPage() {
       <main className="payment-page">
         <div className="site-container grid gap-8 py-10 lg:grid-cols-[1fr_380px] lg:py-14">
           <section className="application-panel">
-            {created ? (
+            {checkingExisting ? (
+              <div className="route-loading"><span /><p>...</p></div>
+            ) : created ? (
               <div className="payment-success">
                 <CheckCircle2 size={54} />
                 <span className="section-label">{c.accepted}</span>

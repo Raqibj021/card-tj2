@@ -4,6 +4,7 @@ export type PaymentStatus = "draft" | "payment_pending" | "payment_review" | "ac
 
 export interface PaymentRequest {
   id: string;
+  organizationId?: string;
   orderNumber: string;
   customerName: string;
   phone: string;
@@ -19,6 +20,7 @@ export interface PaymentRequest {
 
 const fromDatabase = (row: Record<string, unknown>): PaymentRequest => ({
   id: String(row.id),
+  organizationId: row.organization_id ? String(row.organization_id) : undefined,
   orderNumber: String(row.order_number),
   customerName: String((row.customer_snapshot as Record<string, unknown> | null)?.fullName ?? ""),
   phone: String((row.customer_snapshot as Record<string, unknown> | null)?.phone ?? ""),
@@ -43,6 +45,23 @@ export const paymentRepository = {
     return (data ?? []).map((row) => fromDatabase(row as Record<string, unknown>));
   },
 
+  findPending: async (planCode: string, organizationId?: string) => {
+    if (!supabase) throw new Error("Сервер оплаты временно недоступен.");
+    let query = supabase
+      .from("orders")
+      .select("*")
+      .eq("plan_code", planCode)
+      .in("status", ["payment_pending", "payment_review"])
+      .order("created_at", { ascending: false })
+      .limit(1);
+    query = organizationId
+      ? query.eq("organization_id", organizationId)
+      : query.is("organization_id", null);
+    const { data, error } = await query.maybeSingle();
+    if (error) throw error;
+    return data ? fromDatabase(data as Record<string, unknown>) : null;
+  },
+
   create: async (data: {
     customerName: string;
     phone: string;
@@ -55,6 +74,8 @@ export const paymentRepository = {
     if (!supabase) throw new Error("Сервер оплаты временно недоступен.");
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
+    const existingRequest = await paymentRepository.findPending(data.planCode, data.organizationId);
+    if (existingRequest) return existingRequest;
     if (data.receiptFile.size > 5 * 1024 * 1024) throw new Error("Размер чека не должен превышать 5 МБ.");
     if (!["image/png", "image/jpeg", "application/pdf"].includes(data.receiptFile.type)) {
       throw new Error("Разрешены только JPG, PNG и PDF.");
@@ -81,6 +102,10 @@ export const paymentRepository = {
     });
     if (error) {
       await supabase.storage.from("payment-receipts").remove([receiptPath]);
+      if (error.message.toLowerCase().includes("already awaiting review")) {
+        const pendingRequest = await paymentRepository.findPending(data.planCode, data.organizationId);
+        if (pendingRequest) return pendingRequest;
+      }
       throw new Error(error.message);
     }
     return fromDatabase(inserted as Record<string, unknown>);
