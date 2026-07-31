@@ -36,7 +36,14 @@ const STORAGE_KEY = "vizora.leads.v1";
 
 const read = (): Lead[] => {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]") as Lead[];
+    const value: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+    if (!Array.isArray(value)) return [];
+    return value.filter(
+      (item): item is Lead =>
+        Boolean(item) &&
+        typeof item === "object" &&
+        typeof (item as Partial<Lead>).id === "string"
+    );
   } catch {
     return [];
   }
@@ -98,7 +105,9 @@ const fromDatabase = (row: Record<string, unknown>): Lead => {
 };
 
 export const leadRepository = {
-  list: () => read().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
+  list: () => read().sort((a, b) =>
+    String(b.updatedAt ?? "").localeCompare(String(a.updatedAt ?? ""))
+  ),
   listRemote: async () => {
     if (!supabase) throw new Error("Сервис CRM временно недоступен.");
     const { data: auth, error: authError } = await supabase.auth.getUser();
