@@ -72,9 +72,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let active = true;
-    void cardRepository.listRemote().then((result) => {
-      if (active) setCards(withoutDemoCards(result));
-    });
+    void cardRepository.listRemote()
+      .then((result) => {
+        if (active) setCards(withoutDemoCards(Array.isArray(result) ? result : []));
+      })
+      .catch(() => {
+        if (active) setCards([]);
+      });
     void promoRepository.status().then((result) => {
       if (active) setPromo(result);
     }).catch(() => undefined);
