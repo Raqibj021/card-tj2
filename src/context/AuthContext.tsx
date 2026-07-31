@@ -34,13 +34,34 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const AUTH_TIMEOUT_MS = 8000;
+
+async function withTimeout<T>(work: PromiseLike<T>, timeoutMs = AUTH_TIMEOUT_MS) {
+  let timeoutId: number | undefined;
+  try {
+    return await Promise.race([
+      Promise.resolve(work),
+      new Promise<T>((_, reject) => {
+        timeoutId = window.setTimeout(
+          () => reject(new Error("auth-timeout")),
+          timeoutMs
+        );
+      })
+    ]);
+  } finally {
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  }
+}
+
 const loadProfile = async (user: User | null): Promise<AccountProfile | null> => {
   if (!supabase || !user) return null;
-  const { data } = await supabase
-    .from("profiles")
-    .select("id, full_name, email, phone, role, preferred_language, identity_verified_at")
-    .eq("id", user.id)
-    .maybeSingle();
+  const { data } = await withTimeout(
+    supabase
+      .from("profiles")
+      .select("id, full_name, email, phone, role, preferred_language, identity_verified_at")
+      .eq("id", user.id)
+      .maybeSingle()
+  );
   if (!data) return null;
   return {
     id: String(data.id),
@@ -78,29 +99,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const applySession = async (nextSession: Session | null) => {
       if (!active) return;
       setSession(nextSession);
-      const nextProfile = await loadProfile(nextSession?.user ?? null);
-      if (!active) return;
-      setProfile(nextProfile);
-      setLoading(false);
+      try {
+        const nextProfile = await loadProfile(nextSession?.user ?? null);
+        if (active) setProfile(nextProfile);
+      } catch {
+        // A profile request must never block access to login or the dashboard.
+        if (active) setProfile(null);
+      } finally {
+        if (active) setLoading(false);
+      }
     };
 
     const restoreStoredSession = async () => {
-      const { data, error } = await client.auth.getSession();
-      if (!active) return;
-      if (error) {
-        setSession(null);
-        setProfile(null);
-        setLoading(false);
-        return;
+      try {
+        const { data, error } = await withTimeout(client.auth.getSession());
+        if (!active) return;
+        if (error) {
+          setSession(null);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        if (data.session) {
+          const { data: userData, error: userError } = await withTimeout(
+            client.auth.getUser(data.session.access_token)
+          );
+          if (!active) return;
+          if (userError || !userData.user) {
+            setSession(null);
+            setProfile(null);
+            setLoading(false);
+            void client.auth.signOut({ scope: "local" });
+            return;
+          }
+        }
+
+        await applySession(data.session);
+      } catch {
+        // Network trouble or a stale browser token must not leave a black screen.
+        if (active) setLoading(false);
       }
-      await applySession(data.session);
     };
 
     void restoreStoredSession();
 
     const { data: listener } = client.auth.onAuthStateChange((_event, nextSession) => {
-      void applySession(nextSession);
+      // Defer database work until Supabase releases its internal auth lock.
+      window.setTimeout(() => {
+        if (active) void applySession(nextSession);
+      }, 0);
     });
+
+    const loadingFallback = window.setTimeout(() => {
+      if (active) setLoading(false);
+    }, AUTH_TIMEOUT_MS + 1000);
 
     const restoreWhenVisible = () => {
       if (document.visibilityState === "visible") void restoreStoredSession();
@@ -110,6 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       active = false;
+      window.clearTimeout(loadingFallback);
       document.removeEventListener("visibilitychange", restoreWhenVisible);
       window.removeEventListener("focus", restoreStoredSession);
       listener.subscription.unsubscribe();
