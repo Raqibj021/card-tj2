@@ -1,6 +1,6 @@
 import {
-  Ban, Building2, CheckCircle2, ChevronRight, ContactRound, RefreshCw,
-  Search, ShieldAlert, Undo2, UsersRound, WalletCards, X
+  Ban, Building2, CheckCircle2, ChevronRight, ContactRound, FilePenLine,
+  RefreshCw, Search, ShieldAlert, Undo2, UsersRound, WalletCards, X
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
@@ -70,6 +70,45 @@ export default function AdminAccountsPage() {
       await refresh();
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Не удалось изменить статус.");
+    }
+  };
+
+  const reviewOrganization = async (
+    organization: AdminOrganizationDetail,
+    decision: "approved" | "rejected" | "changes_requested"
+  ) => {
+    const approving = decision === "approved";
+    const label = approving ? "одобрить" : decision === "changes_requested" ? "вернуть на исправление" : "отклонить";
+    const defaultNote = approving
+      ? "Заявка принята. Рабочий кабинет организации активирован."
+      : decision === "changes_requested"
+        ? "Уточните данные организации и отправьте заявку повторно."
+        : "";
+    const note = window.prompt(
+      approving
+        ? "Комментарий пользователю (необязательно):"
+        : "Комментарий пользователю (обязательно):",
+      defaultNote
+    );
+    if (note === null || (!approving && !note.trim())) return;
+    if (!window.confirm(`${label[0].toUpperCase()}${label.slice(1)} организацию «${organization.name}»?`)) return;
+    setLoading(true);
+    try {
+      await adminRepository.reviewOrganization(organization.id, decision, note);
+      const detail = await adminRepository.organizationDetail(organization.id);
+      setSelectedOrganization(detail);
+      await refresh();
+      setNotice(
+        approving
+          ? "Организация одобрена. Пользователь получил уведомление и доступ к рабочему кабинету."
+          : decision === "changes_requested"
+            ? "Заявка возвращена на исправление. Комментарий отправлен пользователю."
+            : "Заявка отклонена. Причина отправлена пользователю."
+      );
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Не удалось сохранить решение.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -149,7 +188,24 @@ export default function AdminAccountsPage() {
             <span><small>Статус</small><strong>{selectedOrganization.status}</strong></span>
             <span><small>Отделы</small><strong>{selectedOrganization.departments}</strong></span>
             <span><small>Сотрудники</small><strong>{selectedOrganization.employees}</strong></span>
+            {selectedOrganization.organizationType && <span><small>Тип</small><strong>{selectedOrganization.organizationType}</strong></span>}
+            {selectedOrganization.planCode && <span><small>Тариф</small><strong>{selectedOrganization.planCode} · {selectedOrganization.employeeLimit ?? "—"} сотрудников</strong></span>}
           </div>
+          {["pending", "changes_requested", "rejected"].includes(selectedOrganization.status) && (
+            <section className="admin-organization-review">
+              <small>РЕШЕНИЕ ПО ЗАЯВКЕ</small>
+              <h3>Проверка организации</h3>
+              <p>Комментарий автоматически появится у владельца в разделе «Уведомления».</p>
+              <div>
+                <button className="approve" disabled={loading} onClick={() => void reviewOrganization(selectedOrganization, "approved")}><CheckCircle2 size={17} /> Одобрить</button>
+                <button className="changes" disabled={loading} onClick={() => void reviewOrganization(selectedOrganization, "changes_requested")}><FilePenLine size={17} /> На исправление</button>
+                <button className="reject" disabled={loading} onClick={() => void reviewOrganization(selectedOrganization, "rejected")}><X size={17} /> Отклонить</button>
+              </div>
+            </section>
+          )}
+          {selectedOrganization.status === "approved" && (
+            <div className="admin-organization-approved"><CheckCircle2 size={18} /><span>Организация одобрена. Владелец управляет структурой и визитками сотрудников.</span></div>
+          )}
           <h3>Структура организации</h3>
           <div className="admin-structure-list">
             {selectedOrganization.structure.map((item) => <div key={item.id} className={item.parentId ? "child" : ""}><Building2 size={15} /><span>{item.name}</span><b>{item.employees}</b></div>)}

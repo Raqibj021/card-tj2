@@ -65,6 +65,11 @@ export interface AdminOrganization {
 }
 
 export interface AdminOrganizationDetail extends AdminOrganization {
+  organizationType?: string;
+  phone?: string;
+  email?: string;
+  planCode?: string;
+  employeeLimit?: number;
   structure: Array<{ id: string; name: string; parentId: string | null; employees: number }>;
   members: Array<{
     id: string;
@@ -181,6 +186,21 @@ export const adminRepository = {
     });
     if (error) throw error;
     return data as AdminOrganizationDetail;
+  },
+
+  async reviewOrganization(
+    organizationId: string,
+    decision: "approved" | "rejected" | "changes_requested",
+    note: string
+  ) {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { data, error } = await supabase.rpc("admin_review_organization", {
+      target_organization_id: organizationId,
+      decision,
+      note: note.trim()
+    });
+    if (error) throw error;
+    return data as { organizationId: string; status: string; ownerId: string };
   },
 
   async setAccountStatus(profileId: string, status: "active" | "blocked", reason: string) {
