@@ -24,11 +24,12 @@ const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
 
 const loadAdminProfile = async (user: User | null): Promise<AccountProfile | null> => {
   if (!adminSupabase || !user) return null;
-  const { data } = await adminSupabase
+  const { data, error } = await adminSupabase
     .from("profiles")
     .select("id, full_name, email, phone, role, preferred_language, identity_verified_at")
     .eq("id", user.id)
     .maybeSingle();
+  if (error) return null;
   if (!data) return null;
   return {
     id: String(data.id),
@@ -52,9 +53,15 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const applySession = async (nextSession: Session | null) => {
-    setSession(nextSession);
-    setProfile(await loadAdminProfile(nextSession?.user ?? null));
-    setLoading(false);
+    try {
+      setSession(nextSession);
+      setProfile(await loadAdminProfile(nextSession?.user ?? null));
+    } catch {
+      setSession(null);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const refreshProfile = async () => {
@@ -67,11 +74,15 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     let active = true;
-    void adminSupabase.auth.getSession().then(({ data }) => {
-      if (active) void applySession(data.session);
-    });
+    void adminSupabase.auth.getSession()
+      .then(({ data, error }) => {
+        if (active) void applySession(error ? null : data.session);
+      })
+      .catch(() => {
+        if (active) void applySession(null);
+      });
     const { data: listener } = adminSupabase.auth.onAuthStateChange((_event, nextSession) => {
-      if (active) void applySession(nextSession);
+      if (active) void applySession(nextSession).catch(() => setLoading(false));
     });
     return () => {
       active = false;
