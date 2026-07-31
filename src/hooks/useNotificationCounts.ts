@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { createUuid } from "../lib/id";
 import { notificationChangedEvent, notificationSection, type NotificationSection } from "../lib/notificationCenter";
 import { supabase } from "../lib/supabase";
 
@@ -34,7 +35,7 @@ export function useNotificationCounts() {
     // topic prevents the new subscription from reusing an already subscribed
     // Realtime channel and throwing "cannot add postgres_changes callbacks".
     const channelTopic = user
-      ? `notification-counts-${user.id}-${crypto.randomUUID()}`
+      ? `notification-counts-${user.id}-${createUuid()}`
       : null;
     const channel = supabase && user && channelTopic
       ? supabase.channel(channelTopic)
