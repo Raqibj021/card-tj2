@@ -1,6 +1,7 @@
 import type { Session, User } from "@supabase/supabase-js";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -28,147 +29,140 @@ interface AuthContextValue {
   loading: boolean;
   isAdmin: boolean;
   isModerator: boolean;
+  refreshSession: () => Promise<Session | null>;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const SESSION_TIMEOUT_MS = 6000;
 
-const AUTH_TIMEOUT_MS = 8000;
-
-async function withTimeout<T>(work: PromiseLike<T>, timeoutMs = AUTH_TIMEOUT_MS) {
-  let timeoutId: number | undefined;
-  try {
-    return await Promise.race([
-      Promise.resolve(work),
-      new Promise<T>((_, reject) => {
-        timeoutId = window.setTimeout(
-          () => reject(new Error("auth-timeout")),
-          timeoutMs
-        );
-      })
-    ]);
-  } finally {
-    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
-  }
+function timeout<T>(work: PromiseLike<T>, delay = SESSION_TIMEOUT_MS) {
+  let timer: number | undefined;
+  return Promise.race([
+    Promise.resolve(work),
+    new Promise<T>((_, reject) => {
+      timer = window.setTimeout(() => reject(new Error("session-timeout")), delay);
+    })
+  ]).finally(() => {
+    if (timer !== undefined) window.clearTimeout(timer);
+  });
 }
 
-const loadProfile = async (user: User | null): Promise<AccountProfile | null> => {
-  if (!supabase || !user) return null;
-  const { data } = await withTimeout(
-    supabase
-      .from("profiles")
-      .select("id, full_name, email, phone, role, preferred_language, identity_verified_at")
-      .eq("id", user.id)
-      .maybeSingle()
-  );
-  if (!data) return null;
-  return {
-    id: String(data.id),
-    fullName: String(data.full_name ?? ""),
-    email: String(data.email ?? user.email ?? ""),
-    phone: String(data.phone ?? ""),
-    role: (data.role as AccountRole) ?? "user",
-    preferredLanguage:
-      data.preferred_language === "tj" || data.preferred_language === "en"
-        ? data.preferred_language
-        : "ru",
-    identityVerifiedAt: data.identity_verified_at
-      ? String(data.identity_verified_at)
-      : null
-  };
-};
+async function loadProfile(user: User): Promise<AccountProfile | null> {
+  if (!supabase) return null;
+  try {
+    const { data, error } = await timeout(
+      supabase
+        .from("profiles")
+        .select("id, full_name, email, phone, role, preferred_language, identity_verified_at")
+        .eq("id", user.id)
+        .maybeSingle()
+    );
+    if (error || !data) return null;
+    return {
+      id: String(data.id),
+      fullName: String(data.full_name ?? user.user_metadata?.full_name ?? ""),
+      email: String(data.email ?? user.email ?? ""),
+      phone: String(data.phone ?? ""),
+      role: (data.role as AccountRole) ?? "user",
+      preferredLanguage:
+        data.preferred_language === "tj" || data.preferred_language === "en"
+          ? data.preferred_language
+          : "ru",
+      identityVerifiedAt: data.identity_verified_at
+        ? String(data.identity_verified_at)
+        : null
+    };
+  } catch {
+    return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AccountProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshProfile = async () => {
-    setProfile(await loadProfile(session?.user ?? null));
-  };
+  const refreshSession = useCallback(async () => {
+    if (!supabase) {
+      setSession(null);
+      setLoading(false);
+      return null;
+    }
+    try {
+      const { data, error } = await timeout(supabase.auth.getSession());
+      const nextSession = error ? null : data.session;
+      setSession(nextSession);
+      return nextSession;
+    } catch {
+      setSession(null);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    const currentUser = session?.user ?? null;
+    setProfile(currentUser ? await loadProfile(currentUser) : null);
+  }, [session?.user]);
 
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
       return;
     }
-    const client = supabase;
+
     let active = true;
+    const client = supabase;
 
-    const applySession = async (nextSession: Session | null) => {
-      if (!active) return;
-      setSession(nextSession);
-      try {
-        const nextProfile = await loadProfile(nextSession?.user ?? null);
-        if (active) setProfile(nextProfile);
-      } catch {
-        // A profile request must never block access to login or the dashboard.
-        if (active) setProfile(null);
-      } finally {
-        if (active) setLoading(false);
-      }
-    };
-
-    const restoreStoredSession = async () => {
-      try {
-        const { data, error } = await withTimeout(client.auth.getSession());
+    void client.auth.getSession()
+      .then(({ data, error }) => {
         if (!active) return;
-        if (error) {
-          setSession(null);
-          setProfile(null);
-          setLoading(false);
-          return;
-        }
-
-        if (data.session) {
-          const { data: userData, error: userError } = await withTimeout(
-            client.auth.getUser(data.session.access_token)
-          );
-          if (!active) return;
-          if (userError || !userData.user) {
-            setSession(null);
-            setProfile(null);
-            setLoading(false);
-            void client.auth.signOut({ scope: "local" });
-            return;
-          }
-        }
-
-        await applySession(data.session);
-      } catch {
-        // Network trouble or a stale browser token must not leave a black screen.
-        if (active) setLoading(false);
-      }
-    };
-
-    void restoreStoredSession();
+        setSession(error ? null : data.session);
+        setLoading(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setSession(null);
+        setLoading(false);
+      });
 
     const { data: listener } = client.auth.onAuthStateChange((_event, nextSession) => {
-      // Defer database work until Supabase releases its internal auth lock.
-      window.setTimeout(() => {
-        if (active) void applySession(nextSession);
-      }, 0);
+      if (!active) return;
+      // Only update auth state here. Database requests are performed separately.
+      setSession(nextSession);
+      setLoading(false);
     });
 
-    const loadingFallback = window.setTimeout(() => {
+    const fallback = window.setTimeout(() => {
       if (active) setLoading(false);
-    }, AUTH_TIMEOUT_MS + 1000);
-
-    const restoreWhenVisible = () => {
-      if (document.visibilityState === "visible") void restoreStoredSession();
-    };
-    document.addEventListener("visibilitychange", restoreWhenVisible);
-    window.addEventListener("focus", restoreStoredSession);
+    }, SESSION_TIMEOUT_MS);
 
     return () => {
       active = false;
-      window.clearTimeout(loadingFallback);
-      document.removeEventListener("visibilitychange", restoreWhenVisible);
-      window.removeEventListener("focus", restoreStoredSession);
+      window.clearTimeout(fallback);
       listener.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    const currentUser = session?.user ?? null;
+    if (!currentUser) {
+      setProfile(null);
+      return () => {
+        active = false;
+      };
+    }
+    void loadProfile(currentUser).then((nextProfile) => {
+      if (active) setProfile(nextProfile);
+    });
+    return () => {
+      active = false;
+    };
+  }, [session?.user]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -178,12 +172,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loading,
       isAdmin: profile?.role === "admin",
       isModerator: profile?.role === "moderator" || profile?.role === "admin",
+      refreshSession,
       refreshProfile,
       signOut: async () => {
-        if (supabase) await supabase.auth.signOut();
+        if (!supabase) return;
+        await supabase.auth.signOut({ scope: "local" });
+        setSession(null);
+        setProfile(null);
       }
     }),
-    [session, profile, loading]
+    [session, profile, loading, refreshSession, refreshProfile]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
