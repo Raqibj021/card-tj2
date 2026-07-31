@@ -189,8 +189,11 @@ export const downloadQrCode = async (value: string, filename: string) => {
   anchor.click();
 };
 
-export const formatDate = (date: string, language = "ru") =>
-  new Intl.DateTimeFormat(
+export const formatDate = (date: string, language = "ru") => {
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return "—";
+  return new Intl.DateTimeFormat(
     language === "tj" ? "tg-TJ" : language === "en" ? "en-GB" : "ru-RU",
     { day: "2-digit", month: "short", year: "numeric" }
-  ).format(new Date(date));
+  ).format(parsed);
+};
