@@ -7,7 +7,11 @@
     <script>
       (function () {
         var path = location.pathname + location.search + location.hash;
-        sessionStorage.setItem("vizora-spa-redirect", path);
+        try {
+          sessionStorage.setItem("vizora-spa-redirect", path);
+        } catch (_) {
+          // The root page is still a safe fallback when browser storage is blocked.
+        }
         location.replace(location.origin + "/");
       })();
     </script>
