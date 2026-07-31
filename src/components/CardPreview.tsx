@@ -56,7 +56,7 @@ export default function CardPreview({
     tj: { kicker: "ПРОФИЛИ КАСБӢ", description: "Дар бораи худ, фаъолияти худ ва арзиши асосӣ барои муштарӣ кӯтоҳ маълумот диҳед." },
     en: { kicker: "PROFESSIONAL PROFILE", description: "Briefly introduce yourself, your work and the value you provide to clients." }
   }[language];
-  const palette = themeColors[card.theme];
+  const palette = themeColors[card.theme] ?? themeColors.teal;
   const style: AccentStyle = {
     "--card-accent": palette.accent,
     "--card-soft": palette.soft
