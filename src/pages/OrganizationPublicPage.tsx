@@ -42,6 +42,7 @@ type PublicCopy = {
   registry: string;
   published: string;
   scroll: string;
+  structure: string;
 };
 
 export default function OrganizationPublicPage() {
@@ -70,7 +71,8 @@ export default function OrganizationPublicPage() {
       emptyDepartment: "Опубликованных сотрудников пока нет",
       registry: "Официальный справочник организации",
       published: "Данные опубликованы организацией",
-      scroll: "Перейти к структуре"
+      scroll: "Перейти к структуре",
+      structure: "Структура"
     },
     tj: {
       missing: "Ташкилот ёфт нашуд",
@@ -89,7 +91,8 @@ export default function OrganizationPublicPage() {
       emptyDepartment: "Ҳоло корманди нашршуда нест",
       registry: "Маълумотномаи расмии ташкилот",
       published: "Маълумот аз ҷониби ташкилот нашр шудааст",
-      scroll: "Гузариш ба сохтор"
+      scroll: "Гузариш ба сохтор",
+      structure: "Сохтор"
     },
     en: {
       missing: "Organization not found",
@@ -108,7 +111,8 @@ export default function OrganizationPublicPage() {
       emptyDepartment: "No published employees yet",
       registry: "Official organization directory",
       published: "Information published by the organization",
-      scroll: "View organization structure"
+      scroll: "View organization structure",
+      structure: "Structure"
     }
   }[language];
 
@@ -227,7 +231,7 @@ export default function OrganizationPublicPage() {
 
         {isFiltering ? <EmployeeGrid employees={employees} departments={data.departments} copy={copy} /> : <>
           {employees.some((item) => !item.departmentId) && <section className="org-public-department org-public-reveal">
-            <DepartmentHeader name={copy.common} count={employees.filter((item) => !item.departmentId).length} index={0} />
+            <DepartmentHeader name={copy.common} count={employees.filter((item) => !item.departmentId).length} index={0} label={copy.structure} />
             <EmployeeGrid employees={employees.filter((item) => !item.departmentId)} departments={data.departments} copy={copy} />
           </section>}
           <PublicDepartmentTree departments={data.departments} employees={employees.filter((item) => item.departmentId)} copy={copy} />
@@ -259,10 +263,10 @@ function EmployeeGrid({ employees, departments, copy }: { employees: PublicOrgan
   })}</div>;
 }
 
-function DepartmentHeader({ name, count, index }: { name: string; count: number; index: number }) {
+function DepartmentHeader({ name, count, index, label }: { name: string; count: number; index: number; label: string }) {
   return <header className="org-public-department-head">
     <span className="org-public-department-number">{String(index + 1).padStart(2, "0")}</span>
-    <div><span>STRUCTURE</span><h3>{name}</h3></div>
+    <div><span>{label}</span><h3>{name}</h3></div>
     <strong><Users size={15} />{count}</strong>
   </header>;
 }
@@ -275,7 +279,7 @@ function PublicDepartmentTree({ departments, employees, copy, parentId = null, d
     const directEmployees = employees.filter((item) => item.departmentId === department.id);
     const total = employees.filter((item) => item.departmentId && nested.has(item.departmentId)).length;
     return <section className="org-public-department org-public-reveal" style={{ animationDelay: `${Math.min(index, 5) * 70}ms` }} key={department.id}>
-      <DepartmentHeader name={department.name} count={total} index={index} />
+      <DepartmentHeader name={department.name} count={total} index={index} label={copy.structure} />
       {directEmployees.length > 0
         ? <EmployeeGrid employees={directEmployees} departments={departments} copy={copy} />
         : !departments.some((item) => item.parentId === department.id) && <p className="org-public-department-empty">{copy.emptyDepartment}</p>}
