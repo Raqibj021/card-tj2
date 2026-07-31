@@ -83,7 +83,8 @@ const profileCopy = {
     pending: "ОЖИДАЕТ ПРОВЕРКИ",
     pendingText: "Визитка сохранена. Администратор проверит данные и одобрит её в ближайшее время.",
     pendingQrTitle: "QR-код появится после проверки",
-    pendingQrText: "До одобрения администратора QR-код, ссылка и контактные действия не работают."
+    pendingQrText: "До одобрения администратора QR-код, ссылка и контактные действия не работают.",
+    missingInfo: "Информация не добавлена"
   },
   tj: {
     digitalCard: "Варақаи рақамӣ",
@@ -112,7 +113,8 @@ const profileCopy = {
     pending: "ИНТИЗОРИ САНҶИШ",
     pendingText: "Варақа нигоҳ дошта шуд. Администратор маълумотро месанҷад ва ба наздикӣ онро тасдиқ мекунад.",
     pendingQrTitle: "QR-код пас аз санҷиш пайдо мешавад",
-    pendingQrText: "То тасдиқи администратор QR-код, пайванд ва амалҳои тамос кор намекунанд."
+    pendingQrText: "То тасдиқи администратор QR-код, пайванд ва амалҳои тамос кор намекунанд.",
+    missingInfo: "Маълумот илова нашудааст"
   },
   en: {
     digitalCard: "Digital business card",
@@ -141,7 +143,8 @@ const profileCopy = {
     pending: "AWAITING REVIEW",
     pendingText: "The card has been saved. An administrator will review and approve it shortly.",
     pendingQrTitle: "QR code will appear after review",
-    pendingQrText: "The QR code, public link and contact actions remain disabled until administrator approval."
+    pendingQrText: "The QR code, public link and contact actions remain disabled until administrator approval.",
+    missingInfo: "Information not provided"
   }
 } as const;
 
@@ -299,20 +302,20 @@ export default function CardPage() {
       label: "WhatsApp",
       primary: true
     },
-    card.telegram && {
-      href: socialUrl("telegram", card.telegram),
+    (card.telegram || card.organizationManaged) && {
+      href: card.telegram ? socialUrl("telegram", card.telegram) : null,
       icon: Send,
       label: "Telegram",
       primary: false
     },
-    card.email && {
-      href: `mailto:${card.email}`,
+    (card.email || card.organizationManaged) && {
+      href: card.email ? `mailto:${card.email}` : null,
       icon: Mail,
       label: "E-mail",
       primary: false
     }
   ].filter(Boolean) as Array<{
-    href: string;
+    href: string | null;
     icon: typeof Phone;
     label: string;
     primary: boolean;
@@ -435,12 +438,12 @@ export default function CardPage() {
             <div className="profile-action-grid">
               {actionLinks.map(({ href, icon: Icon, label, primary }) => (
                 <a
-                  href={isLocked ? undefined : href}
+                  href={isLocked || !href ? undefined : href}
                   key={label}
-                  className={`profile-action ${primary ? "profile-action-primary" : ""} ${isLocked ? "is-disabled" : ""}`}
-                  aria-disabled={isLocked}
-                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
-                  target={href.startsWith("http") ? "_blank" : undefined}
+                  className={`profile-action ${primary ? "profile-action-primary" : ""} ${isLocked || !href ? "is-disabled" : ""}`}
+                  aria-disabled={isLocked || !href}
+                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : !href ? (event) => { event.preventDefault(); showToast(labels.missingInfo); } : undefined}
+                  target={href?.startsWith("http") ? "_blank" : undefined}
                   rel="noreferrer"
                 >
                   <Icon size={19} />
@@ -459,7 +462,7 @@ export default function CardPage() {
               {t("saveContact")}
             </button>
 
-            <div className="profile-lead-panel">
+            {!card.organizationManaged && <div className="profile-lead-panel">
               <div>
                 <small>{labels.quickRequest}</small>
                 <strong>{labels.howHelp}</strong>
@@ -475,7 +478,7 @@ export default function CardPage() {
                   <ClipboardPenLine size={18} /><span>{labels.request}</span>
                 </button>
               </div>
-            </div>
+            </div>}
 
             <div className="profile-detail-list">
               {card.phone && (
@@ -526,6 +529,8 @@ export default function CardPage() {
                   <div><small>{t("address")}</small><strong>{card.address}</strong><em>{t("map")}</em></div>
                 </a>
               )}
+              {card.organizationManaged && !card.website && <button type="button" className="is-disabled" onClick={() => showToast(labels.missingInfo)}><span><Globe2 size={18} /></span><div><small>{t("website")}</small><strong>{labels.missingInfo}</strong></div></button>}
+              {card.organizationManaged && !card.address && <button type="button" className="is-disabled" onClick={() => showToast(labels.missingInfo)}><span><MapPin size={18} /></span><div><small>{t("address")}</small><strong>{labels.missingInfo}</strong></div></button>}
             </div>
 
             {(card.instagram || card.facebook || card.whatsapp || card.telegram) && (
@@ -591,9 +596,9 @@ export default function CardPage() {
                 >
                   <Download size={17} /> {t("downloadQr")}
                 </button>
-                <button type="button" className="button button-ghost w-full" onClick={addToWallet}>
+                {!card.organizationManaged && <button type="button" className="button button-ghost w-full" onClick={addToWallet}>
                   <WalletCards size={17} /> {labels.addWallet}
-                </button>
+                </button>}
               </div>
             </div>
           )}
@@ -607,11 +612,11 @@ export default function CardPage() {
       <footer className="profile-footer">
         <span>{labels.createdOn}</span>
         <Link to="/">Vizora.tj</Link>
-        {!isLocked && <ReportCardButton cardId={card.id} />}
+        {!isLocked && !card.organizationManaged && <ReportCardButton cardId={card.id} />}
       </footer>
 
       {toast && <div className="toast"><Check size={17} /> {toast}</div>}
-      {leadSource && (
+      {leadSource && !card.organizationManaged && (
         <LeadFormModal
           cardId={card.id}
           cardSlug={card.slug}
