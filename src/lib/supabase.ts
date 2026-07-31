@@ -12,6 +12,7 @@ export const isSupabaseConfigured = Boolean(
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabasePublishableKey, {
       auth: {
+        storageKey: "vizora-user-auth",
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true
