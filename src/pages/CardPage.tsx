@@ -165,13 +165,25 @@ export default function CardPage() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    void cardRepository.getPublicBySlug(slug).then((result) => {
+    const timer = window.setTimeout(() => {
       if (!active) return;
-      setCard(result);
+      setCard(undefined);
       setLoading(false);
-    });
-    return () => { active = false; };
+    }, 12000);
+    setLoading(true);
+    void cardRepository.getPublicBySlug(slug)
+      .then((result) => {
+        if (active) setCard(result);
+      })
+      .catch(() => {
+        if (active) setCard(undefined);
+      })
+      .finally(() => {
+        if (!active) return;
+        window.clearTimeout(timer);
+        setLoading(false);
+      });
+    return () => { active = false; window.clearTimeout(timer); };
   }, [slug]);
 
   useEffect(() => {

@@ -97,23 +97,32 @@ export const organizationRepository = {
 
   listMine: async (): Promise<OrganizationApplication[]> => {
     if (!supabase) return [];
-    const { data: auth, error: authError } = await supabase.auth.getUser();
+    const { data: auth, error: authError } = await withTimeout(
+      supabase.auth.getUser(),
+      "Не удалось проверить вход в аккаунт. Обновите страницу."
+    );
     if (authError || !auth.user) throw new Error("Сначала войдите в аккаунт.");
-    const { data: memberships, error: membershipError } = await supabase
-      .from("organization_members")
-      .select("organization_id")
-      .eq("profile_id", auth.user.id)
-      .in("role", ["owner", "admin", "editor"]);
+    const { data: memberships, error: membershipError } = await withTimeout(
+      supabase
+        .from("organization_members")
+        .select("organization_id")
+        .eq("profile_id", auth.user.id)
+        .in("role", ["owner", "admin", "editor"]),
+      "Сервер слишком долго загружает список организаций."
+    );
     if (membershipError) throw new Error(membershipError.message || "Не удалось загрузить организации.");
     const organizationIds = (memberships ?? []).map((item) => String(item.organization_id));
     if (!organizationIds.length) return [];
-    const [{ data, error }, { data: orders, error: ordersError }] = await Promise.all([
-      supabase.from("organizations").select("*").in("id", organizationIds).order("created_at", { ascending: false }),
-      supabase.from("orders")
-        .select("organization_id,order_number,status,created_at")
-        .in("organization_id", organizationIds)
-        .order("created_at", { ascending: false })
-    ]);
+    const [{ data, error }, { data: orders, error: ordersError }] = await withTimeout(
+      Promise.all([
+        supabase.from("organizations").select("*").in("id", organizationIds).order("created_at", { ascending: false }),
+        supabase.from("orders")
+          .select("organization_id,order_number,status,created_at")
+          .in("organization_id", organizationIds)
+          .order("created_at", { ascending: false })
+      ]),
+      "Сервер слишком долго загружает данные организации."
+    );
     if (error) throw new Error(error.message || "Не удалось загрузить организации.");
     if (ordersError) throw new Error(ordersError.message || "Не удалось загрузить состояние оплаты.");
     const latestOrderByOrganization = new Map<string, Record<string, unknown>>();
@@ -136,21 +145,30 @@ export const organizationRepository = {
 
   getCurrentApplication: async (): Promise<OrganizationApplication | null> => {
     if (!supabase) return null;
-    const { data: auth, error: authError } = await supabase.auth.getUser();
+    const { data: auth, error: authError } = await withTimeout(
+      supabase.auth.getUser(),
+      "Не удалось проверить вход в аккаунт. Обновите страницу."
+    );
     if (authError || !auth.user) throw new Error("Сначала войдите в аккаунт.");
-    const { data: organization, error } = await supabase
-      .from("organizations")
-      .select("*")
-      .eq("owner_id", auth.user.id)
-      .maybeSingle();
+    const { data: organization, error } = await withTimeout(
+      supabase
+        .from("organizations")
+        .select("*")
+        .eq("owner_id", auth.user.id)
+        .maybeSingle(),
+      "Сервер слишком долго загружает заявку организации."
+    );
     if (error) throw new Error(error.message || "Не удалось загрузить заявку организации.");
     if (!organization) return null;
-    const { data: orders, error: ordersError } = await supabase
-      .from("orders")
-      .select("order_number,status,created_at")
-      .eq("organization_id", organization.id)
-      .in("status", ["payment_pending", "payment_review", "active"])
-      .order("created_at", { ascending: false });
+    const { data: orders, error: ordersError } = await withTimeout(
+      supabase
+        .from("orders")
+        .select("order_number,status,created_at")
+        .eq("organization_id", organization.id)
+        .in("status", ["payment_pending", "payment_review", "active"])
+        .order("created_at", { ascending: false }),
+      "Сервер слишком долго загружает состояние оплаты."
+    );
     if (ordersError) throw new Error(ordersError.message || "Не удалось загрузить состояние оплаты.");
     const order = (orders ?? []).find((item) => item.status === "active") ?? orders?.[0];
     return mapOrganization({

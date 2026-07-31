@@ -6,13 +6,15 @@
     <title>Vizora.tj</title>
     <script>
       (function () {
-        var firstPart = location.pathname.split("/").filter(Boolean)[0] || "";
-        var base = firstPart ? "/" + firstPart + "/" : "/";
-        sessionStorage.setItem(
-          "vizora-spa-redirect",
-          location.pathname + location.search + location.hash
-        );
-        location.replace(base);
+        var path = location.pathname + location.search + location.hash;
+        try {
+          sessionStorage.setItem("vizora-spa-redirect", path);
+        } catch (_) {
+          // The root page is still a safe fallback when browser storage is blocked.
+        }
+        // vizora.tj is served from the domain root. Redirecting to the first path
+        // segment sends /organization/... back to the same 404 forever.
+        location.replace(location.origin + "/");
       })();
     </script>
   </head>

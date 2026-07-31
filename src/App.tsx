@@ -62,6 +62,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/organizations" element={<OrganizationsPage />} />
+        <Route path="/organization" element={<OrganizationsPage />} />
         <Route path="/organization/apply" element={<ProtectedRoute><OrganizationApplyPage /></ProtectedRoute>} />
         <Route path="/organization/dashboard" element={<ProtectedRoute><OrganizationDashboardPage /></ProtectedRoute>} />
         <Route path="/organization/join" element={<ProtectedRoute><OrganizationJoinPage /></ProtectedRoute>} />
