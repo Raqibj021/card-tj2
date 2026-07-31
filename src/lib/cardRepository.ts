@@ -311,6 +311,33 @@ class LocalStorageCardRepository implements CardRepository {
       return remoteCard;
     }
 
+    if (!error) {
+      const { data: employee, error: employeeError } = await supabase.rpc(
+        "get_public_organization_employee",
+        { target_slug: slug.toLowerCase() }
+      );
+      if (!employeeError && employee) {
+        const value = employee as Record<string, unknown>;
+        const organizationCard: DigitalCard = {
+          id: String(value.id), slug: String(value.slug), photo: String(value.photo ?? ""),
+          companyLogo: String(value.companyLogo ?? ""), fullName: String(value.fullName ?? ""),
+          position: String(value.position ?? ""), organization: String(value.organization ?? ""),
+          description: String(value.description ?? ""), phone: String(value.phone ?? ""),
+          secondPhone: String(value.secondPhone ?? ""), whatsapp: String(value.whatsapp ?? ""),
+          telegram: String(value.telegram ?? ""), instagram: String(value.instagram ?? ""),
+          facebook: String(value.facebook ?? ""), email: String(value.email ?? ""),
+          website: String(value.website ?? ""), address: String(value.address ?? ""),
+          language: (value.language as DigitalCard["language"]) ?? "ru",
+          theme: (value.theme as DigitalCard["theme"]) ?? "teal",
+          template: (value.template as DigitalCard["template"]) ?? "executive",
+          visibility: "public_organization", reviewStatus: "approved", trialExpiresAt: null,
+          views: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+          organizationManaged: true
+        };
+        return organizationCard;
+      }
+    }
+
     // A temporary network or Supabase error must never erase the owner's
     // local draft. Hide it for this request, but keep it available for retry.
     if (error) return auth.user ? local : undefined;
