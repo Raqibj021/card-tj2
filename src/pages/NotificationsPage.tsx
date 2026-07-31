@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
 import { useNotificationCounts } from "../hooks/useNotificationCounts";
+import { createUuid } from "../lib/id";
 import {
   notificationChangedEvent, notificationSection, notificationSectionLabel,
   signalNotificationsChanged, type NotificationSection
@@ -45,7 +46,7 @@ export default function NotificationsPage() {
     // Keep every effect instance isolated. In development/StrictMode the
     // previous channel may still be closing when this effect subscribes again.
     const channelTopic = user
-      ? `notifications-page-${user.id}-${crypto.randomUUID()}`
+      ? `notifications-page-${user.id}-${createUuid()}`
       : null;
     const channel = supabase && user && channelTopic
       ? supabase.channel(channelTopic)
