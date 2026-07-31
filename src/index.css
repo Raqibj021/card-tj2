@@ -689,7 +689,8 @@ body {
 .employee-actions button:first-child { color: #087451; }
 .employee-actions button:last-child { color: #b42318; }
 .org-qr-panel { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 26px; margin-top: 20px; border-radius: 20px; background: #071f45; padding: 25px; color: white; }
-.org-qr-preview { display: grid; width: 135px; height: 135px; place-items: center; border-radius: 17px; background: white; color: #071f45; }
+.org-qr-preview { display: grid; width: 250px; height: 250px; place-items: center; border-radius: 20px; background: white; padding: 15px; color: #071f45; }
+.org-qr-preview img { display: block; width: 220px; height: 220px; max-width: none; }
 .org-qr-panel h2 { margin: 8px 0; font-size: 24px; }
 .org-qr-panel p { margin: 0 0 18px; color: #a9c0df; font-size: 11px; line-height: 1.7; }
 .platform-modal { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; overflow: auto; background: rgba(3,15,31,.7); padding: 20px; backdrop-filter: blur(5px); }
@@ -850,7 +851,8 @@ body {
   .org-content-head { align-items: stretch; flex-direction: column; }
   .org-search { width: 100%; }
   .org-qr-panel { grid-template-columns: 1fr; }
-  .org-qr-preview { width: 110px; height: 110px; }
+  .org-qr-preview { width: 220px; height: 220px; padding: 10px; }
+  .org-qr-preview img { width: 200px; height: 200px; }
   .lead-action-grid { grid-template-columns: 1fr; }
   .lead-action-grid button { grid-template-columns: auto 1fr; min-height: 48px; justify-items: start; padding: 0 14px; }
   .crm-fields { grid-template-columns: 1fr; }

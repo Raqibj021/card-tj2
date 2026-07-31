@@ -16,14 +16,18 @@ export default function QRCodeImage({
 
   useEffect(() => {
     let active = true;
-    QRCode.toDataURL(value, {
-      width: size * 2,
-      margin: 2,
-      errorCorrectionLevel: "H",
+    QRCode.toString(value, {
+      type: "svg",
+      margin: 4,
+      errorCorrectionLevel: "M",
       color: { dark: "#0b1220", light: "#ffffff" }
-    }).then((url) => {
-      if (active) setSource(url);
-    });
+    })
+      .then((svg) => {
+        if (active) setSource(`data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`);
+      })
+      .catch(() => {
+        if (active) setSource("");
+      });
     return () => {
       active = false;
     };
@@ -44,6 +48,7 @@ export default function QRCodeImage({
       alt="QR-код электронной визитки"
       width={size}
       height={size}
+      decoding="sync"
       className={className}
     />
   );

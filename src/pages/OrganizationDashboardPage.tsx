@@ -202,7 +202,7 @@ export default function OrganizationDashboardPage() {
           </section>
         </div>
         <section className="org-qr-panel" id="organization-qr">
-          <div className="org-qr-preview"><QRCodeImage value={url} size={150} /></div>
+          <div className="org-qr-preview"><QRCodeImage value={url} size={220} /></div>
           <div><span className="section-label">{copy.shared}</span><h2>{copy.sharedTitle}</h2><p>{copy.sharedText}</p><div className="flex flex-wrap gap-2"><a className="button button-light" href={url} target="_blank" rel="noreferrer"><ExternalLink size={17} /> {copy.openPublic}</a><button className="button button-primary" onClick={() => void downloadQrCode(url, organization.slug || "organization")}><Download size={17} /> {copy.download}</button><button className="button button-dark-outline" onClick={async () => { await navigator.clipboard.writeText(url); setMessage(copy.copy); }}><Copy size={17} /> {copy.copy}</button></div></div>
         </section>
       </div>
