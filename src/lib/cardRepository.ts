@@ -1,5 +1,6 @@
 import { demoCards } from "../data/demo";
 import type { CardDraft, DigitalCard } from "../types/card";
+import { createUuid } from "./id";
 import { supabase } from "./supabase";
 
 const STORAGE_KEY = "vizora.cards.v1";
@@ -17,10 +18,7 @@ export interface CardRepository {
   requestPublication(id: string): Promise<{ ok: boolean; message: string }>;
 }
 
-const createId = () =>
-  typeof crypto !== "undefined" && "randomUUID" in crypto
-    ? crypto.randomUUID()
-    : `card-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const createId = createUuid;
 
 class LocalStorageCardRepository implements CardRepository {
   private pendingRemoteSaves = new Set<Promise<void>>();
