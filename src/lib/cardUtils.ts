@@ -176,12 +176,12 @@ export const openVCardSaveDialog = async (card: DigitalCard) => {
 export const downloadQrCode = async (value: string, filename: string) => {
   const url = await QRCode.toDataURL(value, {
     width: 1200,
-    margin: 2,
+    margin: 4,
     color: {
       dark: "#0b1220",
       light: "#ffffff"
     },
-    errorCorrectionLevel: "H"
+    errorCorrectionLevel: "M"
   });
   const anchor = document.createElement("a");
   anchor.href = url;
