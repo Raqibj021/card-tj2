@@ -104,11 +104,13 @@ begin
   set author_id = null
   where author_id = any(delete_user_ids);
 
-  -- This audit table intentionally protects administrator rows with
-  -- ON DELETE RESTRICT. Remove logs belonging to test accounts first so a
-  -- stale audit record cannot stop the complete cleanup.
-  delete from public.admin_card_access_log
-  where admin_id = any(delete_user_ids);
+  -- This optional audit table was introduced by migration 015. Some projects
+  -- do not have it yet, so only touch it when it actually exists.
+  if to_regclass('public.admin_card_access_log') is not null then
+    execute
+      'delete from public.admin_card_access_log where admin_id = any($1)'
+      using delete_user_ids;
+  end if;
 
   -- Cards, leads, notifications, subscriptions and promotion claims cascade
   -- from profiles. Remaining user-owned records cascade from auth.users.
