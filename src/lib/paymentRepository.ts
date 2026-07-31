@@ -45,21 +45,26 @@ export const paymentRepository = {
     return (data ?? []).map((row) => fromDatabase(row as Record<string, unknown>));
   },
 
-  findPending: async (planCode: string, organizationId?: string) => {
+  findCurrent: async (planCode: string, organizationId?: string) => {
     if (!supabase) throw new Error("Сервер оплаты временно недоступен.");
     let query = supabase
       .from("orders")
       .select("*")
       .eq("plan_code", planCode)
-      .in("status", ["payment_pending", "payment_review"])
-      .order("created_at", { ascending: false })
-      .limit(1);
+      .in("status", ["payment_pending", "payment_review", "active"])
+      .order("created_at", { ascending: false });
     query = organizationId
       ? query.eq("organization_id", organizationId)
       : query.is("organization_id", null);
-    const { data, error } = await query.maybeSingle();
+    const { data, error } = await query;
     if (error) throw error;
-    return data ? fromDatabase(data as Record<string, unknown>) : null;
+    const current = (data ?? []).find((row) => row.status === "active") ?? data?.[0];
+    return current ? fromDatabase(current as Record<string, unknown>) : null;
+  },
+
+  findPending: async (planCode: string, organizationId?: string) => {
+    const current = await paymentRepository.findCurrent(planCode, organizationId);
+    return current?.status === "payment_pending" || current?.status === "payment_review" ? current : null;
   },
 
   create: async (data: {
@@ -74,7 +79,7 @@ export const paymentRepository = {
     if (!supabase) throw new Error("Сервер оплаты временно недоступен.");
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
-    const existingRequest = await paymentRepository.findPending(data.planCode, data.organizationId);
+    const existingRequest = await paymentRepository.findCurrent(data.planCode, data.organizationId);
     if (existingRequest) return existingRequest;
     if (data.receiptFile.size > 5 * 1024 * 1024) throw new Error("Размер чека не должен превышать 5 МБ.");
     if (!["image/png", "image/jpeg", "application/pdf"].includes(data.receiptFile.type)) {

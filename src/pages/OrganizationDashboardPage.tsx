@@ -47,7 +47,11 @@ export default function OrganizationDashboardPage() {
   const refresh = async (organizationId = selectedOrganizationId) => {
     setLoading(true);
     try {
-      const list = (await organizationRepository.listMine()).filter((item) => item.reviewStatus === "approved");
+      const list = (await organizationRepository.listMine()).filter((item) =>
+        item.reviewStatus === "approved"
+        && Boolean(item.activeUntil)
+        && new Date(item.activeUntil as string).getTime() > Date.now()
+      );
       setOrganizations(list.map(({ id, displayName }) => ({ id, displayName })));
       if (!list.length) {
         setWorkspace(null);

@@ -5,6 +5,7 @@ export interface OrganizationApplication {
   id: string; displayName: string; legalName: string; organizationType: string;
   phone: string; email: string; planCode: string; employeeLimit: number;
   reviewStatus: string; slug?: string; activeUntil?: string | null;
+  paymentStatus?: string; paymentOrderNumber?: string;
   contactName?: string; contactPosition?: string;
 }
 export interface OrganizationDepartment { id: string; name: string; parentId: string | null; }
@@ -32,6 +33,8 @@ const mapOrganization = (row: Record<string, unknown>): OrganizationApplication 
     email: String(row.email ?? ""), planCode: String(row.plan_code ?? ""),
     employeeLimit: Number(row.employee_limit ?? 20), reviewStatus: String(row.review_status),
     slug: String(row.slug ?? ""), activeUntil: row.active_until ? String(row.active_until) : null,
+    paymentStatus: String(row.payment_status ?? "none"),
+    paymentOrderNumber: String(row.payment_order_number ?? ""),
     contactName: String(applicationDetails.contactName ?? ""),
     contactPosition: String(applicationDetails.contactPosition ?? "")
   };
@@ -61,22 +64,62 @@ export const organizationRepository = {
     const { data: memberships, error: membershipError } = await supabase
       .from("organization_members")
       .select("organization_id")
-      .eq("profile_id", auth.user.id);
+      .eq("profile_id", auth.user.id)
+      .in("role", ["owner", "admin", "editor"]);
     if (membershipError) throw new Error(membershipError.message || "Не удалось загрузить организации.");
     const organizationIds = (memberships ?? []).map((item) => String(item.organization_id));
     if (!organizationIds.length) return [];
-    const { data, error } = await supabase
-      .from("organizations")
-      .select("*")
-      .in("id", organizationIds)
-      .order("created_at", { ascending: false });
+    const [{ data, error }, { data: orders, error: ordersError }] = await Promise.all([
+      supabase.from("organizations").select("*").in("id", organizationIds).order("created_at", { ascending: false }),
+      supabase.from("orders")
+        .select("organization_id,order_number,status,created_at")
+        .in("organization_id", organizationIds)
+        .order("created_at", { ascending: false })
+    ]);
     if (error) throw new Error(error.message || "Не удалось загрузить организации.");
-    return (data ?? []).map((row) => mapOrganization(row as Record<string, unknown>));
+    if (ordersError) throw new Error(ordersError.message || "Не удалось загрузить состояние оплаты.");
+    const latestOrderByOrganization = new Map<string, Record<string, unknown>>();
+    (orders ?? []).forEach((order) => {
+      const organizationId = String(order.organization_id ?? "");
+      const current = latestOrderByOrganization.get(organizationId);
+      if (organizationId && (!current || (order.status === "active" && current.status !== "active"))) {
+        latestOrderByOrganization.set(organizationId, order as Record<string, unknown>);
+      }
+    });
+    return (data ?? []).map((row) => {
+      const order = latestOrderByOrganization.get(String(row.id));
+      return mapOrganization({
+        ...(row as Record<string, unknown>),
+        payment_status: order?.status ?? "none",
+        payment_order_number: order?.order_number ?? ""
+      });
+    });
   },
 
   getCurrentApplication: async (): Promise<OrganizationApplication | null> => {
-    const organizations = await organizationRepository.listMine();
-    return organizations[0] ?? null;
+    if (!supabase) return null;
+    const { data: auth, error: authError } = await supabase.auth.getUser();
+    if (authError || !auth.user) throw new Error("Сначала войдите в аккаунт.");
+    const { data: organization, error } = await supabase
+      .from("organizations")
+      .select("*")
+      .eq("owner_id", auth.user.id)
+      .maybeSingle();
+    if (error) throw new Error(error.message || "Не удалось загрузить заявку организации.");
+    if (!organization) return null;
+    const { data: orders, error: ordersError } = await supabase
+      .from("orders")
+      .select("order_number,status,created_at")
+      .eq("organization_id", organization.id)
+      .in("status", ["payment_pending", "payment_review", "active"])
+      .order("created_at", { ascending: false });
+    if (ordersError) throw new Error(ordersError.message || "Не удалось загрузить состояние оплаты.");
+    const order = (orders ?? []).find((item) => item.status === "active") ?? orders?.[0];
+    return mapOrganization({
+      ...(organization as Record<string, unknown>),
+      payment_status: order?.status ?? "none",
+      payment_order_number: order?.order_number ?? ""
+    });
   },
 
   getWorkspace: async (organizationId?: string): Promise<OrganizationWorkspace | null> => {

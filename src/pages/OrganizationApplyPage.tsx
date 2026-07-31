@@ -65,17 +65,32 @@ export default function OrganizationApplyPage() {
 
   useEffect(() => {
     let active = true;
-    organizationRepository.getCurrentApplication()
-      .then((result) => {
-        if (active) setApplication(result);
-      })
-      .catch((caught) => {
-        if (active) setError(caught instanceof Error ? caught.message : copy.loadError);
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => { active = false; };
+    const loadApplication = () => {
+      organizationRepository.getCurrentApplication()
+        .then((result) => {
+          if (active) {
+            setApplication(result);
+            setError("");
+          }
+        })
+        .catch((caught) => {
+          if (active) setError(caught instanceof Error ? caught.message : copy.loadError);
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") loadApplication();
+    };
+    loadApplication();
+    window.addEventListener("focus", loadApplication);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", loadApplication);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   const canEdit = application?.reviewStatus === "rejected" || application?.reviewStatus === "changes_requested";

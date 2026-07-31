@@ -25,17 +25,32 @@ export default function OrganizationsPage() {
     }
     let active = true;
     setApplicationLoading(true);
-    organizationRepository.getCurrentApplication()
-      .then((result) => {
-        if (active) setApplication(result);
-      })
-      .catch((caught) => {
-        if (active) setApplicationError(caught instanceof Error ? caught.message : "Не удалось загрузить заявку.");
-      })
-      .finally(() => {
-        if (active) setApplicationLoading(false);
-      });
-    return () => { active = false; };
+    const loadApplication = () => {
+      organizationRepository.getCurrentApplication()
+        .then((result) => {
+          if (active) {
+            setApplication(result);
+            setApplicationError("");
+          }
+        })
+        .catch((caught) => {
+          if (active) setApplicationError(caught instanceof Error ? caught.message : "Не удалось загрузить заявку.");
+        })
+        .finally(() => {
+          if (active) setApplicationLoading(false);
+        });
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") loadApplication();
+    };
+    loadApplication();
+    window.addEventListener("focus", loadApplication);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      active = false;
+      window.removeEventListener("focus", loadApplication);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [authLoading, user?.id]);
   const copy = {
     ru: { label: "Vizora для организаций", title: "Вся структура организации — в одном QR-коде", text: "Создавайте подразделения, управляйте визитками сотрудников и предоставляйте удобный доступ к проверенным контактам.", register: "Зарегистрировать организацию", turnkey: "Заказать под ключ", demo: "Демо кабинета", organization: "Организация", rectorate: "Ректорат", faculties: "Факультеты", administration: "Администрация", commonQr: "Общий QR организации", annual: "Годовые тарифы", chooseSize: "Выберите размер организации", startPrices: "Стартовые цены для первых организаций Vizora", popular: "Популярный", perYear: "сомони / год", features: ["Общий QR-код", "Структура и подразделения", "Визитки сотрудников", "Управление и статистика"], choose: "Выбрать тариф", staff: ["до 20 сотрудников", "до 50 сотрудников", "до 100 сотрудников"] },
@@ -51,7 +66,10 @@ export default function OrganizationsPage() {
   if (authLoading || applicationLoading) {
     return <main className="route-loading"><span /><p>...</p></main>;
   }
-  if (application?.reviewStatus === "approved") {
+  const tariffActive = application?.reviewStatus === "approved"
+    && Boolean(application.activeUntil)
+    && new Date(application.activeUntil as string).getTime() > Date.now();
+  if (tariffActive) {
     return <Navigate replace to="/organization/dashboard" />;
   }
   if (application) {

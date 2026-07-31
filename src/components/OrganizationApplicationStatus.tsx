@@ -31,6 +31,8 @@ export default function OrganizationApplicationStatus({
       suspendedText: "Откройте уведомления или свяжитесь с поддержкой, чтобы узнать причину.",
       plan: "Выбранный тариф", capacity: "Лимит сотрудников", open: "Открыть организацию",
       notifications: "Открыть уведомления", payment: "Перейти к оплате",
+      paymentWaiting: "Оплата проверяется", paymentWaitingText: "Чек уже отправлен. Повторно оплачивать не нужно — дождитесь решения администратора.",
+      approvedUnpaid: "Организация одобрена — активируйте тариф", approvedUnpaidText: "Проверка организации завершена. После подтверждения оплаты рабочий кабинет откроется автоматически.",
       edit: "Исправить заявку", employees: "сотрудников"
     },
     tj: {
@@ -46,6 +48,8 @@ export default function OrganizationApplicationStatus({
       suspendedText: "Огоҳиҳоро бинед ё бо дастгирӣ тамос гиред.",
       plan: "Тарофаи интихобшуда", capacity: "Ҳадди кормандон", open: "Кушодани ташкилот",
       notifications: "Кушодани огоҳиҳо", payment: "Гузаштан ба пардохт",
+      paymentWaiting: "Пардохт санҷида мешавад", paymentWaitingText: "Расид аллакай фиристода шудааст. Дубора пардохт накунед — қарори администраторро интизор шавед.",
+      approvedUnpaid: "Ташкилот тасдиқ шуд — тарофаро фаъол кунед", approvedUnpaidText: "Санҷиши ташкилот анҷом ёфт. Пас аз тасдиқи пардохт кабинети корӣ худкор кушода мешавад.",
       edit: "Ислоҳи дархост", employees: "корманд"
     },
     en: {
@@ -61,18 +65,23 @@ export default function OrganizationApplicationStatus({
       suspendedText: "Open Notifications or contact support to see the reason.",
       plan: "Selected plan", capacity: "Employee limit", open: "Open organization",
       notifications: "Open notifications", payment: "Continue to payment",
+      paymentWaiting: "Payment is being reviewed", paymentWaitingText: "Your receipt has already been submitted. Do not pay again — wait for the administrator’s decision.",
+      approvedUnpaid: "Organization approved — activate the plan", approvedUnpaidText: "The organization review is complete. The workspace opens automatically after payment approval.",
       edit: "Correct application", employees: "employees"
     }
   }[language];
 
   const status = organization.reviewStatus;
   const approved = status === "approved";
+  const tariffActive = approved && Boolean(organization.activeUntil) && new Date(organization.activeUntil as string).getTime() > Date.now();
+  const paymentWaiting = organization.paymentStatus === "payment_pending" || organization.paymentStatus === "payment_review";
+  const approvedUnpaid = approved && !tariffActive && !paymentWaiting;
   const changes = status === "changes_requested";
   const rejected = status === "rejected";
   const suspended = status === "suspended";
-  const Icon = approved ? CheckCircle2 : changes || rejected || suspended ? ShieldAlert : Clock3;
-  const title = approved ? copy.approved : changes ? copy.changes : rejected ? copy.rejected : suspended ? copy.suspended : copy.pending;
-  const text = approved ? copy.approvedText : changes ? copy.changesText : rejected ? copy.rejectedText : suspended ? copy.suspendedText : copy.pendingText;
+  const Icon = tariffActive ? CheckCircle2 : changes || rejected || suspended ? ShieldAlert : Clock3;
+  const title = tariffActive ? copy.approved : paymentWaiting ? copy.paymentWaiting : approvedUnpaid ? copy.approvedUnpaid : changes ? copy.changes : rejected ? copy.rejected : suspended ? copy.suspended : copy.pending;
+  const text = tariffActive ? copy.approvedText : paymentWaiting ? copy.paymentWaitingText : approvedUnpaid ? copy.approvedUnpaidText : changes ? copy.changesText : rejected ? copy.rejectedText : suspended ? copy.suspendedText : copy.pendingText;
 
   return (
     <section className={`organization-application-status status-${status}`}>
@@ -86,8 +95,8 @@ export default function OrganizationApplicationStatus({
         <span><Clock3 size={18} /><small>{copy.capacity}</small><b>{organization.employeeLimit} {copy.employees}</b></span>
       </div>
       <div className="organization-status-actions">
-        {approved && <Link className="button button-primary" to="/organization/dashboard">{copy.open}</Link>}
-        {!approved && status === "pending" && (
+        {tariffActive && <Link className="button button-primary" to="/organization/dashboard">{copy.open}</Link>}
+        {approvedUnpaid && (
           <Link className="button button-primary" to={`/payment?plan=${organization.planCode}&organization=${organization.id}`}>
             {copy.payment}
           </Link>
