@@ -81,17 +81,13 @@ export default function AdminCardsPage() {
   };
 
   const review = async (card: AdminCardDetails, decision: "approved" | "changes_requested" | "rejected") => {
-    const prompts = {
-      approved: "Комментарий к одобрению (необязательно)",
-      changes_requested: "Напишите, что нужно исправить",
-      rejected: "Укажите причину отклонения"
-    };
+    const prompts = { changes_requested: "Напишите, что нужно исправить", rejected: "Укажите причину отклонения" };
     const defaults = {
-      approved: "",
       changes_requested: "Исправьте указанные данные визитки и отправьте её на повторную проверку.",
       rejected: "Данные визитки не прошли проверку. Уточните информацию и отправьте заявку повторно."
     };
-    const note = window.prompt(prompts[decision], defaults[decision])?.trim() ?? "";
+    if (decision === "approved" && !window.confirm(`Одобрить визитку «${card.fullName || card.slug}» и активировать QR-код?`)) return;
+    const note = decision === "approved" ? "" : window.prompt(prompts[decision], defaults[decision])?.trim() ?? "";
     if (decision !== "approved" && note.length < 3) {
       setNotice("Для исправления или отклонения обязательно укажите причину.");
       return;

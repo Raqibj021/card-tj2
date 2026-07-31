@@ -1,4 +1,5 @@
 import { adminSupabase as supabase } from "./supabase";
+import { signalAdminCountsChanged } from "./adminNotificationRepository";
 
 export type SupportTicketAdmin = {
   id: string; ticketNumber: string; category: string; subject: string; message: string;
@@ -43,6 +44,7 @@ export const supportAdminRepository = {
       next_priority: priority, internal_note_text: internalNote
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async retryEmail(id: string) {
     if (!supabase) throw new Error("Supabase не подключён");

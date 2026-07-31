@@ -29,13 +29,13 @@ export default function ModerationPage() {
 
   const note = (title: string, initial: string) => window.prompt(title, initial)?.trim() ?? "";
   const reviewCard = async (card: ModerationCard, decision: "approved" | "changes_requested" | "rejected") => {
-    const comment = decision === "approved" ? "Данные проверены главным администратором" :
+    const comment = decision === "approved" ? "" :
       note("Комментарий владельцу визитки", decision === "rejected" ? "Публикация отклонена" : "Исправьте указанные данные");
     if (decision !== "approved" && !comment) return;
     await run(() => moderationRepository.reviewCard(card.id, decision, comment), "Решение по визитке сохранено.");
   };
   const reviewVerification = async (item: ModerationVerification, decision: "approved" | "changes_requested" | "rejected") => {
-    const comment = decision === "approved" ? "Документы подтверждены" :
+    const comment = decision === "approved" ? "" :
       note("Комментарий пользователю", decision === "rejected" ? "Документы не подтверждают профессию" : "Нужны дополнительные документы");
     if (decision !== "approved" && !comment) return;
     await run(() => moderationRepository.reviewVerification(item.id, decision, comment), "Результат проверки документов сохранён.");

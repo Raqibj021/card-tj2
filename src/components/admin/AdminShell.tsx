@@ -8,19 +8,20 @@ import {
   Settings2,
   ShieldCheck
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router";
 import BrandLogo from "../BrandLogo";
 import { useAdminAuth } from "../../context/AdminAuthContext";
+import { adminCountsChangedEvent, adminNotificationRepository, emptyAdminNavCounts } from "../../lib/adminNotificationRepository";
 import "./AdminTypography.css";
 
 const navigation = [
-  { to: "/admin", label: "Главная", icon: LayoutDashboard, end: true },
-  { to: "/admin/accounts", label: "Аккаунты", icon: Building2 },
-  { to: "/admin/cards", label: "Визитки", icon: ContactRound },
-  { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck },
-  { to: "/admin/payments", label: "Оплаты и заказы", icon: Banknote },
-  { to: "/admin/support", label: "Поддержка", icon: Headphones }
+  { to: "/admin", label: "Главная", icon: LayoutDashboard, end: true, count: "total" as const },
+  { to: "/admin/accounts", label: "Аккаунты", icon: Building2, count: "accounts" as const },
+  { to: "/admin/cards", label: "Визитки", icon: ContactRound, count: "cards" as const },
+  { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck, count: "moderation" as const },
+  { to: "/admin/payments", label: "Оплаты и заказы", icon: Banknote, count: "payments" as const },
+  { to: "/admin/support", label: "Поддержка", icon: Headphones, count: "support" as const }
 ];
 
 export default function AdminShell({
@@ -35,6 +36,21 @@ export default function AdminShell({
   actions?: ReactNode;
 }) {
   const { profile, signOut } = useAdminAuth();
+  const [counts, setCounts] = useState(emptyAdminNavCounts);
+  const refreshCounts = useCallback(async () => setCounts(await adminNotificationRepository.counts()), []);
+
+  useEffect(() => {
+    void refreshCounts();
+    const refresh = () => void refreshCounts();
+    window.addEventListener(adminCountsChangedEvent, refresh);
+    window.addEventListener("focus", refresh);
+    const timer = window.setInterval(refresh, 30_000);
+    return () => {
+      window.removeEventListener(adminCountsChangedEvent, refresh);
+      window.removeEventListener("focus", refresh);
+      window.clearInterval(timer);
+    };
+  }, [refreshCounts]);
 
   return (
     <main className="admin-workspace">
@@ -48,9 +64,9 @@ export default function AdminShell({
           <div><strong>Главный администратор</strong><small>Единый защищённый кабинет</small></div>
         </div>
         <nav aria-label="Разделы администратора">
-          {navigation.map(({ to, label, icon: Icon, end }) => (
+          {navigation.map(({ to, label, icon: Icon, end, count }) => (
             <NavLink key={to} to={to} end={end}>
-              <Icon size={18} /><span>{label}</span>
+              <Icon size={18} /><span>{label}</span>{counts[count] > 0 && <b className="admin-nav-badge">{counts[count] > 99 ? "99+" : counts[count]}</b>}
             </NavLink>
           ))}
         </nav>

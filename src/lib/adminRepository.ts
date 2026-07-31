@@ -200,6 +200,7 @@ export const adminRepository = {
       note: note.trim()
     });
     if (error) throw error;
+    window.dispatchEvent(new Event("vizora:admin-counts-changed"));
     return data as { organizationId: string; status: string; ownerId: string };
   },
 

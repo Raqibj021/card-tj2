@@ -1,6 +1,6 @@
 import {
   Building2, ChevronRight, Copy, Download, Edit3, FolderTree, Network, Plus, QrCode,
-  Search, ShieldCheck, Trash2, Users, X, LogOut, UserRound
+  Search, ShieldCheck, Trash2, Users, X, LogOut, UserRound, Bell
 } from "lucide-react";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
@@ -15,6 +15,7 @@ import {
   type OrganizationWorkspace
 } from "../lib/organizationRepository";
 import { publicSiteUrl } from "../lib/siteUrl";
+import { useNotificationCounts } from "../hooks/useNotificationCounts";
 
 const publicUrl = (slug: string) => {
   return publicSiteUrl(`/organization/${slug}`);
@@ -23,6 +24,7 @@ const publicUrl = (slug: string) => {
 export default function OrganizationDashboardPage() {
   const { language } = useApp();
   const { profile, user, signOut } = useAuth();
+  const { counts } = useNotificationCounts();
   const navigate = useNavigate();
   const [workspace, setWorkspace] = useState<OrganizationWorkspace | null>(null);
   const [loading, setLoading] = useState(true);
@@ -105,9 +107,7 @@ export default function OrganizationDashboardPage() {
               <em>{profile?.email || user?.email}</em>
             </div>
           </div>
-          <button type="button" className="button dashboard-logout" onClick={() => void leaveAccount()}>
-            <LogOut size={16} /> {copy.logout}
-          </button>
+          <div className="org-account-actions"><Link to="/notifications?section=organization" className="button button-secondary"><Bell size={16} />{counts.organization > 0 && <b className="button-notification-badge">{counts.organization > 99 ? "99+" : counts.organization}</b>}</Link><button type="button" className="button dashboard-logout" onClick={() => void leaveAccount()}><LogOut size={16} /> {copy.logout}</button></div>
         </div>
         <div className="org-workspace-head">
           <div className="org-workspace-brand"><span><Building2 size={22} /></span><div><small>{copy.workspace}</small>{organizations.length > 1 ? <select className="org-switcher" value={organization.id} onChange={(event) => { setSelectedDepartmentId(null); setSelectedOrganizationId(event.target.value); void refresh(event.target.value); }}>{organizations.map((item) => <option value={item.id} key={item.id}>{item.displayName}</option>)}</select> : <h1>{organization.displayName}</h1>}</div></div>

@@ -4,6 +4,7 @@ import {
 import { Link } from "react-router";
 import { useApp } from "../context/AppContext";
 import type { OrganizationApplication } from "../lib/organizationRepository";
+import { useNotificationCounts } from "../hooks/useNotificationCounts";
 
 interface OrganizationApplicationStatusProps {
   organization: OrganizationApplication;
@@ -15,6 +16,7 @@ export default function OrganizationApplicationStatus({
   onEdit
 }: OrganizationApplicationStatusProps) {
   const { language } = useApp();
+  const { counts } = useNotificationCounts();
   const copy = {
     ru: {
       label: "Заявка организации", pending: "Ваша заявка на рассмотрении",
@@ -95,7 +97,7 @@ export default function OrganizationApplicationStatus({
             <FilePenLine size={17} /> {copy.edit}
           </button>
         )}
-        <Link className="button button-secondary" to="/notifications"><Bell size={17} /> {copy.notifications}</Link>
+        <Link className="button button-secondary" to="/notifications"><Bell size={17} /> {copy.notifications}{counts.all > 0 && <b className="button-notification-badge">{counts.all > 99 ? "99+" : counts.all}</b>}</Link>
       </div>
     </section>
   );

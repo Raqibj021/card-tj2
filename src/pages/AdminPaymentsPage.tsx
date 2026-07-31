@@ -40,10 +40,9 @@ export default function AdminPaymentsPage() {
   const payments = useMemo(() => data.payments.filter((p) => filter === "all" || p.status === filter), [data.payments, filter]);
 
   const approve = async (id: string) => {
-    const note = window.prompt("Комментарий администратора (необязательно):", "") ?? "";
     if (!window.confirm("Вы проверили поступление денег, тариф, сумму и чек? После подтверждения тариф активируется автоматически — код не потребуется.")) return;
     setBusy(id);
-    try { await commerceAdminRepository.approvePayment(id, note); await refresh(); setNotice("Оплата подтверждена. Тариф активирован автоматически."); }
+    try { await commerceAdminRepository.approvePayment(id, ""); await refresh(); setNotice("Оплата подтверждена. Тариф активирован автоматически."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка подтверждения"); }
     finally { setBusy(""); }
   };

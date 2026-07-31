@@ -1,4 +1,5 @@
 import { adminSupabase as supabase } from "./supabase";
+import { signalAdminCountsChanged } from "./adminNotificationRepository";
 
 export type ModerationDecision = "approved" | "changes_requested" | "rejected" | "suspended";
 
@@ -45,6 +46,7 @@ export const moderationRepository = {
       target_card_id: id, decision, note
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async reviewVerification(id: string, decision: Exclude<ModerationDecision, "suspended">, note: string) {
     if (!supabase) throw new Error("Supabase не подключён.");
@@ -52,6 +54,7 @@ export const moderationRepository = {
       target_request_id: id, decision, note
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async resolveReport(id: string, action: "dismiss" | "hide_card" | "restore_card", note: string) {
     if (!supabase) throw new Error("Supabase не подключён.");
@@ -59,6 +62,7 @@ export const moderationRepository = {
       target_report_id: id, action, note
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async documentUrl(path: string) {
     if (!supabase) throw new Error("Supabase не подключён.");

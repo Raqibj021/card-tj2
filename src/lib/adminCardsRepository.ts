@@ -1,4 +1,5 @@
 import { adminSupabase as supabase } from "./supabase";
+import { signalAdminCountsChanged } from "./adminNotificationRepository";
 
 export type AdminCardSummary = {
   id: string; ownerId: string; ownerName: string; ownerEmail: string; slug: string;
@@ -101,6 +102,7 @@ export const adminCardsRepository = {
       target_card_id: cardId
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async review(cardId: string, decision: "approved" | "changes_requested" | "rejected", note = ""): Promise<void> {
     if (!supabase) throw new Error("Supabase не подключён.");
@@ -110,6 +112,7 @@ export const adminCardsRepository = {
       note
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async details(cardId: string, reason = "administrative_review"): Promise<AdminCardDetails> {
     if (!supabase) throw new Error("Supabase не подключён.");

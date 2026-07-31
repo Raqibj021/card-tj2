@@ -107,6 +107,9 @@
   .admin-workspace-sidebar{height:74px!important;padding:7px 6px!important}
   .admin-workspace-sidebar nav{gap:3px!important}
   .admin-workspace-sidebar nav a{min-width:0!important;min-height:59px!important;gap:4px!important;padding:4px 2px!important;font-size:10px!important;line-height:1.1;text-align:center}
+  .admin-workspace-sidebar nav{grid-template-columns:repeat(6,1fr)!important}
+  .admin-workspace-sidebar nav a{position:relative}
+  .admin-nav-badge{position:absolute;top:2px;right:6px;min-width:18px;height:18px;padding:0 4px;font-size:9px!important}
   .admin-workspace-sidebar nav a svg{width:20px;height:20px}
   .admin-workspace-body{padding:0 14px 28px!important}
   .admin-workspace-header{min-height:0!important;display:grid!important;gap:14px!important;padding:22px 0 18px!important}

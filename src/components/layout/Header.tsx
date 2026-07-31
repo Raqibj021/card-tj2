@@ -5,6 +5,7 @@ import {
   Moon,
   Search,
   Building2,
+  Bell,
   Sun,
   UserRound,
   X
@@ -14,16 +15,18 @@ import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../context/AuthContext";
 import type { Language } from "../../types/card";
 import BrandLogo from "../BrandLogo";
+import { useNotificationCounts } from "../../hooks/useNotificationCounts";
 
 export default function Header() {
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const { user, profile, loading: authLoading } = useAuth();
+  const { counts } = useNotificationCounts();
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const copy = {
-    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", login: "Войти", account: "Личный кабинет", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
-    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", login: "Ворид шудан", account: "Утоқи шахсӣ", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
-    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", login: "Sign in", account: "Personal account", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
+    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", notifications: "Уведомления", login: "Войти", account: "Личный кабинет", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
+    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", notifications: "Огоҳиномаҳо", login: "Ворид шудан", account: "Утоқи шахсӣ", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
+    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", notifications: "Notifications", login: "Sign in", account: "Personal account", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
   }[language];
   const navItems = [
     { to: "/", text: copy.home },
@@ -90,6 +93,7 @@ export default function Header() {
           >
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
+          {user && <Link to="/notifications" className="site-notification-link" aria-label={copy.notifications} title={copy.notifications}><Bell size={18} />{counts.all > 0 && <b>{counts.all > 99 ? "99+" : counts.all}</b>}</Link>}
           {!authLoading && (
             user ? (
               <Link
@@ -135,6 +139,7 @@ export default function Header() {
                 {text}
               </NavLink>
             ))}
+            {user && <NavLink to="/notifications" className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}><Bell size={18} />{copy.notifications}{counts.all > 0 && <b className="mobile-notification-badge">{counts.all > 99 ? "99+" : counts.all}</b>}</NavLink>}
           </nav>
           <div className="mt-4 flex items-center gap-2 border-t border-[var(--line)] pt-4">
             <select

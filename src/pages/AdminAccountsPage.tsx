@@ -79,22 +79,15 @@ export default function AdminAccountsPage() {
   ) => {
     const approving = decision === "approved";
     const label = approving ? "одобрить" : decision === "changes_requested" ? "вернуть на исправление" : "отклонить";
-    const defaultNote = approving
-      ? "Заявка принята. Рабочий кабинет организации активирован."
-      : decision === "changes_requested"
+    const defaultNote = decision === "changes_requested"
         ? "Уточните данные организации и отправьте заявку повторно."
         : "";
-    const note = window.prompt(
-      approving
-        ? "Комментарий пользователю (необязательно):"
-        : "Комментарий пользователю (обязательно):",
-      defaultNote
-    );
-    if (note === null || (!approving && !note.trim())) return;
+    const note = approving ? "" : window.prompt("Комментарий пользователю (обязательно):", defaultNote);
+    if (!approving && (note === null || !note.trim())) return;
     if (!window.confirm(`${label[0].toUpperCase()}${label.slice(1)} организацию «${organization.name}»?`)) return;
     setLoading(true);
     try {
-      await adminRepository.reviewOrganization(organization.id, decision, note);
+      await adminRepository.reviewOrganization(organization.id, decision, note ?? "");
       const detail = await adminRepository.organizationDetail(organization.id);
       setSelectedOrganization(detail);
       await refresh();

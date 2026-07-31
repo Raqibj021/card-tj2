@@ -27,6 +27,8 @@ import { leadRepository } from "../lib/leadRepository";
 import { publicSiteUrl } from "../lib/siteUrl";
 import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import { supabase } from "../lib/supabase";
+import { useNotificationCounts } from "../hooks/useNotificationCounts";
+import { signalNotificationsChanged } from "../lib/notificationCenter";
 
 interface DashboardNotification {
   id: string;
@@ -55,6 +57,7 @@ const withoutDemoCards = (cards: DigitalCard[]) =>
 export default function DashboardPage() {
   const { t, language } = useApp();
   const { profile, user, signOut } = useAuth();
+  const { counts } = useNotificationCounts();
   const navigate = useNavigate();
   const [cards, setCards] = useState<DigitalCard[]>([]);
   const [toast, setToast] = useState("");
@@ -79,7 +82,7 @@ export default function DashboardPage() {
       void supabase
         .from("notifications")
         .select("id,title,body,kind,action_url,read_at")
-        .eq("kind", "card_review")
+        .in("kind", ["card_review", "card_approved", "card_changes_requested", "card_rejected", "card_suspended"])
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle()
@@ -162,7 +165,7 @@ export default function DashboardPage() {
                 </Link>
               )}
               <Link to="/notifications" className="button button-secondary">
-                <Bell size={16} /> {dashboardCopy.notifications}
+                <Bell size={16} /> {dashboardCopy.notifications}{counts.all > 0 && <b className="button-notification-badge">{counts.all > 99 ? "99+" : counts.all}</b>}
               </Link>
               <button type="button" className="button dashboard-logout" onClick={() => void leaveAccount()}>
                 <LogOut size={16} /> {dashboardCopy.logout}
@@ -229,6 +232,7 @@ export default function DashboardPage() {
                     .eq("id", latestNotification.id);
                 }
                 setLatestNotification((item) => item ? { ...item, read_at: new Date().toISOString() } : item);
+                signalNotificationsChanged();
               }}
             >
               {language === "ru" ? "Посмотреть" : language === "tj" ? "Дидан" : "View"}
@@ -241,11 +245,11 @@ export default function DashboardPage() {
         </div>
         <div className="dashboard-crm-banner mt-3">
           <div><ShoppingBag size={22} /><span><strong>{language === "ru" ? "Заказы и договоры" : language === "tj" ? "Фармоишҳо ва шартномаҳо" : "Orders and contracts"}</strong><small>{language === "ru" ? "Статусы изготовления, оплаты и документы" : language === "tj" ? "Ҳолати омодасозӣ, пардохт ва ҳуҷҷатҳо" : "Production, payment status and documents"}</small></span></div>
-          <Link to="/dashboard/orders" className="button button-secondary">{language === "ru" ? "Открыть" : language === "tj" ? "Кушодан" : "Open"}</Link>
+          <Link to="/dashboard/orders" className="button button-secondary">{language === "ru" ? "Открыть" : language === "tj" ? "Кушодан" : "Open"}{counts.services > 0 && <b className="button-notification-badge">{counts.services > 99 ? "99+" : counts.services}</b>}</Link>
         </div>
         <div className="dashboard-crm-banner mt-3">
           <div><ShieldCheck size={22} /><span><strong>{language === "ru" ? "Проверка специалиста" : language === "tj" ? "Санҷиши мутахассис" : "Professional verification"}</strong><small>{language === "ru" ? "Подтвердите профессию перед публикацией в открытом каталоге" : language === "tj" ? "Пеш аз нашр касби худро тасдиқ кунед" : "Verify your profession before directory publication"}</small></span></div>
-          <Link to="/verification" className="button button-secondary">{language === "ru" ? "Загрузить документы" : language === "tj" ? "Бор кардани ҳуҷҷатҳо" : "Upload documents"}</Link>
+          <Link to="/verification" className="button button-secondary">{language === "ru" ? "Загрузить документы" : language === "tj" ? "Бор кардани ҳуҷҷатҳо" : "Upload documents"}{counts.cards > 0 && <b className="button-notification-badge">{counts.cards > 99 ? "99+" : counts.cards}</b>}</Link>
         </div>
         <div className="dashboard-section-head">
           <div>

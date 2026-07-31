@@ -1,4 +1,5 @@
 import { adminSupabase as supabase } from "./supabase";
+import { signalAdminCountsChanged } from "./adminNotificationRepository";
 
 export type AdminPayment = {
   id: string; orderNumber: string; planCode: string; amount: number; payerName: string;
@@ -44,12 +45,14 @@ export const commerceAdminRepository = {
     if (!supabase) throw new Error("Supabase не подключён");
     const { data, error } = await supabase.rpc("admin_approve_payment", { target_order_id: id, note });
     if (error) throw new Error(error.message || "Сервер не смог подтвердить оплату.");
+    signalAdminCountsChanged();
     return data;
   },
   async rejectPayment(id: string, reason: string) {
     if (!supabase) throw new Error("Supabase не подключён");
     const { error } = await supabase.rpc("admin_reject_payment", { target_order_id: id, reason });
     if (error) throw new Error(error.message || "Сервер не смог отклонить оплату.");
+    signalAdminCountsChanged();
   },
   async updateServiceOrder(id: string, status: string, paymentStatus: string, comment: string) {
     if (!supabase) throw new Error("Supabase не подключён");
@@ -57,10 +60,12 @@ export const commerceAdminRepository = {
       target_order_id: id, next_status: status, next_payment_status: paymentStatus, comment
     });
     if (error) throw error;
+    signalAdminCountsChanged();
   },
   async updateContract(id: string, status: string) {
     if (!supabase) throw new Error("Supabase не подключён");
     const { error } = await supabase.rpc("admin_update_contract", { target_contract_id: id, next_status: status });
     if (error) throw error;
+    signalAdminCountsChanged();
   }
 };
