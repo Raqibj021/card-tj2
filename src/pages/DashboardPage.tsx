@@ -44,7 +44,7 @@ const getCardUrl = (slug: string) => {
 };
 
 const avatarText = (name: string) =>
-  name
+  String(name || "Vizora")
     .split(/\s+/)
     .slice(0, 2)
     .map((part) => part[0])
@@ -93,7 +93,7 @@ export default function DashboardPage() {
     return () => { active = false; };
   }, []);
 
-  const totalViews = cards.reduce((sum, card) => sum + card.views, 0);
+  const totalViews = cards.reduce((sum, card) => sum + (Number(card.views) || 0), 0);
   const activeCards = cards.filter((card) => card.reviewStatus === "approved").length;
   const primaryCard = cards[0];
   const accountName =
@@ -268,7 +268,7 @@ export default function DashboardPage() {
         {cards.length ? (
           <div className="grid gap-5 lg:grid-cols-2">
             {cards.map((card) => {
-              const palette = themeColors[card.theme];
+              const palette = themeColors[card.theme] ?? themeColors.teal;
               return (
                 <article key={card.id} className="dashboard-card">
                   <div
@@ -298,7 +298,7 @@ export default function DashboardPage() {
                   </Link>
 
                   <div className="dashboard-card-meta">
-                    <span><Eye size={15} /> {card.views.toLocaleString()} {t("views").toLowerCase()}</span>
+                    <span><Eye size={15} /> {(Number(card.views) || 0).toLocaleString()} {t("views").toLowerCase()}</span>
                     <span className={`status-pill ${card.reviewStatus === "pending" ? "status-review" : ""}`}>
                       {statusLabel(card.reviewStatus)}
                     </span>
