@@ -7,6 +7,7 @@ import {
   MapPin,
   Network,
   Phone,
+  QrCode,
   Search,
   ShieldCheck,
   Users
@@ -14,8 +15,10 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
+import QRCodeImage from "../components/QRCode";
 import { useApp } from "../context/AppContext";
 import { sanitizePhone } from "../lib/cardUtils";
+import { publicSiteUrl } from "../lib/siteUrl";
 import { supabase } from "../lib/supabase";
 
 interface PublicOrganization {
@@ -43,6 +46,8 @@ type PublicCopy = {
   published: string;
   scroll: string;
   structure: string;
+  sharedQr: string;
+  sharedQrHint: string;
 };
 
 export default function OrganizationPublicPage() {
@@ -72,7 +77,9 @@ export default function OrganizationPublicPage() {
       registry: "Официальный справочник организации",
       published: "Данные опубликованы организацией",
       scroll: "Перейти к структуре",
-      structure: "Структура"
+      structure: "Структура",
+      sharedQr: "Общий QR-код",
+      sharedQrHint: "Вся структура организации"
     },
     tj: {
       missing: "Ташкилот ёфт нашуд",
@@ -92,7 +99,9 @@ export default function OrganizationPublicPage() {
       registry: "Маълумотномаи расмии ташкилот",
       published: "Маълумот аз ҷониби ташкилот нашр шудааст",
       scroll: "Гузариш ба сохтор",
-      structure: "Сохтор"
+      structure: "Сохтор",
+      sharedQr: "QR-коди умумӣ",
+      sharedQrHint: "Тамоми сохтори ташкилот"
     },
     en: {
       missing: "Organization not found",
@@ -112,7 +121,9 @@ export default function OrganizationPublicPage() {
       registry: "Official organization directory",
       published: "Information published by the organization",
       scroll: "View organization structure",
-      structure: "Structure"
+      structure: "Structure",
+      sharedQr: "Shared QR code",
+      sharedQrHint: "The entire organization structure"
     }
   }[language];
 
@@ -158,6 +169,7 @@ export default function OrganizationPublicPage() {
   const organizationMark = initials(data.organization.name);
   const employeePhotos = data.employees.filter((employee) => employee.photo).slice(0, 3);
   const isFiltering = Boolean(query.trim() || departmentId);
+  const organizationUrl = publicSiteUrl(`/organization/${slug}`);
 
   return <main className="organization-public-page">
     <section className="org-public-hero">
@@ -174,7 +186,14 @@ export default function OrganizationPublicPage() {
               <span className="org-public-verified"><BadgeCheck size={15} /> {copy.verified}</span>
             </div>
           </div>
-          <h1>{data.organization.name}</h1>
+          <div className="org-public-title-row">
+            <h1>{data.organization.name}</h1>
+            <div className="org-public-title-qr" aria-label={copy.sharedQr}>
+              <div><QRCodeImage value={organizationUrl} size={142} /></div>
+              <span><QrCode size={14} /> {copy.sharedQr}</span>
+              <small>{copy.sharedQrHint}</small>
+            </div>
+          </div>
           {description && <p className="org-public-description">{description}</p>}
           <div className="org-public-contacts">
             {data.organization.phone && <a href={`tel:${sanitizePhone(data.organization.phone)}`}><Phone size={16} /><span>{data.organization.phone}</span><ArrowUpRight size={14} /></a>}
