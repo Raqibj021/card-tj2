@@ -188,7 +188,7 @@ export default function OrganizationPublicPage() {
           </div>
           <div className="org-public-title-row">
             <h1>{data.organization.name}</h1>
-            <div className="org-public-title-qr" aria-label={copy.sharedQr}>
+            <div className="org-public-title-qr" aria-label={copy.sharedQr} title={copy.sharedQrHint}>
               <div><QRCodeImage value={organizationUrl} size={142} /></div>
               <span><QrCode size={14} /> {copy.sharedQr}</span>
               <small>{copy.sharedQrHint}</small>
