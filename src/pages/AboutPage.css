@@ -405,6 +405,78 @@
   .about-cta-button { width: 100%; }
   .about-cta-content small { justify-content: center; line-height: 1.5; }
   .about-cta-brand { display: none; }
+
+  /* Compact mobile narrative: keep every essential section without turning
+     the About page into a long desktop layout stacked vertically. */
+  .about-section { padding-block: 27px; }
+  .about-ecosystem-section { padding-block: 27px; }
+  .about-section-heading h2,
+  .about-ecosystem-heading .about-section-heading h2 { margin-top: 7px; font-size: 26px; line-height: 1.05; }
+
+  .about-story-layout { gap: 15px; }
+  .about-story-copy > p { margin-top: 9px; font-size: 13px; line-height: 1.48; }
+  .about-story-copy .about-story-lead { font-size: 15px; line-height: 1.42; }
+  .about-story-copy blockquote { margin-top: 11px; padding-block: 5px; font-size: 13px; line-height: 1.42; }
+  .about-story-points { display: flex; flex-wrap: nowrap; gap: 10px; overflow: hidden; margin-top: 9px; mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .about-story-points span { min-height: 27px; flex: 0 0 auto; font-size: 10px; }
+  .about-network-card { display: none; }
+
+  .about-ecosystem-shell { padding: 18px 14px; }
+  .about-ecosystem-heading { gap: 10px; }
+  .about-ecosystem-heading > div > p { margin-top: 8px; font-size: 12.5px; line-height: 1.45; }
+  .about-made-in { padding-top: 9px; font-size: 11px; }
+  .about-ecosystem-grid { margin-top: 13px; }
+  .about-ecosystem-item { min-width: 190px; min-height: 124px; flex-basis: 190px; padding: 13px; }
+  .about-ecosystem-item > span { width: 31px; height: 31px; }
+  .about-ecosystem-item h3 { margin-top: 8px; font-size: 15px; }
+  .about-ecosystem-item p { margin-top: 5px; font-size: 11px; line-height: 1.38; }
+  .about-audience-row { gap: 7px; margin-top: 11px; padding-top: 11px; }
+
+  .about-support-card { padding: 17px 14px; }
+  .about-support-head { display: grid; gap: 10px; grid-template-columns: 105px minmax(0, 1fr); }
+  .about-support-logo { width: 105px; }
+  .about-support-head h2 { margin-top: 5px; font-size: 23px; line-height: 1.04; }
+  .about-support-head p { margin-top: 7px; font-size: 11.5px; line-height: 1.42; }
+  .about-service-grid { margin-top: 13px; }
+  .about-service-chip { min-width: 104px; min-height: 54px; flex-basis: 104px; gap: 5px; padding-top: 7px; }
+  .about-service-chip svg { width: 16px; height: 16px; }
+  .about-service-chip span { font-size: 10px; }
+
+  .about-mission-card { padding: 18px 16px; }
+  .about-mission-icon { float: left; width: 29px; height: 29px; margin: 0 8px 0 0; }
+  .about-mission-card h2 { margin-top: 6px; font-size: 26px; }
+  .about-mission-card p { margin-top: 7px; font-size: 12.5px; line-height: 1.45; }
+
+  .about-values-grid,
+  .about-stats-grid { margin-top: 16px; }
+  .about-values-grid > div { min-width: 190px; flex-basis: 190px; }
+  .about-value-card { min-height: 121px; padding: 13px; }
+  .about-value-card > span { width: 31px; height: 31px; }
+  .about-value-card h3 { margin-top: 8px; font-size: 15px; }
+  .about-value-card p { margin-top: 5px; font-size: 11px; line-height: 1.38; }
+  .about-stats-grid > div { min-width: 112px; flex-basis: 112px; }
+  .about-stat-card { min-height: 92px; padding: 10px 4px 2px; }
+  .about-stat-card strong { font-size: 21px; }
+
+  .about-contact-layout { gap: 14px; }
+  .about-contact-intro > p { margin-top: 7px; font-size: 12.5px; line-height: 1.45; }
+  .about-contact-columns { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x proximity; }
+  .about-contact-group { min-width: min(86vw, 330px); flex: 0 0 min(86vw, 330px); border-radius: 17px; padding: 13px; scroll-snap-align: start; }
+  .about-contact-group > header { gap: 8px; grid-template-columns: 92px 1fr; }
+  .about-contact-brand .vizora-brand-full,
+  .about-contact-buro-logo { width: 92px; }
+  .about-contact-group > header p { font-size: 10.5px; line-height: 1.35; }
+  .about-contact-list { display: flex; gap: 7px; overflow-x: auto; margin-top: 10px; }
+  .about-contact-link { min-width: 172px; min-height: 48px; flex: 0 0 172px; padding: 8px 9px; }
+  .about-contact-link strong { font-size: 10px; }
+  .about-contact-link small { font-size: 9px; }
+
+  .about-cta-section { padding-bottom: 29px; }
+  .about-cta-card { padding: 21px 16px; }
+  .about-cta-content h2 { margin-top: 8px; font-size: 29px; }
+  .about-cta-content p { margin-top: 8px; font-size: 12.5px; line-height: 1.45; }
+  .about-cta-button { min-height: 44px; margin-top: 14px; }
+  .about-cta-content small { margin-top: 10px; font-size: 10px; }
 }
 
 @media (max-width: 390px) {
