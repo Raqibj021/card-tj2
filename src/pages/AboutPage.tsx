@@ -651,11 +651,12 @@ function HeroPattern() {
 }
 
 const heroCardDesigns = [
-  { variant: "classic", title: "VIZORA ID", caption: "Tap to connect", landmark: "signal" },
-  { variant: "somoni", title: "ИСМОИЛИ СОМОНӢ", caption: "Dushanbe · Tajikistan", landmark: "somoni" },
-  { variant: "istiqlol", title: "МАЙДОНИ ИСТИҚЛОЛ", caption: "Independence Square", landmark: "istiqlol" },
-  { variant: "hissar", title: "ҚАЛЪАИ ҲИСОР", caption: "Hissar Fortress", landmark: "hissar" },
-  { variant: "pamir", title: "ҚУЛЛАҲОИ ПОМИР", caption: "Pamir Mountains", landmark: "pamir" }
+  { name: "Dushanbe building", image: "vizora-tajikistan-building.webp" },
+  { name: "Palace", image: "vizora-tajikistan-palace.webp" },
+  { name: "Ismoil Somoni monument", image: "vizora-tajikistan-somoni.webp" },
+  { name: "Ismoil Somoni arch", image: "vizora-tajikistan-arch.webp" },
+  { name: "Hissar fortress", image: "vizora-tajikistan-hissar.webp" },
+  { name: "Independence stele", image: "vizora-tajikistan-independence.webp" }
 ] as const;
 
 function HeroNfcCards({ className = "" }: { className?: string }) {
@@ -663,26 +664,17 @@ function HeroNfcCards({ className = "" }: { className?: string }) {
     <div className={`about-hero-card-stack ${className}`} aria-hidden="true">
       {heroCardDesigns.map((card, index) => (
         <div
-          className={`about-nfc-card about-nfc-card-${card.variant}`}
+          className="about-nfc-card"
           style={{ "--card-index": index } as CSSProperties}
-          key={card.variant}
+          key={card.name}
         >
-          <BrandLogo light className="about-card-logo" />
+          <img className="about-card-bg" src={`${import.meta.env.BASE_URL}images/cards/${card.image}`} alt="" />
+          <BrandLogo className="about-card-logo" />
           <div className="about-card-contactless"><SmartphoneNfc size={25} /><span>NFC</span></div>
-          <HeroCardArtwork kind={card.landmark} />
-          <div className="about-card-footer"><strong>{card.title}</strong><small>{card.caption}</small></div>
         </div>
       ))}
     </div>
   );
-}
-
-function HeroCardArtwork({ kind }: { kind: typeof heroCardDesigns[number]["landmark"] }) {
-  if (kind === "somoni") return <svg className="about-card-art" viewBox="0 0 220 130"><circle cx="110" cy="46" r="24" /><path d="M110 18v56M91 74h38M97 74l-8 34h42l-8-34M84 108h52M110 30l8 10-8 10-8-10z" /></svg>;
-  if (kind === "istiqlol") return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M110 15v78M98 27h24M103 15h14M92 93h36M80 101h60M65 110h90" /><path d="M110 12l7 10h-14z" /></svg>;
-  if (kind === "hissar") return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M45 108V53l21-18 21 18v55M133 108V53l21-18 21 18v55M87 108V71c11-14 35-14 46 0v37M39 108h142M52 59h28M140 59h28" /></svg>;
-  if (kind === "pamir") return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M20 110l49-65 25 31 27-43 79 77zM50 70l19-25 13 16M103 62l18-29 18 18" /><circle cx="176" cy="29" r="12" /></svg>;
-  return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M38 92c22-22 22-58 0-80M58 82c16-16 16-42 0-58M78 70c9-9 9-24 0-34" /><circle cx="91" cy="54" r="5" /><path d="M115 36h68M115 54h52M115 72h59" /></svg>;
 }
 
 type ContactItem = readonly [string, string, string, LucideIcon];
