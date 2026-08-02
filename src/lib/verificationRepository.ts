@@ -16,21 +16,24 @@ export interface SpecialistSubmission {
   experience: string;
   summary: string;
   files: File[];
+  plan: "specialist" | "pro";
+  serviceArea: string;
+  consultation: string;
+  portfolio: File[];
 }
 
 export const verificationRepository = {
   categories: async (language: "ru" | "tj" | "en"): Promise<ProfessionCategory[]> => {
     if (!supabase) return [];
-    const column = language === "tj" ? "name_tj" : language === "en" ? "name_en" : "name_ru";
     const { data, error } = await supabase
       .from("profession_categories")
-      .select(`id, ${column}, requires_license`)
+      .select("id, name_ru, name_tj, name_en, requires_license")
       .eq("enabled", true)
-      .order(column);
+      .order("name_ru");
     if (error) return [];
     return (data ?? []).map((row) => ({
       id: String(row.id),
-      name: String(row[column as keyof typeof row]),
+      name: String(language === "tj" ? row.name_tj : language === "en" ? row.name_en : row.name_ru),
       requiresLicense: Boolean(row.requires_license)
     }));
   },
@@ -75,6 +78,16 @@ export const verificationRepository = {
       paths.push(path);
     }
     const tags = submission.tags.map((tag) => tag.trim()).filter(Boolean).slice(0, 12);
+    const portfolioPaths: string[] = [];
+    if (submission.plan === "pro") {
+      for (const file of submission.portfolio.slice(0, 20)) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const path = `${auth.user.id}/${submission.cardId}/portfolio/${createUuid()}-${safeName}`;
+        const { error } = await supabase.storage.from("card-assets").upload(path, file, { contentType: file.type });
+        if (error) throw error;
+        portfolioPaths.push(supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl);
+      }
+    }
     const { error: cardError } = await supabase.from("cards").update({
       profession_category_id: submission.categoryId,
       specialist_title: submission.title.trim(),
@@ -82,6 +95,10 @@ export const verificationRepository = {
       specialist_tags: tags,
       specialist_experience: submission.experience.trim(),
       specialist_summary: submission.summary.trim(),
+      specialist_plan: submission.plan,
+      specialist_service_area: submission.plan === "pro" ? submission.serviceArea.trim() : "",
+      specialist_consultation: submission.plan === "pro" ? submission.consultation.trim() : "",
+      specialist_portfolio: submission.plan === "pro" ? portfolioPaths : [],
       directory_hidden: false,
       review_status: "pending"
     }).eq("id", submission.cardId).eq("owner_id", auth.user.id);
