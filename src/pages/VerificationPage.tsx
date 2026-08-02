@@ -18,7 +18,10 @@ export default function VerificationPage() {
     en: { label: "Directory publication", title: "Add your card to Professionals", text: "Choose a card and profession, then verify your qualification. Once approved, the card is published in the directory automatically.", card: "1. Choose a business card", category: "2. Choose a profession", docs: "3. Upload proof", hint: "Diploma, certificate, licence or another document. Only a moderator can see it. PDF, JPG, PNG up to 10 MB.", submit: "Submit and add to directory", success: "Done! Once approved, the card will automatically appear under Professionals.", back: "Back to dashboard", noCard: "Create a card first", noCardText: "A completed digital business card is required for directory publication.", create: "Create business card", steps: ["Create or choose a business card", "Select a profession category", "Upload a supporting document"] }
   }[language];
 
-  useEffect(() => { void verificationRepository.categories(language).then(setCategories); }, [language]);
+  useEffect(() => {
+    setMessage("");
+    void verificationRepository.categories(language).then(setCategories).catch((error) => setMessage(error instanceof Error ? error.message : "Не удалось загрузить категории."));
+  }, [language]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +45,7 @@ export default function VerificationPage() {
           <span className="section-label">{copy.label}</span><h1>{copy.title}</h1><p className="form-intro">{copy.text}</p>
           {!cards.length ? <div className="empty-state !mt-6"><h2>{copy.noCard}</h2><p>{copy.noCardText}</p><Link to="/create" className="button button-primary">{copy.create}</Link></div> : <form className="platform-form" onSubmit={submit}>
             <label><span>{copy.card}</span><select name="cardId" required>{cards.map((card) => <option value={card.id} key={card.id}>{card.fullName}</option>)}</select></label>
-            <label><span>{copy.category}</span><select name="categoryId" required><option value="" />{categories.map((category) => <option value={category.id} key={category.id}>{category.name}{category.requiresLicense ? " *" : ""}</option>)}</select></label>
+            <label><span>{copy.category}</span><select name="categoryId" required disabled={!categories.length}><option value="">{categories.length ? "Выберите категорию" : "Категории загружаются…"}</option>{categories.map((category) => <option value={category.id} key={category.id}>{category.name}{category.requiresLicense ? " *" : ""}</option>)}</select></label>
             <label className="receipt-upload"><Upload size={23} /><strong>{files.length ? `${files.length} файл(а)` : copy.docs}</strong><span>{copy.hint}</span><input type="file" multiple required accept="image/png,image/jpeg,application/pdf" onChange={(event) => setFiles(Array.from(event.target.files ?? []).filter((file) => file.size <= 10 * 1024 * 1024))} /></label>
             {message && <div className="auth-message">{message}</div>}
             <button className="button button-primary button-large" type="submit" disabled={busy || !cards.length || !files.length}><ShieldCheck size={18} /> {busy ? "…" : copy.submit}</button>
