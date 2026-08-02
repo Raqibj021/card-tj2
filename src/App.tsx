@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router";
 import Header from "./components/layout/Header";
 import HomePage from "./pages/HomePage";
@@ -37,6 +37,8 @@ import AdminAccountsPage from "./pages/AdminAccountsPage";
 import AdminCardsPage from "./pages/AdminCardsPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+
 function ScrollToTop() {
   const { pathname } = useLocation();
 
@@ -71,6 +73,14 @@ export default function App() {
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route
+          path="/about"
+          element={
+            <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" aria-label="Loading" />}>
+              <AboutPage />
+            </Suspense>
+          }
+        />
         <Route path="/service-order" element={<ProtectedRoute><ServiceOrderPage /></ProtectedRoute>} />
         <Route path="/contract" element={<ProtectedRoute><ContractPage /></ProtectedRoute>} />
         <Route path="/print-card" element={<PrintCardDesignerPage />} />
