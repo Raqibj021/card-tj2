@@ -4,6 +4,7 @@ import {
   Building2,
   Camera,
   ChevronRight,
+  CreditCard,
   FileCheck2,
   GraduationCap,
   Languages,
@@ -340,6 +341,7 @@ export default function DirectoryPage() {
           {!myCards.length ? <div className="empty-state"><FileCheck2 size={27} /><h3>{publishCopy.noCard}</h3><Link to="/create?plan=personal" className="button button-primary">{publishCopy.noCard}</Link></div> : !selectedPlan ? <div className="specialist-plan-step">
             <div className="specialist-plan-intro"><h3>{planCopy.choose}</h3><p>{planCopy.chooseText}</p></div>
             <div className="specialist-plan-grid">{(["specialist", "pro"] as const).map((plan, index) => <article className={plan === "pro" ? "specialist-plan-card pro" : "specialist-plan-card"} key={plan}><span>{plan === "pro" ? "PRO" : "VIZORA VERIFIED"}</span><h3>{plan === "pro" ? planCopy.pro : planCopy.verified}</h3><div className="specialist-plan-price"><strong>{plan === "pro" ? "100" : "50"}</strong> {planCopy.perYear}</div><ul>{planCopy.features[index].map((feature) => <li key={feature}><BadgeCheck size={17} />{feature}</li>)}</ul><button type="button" className="button button-primary" onClick={() => setSelectedPlan(plan)}>{plan === "pro" ? planCopy.pro : planCopy.verified}<ChevronRight size={17} /></button></article>)}</div>
+            <div className="inline-payment-summary"><CreditCard size={20} /><div><strong>DC Bank / Alif Bank · 084785555</strong><span>{language === "ru" ? "После формы откроется загрузка чека оплаты (JPG, PNG или PDF до 5 МБ)." : language === "tj" ? "Пас аз шакл саҳифаи боркунии расиди пардохт кушода мешавад (JPG, PNG ё PDF то 5 МБ)." : "After the form, you will upload the payment receipt (JPG, PNG or PDF up to 5 MB)."}</span></div></div>
           </div> : selectedCard?.specialistSummary && ["pending", "approved"].includes(selectedCard.reviewStatus ?? "") && selectedCard.specialistPlan === selectedPlan && !selectedCard.directoryRemovedAt ? <div className="specialist-already-state"><BadgeCheck size={42} /><h3>{selectedPlan === "pro" ? planCopy.alreadyPro : planCopy.alreadyVerified}</h3><div><Link to="/" className="button button-primary">{planCopy.home}</Link><button type="button" className="button button-secondary" onClick={() => setSelectedPlan("")}>{planCopy.back}</button></div></div> : <form className="directory-specialist-form" onSubmit={(event) => void submitSpecialist(event)}>
             <button type="button" className="specialist-plan-back" onClick={() => setSelectedPlan("")}><ChevronRight size={16} />{planCopy.back}</button>
             <label><span>{publishCopy.chooseCard}</span><select name="cardId" required value={selectedCardId} onChange={(event) => setSelectedCardId(event.target.value)}>{myCards.map((card) => <option key={card.id} value={card.id}>{card.fullName} — {card.position}</option>)}</select></label>
