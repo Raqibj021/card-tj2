@@ -23,6 +23,71 @@ import { cardRepository } from "../lib/cardRepository";
 import { directoryRepository, type DirectoryProfile } from "../lib/directoryRepository";
 import { verificationRepository, type ProfessionCategory } from "../lib/verificationRepository";
 import type { DigitalCard } from "../types/card";
+import "./DirectoryPage.css";
+
+const categoryTags = {
+  ru: {
+    medicine: ["Терапевт", "Педиатр", "Стоматолог", "Кардиолог", "Диагностика", "Клиника"],
+    law: ["Адвокат", "Юрист", "Договоры", "Суды", "Нотариус", "Консультация"],
+    translation: ["Письменный перевод", "Устный перевод", "Английский", "Русский", "Таджикский", "Нотариальный перевод"],
+    education: ["Репетитор", "Курсы", "Английский язык", "Математика", "Подготовка к экзаменам", "Онлайн-обучение"],
+    repair: ["Ремонт техники", "Сантехник", "Электрик", "Мастер", "Установка", "Выезд"],
+    "photo-design": ["Графический дизайн", "Логотипы", "Полиграфический дизайн", "Фотограф", "Видеограф", "Брендинг"],
+    companies: ["B2B", "Услуги для бизнеса", "Производство", "Консалтинг", "Продажи", "Сервис"],
+    other: ["Консультация", "Услуги", "Частный специалист", "Выезд", "Онлайн", "По записи"]
+  },
+  tj: {
+    medicine: ["Терапевт", "Педиатр", "Дандонпизишк", "Кардиолог", "Ташхис", "Дармонгоҳ"],
+    law: ["Адвокат", "Ҳуқуқшинос", "Шартномаҳо", "Судҳо", "Нотариус", "Машварат"],
+    translation: ["Тарҷумаи хаттӣ", "Тарҷумаи шифоҳӣ", "Англисӣ", "Русӣ", "Тоҷикӣ", "Тарҷумаи нотариалӣ"],
+    education: ["Омӯзгори хусусӣ", "Курсҳо", "Забони англисӣ", "Математика", "Омодагӣ ба имтиҳон", "Омӯзиши онлайн"],
+    repair: ["Таъмири техника", "Сантехник", "Барқчӣ", "Усто", "Насб", "Хизмат дар маҳал"],
+    "photo-design": ["Дизайни графикӣ", "Логотип", "Дизайни полиграфӣ", "Суратгир", "Наворбардор", "Брендинг"],
+    companies: ["B2B", "Хизмат барои бизнес", "Истеҳсолот", "Машварат", "Фурӯш", "Хизматрасонӣ"],
+    other: ["Машварат", "Хизматҳо", "Мутахассиси хусусӣ", "Хизмат дар маҳал", "Онлайн", "Бо навбат"]
+  },
+  en: {
+    medicine: ["Therapist", "Pediatrician", "Dentist", "Cardiologist", "Diagnostics", "Clinic"],
+    law: ["Attorney", "Lawyer", "Contracts", "Court", "Notary", "Consultation"],
+    translation: ["Written translation", "Interpreting", "English", "Russian", "Tajik", "Notarised translation"],
+    education: ["Tutor", "Courses", "English", "Mathematics", "Exam preparation", "Online learning"],
+    repair: ["Device repair", "Plumber", "Electrician", "Handyman", "Installation", "On-site service"],
+    "photo-design": ["Graphic design", "Logos", "Print design", "Photographer", "Videographer", "Branding"],
+    companies: ["B2B", "Business services", "Manufacturing", "Consulting", "Sales", "Service"],
+    other: ["Consultation", "Services", "Independent specialist", "On-site", "Online", "By appointment"]
+  }
+} as const;
+
+const getCategoryTags = (slug: string, language: "ru" | "tj" | "en") => {
+  const tags = categoryTags[language];
+  return tags[slug as keyof typeof tags] ?? tags.other;
+};
+
+const normalizeSearch = (value: string) => value.toLocaleLowerCase("ru").replace(/ё/g, "е").replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+const editDistance = (left: string, right: string) => {
+  const row = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    let previous = row[0];
+    row[0] = leftIndex;
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      const current = row[rightIndex];
+      row[rightIndex] = Math.min(row[rightIndex] + 1, row[rightIndex - 1] + 1, previous + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1));
+      previous = current;
+    }
+  }
+  return row[right.length];
+};
+
+const fuzzyProfileMatch = (profile: DirectoryProfile, rawQuery: string) => {
+  const search = normalizeSearch(rawQuery);
+  if (!search) return true;
+  const haystack = normalizeSearch([profile.name, profile.role, profile.specialistTitle, profile.organization, profile.address, profile.city, profile.tags.join(" "), profile.summary, profile.experience].join(" "));
+  const words = haystack.split(" ").filter(Boolean);
+  return search.split(" ").every((term) => haystack.includes(term) || words.some((word) =>
+    word.startsWith(term) || term.startsWith(word) || (term.length >= 5 && word.length >= 5 && Math.abs(word.length - term.length) <= 2 && editDistance(word, term) <= 2)
+  ));
+};
 
 export default function DirectoryPage() {
   const { language } = useApp();
@@ -43,6 +108,8 @@ export default function DirectoryPage() {
   const [portfolio, setPortfolio] = useState<File[]>([]);
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [categoryError, setCategoryError] = useState("");
+  const [selectedProfessionCategoryId, setSelectedProfessionCategoryId] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const copy = {
     ru: { label: "Проверенный каталог", title: "Найдите нужного специалиста", text: "Настоящие люди и организации с подтверждёнными данными", search: "Поиск", placeholder: "Профессия, услуга или имя", find: "Найти", categories: "Категории", all: "Все специалисты в одном месте", verifiedOnly: "Публикация только после проверки", profiles: "профилей", newProfiles: "Новые профили", verified: "Проверенные специалисты", publish: "Добавить мою визитку", publishHint: "Уже есть визитка? Добавьте к ней профессию, город и услуги", checked: "Проверено Vizora", open: "Открыть визитку", modalTitle: "Визитка специалиста", modalText: "Основные контакты берутся из вашей визитки. Заполните только профессиональную информацию.", chooseCard: "Ваша визитка", chooseCategory: "Категория", specialty: "Специальность", city: "Город", tags: "Услуги и теги", tagsHint: "Например: письменный перевод, английский, нотариальное заверение", experience: "Опыт", experienceHint: "Например: 8 лет", summary: "О профессиональной деятельности", summaryHint: "Коротко расскажите, чем вы полезны клиенту", proof: "Подтверждающий документ", proofHint: "Обязателен для лицензируемых профессий. Видит только модератор.", add: "Отправить на проверку", cancel: "Отмена", noCard: "Сначала создайте личную визитку", success: "Заявка отправлена. После проверки визитка станет доступна всем в выбранной категории.", categoryNames: ["Врачи и клиники", "Юристы", "Переводчики", "Преподаватели", "Ремонт и мастера", "Фото и дизайн", "Компании", "Другие специалисты"], roles: ["Переводчик английского языка", "Преподаватель математики", "Специалист по ремонту техники"] },
     tj: { label: "Феҳристи тасдиқшуда", title: "Мутахассиси лозимиро ёбед", text: "Шахсон ва ташкилотҳои воқеӣ бо маълумоти тасдиқшуда", search: "Ҷустуҷӯ", placeholder: "Касб, хизмат ё ном", find: "Ёфтан", categories: "Категорияҳо", all: "Ҳамаи мутахассисон дар як ҷой", verifiedOnly: "Нашр танҳо пас аз санҷиш", profiles: "профил", newProfiles: "Профилҳои нав", verified: "Мутахассисони тасдиқшуда", publish: "Ҷойгир кардани профил", checked: "Аз ҷониби Vizora тасдиқ шудааст", open: "Кушодани варақа", categoryNames: ["Табибон ва клиникаҳо", "Ҳуқуқшиносон", "Тарҷумонҳо", "Омӯзгорон", "Таъмир ва устоҳо", "Акс ва дизайн", "Ширкатҳо", "Дигар мутахассисон"], roles: ["Тарҷумони забони англисӣ", "Омӯзгори математика", "Мутахассиси таъмири техника"] },
@@ -62,6 +129,8 @@ export default function DirectoryPage() {
   };
   const icons = [Stethoscope, Scale, Languages, GraduationCap, Wrench, Camera, Building2, BriefcaseBusiness];
   const categories = copy.categoryNames.map((name, index) => ({ name, icon: icons[index] }));
+  const selectedProfessionCategory = professionCategories.find((item) => item.id === selectedProfessionCategoryId);
+  const availableTags = selectedProfessionCategory ? getCategoryTags(selectedProfessionCategory.slug, language) : [];
   useEffect(() => {
     let active = true;
     const loadProfiles = () => void directoryRepository.list().then((items) => { if (active) setProfiles(items); });
@@ -80,6 +149,8 @@ export default function DirectoryPage() {
     setPublishOpen(true);
     setSelectedPlan(plan);
     setPublishMessage("");
+    setSelectedProfessionCategoryId("");
+    setSelectedTags([]);
     setCategoryLoading(true); setCategoryError("");
     const cards = await cardRepository.listRemote();
     let availableCategories: ProfessionCategory[] = [];
@@ -112,7 +183,8 @@ export default function DirectoryPage() {
       await verificationRepository.submitSpecialist({
         cardId: String(form.get("cardId") ?? ""), categoryId,
         title: String(form.get("title") ?? ""), city: String(form.get("city") ?? ""),
-        tags: String(form.get("tags") ?? "").split(/[,;]+/),
+        tags: [...selectedTags, ...String(form.get("tags") ?? "").split(/[,;]+/).map((tag) => tag.trim()).filter(Boolean)]
+          .filter((tag, index, all) => all.findIndex((item) => item.toLocaleLowerCase() === tag.toLocaleLowerCase()) === index),
         experience: String(form.get("experience") ?? ""), summary: String(form.get("summary") ?? ""), files: documents,
         plan: selectedPlan || "specialist", serviceArea: String(form.get("serviceArea") ?? ""), consultation: String(form.get("consultation") ?? ""), portfolio
       });
@@ -134,7 +206,7 @@ export default function DirectoryPage() {
     finally { setPublishBusy(false); }
   }
   const filteredProfiles = useMemo(() => profiles.filter((profile) => {
-    const matchesText = `${profile.name} ${profile.role} ${profile.organization} ${profile.address}`.toLowerCase().includes(query.toLowerCase());
+    const matchesText = fuzzyProfileMatch(profile, query);
     const matchesCategory = !category || profile.categorySlug === category;
     return matchesText && matchesCategory;
   }), [profiles, query, category]);
@@ -229,11 +301,16 @@ export default function DirectoryPage() {
             <div className="directory-card-preview">{selectedCard?.photo ? <img src={selectedCard.photo} alt="" /> : <BadgeCheck size={28} />}<div><strong>{selectedCard?.fullName}</strong><span>{selectedCard?.position}</span><small>{selectedCard?.phone}</small></div></div>
             {(selectedCard?.specialistSummary || selectedCard?.directoryRemovedAt) && <div className="directory-profile-management"><div><strong>{publishCopy.manage}</strong><span>{selectedCard.directoryRemovedAt ? publishCopy.removed : selectedCard.directoryHidden ? publishCopy.hidden : publishCopy.visible}</span></div>{!selectedCard.directoryRemovedAt && <div className="directory-profile-actions"><button type="button" onClick={() => void manageSpecialist(selectedCard.directoryHidden ? "show" : "hide")} disabled={publishBusy}>{selectedCard.directoryHidden ? publishCopy.show : publishCopy.hide}</button><Link to="/payment?plan=pro">{publishCopy.top}</Link><button type="button" className="danger" onClick={() => void manageSpecialist("remove")} disabled={publishBusy}>{publishCopy.remove}</button></div>}</div>}
             <div className="directory-specialist-grid">
-              <label><span>{publishCopy.chooseCategory}</span><select name="categoryId" required disabled={categoryLoading || !professionCategories.length}><option value="">{categoryLoading ? "Загрузка категорий…" : professionCategories.length ? "Выберите категорию" : "Категории недоступны"}</option>{professionCategories.map((item) => <option key={item.id} value={item.id}>{item.name}{item.requiresLicense ? " *" : ""}</option>)}</select>{categoryError && <small className="form-error">{categoryError}</small>}</label>
+              <label><span>{publishCopy.chooseCategory}</span><select name="categoryId" required value={selectedProfessionCategoryId} disabled={categoryLoading || !professionCategories.length} onChange={(event) => { setSelectedProfessionCategoryId(event.target.value); setSelectedTags([]); }}><option value="">{categoryLoading ? "Загрузка категорий…" : professionCategories.length ? "Выберите категорию" : "Категории недоступны"}</option>{professionCategories.map((item) => <option key={item.id} value={item.id}>{item.name}{item.requiresLicense ? " *" : ""}</option>)}</select>{categoryError && <small className="form-error">{categoryError}</small>}</label>
               <label><span>{publishCopy.specialty}</span><input name="title" required maxLength={100} placeholder={publishCopy.specialty} /></label>
               <label><span>{publishCopy.city}</span><input name="city" required maxLength={80} placeholder="Душанбе" /></label>
               <label><span>{publishCopy.experience}</span><input name="experience" maxLength={80} placeholder={publishCopy.experienceHint} /></label>
-              <label className="wide"><span>{publishCopy.tags}</span><input name="tags" required placeholder={publishCopy.tagsHint} /></label>
+              <div className="wide directory-tag-picker">
+                <span>{language === "tj" ? "Барчаспҳои омода" : language === "en" ? "Suggested tags" : "Готовые теги"}</span>
+                <small>{language === "tj" ? "Якчанд барчаспро интихоб кунед, то муштариён шуморо осонтар ёбанд." : language === "en" ? "Choose several tags so clients can find you more easily." : "Выберите несколько тегов, чтобы клиентам было проще Вас найти."}</small>
+                {selectedProfessionCategoryId ? <div>{availableTags.map((tag) => <button type="button" className={selectedTags.includes(tag) ? "selected" : ""} key={tag} onClick={() => setSelectedTags((current) => current.includes(tag) ? current.filter((item) => item !== tag) : current.length < 12 ? [...current, tag] : current)}>{selectedTags.includes(tag) ? "✓ " : "+ "}{tag}</button>)}</div> : <em>{language === "tj" ? "Аввал категорияро интихоб кунед" : language === "en" ? "Choose a category first" : "Сначала выберите категорию"}</em>}
+              </div>
+              <label className="wide"><span>{language === "tj" ? "Барчаспҳои иловагӣ" : language === "en" ? "Additional tags" : "Дополнительные теги"}</span><input name="tags" placeholder={publishCopy.tagsHint} /></label>
               <label className="wide"><span>{publishCopy.summary}</span><textarea name="summary" required maxLength={500} placeholder={publishCopy.summaryHint} /></label>
               {selectedPlan === "pro" && <>
                 <label><span>{planCopy.serviceArea}</span><input name="serviceArea" required maxLength={140} placeholder={language === "ru" ? "Душанбе и онлайн по Таджикистану" : planCopy.serviceArea} /></label>
