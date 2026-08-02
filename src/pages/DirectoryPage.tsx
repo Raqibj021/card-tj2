@@ -15,8 +15,9 @@ import {
   Wrench
 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import Footer from "../components/layout/Footer";
+import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
 import { cardRepository } from "../lib/cardRepository";
@@ -161,6 +162,7 @@ export default function DirectoryPage() {
               <div><strong>{copy.publish}</strong><small>{publishCopy.hint}</small></div>
               <button type="button" className="button button-primary" onClick={() => void openPublisher()}>{copy.publish}<ChevronRight size={17} /></button>
             </div>
+            <DirectoryCardFlow />
             <div className="platform-section-head">
               <div>
                 <span className="section-label">{copy.categories}</span>
@@ -264,5 +266,23 @@ export default function DirectoryPage() {
       </div>}
       <Footer />
     </>
+  );
+}
+
+function DirectoryCardFlow() {
+  return (
+    <div className="directory-card-flow" aria-hidden="true">
+      <div className="directory-card-flow-copy">
+        <span>VIZORA DIRECTORY</span>
+        <strong>QR · NFC · VERIFIED</strong>
+      </div>
+      <div className="directory-layered-stage">
+        {Array.from({ length: 10 }, (_, index) => (
+          <i className="directory-layered-card" key={index} style={{ "--layer": index } as CSSProperties}>
+            {index === 6 && <BrandLogo compact />}
+          </i>
+        ))}
+      </div>
+    </div>
   );
 }
