@@ -30,7 +30,7 @@ import {
   type LucideIcon
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import QRCodeImage from "../components/QRCode";
@@ -382,6 +382,7 @@ export default function AboutPage() {
               <span className="about-kicker"><Sparkles size={15} />{text.heroLabel}</span>
               <h1 id="about-founder-title">{text.heroTitle}</h1>
               <p className="about-founder-role"><BadgeCheck size={19} />{text.heroRole}</p>
+              <HeroNfcCards className="is-mobile" />
             </motion.div>
 
             <motion.div
@@ -424,7 +425,7 @@ export default function AboutPage() {
                 <span className="about-founder-orbit about-founder-orbit-lang"><Languages size={19} /></span>
               </div>
             </motion.div>
-            <HeroNfcCards />
+            <HeroNfcCards className="is-desktop" />
           </div>
         </section>
 
@@ -649,21 +650,39 @@ function HeroPattern() {
   );
 }
 
-function HeroNfcCards() {
+const heroCardDesigns = [
+  { variant: "classic", title: "VIZORA ID", caption: "Tap to connect", landmark: "signal" },
+  { variant: "somoni", title: "ИСМОИЛИ СОМОНӢ", caption: "Dushanbe · Tajikistan", landmark: "somoni" },
+  { variant: "istiqlol", title: "МАЙДОНИ ИСТИҚЛОЛ", caption: "Independence Square", landmark: "istiqlol" },
+  { variant: "hissar", title: "ҚАЛЪАИ ҲИСОР", caption: "Hissar Fortress", landmark: "hissar" },
+  { variant: "pamir", title: "ҚУЛЛАҲОИ ПОМИР", caption: "Pamir Mountains", landmark: "pamir" }
+] as const;
+
+function HeroNfcCards({ className = "" }: { className?: string }) {
   return (
-    <div className="about-hero-card-stack" aria-hidden="true">
-      <div className="about-nfc-card about-nfc-card-dark">
-        <BrandLogo light className="about-card-logo" />
-        <div className="about-card-contactless"><SmartphoneNfc size={27} /><span>NFC</span></div>
-        <div className="about-card-footer"><strong>VIZORA ID</strong><small>Tap to connect</small></div>
-      </div>
-      <div className="about-nfc-card about-nfc-card-light">
-        <BrandLogo compact className="about-card-mark" />
-        <QRCodeImage value={publicSiteUrl("/create")} size={82} />
-        <div className="about-card-meta"><strong>VIZORA.TJ</strong><span>QR · NFC</span></div>
-      </div>
+    <div className={`about-hero-card-stack ${className}`} aria-hidden="true">
+      {heroCardDesigns.map((card, index) => (
+        <div
+          className={`about-nfc-card about-nfc-card-${card.variant}`}
+          style={{ "--card-index": index } as CSSProperties}
+          key={card.variant}
+        >
+          <BrandLogo light className="about-card-logo" />
+          <div className="about-card-contactless"><SmartphoneNfc size={25} /><span>NFC</span></div>
+          <HeroCardArtwork kind={card.landmark} />
+          <div className="about-card-footer"><strong>{card.title}</strong><small>{card.caption}</small></div>
+        </div>
+      ))}
     </div>
   );
+}
+
+function HeroCardArtwork({ kind }: { kind: typeof heroCardDesigns[number]["landmark"] }) {
+  if (kind === "somoni") return <svg className="about-card-art" viewBox="0 0 220 130"><circle cx="110" cy="46" r="24" /><path d="M110 18v56M91 74h38M97 74l-8 34h42l-8-34M84 108h52M110 30l8 10-8 10-8-10z" /></svg>;
+  if (kind === "istiqlol") return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M110 15v78M98 27h24M103 15h14M92 93h36M80 101h60M65 110h90" /><path d="M110 12l7 10h-14z" /></svg>;
+  if (kind === "hissar") return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M45 108V53l21-18 21 18v55M133 108V53l21-18 21 18v55M87 108V71c11-14 35-14 46 0v37M39 108h142M52 59h28M140 59h28" /></svg>;
+  if (kind === "pamir") return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M20 110l49-65 25 31 27-43 79 77zM50 70l19-25 13 16M103 62l18-29 18 18" /><circle cx="176" cy="29" r="12" /></svg>;
+  return <svg className="about-card-art" viewBox="0 0 220 130"><path d="M38 92c22-22 22-58 0-80M58 82c16-16 16-42 0-58M78 70c9-9 9-24 0-34" /><circle cx="91" cy="54" r="5" /><path d="M115 36h68M115 54h52M115 72h59" /></svg>;
 }
 
 type ContactItem = readonly [string, string, string, LucideIcon];
