@@ -342,7 +342,7 @@ body {
 .specialist-card { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); padding: 22px; box-shadow: var(--shadow-sm); }
 .specialist-card { position: relative; }
 .specialist-top-badge { position: absolute; top: 17px; right: 17px; border-radius: 999px; background: linear-gradient(135deg,#f2b632,#e67a18); padding: 6px 10px; color: #fff; font-size: 9px; letter-spacing: .12em; box-shadow: 0 8px 20px rgba(219,132,28,.28); }
-.specialist-avatar { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 18px; color: white; font-weight: 800; }
+.specialist-avatar { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 18px; color: white; font-weight: 800; object-fit: cover; object-position: center; }
 .specialist-avatar-blue { background: #1677ea; }
 .specialist-avatar-violet { background: #7253d7; }
 .specialist-avatar-emerald { background: #078664; }
@@ -8584,41 +8584,11 @@ body,
   }
 }
 
-/* Compact layered-card flow above the specialist categories. */
-.directory-card-flow {
-  position: relative;
-  min-width: 0;
-  min-height: 250px;
-  perspective: 850px;
-}
-.directory-layered-stage { position: absolute; inset: 0; transform-style: preserve-3d; }
-.directory-layered-card { --layer: 0; position: absolute; top: 50%; left: 50%; display: block; width: min(270px, 82%); overflow: hidden; aspect-ratio: 1.585 / 1; border: 1px solid rgba(103,173,235,.3); border-radius: 17px; background: #edf8ff; box-shadow: 0 24px 52px rgba(2,24,58,.3); opacity: .05; transform-origin: 50% 115%; animation: directory-real-card-cycle 12s cubic-bezier(.45,0,.18,1) infinite; animation-delay: calc(var(--layer) * -2s); }
-.directory-layered-card img { display: block; width: 100%; height: 100%; object-fit: cover; }
-@keyframes directory-real-card-cycle {
-  0%,14% { z-index:6; opacity:1; transform:translate3d(-50%,-56%,34px) rotateY(-4deg) rotateZ(-2deg) scale(1); }
-  18% { z-index:6; opacity:1; transform:translate3d(-50%,-66%,46px) rotateY(3deg) rotateZ(1deg) scale(1.025); }
-  24% { z-index:2; opacity:.16; transform:translate3d(-40%,-43%,-10px) rotateY(8deg) rotateZ(4deg) scale(.9); }
-  31%,82% { z-index:1; opacity:.035; transform:translate3d(-58%,-42%,-32px) rotateY(-7deg) rotateZ(-4deg) scale(.85); }
-  91% { z-index:2; opacity:.1; transform:translate3d(-55%,-45%,-18px) rotateY(-5deg) rotateZ(-3deg) scale(.89); }
-  100% { z-index:4; opacity:.22; transform:translate3d(-52%,-49%,-4px) rotateY(-3deg) rotateZ(-2deg) scale(.94); }
-}
-
-.directory-hero-layout { display:grid; min-height:420px; align-items:center; gap:34px; padding-block:48px; grid-template-columns:minmax(0,1.2fr) minmax(310px,.8fr); }
-.directory-hero-copy { min-width:0; text-align:left; }
-.directory-hero-copy h1 { max-width:760px; margin-inline:0; }
-.directory-hero-copy p { max-width:670px; }
-.directory-hero-copy .directory-search { width:100%; margin:28px 0 0; }
-.directory-hero + .section { padding-block:48px 54px; }
-.directory-hero + .section .directory-publish-banner { margin-bottom:26px; }
-.directory-hero + .section .platform-section-head { margin-bottom:24px; }
-
+/* Compact, animation-free specialist directory rhythm. */
+.directory-hero + .section { padding-block: 52px 58px; }
+.directory-hero + .section .directory-publish-banner { margin-bottom: 26px; }
+.directory-hero + .section .platform-section-head { margin-bottom: 24px; }
 @media (max-width: 720px) {
-  .directory-hero-layout { min-height:0; gap:12px; padding-block:34px 24px; grid-template-columns:1fr; }
-  .directory-hero-copy { text-align:center; }
-  .directory-hero-copy h1,.directory-hero-copy p { margin-inline:auto; }
-  .directory-card-flow { min-height:155px; margin-top:2px; }
-  .directory-layered-card { width:205px; border-radius:13px; }
-  .directory-hero + .section { padding-block:30px 38px; }
-  .directory-hero + .section .directory-publish-banner { margin-bottom:22px; }
+  .directory-hero + .section { padding-block: 30px 38px; }
+  .directory-hero + .section .directory-publish-banner { margin-bottom: 22px; }
 }
-@media (prefers-reduced-motion: reduce) { .directory-layered-card { animation: none !important; } }
