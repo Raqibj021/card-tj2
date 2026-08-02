@@ -2716,7 +2716,7 @@ summary:focus-visible {
   position: absolute;
   z-index: 4;
   right: -48px;
-  bottom: 105px;
+  bottom: 24px;
   width: 270px;
   height: 220px;
   perspective: 1000px;
