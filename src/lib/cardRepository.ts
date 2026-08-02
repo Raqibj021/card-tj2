@@ -79,6 +79,15 @@ class LocalStorageCardRepository implements CardRepository {
       views: Number(row.views ?? 0),
       createdAt: String(row.created_at ?? new Date().toISOString()),
       updatedAt: String(row.updated_at ?? new Date().toISOString())
+      ,professionCategoryId: row.profession_category_id ? String(row.profession_category_id) : ""
+      ,specialistTitle: String(row.specialist_title ?? "")
+      ,specialistCity: String(row.specialist_city ?? "")
+      ,specialistTags: Array.isArray(row.specialist_tags) ? row.specialist_tags.map(String) : []
+      ,specialistExperience: String(row.specialist_experience ?? "")
+      ,specialistSummary: String(row.specialist_summary ?? "")
+      ,directoryHidden: Boolean(row.directory_hidden)
+      ,directoryRemovedAt: row.directory_removed_at ? String(row.directory_removed_at) : null
+      ,directoryFeaturedUntil: row.directory_featured_until ? String(row.directory_featured_until) : null
     };
   }
 

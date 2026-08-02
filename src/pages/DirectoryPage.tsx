@@ -44,9 +44,9 @@ export default function DirectoryPage() {
     en: { label: "Verified directory", title: "Find the specialist you need", text: "Real people and organizations with verified information", search: "Search", placeholder: "Profession, service or name", find: "Find", categories: "Categories", all: "All specialists in one place", verifiedOnly: "Published only after verification", profiles: "profiles", newProfiles: "New profiles", verified: "Verified specialists", publish: "Publish profile", checked: "Verified by Vizora", open: "Open business card", categoryNames: ["Doctors and clinics", "Lawyers", "Translators", "Teachers", "Repair and trades", "Photography and design", "Companies", "Other specialists"], roles: ["English translator", "Mathematics teacher", "Technical repair specialist"] }
   }[language];
   const publishCopy = {
-    ru: { hint: "Уже есть визитка? Добавьте к ней профессию, город и услуги", modalTitle: "Визитка специалиста", modalText: "Основные контакты берутся из вашей визитки. Заполните только профессиональную информацию.", chooseCard: "Ваша визитка", chooseCategory: "Категория", specialty: "Специальность", city: "Город", tags: "Услуги и теги", tagsHint: "Например: письменный перевод, английский, нотариальное заверение", experience: "Опыт", experienceHint: "Например: 8 лет", summary: "О профессиональной деятельности", summaryHint: "Коротко расскажите, чем вы полезны клиенту", proof: "Подтверждающий документ", proofHint: "Обязателен для лицензируемых профессий. Видит только модератор.", add: "Отправить на проверку", cancel: "Отмена", noCard: "Сначала создайте личную визитку", success: "Заявка отправлена. После проверки визитка станет доступна всем в выбранной категории." },
-    tj: { hint: "Варақа доред? Касб, шаҳр ва хизматҳоро илова кунед", modalTitle: "Варақаи мутахассис", modalText: "Тамосҳо аз варақаи шумо гирифта мешаванд. Танҳо маълумоти касбиро пур кунед.", chooseCard: "Варақаи шумо", chooseCategory: "Категория", specialty: "Ихтисос", city: "Шаҳр", tags: "Хизматҳо ва барчаспҳо", tagsHint: "Масалан: тарҷумаи хаттӣ, англисӣ, тасдиқи нотариалӣ", experience: "Таҷриба", experienceHint: "Масалан: 8 сол", summary: "Дар бораи фаъолияти касбӣ", summaryHint: "Кӯтоҳ нависед, ки ба муштарӣ чӣ фоида мерасонед", proof: "Ҳуҷҷати тасдиқкунанда", proofHint: "Барои касбҳои иҷозатномадор ҳатмист. Танҳо модератор мебинад.", add: "Ба санҷиш фиристодан", cancel: "Бекор кардан", noCard: "Аввал варақаи шахсӣ созед", success: "Дархост фиристода шуд. Пас аз санҷиш варақа барои ҳама дастрас мешавад." },
-    en: { hint: "Already have a card? Add your profession, city and services", modalTitle: "Professional business card", modalText: "Contact details come from your existing card. Complete only the professional information.", chooseCard: "Your business card", chooseCategory: "Category", specialty: "Specialty", city: "City", tags: "Services and tags", tagsHint: "For example: written translation, English, notarisation", experience: "Experience", experienceHint: "For example: 8 years", summary: "Professional summary", summaryHint: "Briefly explain how you help clients", proof: "Supporting document", proofHint: "Required for licensed professions. Visible only to moderators.", add: "Submit for review", cancel: "Cancel", noCard: "Create a personal card first", success: "Submitted. Once approved, the card will be public in the selected category." }
+    ru: { hint: "Уже есть визитка? Добавьте к ней профессию, город и услуги", modalTitle: "Визитка специалиста", modalText: "Основные контакты берутся из вашей визитки. Заполните только профессиональную информацию.", chooseCard: "Ваша визитка", chooseCategory: "Категория", specialty: "Специальность", city: "Город", tags: "Услуги и теги", tagsHint: "Например: письменный перевод, английский, нотариальное заверение", experience: "Опыт", experienceHint: "Например: 8 лет", summary: "О профессиональной деятельности", summaryHint: "Коротко расскажите, чем вы полезны клиенту", proof: "Подтверждающий документ", proofHint: "Обязателен для лицензируемых профессий. Видит только модератор.", add: "Отправить на проверку", cancel: "Отмена", noCard: "Сначала создайте личную визитку", success: "Заявка отправлена. После проверки визитка станет доступна всем в выбранной категории.", manage: "Управление профилем специалиста", visible: "Профиль доступен всем", hidden: "Профиль временно скрыт", removed: "Профиль навсегда удалён из специалистов", hide: "Скрыть", show: "Показать снова", remove: "Удалить навсегда", removeConfirm: "Удалить профиль из «Специалистов» навсегда? Личная визитка сохранится.", top: "Поднять в TOP", topBadge: "TOP" },
+    tj: { hint: "Варақа доред? Касб, шаҳр ва хизматҳоро илова кунед", modalTitle: "Варақаи мутахассис", modalText: "Тамосҳо аз варақаи шумо гирифта мешаванд. Танҳо маълумоти касбиро пур кунед.", chooseCard: "Варақаи шумо", chooseCategory: "Категория", specialty: "Ихтисос", city: "Шаҳр", tags: "Хизматҳо ва барчаспҳо", tagsHint: "Масалан: тарҷумаи хаттӣ, англисӣ, тасдиқи нотариалӣ", experience: "Таҷриба", experienceHint: "Масалан: 8 сол", summary: "Дар бораи фаъолияти касбӣ", summaryHint: "Кӯтоҳ нависед, ки ба муштарӣ чӣ фоида мерасонед", proof: "Ҳуҷҷати тасдиқкунанда", proofHint: "Барои касбҳои иҷозатномадор ҳатмист. Танҳо модератор мебинад.", add: "Ба санҷиш фиристодан", cancel: "Бекор кардан", noCard: "Аввал варақаи шахсӣ созед", success: "Дархост фиристода шуд. Пас аз санҷиш варақа барои ҳама дастрас мешавад.", manage: "Идоракунии профили мутахассис", visible: "Профил барои ҳама дастрас аст", hidden: "Профил муваққатан пинҳон аст", removed: "Профил аз мутахассисон пурра нест карда шуд", hide: "Пинҳон кардан", show: "Боз нишон додан", remove: "Пурра нест кардан", removeConfirm: "Профилро аз «Мутахассисон» пурра нест мекунед? Варақаи шахсӣ нигоҳ дошта мешавад.", top: "Ба TOP баровардан", topBadge: "TOP" },
+    en: { hint: "Already have a card? Add your profession, city and services", modalTitle: "Professional business card", modalText: "Contact details come from your existing card. Complete only the professional information.", chooseCard: "Your business card", chooseCategory: "Category", specialty: "Specialty", city: "City", tags: "Services and tags", tagsHint: "For example: written translation, English, notarisation", experience: "Experience", experienceHint: "For example: 8 years", summary: "Professional summary", summaryHint: "Briefly explain how you help clients", proof: "Supporting document", proofHint: "Required for licensed professions. Visible only to moderators.", add: "Submit for review", cancel: "Cancel", noCard: "Create a personal card first", success: "Submitted. Once approved, the card will be public in the selected category.", manage: "Manage specialist profile", visible: "Profile is visible to everyone", hidden: "Profile is temporarily hidden", removed: "Profile was permanently removed from Professionals", hide: "Hide", show: "Show again", remove: "Remove permanently", removeConfirm: "Permanently remove this profile from Professionals? Your personal card will remain.", top: "Move to TOP", topBadge: "TOP" }
   }[language];
   const icons = [Stethoscope, Scale, Languages, GraduationCap, Wrench, Camera, Building2, BriefcaseBusiness];
   const categories = copy.categoryNames.map((name, index) => ({ name, icon: icons[index] }));
@@ -88,6 +88,18 @@ export default function DirectoryPage() {
     } catch (error) {
       setPublishMessage(error instanceof Error ? error.message : "Ошибка отправки");
     } finally { setPublishBusy(false); }
+  }
+  async function manageSpecialist(action: "hide" | "show" | "remove") {
+    if (!selectedCard) return;
+    if (action === "remove" && !window.confirm(publishCopy.removeConfirm)) return;
+    setPublishBusy(true); setPublishMessage("");
+    try {
+      await verificationRepository.setDirectoryVisibility(selectedCard.id, action);
+      const cards = await cardRepository.listRemote();
+      setMyCards(cards);
+      setPublishMessage(action === "remove" ? publishCopy.removed : action === "hide" ? publishCopy.hidden : publishCopy.visible);
+    } catch (error) { setPublishMessage(error instanceof Error ? error.message : "Ошибка"); }
+    finally { setPublishBusy(false); }
   }
   const filteredProfiles = useMemo(() => profiles.filter((profile) => {
     const matchesText = `${profile.name} ${profile.role} ${profile.organization} ${profile.address}`.toLowerCase().includes(query.toLowerCase());
@@ -140,7 +152,7 @@ export default function DirectoryPage() {
           </div>
         </section>
 
-        <section className="section section-muted">
+        {profiles.length > 0 && <section className="section section-muted">
           <div className="site-container">
             <div className="platform-section-head">
               <div>
@@ -151,6 +163,7 @@ export default function DirectoryPage() {
             <div className="specialist-grid">
               {filteredProfiles.map((item, index) => (
                 <article className="specialist-card" key={item.id}>
+                  {item.featuredUntil && new Date(item.featuredUntil).getTime() > Date.now() && <b className="specialist-top-badge">{publishCopy.topBadge}</b>}
                   {item.photo ? <img className="specialist-avatar" src={item.photo} alt="" /> : <div className={`specialist-avatar specialist-avatar-${["blue", "violet", "emerald"][index % 3]}`}>{item.name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("")}</div>}
                   <div className="specialist-verified"><BadgeCheck size={15} /> {copy.checked}</div>
                   <h3>{item.name}</h3>
@@ -163,7 +176,7 @@ export default function DirectoryPage() {
               {!filteredProfiles.length && <div className="empty-state"><BadgeCheck size={30} /><h2>{copy.verified}</h2><p>{copy.verifiedOnly}</p></div>}
             </div>
           </div>
-        </section>
+        </section>}
       </main>
       {publishOpen && <div className="directory-publish-backdrop" role="presentation" onMouseDown={() => setPublishOpen(false)}>
         <section className="directory-publish-modal" role="dialog" aria-modal="true" aria-labelledby="directory-publish-title" onMouseDown={(event) => event.stopPropagation()}>
@@ -171,6 +184,7 @@ export default function DirectoryPage() {
           {!myCards.length ? <div className="empty-state"><FileCheck2 size={27} /><h3>{publishCopy.noCard}</h3><Link to="/create" className="button button-primary">{publishCopy.noCard}</Link></div> : <form className="directory-specialist-form" onSubmit={(event) => void submitSpecialist(event)}>
             <label><span>{publishCopy.chooseCard}</span><select name="cardId" required value={selectedCardId} onChange={(event) => setSelectedCardId(event.target.value)}>{myCards.map((card) => <option key={card.id} value={card.id}>{card.fullName} — {card.position}</option>)}</select></label>
             <div className="directory-card-preview">{selectedCard?.photo ? <img src={selectedCard.photo} alt="" /> : <BadgeCheck size={28} />}<div><strong>{selectedCard?.fullName}</strong><span>{selectedCard?.position}</span><small>{selectedCard?.phone}</small></div></div>
+            {(selectedCard?.specialistSummary || selectedCard?.directoryRemovedAt) && <div className="directory-profile-management"><div><strong>{publishCopy.manage}</strong><span>{selectedCard.directoryRemovedAt ? publishCopy.removed : selectedCard.directoryHidden ? publishCopy.hidden : publishCopy.visible}</span></div>{!selectedCard.directoryRemovedAt && <div className="directory-profile-actions"><button type="button" onClick={() => void manageSpecialist(selectedCard.directoryHidden ? "show" : "hide")} disabled={publishBusy}>{selectedCard.directoryHidden ? publishCopy.show : publishCopy.hide}</button><Link to="/payment?plan=pro">{publishCopy.top}</Link><button type="button" className="danger" onClick={() => void manageSpecialist("remove")} disabled={publishBusy}>{publishCopy.remove}</button></div>}</div>}
             <div className="directory-specialist-grid">
               <label><span>{publishCopy.chooseCategory}</span><select name="categoryId" required><option value="" />{professionCategories.map((item) => <option key={item.id} value={item.id}>{item.name}{item.requiresLicense ? " *" : ""}</option>)}</select></label>
               <label><span>{publishCopy.specialty}</span><input name="title" required maxLength={100} placeholder={publishCopy.specialty} /></label>

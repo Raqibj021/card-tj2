@@ -340,6 +340,8 @@ body {
 .category-other { --category-color: #52647b; background-image: radial-gradient(circle at 100% 0%, rgba(82,100,123,.1), transparent 55%); }
 .specialist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .specialist-card { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); padding: 22px; box-shadow: var(--shadow-sm); }
+.specialist-card { position: relative; }
+.specialist-top-badge { position: absolute; top: 17px; right: 17px; border-radius: 999px; background: linear-gradient(135deg,#f2b632,#e67a18); padding: 6px 10px; color: #fff; font-size: 9px; letter-spacing: .12em; box-shadow: 0 8px 20px rgba(219,132,28,.28); }
 .specialist-avatar { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 18px; color: white; font-weight: 800; }
 .specialist-avatar-blue { background: #1677ea; }
 .specialist-avatar-violet { background: #7253d7; }
@@ -364,6 +366,13 @@ body {
 .directory-card-preview img { width: 55px; height: 55px; border-radius: 14px; object-fit: cover; }
 .directory-card-preview strong, .directory-card-preview span, .directory-card-preview small { display: block; }
 .directory-card-preview span, .directory-card-preview small { margin-top: 3px; color: var(--muted); font-size: 11px; }
+.directory-profile-management { display: grid; gap: 12px; border: 1px solid #bcd8ef; border-radius: 15px; background: color-mix(in srgb,#1478ee 6%,var(--panel)); padding: 13px; }
+.directory-profile-management strong, .directory-profile-management span { display: block; }
+.directory-profile-management span { margin-top: 4px; color: var(--muted); font-size: 11px; }
+.directory-profile-actions { display: flex; flex-wrap: wrap; gap: 7px; }
+.directory-profile-actions button, .directory-profile-actions a { border: 1px solid var(--line); border-radius: 9px; background: var(--panel); padding: 8px 10px; color: var(--ink); font-size: 10px; font-weight: 800; cursor: pointer; }
+.directory-profile-actions a { border-color: #e4b34b; color: #a56800; }
+.directory-profile-actions .danger { border-color: #efc1bc; color: #b33b31; }
 .directory-specialist-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0,1fr)); }
 .directory-specialist-grid .wide { grid-column: 1 / -1; }
 .directory-proof { border: 1px dashed #9abfe7; border-radius: 14px; padding: 12px; }

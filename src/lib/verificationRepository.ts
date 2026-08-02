@@ -82,6 +82,7 @@ export const verificationRepository = {
       specialist_tags: tags,
       specialist_experience: submission.experience.trim(),
       specialist_summary: submission.summary.trim(),
+      directory_hidden: false,
       review_status: "pending"
     }).eq("id", submission.cardId).eq("owner_id", auth.user.id);
     if (cardError) throw cardError;
@@ -92,5 +93,14 @@ export const verificationRepository = {
       status: "pending"
     });
     if (error) throw error;
+  }
+  ,setDirectoryVisibility: async (cardId: string, action: "hide" | "show" | "remove") => {
+    if (!supabase) throw new Error("Сервер временно недоступен.");
+    const { data, error } = await supabase.rpc("set_specialist_directory_visibility", {
+      target_card_id: cardId,
+      requested_action: action
+    });
+    if (error) throw error;
+    return data;
   }
 };

@@ -14,6 +14,7 @@ export interface DirectoryProfile {
   tags: string[];
   experience: string;
   summary: string;
+  featuredUntil: string | null;
 }
 
 export const directoryRepository = {
@@ -21,9 +22,14 @@ export const directoryRepository = {
     if (!supabase) return [];
     const primary = await supabase
       .from("cards")
-      .select("id, slug, full_name, position, organization_name, address, photo_path, specialist_title, specialist_city, specialist_tags, specialist_experience, specialist_summary, profession_categories(slug)")
+      .select("id, slug, full_name, position, organization_name, address, photo_path, specialist_title, specialist_city, specialist_tags, specialist_experience, specialist_summary, directory_featured_until, profession_category_id, profession_categories(slug)")
       .eq("review_status", "approved")
       .in("visibility", ["public", "public_organization"])
+      .eq("directory_hidden", false)
+      .is("directory_removed_at", null)
+      .neq("specialist_title", "")
+      .neq("specialist_summary", "")
+      .not("profession_category_id", "is", null)
       .order("published_at", { ascending: false });
     let rows = primary.data as unknown as Record<string, unknown>[] | null;
     let error = primary.error;
@@ -33,6 +39,7 @@ export const directoryRepository = {
         .select("id, slug, full_name, position, organization_name, address, photo_path, profession_categories(slug)")
         .eq("review_status", "approved")
         .in("visibility", ["public", "public_organization"])
+        .not("profession_category_id", "is", null)
         .order("published_at", { ascending: false });
       rows = fallback.data as unknown as Record<string, unknown>[] | null;
       error = fallback.error;
@@ -55,7 +62,12 @@ export const directoryRepository = {
         ,tags: Array.isArray(row.specialist_tags) ? row.specialist_tags.map(String) : []
         ,experience: String(row.specialist_experience ?? "")
         ,summary: String(row.specialist_summary ?? "")
+        ,featuredUntil: row.directory_featured_until ? String(row.directory_featured_until) : null
       };
+    }).filter((profile) => Boolean(profile.specialistTitle && profile.summary)).sort((a, b) => {
+      const aTop = a.featuredUntil && new Date(a.featuredUntil).getTime() > Date.now() ? 1 : 0;
+      const bTop = b.featuredUntil && new Date(b.featuredUntil).getTime() > Date.now() ? 1 : 0;
+      return bTop - aTop;
     });
   }
 };
