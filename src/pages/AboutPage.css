@@ -510,11 +510,11 @@
   width: 290px;
   height: 174px;
   place-items: center;
-  border: 2px solid color-mix(in srgb, #fff 72%, var(--about-blue));
+  border: 2px solid #0a1930;
   border-radius: 17px;
-  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  background: #fff;
   color: var(--about-blue);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--about-blue) 48%, transparent), 0 10px 26px rgba(23, 111, 242, .13);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .28), 0 10px 26px rgba(1, 11, 27, .2);
   transform: rotateX(61deg) rotateZ(-31deg) translateZ(calc(var(--layer) * 3px));
   transform-origin: 50% 100%;
   animation: about-layer-wave 7.5s cubic-bezier(.45, 0, .2, 1) infinite;
@@ -523,25 +523,26 @@
 }
 
 .about-layered-card > img { display: block; width: 100%; height: 100%; border-radius: calc(17px - 2px); object-fit: cover; animation: about-card-design-swap .55s ease both; }
-.about-layered-card:nth-child(3n) { border-color: color-mix(in srgb, #26c6da 42%, var(--line)); }
-.about-layered-card:nth-child(4n) { border-color: color-mix(in srgb, #6f7cff 42%, var(--line)); }
+.about-layered-card:nth-child(3n),
+.about-layered-card:nth-child(4n) { border-color: #0a1930; }
 
 .about-layered-brand { width: 82px; opacity: .82; filter: drop-shadow(0 8px 15px rgba(23, 111, 242, .2)); }
 .about-layered-brand .vizora-brand-mark { width: 72px; height: auto; }
-.about-layered-signal { position: absolute; z-index: 20; display: grid; width: 36px; height: 36px; place-items: center; border: 1px solid color-mix(in srgb, var(--about-blue) 28%, var(--line)); border-radius: 11px; background: color-mix(in srgb, var(--panel) 82%, transparent); color: var(--about-blue); box-shadow: 0 12px 28px rgba(23, 111, 242, .13); animation: about-signal-float 5s ease-in-out infinite; backdrop-filter: blur(10px); }
+.about-layered-signal { position: absolute; z-index: 20; display: grid; width: 36px; height: 36px; place-items: center; border: 0; border-radius: 0; background: transparent; color: var(--about-blue); box-shadow: none; animation: about-signal-float 5s ease-in-out infinite; filter: drop-shadow(0 8px 13px rgba(23, 111, 242, .24)); backdrop-filter: none; }
 .about-layered-signal.signal-one { top: 12%; left: 12%; }
 .about-layered-signal.signal-two { top: 25%; right: 10%; animation-delay: -1.7s; }
 .about-layered-signal.signal-three { right: 19%; bottom: 11%; animation-delay: -3.2s; }
 
 @keyframes about-layer-wave {
-  0%, 100% { opacity: .48; transform: rotateX(61deg) rotateZ(-31deg) translate3d(0, 0, calc(var(--layer) * 3px)); }
+  0%, 100% { opacity: 1; transform: rotateX(61deg) rotateZ(-31deg) translate3d(0, 0, calc(var(--layer) * 3px)); }
   48% { opacity: 1; transform: rotateX(57deg) rotateZ(-29deg) translate3d(4px, -11px, calc(var(--layer) * 5px)); }
 }
-@keyframes about-card-design-swap { from { opacity: .35; filter: saturate(.8) brightness(1.08); } to { opacity: 1; filter: none; } }
-@keyframes about-signal-float { 50% { transform: translate3d(0, -9px, 0); box-shadow: 0 18px 34px rgba(23, 111, 242, .19); } }
+@keyframes about-card-design-swap { from { opacity: 1; filter: saturate(.78) brightness(1.08); clip-path: inset(0 100% 0 0 round 15px); } to { opacity: 1; filter: none; clip-path: inset(0 round 15px); } }
+@keyframes about-signal-float { 50% { transform: translate3d(0, -9px, 0); } }
 
 @media (max-width: 680px) {
-  .about-network-card { display: block; width: min(100%, 390px); min-height: 270px; margin-inline: auto; justify-self: center; }
+  .about-page { display: block; min-height: 100vh; visibility: visible; }
+  .about-network-card { display: block !important; width: min(100%, 390px); min-height: 270px; margin-inline: auto; justify-self: center; visibility: visible; }
   .about-network-visual.about-layered-cards { inset: 0 0 48px; display: grid; place-items: center; }
   .about-layered-stage { width: 310px; height: 190px; transform: translateY(-2px) scale(.68); transform-origin: center; }
   .about-layered-signal { width: 29px; height: 29px; border-radius: 9px; }
@@ -556,4 +557,4 @@
   .about-layered-card,
   .about-layered-signal { animation: none !important; }
 }
-/* Production refresh: rotating Vizora card stack. */
+/* Production refresh: opaque outlined Vizora stack. */
