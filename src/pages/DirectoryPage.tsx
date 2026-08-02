@@ -17,7 +17,6 @@ import {
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import Footer from "../components/layout/Footer";
-import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
 import { cardRepository } from "../lib/cardRepository";
@@ -142,16 +141,19 @@ export default function DirectoryPage() {
     <>
       <main>
         <section className="directory-hero">
-          <div className="site-container py-16 text-center md:py-24">
-            <span className="section-label">{copy.label}</span>
-            <h1>{copy.title}</h1>
-            <p>{copy.text}</p>
-            <form className="directory-search" onSubmit={(event) => event.preventDefault()}>
-              <Search size={21} />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={copy.search} placeholder={copy.placeholder} />
-              <span><MapPin size={17} /> {language === "en" ? "Dushanbe" : "Душанбе"}</span>
-              <button type="submit" className="button button-primary">{copy.find}</button>
-            </form>
+          <div className="site-container directory-hero-layout">
+            <div className="directory-hero-copy">
+              <span className="section-label">{copy.label}</span>
+              <h1>{copy.title}</h1>
+              <p>{copy.text}</p>
+              <form className="directory-search" onSubmit={(event) => event.preventDefault()}>
+                <Search size={21} />
+                <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={copy.search} placeholder={copy.placeholder} />
+                <span><MapPin size={17} /> {language === "en" ? "Dushanbe" : "Душанбе"}</span>
+                <button type="submit" className="button button-primary">{copy.find}</button>
+              </form>
+            </div>
+            <DirectoryCardFlow />
           </div>
         </section>
 
@@ -162,7 +164,6 @@ export default function DirectoryPage() {
               <div><strong>{copy.publish}</strong><small>{publishCopy.hint}</small></div>
               <button type="button" className="button button-primary" onClick={() => void openPublisher()}>{copy.publish}<ChevronRight size={17} /></button>
             </div>
-            <DirectoryCardFlow />
             <div className="platform-section-head">
               <div>
                 <span className="section-label">{copy.categories}</span>
@@ -270,16 +271,20 @@ export default function DirectoryPage() {
 }
 
 function DirectoryCardFlow() {
+  const cards = [
+    "vizora-tajikistan-building.webp",
+    "vizora-tajikistan-palace.webp",
+    "vizora-tajikistan-somoni.webp",
+    "vizora-tajikistan-arch.webp",
+    "vizora-tajikistan-hissar.webp",
+    "vizora-tajikistan-independence.webp"
+  ];
   return (
     <div className="directory-card-flow" aria-hidden="true">
-      <div className="directory-card-flow-copy">
-        <span>VIZORA DIRECTORY</span>
-        <strong>QR · NFC · VERIFIED</strong>
-      </div>
       <div className="directory-layered-stage">
-        {Array.from({ length: 10 }, (_, index) => (
-          <i className="directory-layered-card" key={index} style={{ "--layer": index } as CSSProperties}>
-            {index === 6 && <BrandLogo compact />}
+        {cards.map((image, index) => (
+          <i className="directory-layered-card" key={image} style={{ "--layer": index } as CSSProperties}>
+            <img src={`${import.meta.env.BASE_URL}images/cards/${image}`} alt="" />
           </i>
         ))}
       </div>
