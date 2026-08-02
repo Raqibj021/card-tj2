@@ -29,7 +29,7 @@ import {
   Workflow,
   type LucideIcon
 } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router";
 import BrandLogo from "../components/BrandLogo";
@@ -696,15 +696,16 @@ function ContactGroup({ title, note, contacts, brand }: { title: string; note: s
 
 function ContactNetwork() {
   const [topDesign, setTopDesign] = useState(0);
-  const [previousTopDesign, setPreviousTopDesign] = useState<number | null>(null);
 
   useEffect(() => {
+    heroCardDesigns.forEach((card) => {
+      const image = new Image();
+      image.src = `${import.meta.env.BASE_URL}images/cards/${card.image}`;
+    });
+
     const rotation = window.setInterval(() => {
-      setTopDesign((current) => {
-        setPreviousTopDesign(current);
-        return (current + 1) % heroCardDesigns.length;
-      });
-    }, 3600);
+      setTopDesign((current) => (current + 1) % heroCardDesigns.length);
+    }, 4200);
 
     return () => window.clearInterval(rotation);
   }, []);
@@ -716,21 +717,28 @@ function ContactNetwork() {
           const isTopCard = index === 13;
           return (
             <span className={`about-layered-card${isTopCard ? " is-top-card" : ""}`} key={index} style={{ "--layer": index } as CSSProperties}>
-              {isTopCard && previousTopDesign !== null && (
+              {isTopCard ? (
+                <AnimatePresence initial={false} mode="sync">
+                  <motion.img
+                    key={topDesign}
+                    className="about-top-card-image"
+                    src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[topDesign].image}`}
+                    alt=""
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.15, ease: "easeInOut" }}
+                  />
+                </AnimatePresence>
+              ) : (
                 <img
-                  className="about-top-card-outgoing"
-                  src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[previousTopDesign].image}`}
+                  src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[index % heroCardDesigns.length].image}`}
                   alt=""
-                  onAnimationEnd={() => setPreviousTopDesign(null)}
+                  loading="lazy"
                 />
               )}
-              <img
-                key={isTopCard ? topDesign : index}
-                className={isTopCard && previousTopDesign !== null ? "about-top-card-incoming" : undefined}
-                src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[isTopCard ? topDesign : index % heroCardDesigns.length].image}`}
-                alt=""
-                loading="lazy"
-              />
+              <img className="about-layered-card-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="" />
+              <span className="about-layered-card-nfc"><SmartphoneNfc size={16} />NFC</span>
             </span>
           );
         })}
