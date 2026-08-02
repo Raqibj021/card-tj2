@@ -8388,3 +8388,26 @@ body,
     width: 100%;
   }
 }
+
+
+.specialist-plan-step { padding: 4px 0 8px; }
+.specialist-plan-intro { margin-bottom: 20px; }
+.specialist-plan-intro h3 { margin: 0 0 6px; font-size: clamp(22px, 3vw, 30px); }
+.specialist-plan-intro p { margin: 0; color: var(--muted); }
+.specialist-plan-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.specialist-plan-card { display: flex; flex-direction: column; min-height: 330px; border: 1px solid var(--line); border-radius: 22px; background: var(--panel); padding: 22px; }
+.specialist-plan-card.pro { border-color: var(--accent); background: color-mix(in srgb, var(--panel) 90%, var(--accent) 10%); }
+.specialist-plan-card > span { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+.specialist-plan-card h3 { margin: 12px 0; font-size: 23px; }
+.specialist-plan-price strong { font-size: 42px; }
+.specialist-plan-card ul { display: grid; gap: 10px; margin: 20px 0; padding: 18px 0; border-top: 1px solid var(--line); list-style: none; }
+.specialist-plan-card li { display: flex; gap: 9px; align-items: center; color: var(--muted); }
+.specialist-plan-card li svg { flex: 0 0 auto; color: var(--accent); }
+.specialist-plan-card .button { width: 100%; margin-top: auto; }
+.specialist-plan-back { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: var(--accent); font-weight: 700; cursor: pointer; }
+.specialist-plan-back svg { transform: rotate(180deg); }
+.specialist-already-state { display: grid; justify-items: center; gap: 16px; padding: 42px 10px; text-align: center; }
+.specialist-already-state > svg { color: var(--accent); }
+.specialist-already-state h3 { max-width: 560px; font-size: 25px; }
+.specialist-already-state > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+@media (max-width: 700px) { .specialist-plan-grid { grid-template-columns: 1fr; } .specialist-plan-card { min-height: 0; } }
