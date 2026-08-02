@@ -1,5 +1,6 @@
 import { Building2, CreditCard, LockKeyhole, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import Footer from "../components/layout/Footer";
 import OrganizationApplicationStatus from "../components/OrganizationApplicationStatus";
 import { useApp } from "../context/AppContext";
@@ -9,6 +10,8 @@ import {
 } from "../lib/organizationRepository";
 
 export default function OrganizationApplyPage() {
+  const [searchParams] = useSearchParams();
+  const creatingNew = searchParams.get("new") === "1";
   const { language } = useApp();
   const [application, setApplication] = useState<OrganizationApplication | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +69,7 @@ export default function OrganizationApplyPage() {
   useEffect(() => {
     let active = true;
     const loadApplication = () => {
-      organizationRepository.getCurrentApplication()
+      (creatingNew ? Promise.resolve(null) : organizationRepository.getCurrentApplication())
         .then((result) => {
           if (active) {
             setApplication(result);
@@ -129,7 +132,8 @@ export default function OrganizationApplyPage() {
                         contactPosition: String(form.get("contactPosition") ?? ""),
                         phone: String(form.get("phone") ?? ""),
                         email: String(form.get("email") ?? ""),
-                        planCode: String(form.get("plan") ?? "start")
+                        planCode: String(form.get("plan") ?? "start"),
+                        createNew: creatingNew
                       });
                       setApplication(result);
                       setEditing(false);
