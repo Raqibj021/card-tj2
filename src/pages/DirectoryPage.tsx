@@ -128,6 +128,7 @@ export default function DirectoryPage() {
   const [selectedProfessionCategoryId, setSelectedProfessionCategoryId] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const copy = {
     ru: { label: "Проверенный каталог", title: "Найдите нужного специалиста", text: "Настоящие люди и организации с подтверждёнными данными", search: "Поиск", placeholder: "Профессия, услуга или имя", find: "Найти", categories: "Категории", all: "Все специалисты в одном месте", verifiedOnly: "Публикация только после проверки", profiles: "профилей", newProfiles: "Новые профили", verified: "Проверенные специалисты", publish: "Добавить мою визитку", publishHint: "Уже есть визитка? Добавьте к ней профессию, город и услуги", checked: "Проверено Vizora", open: "Открыть визитку", modalTitle: "Визитка специалиста", modalText: "Основные контакты берутся из вашей визитки. Заполните только профессиональную информацию.", chooseCard: "Ваша визитка", chooseCategory: "Категория", specialty: "Специальность", city: "Город", tags: "Услуги и теги", tagsHint: "Например: письменный перевод, английский, нотариальное заверение", experience: "Опыт", experienceHint: "Например: 8 лет", summary: "О профессиональной деятельности", summaryHint: "Коротко расскажите, чем вы полезны клиенту", proof: "Подтверждающий документ", proofHint: "Обязателен для лицензируемых профессий. Видит только модератор.", add: "Отправить на проверку", cancel: "Отмена", noCard: "Сначала создайте личную визитку", success: "Заявка отправлена. После проверки визитка станет доступна всем в выбранной категории.", categoryNames: ["Врачи и клиники", "Юристы", "Переводчики", "Преподаватели", "Ремонт и мастера", "Фото и дизайн", "Компании", "Другие специалисты"], roles: ["Переводчик английского языка", "Преподаватель математики", "Специалист по ремонту техники"] },
     tj: { label: "Феҳристи тасдиқшуда", title: "Мутахассиси лозимиро ёбед", text: "Шахсон ва ташкилотҳои воқеӣ бо маълумоти тасдиқшуда", search: "Ҷустуҷӯ", placeholder: "Касб, хизмат ё ном", find: "Ёфтан", categories: "Категорияҳо", all: "Ҳамаи мутахассисон дар як ҷой", verifiedOnly: "Нашр танҳо пас аз санҷиш", profiles: "профил", newProfiles: "Профилҳои нав", verified: "Мутахассисони тасдиқшуда", publish: "Ҷойгир кардани профил", checked: "Аз ҷониби Vizora тасдиқ шудааст", open: "Кушодани варақа", categoryNames: ["Табибон ва клиникаҳо", "Ҳуқуқшиносон", "Тарҷумонҳо", "Омӯзгорон", "Таъмир ва устоҳо", "Акс ва дизайн", "Ширкатҳо", "Дигар мутахассисон"], roles: ["Тарҷумони забони англисӣ", "Омӯзгори математика", "Мутахассиси таъмири техника"] },
@@ -244,7 +245,7 @@ export default function DirectoryPage() {
       ? ["Verified doctors, clinics and medical services.", "Lawyers and professional legal advice.", "Translators and language services.", "Teachers, tutors and education providers.", "Repair experts and technical trades.", "Photographers, designers and creative professionals.", "Companies and professional services.", "Other permitted platform professionals."]
       : ["Проверенные врачи, клиники и медицинские услуги.", "Юристы и профессиональная правовая помощь.", "Переводчики и профессиональные языковые услуги.", "Преподаватели, репетиторы и образовательные центры.", "Мастера по ремонту и техническому обслуживанию.", "Фотографы, дизайнеры и творческие специалисты.", "Компании и профессиональные услуги для бизнеса.", "Другие разрешённые специалисты платформы."];
   const selectedCard = myCards.find((card) => card.id === selectedCardId) ?? myCards[0];
-  const showResults = () => window.setTimeout(() => document.getElementById("specialist-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  const showResults = () => { if (query.trim()) { setSearchFocused(false); setSearchOpen(true); } };
   return (
     <>
       <main>
@@ -253,13 +254,13 @@ export default function DirectoryPage() {
             <span className="section-label">{copy.label}</span>
             <h1>{copy.title}</h1>
             <p>{copy.text}</p>
-            <form className="directory-search" onSubmit={(event) => { event.preventDefault(); setSearchFocused(false); showResults(); }}>
+            <form className="directory-search" onSubmit={(event) => { event.preventDefault(); showResults(); }}>
               <Search size={21} />
               <input value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => window.setTimeout(() => setSearchFocused(false), 120)} onKeyDown={(event) => { if (event.key === "Escape") setSearchFocused(false); }} autoComplete="off" aria-label={copy.search} aria-expanded={searchFocused && !!query.trim()} aria-controls="directory-search-suggestions" placeholder={copy.placeholder} />
               <span><MapPin size={17} /> {language === "en" ? "Dushanbe" : "Душанбе"}</span>
               <button type="submit" className="button button-primary">{copy.find}</button>
               {searchFocused && query.trim() && <div className="directory-search-suggestions" id="directory-search-suggestions" role="listbox">
-                {searchSuggestions.length ? searchSuggestions.map((suggestion) => <button type="button" role="option" key={suggestion} onMouseDown={(event) => event.preventDefault()} onClick={() => { setQuery(suggestion); setSearchFocused(false); showResults(); }}><Search size={15} /><span>{suggestion}</span></button>) : <p>{language === "tj" ? "Калимаи наздик ёфт нашуд — ҷустуҷӯ аз рӯи матни воридшуда анҷом мешавад." : language === "en" ? "No close suggestion — search will use the entered text." : "Близкой подсказки пока нет — поиск выполнится по введённому тексту."}</p>}
+                {searchSuggestions.length ? searchSuggestions.map((suggestion) => <button type="button" role="option" key={suggestion} onMouseDown={(event) => event.preventDefault()} onClick={() => { setQuery(suggestion); setSearchFocused(false); setSearchOpen(true); }}><Search size={15} /><span>{suggestion}</span></button>) : <p>{language === "tj" ? "Калимаи наздик ёфт нашуд — ҷустуҷӯ аз рӯи матни воридшуда анҷом мешавад." : language === "en" ? "No close suggestion — search will use the entered text." : "Близкой подсказки пока нет — поиск выполнится по введённому тексту."}</p>}
               </div>}
             </form>
           </div>
@@ -301,7 +302,7 @@ export default function DirectoryPage() {
               </div>
             </div>
             <div className="specialist-grid">
-              {filteredProfiles.map((item, index) => (
+              {profiles.map((item, index) => (
                 <article className="specialist-card" key={item.id}>
                   {item.featuredUntil && new Date(item.featuredUntil).getTime() > Date.now() && <b className="specialist-top-badge">{publishCopy.topBadge}</b>}
                   {item.photo ? <img className="specialist-avatar" src={item.photo} alt="" /> : <div className={`specialist-avatar specialist-avatar-${["blue", "violet", "emerald"][index % 3]}`}>{item.name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("")}</div>}
@@ -318,6 +319,20 @@ export default function DirectoryPage() {
           </div>
         </section>}
       </main>
+      {searchOpen && <div className="directory-search-results-backdrop" role="presentation" onMouseDown={() => setSearchOpen(false)}>
+        <section className="directory-search-results" role="dialog" aria-modal="true" aria-labelledby="directory-search-results-title" onMouseDown={(event) => event.stopPropagation()}>
+          <header><div><span className="section-label">{copy.label}</span><h2 id="directory-search-results-title">{language === "tj" ? "Натиҷаҳои ҷустуҷӯ" : language === "en" ? "Search results" : "Результаты поиска"}</h2><p>«{query}» · {filteredProfiles.length} {copy.profiles}</p></div><button type="button" onClick={() => setSearchOpen(false)} aria-label={publishCopy.cancel}>×</button></header>
+          <div className="directory-search-results-body">
+            {filteredProfiles.length ? <div className="specialist-grid">{filteredProfiles.map((item, index) => <article className="specialist-card" key={item.id}>
+              {item.featuredUntil && new Date(item.featuredUntil).getTime() > Date.now() && <b className="specialist-top-badge">{publishCopy.topBadge}</b>}
+              {item.photo ? <img className="specialist-avatar" src={item.photo} alt="" /> : <div className={`specialist-avatar specialist-avatar-${["blue", "violet", "emerald"][index % 3]}`}>{item.name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("")}</div>}
+              <div className="specialist-verified"><BadgeCheck size={15} />{copy.checked}</div><h3>{item.name}</h3><p>{item.specialistTitle || item.role}</p><span><MapPin size={15} />{item.city || item.address || "—"}</span>
+              {!!item.tags.length && <div className="specialist-tags">{item.tags.slice(0, 3).map((tag) => <small key={tag}>{tag}</small>)}</div>}
+              <Link to={`/card/${item.slug}?profile=specialist`} className="button button-secondary w-full">{copy.open}</Link>
+            </article>)}</div> : <div className="directory-search-empty"><Search size={31} /><h3>{language === "tj" ? "Мутахассис ёфт нашуд" : language === "en" ? "No specialist found" : "Специалист не найден"}</h3><p>{language === "tj" ? "Касб, хизмат, барчасп ё номро бо калимаи дигар нависед." : language === "en" ? "Try another profession, service, tag or name." : "Попробуйте другое название профессии, услуги, тег или имя."}</p></div>}
+          </div>
+        </section>
+      </div>}
       {publishOpen && <div className="directory-publish-backdrop" role="presentation" onMouseDown={() => setPublishOpen(false)}>
         <section className="directory-publish-modal" role="dialog" aria-modal="true" aria-labelledby="directory-publish-title" onMouseDown={(event) => event.stopPropagation()}>
           <header><div><span className="section-label">VIZORA.TJ</span><h2 id="directory-publish-title">{publishCopy.modalTitle}</h2><p>{publishCopy.modalText}</p></div><button type="button" onClick={() => setPublishOpen(false)} aria-label={publishCopy.cancel}>×</button></header>
