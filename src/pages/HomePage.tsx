@@ -158,7 +158,8 @@ export default function HomePage() {
 
   return (
     <>
-      <main>
+      <main className="home-page">
+        <div className="home-digital-atmosphere" aria-hidden="true"><i /><i /><i /><span /><span /><span /></div>
         <div className="site-container home-promo-wrap">
           <HomePromoCarousel />
         </div>
