@@ -44,8 +44,8 @@ const ru = {
   chooseDesign: "Выбрать этот дизайн",
   pricingTitle: "Тарифы для любого масштаба",
   pricingText:
-    "На этапе MVP тарифы представлены для демонстрации. Оплата пока не подключена.",
-  testTariff: "Тестовый тариф",
+    "Выберите личную визитку или профессиональный профиль в каталоге специалистов.",
+  testTariff: "Годовой тариф",
   free: "Бесплатный",
   professional: "Профессиональный",
   corporate: "Корпоративный",
@@ -210,8 +210,8 @@ const tj: Record<CopyKey, string> = {
   chooseDesign: "Ин дизайнро интихоб кардан",
   pricingTitle: "Нарҳҳо барои ҳар андоза",
   pricingText:
-    "Дар марҳилаи MVP нархҳо барои намоиш мебошанд. Пардохт ҳоло пайваст нашудааст.",
-  testTariff: "Нархи санҷишӣ",
+    "Варақаи шахсӣ ё профили касбиро дар феҳристи мутахассисон интихоб кунед.",
+  testTariff: "Тарофаи солона",
   free: "Ройгон",
   professional: "Касбӣ",
   corporate: "Корпоративӣ",
@@ -371,8 +371,8 @@ const en: Record<CopyKey, string> = {
   chooseDesign: "Choose this design",
   pricingTitle: "Plans for every scale",
   pricingText:
-    "At the MVP stage, plans are for demonstration only. Payments are not connected yet.",
-  testTariff: "Test plan",
+    "Choose a personal card or a professional profile in the specialist directory.",
+  testTariff: "Annual plan",
   free: "Free",
   professional: "Professional",
   corporate: "Corporate",

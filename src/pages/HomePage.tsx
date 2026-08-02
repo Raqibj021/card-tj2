@@ -326,7 +326,6 @@ export default function HomePage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <span className="pricing-badge">{t("testTariff")}</span>
                       <h3>{plan.name}</h3>
                     </div>
                     {plan.featured && <Sparkles size={22} className="text-teal-300" />}
@@ -341,7 +340,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <Link
-                    to="/create"
+                    to={plan.price === "20" ? "/create?plan=personal" : `/directory?publish=${plan.price === "50" ? "specialist" : "pro"}`}
                     className={`button w-full ${
                       plan.featured ? "button-primary" : "button-dark-outline"
                     }`}

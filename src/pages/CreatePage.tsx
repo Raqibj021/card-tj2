@@ -350,6 +350,12 @@ export default function CreatePage() {
             <Link to="/dashboard" className="button button-ghost">
               {statusCopy.dashboard}
             </Link>
+            <Link to="/directory?publish=specialist" className="button button-secondary">
+              {language === "ru" ? "Добавить в специалисты" : language === "tj" ? "Ба мутахассисон илова кардан" : "Add to specialists"}
+            </Link>
+            <Link to="/" className="button button-ghost">
+              {language === "ru" ? "Главная" : language === "tj" ? "Саҳифаи асосӣ" : "Home"}
+            </Link>
           </div>
         </section>
       </main>

@@ -47,6 +47,10 @@ export interface DigitalCard {
   directoryHidden?: boolean;
   directoryRemovedAt?: string | null;
   directoryFeaturedUntil?: string | null;
+  specialistPlan?: "specialist" | "pro";
+  specialistServiceArea?: string;
+  specialistConsultation?: string;
+  specialistPortfolio?: string[];
 }
 
 export type CardDraft = Omit<
