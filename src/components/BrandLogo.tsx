@@ -9,8 +9,8 @@ export default function BrandLogo({
   className = "",
   light = false
 }: BrandLogoProps) {
-  const asset = `${import.meta.env.BASE_URL}brand/${compact ? "vizora-mark.webp" : "vizora-logo.webp"}`;
-  const lightAsset = `${import.meta.env.BASE_URL}brand/${compact ? "vizora-mark.webp" : "vizora-logo-silver.png"}`;
+  const asset = `${import.meta.env.BASE_URL}brand/${compact ? "vizora-mark-clean.webp" : "vizora-logo-clean.webp"}`;
+  const lightAsset = `${import.meta.env.BASE_URL}brand/${compact ? "vizora-mark-white.png" : "vizora-logo-white.png"}`;
 
   return (
     <span className={`vizora-brand ${compact ? "vizora-brand-compact" : ""} ${light ? "vizora-brand-light" : ""} ${className}`}>

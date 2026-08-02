@@ -51,7 +51,7 @@ const pageCopy = {
     seoTitle: "О Vizora.tj — история создания платформы цифровых визиток",
     seoDescription: "История основателя Vizora.tj Ракибджона Муродкулова, миссия платформы и поддержка Бюро «Тезаурус».",
     heroLabel: "История Vizora.tj",
-    heroTitle: "Привет! Меня зовут Ракибджон Муродкулов",
+    heroTitle: "Меня зовут Ракибджон!",
     heroRole: "Основатель платформы Vizora.tj",
     heroText: "Я создал Vizora.tj, чтобы сделать обмен контактами, цифровые визитки и профессиональные связи современными, удобными и доступными каждому.",
     heroAction: "Почему появилась Vizora",
@@ -116,7 +116,7 @@ const pageCopy = {
     seoTitle: "Дар бораи Vizora.tj — таърихи таъсиси платформа",
     seoDescription: "Таърихи муассиси Vizora.tj Ракибҷон Муродқулов, рисолати платформа ва дастгирии Бюрои «Тезаурус».",
     heroLabel: "Таърихи Vizora.tj",
-    heroTitle: "Салом! Номи ман Ракибҷон Муродқулов аст",
+    heroTitle: "Номи ман Ракибҷон аст!",
     heroRole: "Муассиси платформаи Vizora.tj",
     heroText: "Ман Vizora.tj-ро таъсис додам, то мубодилаи тамос, варақаҳои рақамӣ ва робитаҳои касбӣ барои ҳама муосир, қулай ва дастрас бошанд.",
     heroAction: "Чаро Vizora пайдо шуд",
@@ -181,7 +181,7 @@ const pageCopy = {
     seoTitle: "About Vizora.tj — the story behind the digital identity platform",
     seoDescription: "The story of Vizora.tj founder Raqibjon Murodqulov, the platform mission and support from Buro Tezaurus.",
     heroLabel: "The Vizora.tj story",
-    heroTitle: "Hello! My name is Raqibjon Murodqulov",
+    heroTitle: "My name is Raqibjon!",
     heroRole: "Founder of Vizora.tj",
     heroText: "I created Vizora.tj to make contact sharing, digital business cards and professional connections modern, convenient and accessible to everyone.",
     heroAction: "Why Vizora was created",
@@ -248,8 +248,8 @@ const serviceIcons: LucideIcon[] = [Languages, FileText, Palette, Megaphone, Bad
 const valueIcons: LucideIcon[] = [ShieldCheck, Lightbulb, CheckCircle2, Palette, Rocket, HeartHandshake];
 
 const revealVariants = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.68, ease: [0.22, 1, 0.36, 1] as const } }
+  hidden: { opacity: 0, y: 46 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.46, ease: [0.22, 1, 0.36, 1] as const } }
 };
 
 export default function AboutPage() {
@@ -364,10 +364,10 @@ export default function AboutPage() {
               <div className="about-founder-glow" aria-hidden="true" />
               <img
                 className="about-founder-portrait"
-                src={`${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov-founder-transparent.png`}
+                src={`${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov-founder-light-v2.webp`}
                 alt={`${text.heroTitle}. ${text.heroRole}`}
-                width="670"
-                height="989"
+                width="780"
+                height="1150"
                 loading="eager"
                 fetchPriority="high"
               />
@@ -414,11 +414,23 @@ export default function AboutPage() {
                 <img className="about-support-logo" src={`${import.meta.env.BASE_URL}brand/buro-tezaurus-logo.webp`} alt="Бюро Тезаурус" width="2048" height="494" loading="lazy" />
                 <div><span className="about-dark-kicker">{text.supportLabel}</span><h2>{text.supportTitle}</h2><p>{text.supportText}</p></div>
               </div>
-              <div className="about-service-grid">
-                {text.services.map((service, index) => {
-                  const Icon = serviceIcons[index];
-                  return <motion.div key={service} className="about-service-chip" whileHover={reduceMotion ? undefined : { y: -5 }}><Icon size={18} /><span>{service}</span></motion.div>;
-                })}
+              <div className="about-marquee about-service-marquee">
+                <div className="about-service-grid about-marquee-track">
+                  {[...text.services, ...text.services].map((service, index) => {
+                    const Icon = serviceIcons[index % serviceIcons.length];
+                    const duplicate = index >= text.services.length;
+                    return (
+                      <motion.div
+                        key={`${service}-${index}`}
+                        className={`about-service-chip ${duplicate ? "about-marquee-copy" : ""}`}
+                        aria-hidden={duplicate || undefined}
+                        whileHover={reduceMotion ? undefined : { y: -5 }}
+                      >
+                        <Icon size={20} /><span>{service}</span>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </div>
             </Reveal>
           </div>
@@ -438,17 +450,20 @@ export default function AboutPage() {
         <section className="about-section about-values-section">
           <div className="site-container">
             <Reveal><SectionHeading label={text.valuesLabel} title={text.valuesTitle} centered /></Reveal>
-            <div className="about-values-grid">
-              {text.values.map(([title, description], index) => {
-                const Icon = valueIcons[index];
-                return (
-                  <Reveal key={title} delay={index * 0.05}>
-                    <motion.article className="about-value-card" whileHover={reduceMotion ? undefined : { y: -8, scale: 1.01 }}>
-                      <span><Icon size={22} /></span><h3>{title}</h3><p>{description}</p>
-                    </motion.article>
-                  </Reveal>
-                );
-              })}
+            <div className="about-marquee about-values-marquee">
+              <div className="about-values-grid about-marquee-track">
+                {[...text.values, ...text.values].map(([title, description], index) => {
+                  const Icon = valueIcons[index % valueIcons.length];
+                  const duplicate = index >= text.values.length;
+                  return (
+                    <Reveal key={`${title}-${index}`} className={duplicate ? "about-marquee-copy" : ""} delay={duplicate ? 0 : (index % text.values.length) * 0.04}>
+                      <motion.article aria-hidden={duplicate || undefined} className="about-value-card" whileHover={reduceMotion ? undefined : { y: -7, scale: 1.01 }}>
+                        <span><Icon size={24} /></span><h3>{title}</h3><p>{description}</p>
+                      </motion.article>
+                    </Reveal>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
@@ -456,14 +471,19 @@ export default function AboutPage() {
         <section className="about-section about-stats-section">
           <div className="site-container">
             <Reveal><SectionHeading label={text.trustLabel} title={text.trustTitle} centered /></Reveal>
-            <div className="about-stats-grid">
-              {statItems.map(([value, label, Icon], index) => (
-                <Reveal key={label} delay={index * 0.045}>
-                  <motion.article className="about-stat-card" whileHover={reduceMotion ? undefined : { y: -5 }}>
-                    <Icon size={20} /><strong>{value}</strong><span>{label}</span>
-                  </motion.article>
-                </Reveal>
-              ))}
+            <div className="about-marquee about-stats-marquee">
+              <div className="about-stats-grid about-marquee-track">
+                {[...statItems, ...statItems].map(([value, label, Icon], index) => {
+                  const duplicate = index >= statItems.length;
+                  return (
+                    <Reveal key={`${label}-${index}`} className={duplicate ? "about-marquee-copy" : ""} delay={duplicate ? 0 : (index % statItems.length) * 0.04}>
+                      <motion.article aria-hidden={duplicate || undefined} className="about-stat-card" whileHover={reduceMotion ? undefined : { y: -5 }}>
+                        <Icon size={22} /><strong>{value}</strong><span>{label}</span>
+                      </motion.article>
+                    </Reveal>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
@@ -504,7 +524,7 @@ export default function AboutPage() {
 function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const reduceMotion = useReducedMotion();
   return (
-    <motion.div className={className} initial={reduceMotion ? false : "hidden"} whileInView="visible" viewport={{ once: true, margin: "-70px" }} variants={{ ...revealVariants, visible: { ...revealVariants.visible, transition: { ...revealVariants.visible.transition, delay } } }}>
+    <motion.div className={className} initial={reduceMotion ? false : "hidden"} whileInView="visible" viewport={{ once: true, margin: "-35px" }} variants={{ ...revealVariants, visible: { ...revealVariants.visible, transition: { ...revealVariants.visible.transition, delay } } }}>
       {children}
     </motion.div>
   );
@@ -540,8 +560,11 @@ function ContactNetwork() {
   return (
     <div className="about-network-visual" aria-hidden="true">
       <svg viewBox="0 0 620 500" role="img">
-        <defs><linearGradient id="about-network-line" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#57d6ff" /><stop offset="1" stopColor="#4074ff" /></linearGradient></defs>
-        <g className="about-network-lines" fill="none" stroke="url(#about-network-line)">
+        <defs>
+          <linearGradient id="about-network-line" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#57d6ff" /><stop offset="1" stopColor="#4074ff" /></linearGradient>
+          <mask id="about-network-mask"><rect width="620" height="500" fill="white" /><rect x="238" y="195" width="144" height="110" rx="32" fill="black" /></mask>
+        </defs>
+        <g className="about-network-lines" fill="none" stroke="url(#about-network-line)" mask="url(#about-network-mask)">
           <path d="M310 250 130 116M310 250 500 105M310 250 520 340M310 250 125 378M130 116 500 105M125 378 520 340" />
           <circle cx="310" cy="250" r="112" /><circle cx="310" cy="250" r="178" />
         </g>
