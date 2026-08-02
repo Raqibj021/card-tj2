@@ -1273,6 +1273,13 @@ body {
 .dark .receipt-upload { background: rgba(20,120,238,.08); }
 .receipt-upload span { color: var(--muted); font-size: 9px; font-weight: 600; }
 .receipt-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.inline-payment-guide { display: grid; gap: 14px; padding: 18px; border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border)); border-radius: 18px; background: color-mix(in srgb, var(--accent) 7%, var(--surface)); }
+.inline-payment-guide > div, .inline-payment-summary { display: flex; align-items: flex-start; gap: 12px; }
+.inline-payment-guide p, .inline-payment-summary span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.inline-payment-guide > b { width: fit-content; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.inline-payment-guide .receipt-upload { min-height: 108px; }
+.inline-payment-summary { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--border); border-radius: 14px; background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+.inline-payment-summary svg { flex: 0 0 auto; color: var(--accent); }
 .payment-success { display: grid; min-height: 520px; place-items: center; align-content: center; text-align: center; }
 .payment-success > svg { color: #078664; }
 .payment-success h1 { margin: 14px 0 8px; font-size: 38px; }
