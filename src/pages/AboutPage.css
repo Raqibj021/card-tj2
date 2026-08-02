@@ -103,23 +103,13 @@
 
 .about-hero-card-stack { position: relative; z-index: 4; width: 245px; height: 350px; justify-self: center; align-self: center; grid-column: 3; grid-row: 1 / 3; perspective: 1000px; }
 .about-hero-card-stack.is-mobile { display: none; }
-.about-nfc-card { --card-index: 0; position: absolute; top: 50%; left: 50%; display: block; width: 232px; aspect-ratio: 1.585 / 1; overflow: hidden; border: 1px solid rgba(158, 220, 255, .28); border-radius: 19px; color: white; box-shadow: 0 25px 54px rgba(5, 34, 77, .28); transform-origin: 50% 120%; animation: about-card-deck 17.5s cubic-bezier(.45, 0, .18, 1) infinite; animation-delay: calc(var(--card-index) * -3.5s); }
-.about-nfc-card::before { position: absolute; inset: 0; background: radial-gradient(circle at 86% 12%, rgba(255, 255, 255, .25), transparent 38%), repeating-linear-gradient(125deg, transparent 0 15px, rgba(255, 255, 255, .045) 16px 17px); content: ""; pointer-events: none; }
-.about-nfc-card-classic { background: linear-gradient(145deg, #061a3e, #0a438f 62%, #087f9d); }
-.about-nfc-card-somoni { background: linear-gradient(145deg, #7b1527, #bd1739 52%, #d69a2b); }
-.about-nfc-card-istiqlol { background: linear-gradient(145deg, #071d45, #1859a4 58%, #3bc1d4); }
-.about-nfc-card-hissar { background: linear-gradient(145deg, #392719, #8b5a31 52%, #c79858); }
-.about-nfc-card-pamir { background: linear-gradient(145deg, #063746, #137a87 55%, #8ed8d4); }
+.about-nfc-card { --card-index: 0; position: absolute; top: 50%; left: 50%; display: block; width: 232px; aspect-ratio: 1.585 / 1; overflow: hidden; border: 1px solid rgba(82, 157, 219, .32); border-radius: 19px; background: #edf8ff; color: #062865; box-shadow: 0 25px 54px rgba(5, 34, 77, .24); transform-origin: 50% 120%; animation: about-card-deck 21s cubic-bezier(.45, 0, .18, 1) infinite; animation-delay: calc(var(--card-index) * -3.5s); }
+.about-nfc-card::before { position: absolute; z-index: 2; inset: 0; background: linear-gradient(120deg, transparent 15%, rgba(255, 255, 255, .38) 38%, transparent 61%); content: ""; transform: translateX(-120%); animation: about-card-shine 7s ease-in-out infinite; pointer-events: none; }
+.about-card-bg { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .about-card-logo { position: absolute; z-index: 2; top: 16px; left: 16px; }
 .about-card-logo .vizora-brand-full { width: 125px; height: auto; }
-.about-card-contactless { position: absolute; z-index: 2; top: 16px; right: 15px; display: grid; justify-items: center; gap: 2px; color: #8ee4ff; }
+.about-card-contactless { position: absolute; z-index: 3; bottom: 13px; left: 16px; display: grid; justify-items: center; gap: 1px; color: #062865; }
 .about-card-contactless span { font-size: 8px; font-weight: 900; letter-spacing: .12em; }
-.about-card-art { position: absolute; z-index: 1; right: 7px; bottom: 7px; width: 74%; height: 72%; fill: none; stroke: rgba(255, 255, 255, .42); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
-.about-nfc-card-somoni .about-card-art { stroke: rgba(255, 232, 161, .52); }
-.about-nfc-card-hissar .about-card-art { stroke: rgba(255, 233, 194, .5); }
-.about-card-footer { position: absolute; z-index: 2; right: 16px; bottom: 15px; left: 16px; display: flex; align-items: end; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, .18); padding-top: 10px; }
-.about-card-footer strong { max-width: 64%; font-size: 10px; letter-spacing: .06em; }
-.about-card-footer small { max-width: 34%; color: rgba(235, 248, 255, .78); font-size: 7px; text-align: right; }
 
 .about-section { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(58px, 5vw, 72px); }
 .about-section::before { position: absolute; z-index: 0; top: 44px; right: -75px; width: 330px; height: 330px; background-image: radial-gradient(circle, rgba(23, 111, 242, .42) 1.1px, transparent 1.6px); background-size: 19px 19px; content: ""; opacity: .2; mask-image: radial-gradient(circle, black, transparent 70%); pointer-events: none; }
@@ -295,6 +285,7 @@
   84% { z-index: 3; opacity: .42; transform: translate3d(-58%, -45%, -10px) rotate(-8deg) scale(.9); }
   100% { z-index: 4; opacity: .78; transform: translate3d(-53%, -48%, 0) rotate(-6deg) scale(.96); }
 }
+@keyframes about-card-shine { 0%, 67% { transform: translateX(-120%); } 84%, 100% { transform: translateX(120%); } }
 
 @media (max-width: 1180px) {
   .about-hero-layout { gap: 0 10px; grid-template-columns: minmax(0, 1fr) minmax(285px, .53fr) minmax(185px, .32fr); }
@@ -346,13 +337,9 @@
   .about-nfc-card { width: 142px; border-radius: 11px; box-shadow: 0 12px 26px rgba(9, 45, 94, .2); }
   .about-card-logo { top: 7px; left: 7px; }
   .about-card-logo .vizora-brand-full { width: 72px; }
-  .about-card-contactless { top: 6px; right: 6px; }
+  .about-card-contactless { bottom: 6px; left: 7px; }
   .about-card-contactless svg { width: 15px; height: 15px; }
   .about-card-contactless span { font-size: 5px; }
-  .about-card-art { right: 4px; bottom: 4px; stroke-width: 5; }
-  .about-card-footer { right: 7px; bottom: 6px; left: 7px; padding-top: 4px; }
-  .about-card-footer strong { font-size: 5.8px; }
-  .about-card-footer small { font-size: 4.5px; }
   .about-hero-pattern svg { width: 145%; transform: translateX(-15%); opacity: .47; }
   .about-section { padding-block: 43px; }
   .about-section::before { top: 28px; right: -95px; width: 230px; height: 230px; opacity: .16; }
@@ -436,6 +423,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .about-ambient, .about-hero-pattern svg, .about-network-lines, .about-cta-orb, .about-marquee-track, .about-audience-tags, .about-nfc-card, .about-founder-orbit { animation: none !important; }
+  .about-nfc-card::before { animation: none !important; }
   .about-marquee { overflow-x: auto; }
   .about-marquee-copy { display: none !important; }
   .about-audience-marquee { overflow-x: auto; }
