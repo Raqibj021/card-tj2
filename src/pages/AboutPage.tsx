@@ -418,6 +418,11 @@ export default function AboutPage() {
                 loading="eager"
                 fetchPriority="high"
               />
+              <div className="about-founder-orbits" aria-hidden="true">
+                <span className="about-founder-orbit about-founder-orbit-qr"><QrCode size={20} /></span>
+                <span className="about-founder-orbit about-founder-orbit-nfc"><SmartphoneNfc size={20} /></span>
+                <span className="about-founder-orbit about-founder-orbit-lang"><Languages size={19} /></span>
+              </div>
             </motion.div>
             <HeroNfcCards />
           </div>
