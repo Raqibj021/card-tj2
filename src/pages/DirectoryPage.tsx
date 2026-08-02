@@ -89,6 +89,23 @@ const fuzzyProfileMatch = (profile: DirectoryProfile, rawQuery: string) => {
   ));
 };
 
+const fuzzyTermMatch = (candidate: string, rawQuery: string) => {
+  const query = normalizeSearch(rawQuery);
+  const normalizedCandidate = normalizeSearch(candidate);
+  if (!query) return false;
+  if (normalizedCandidate.includes(query) || query.includes(normalizedCandidate)) return true;
+  return normalizedCandidate.split(" ").some((word) =>
+    word.startsWith(query) || query.startsWith(word) ||
+    (query.length >= 4 && word.length >= 4 && Math.abs(word.length - query.length) <= 3 && editDistance(word, query) <= Math.max(1, Math.floor(Math.max(word.length, query.length) * .28)))
+  );
+};
+
+const specialtySeeds = {
+  ru: ["Дизайнер", "Графический дизайнер", "Фотограф", "Видеограф", "Переводчик", "Юрист", "Адвокат", "Нотариус", "Врач", "Стоматолог", "Педиатр", "Преподаватель", "Репетитор", "Электрик", "Сантехник", "Мастер по ремонту", "Компания", "Консультант"],
+  tj: ["Дизайнер", "Дизайнери графикӣ", "Суратгир", "Наворбардор", "Тарҷумон", "Ҳуқуқшинос", "Адвокат", "Нотариус", "Табиб", "Дандонпизишк", "Педиатр", "Омӯзгор", "Устоди хусусӣ", "Барқчӣ", "Сантехник", "Усто", "Ширкат", "Машваратчӣ"],
+  en: ["Designer", "Graphic designer", "Photographer", "Videographer", "Translator", "Lawyer", "Attorney", "Notary", "Doctor", "Dentist", "Pediatrician", "Teacher", "Tutor", "Electrician", "Plumber", "Repair specialist", "Company", "Consultant"]
+} as const;
+
 export default function DirectoryPage() {
   const { language } = useApp();
   const { user } = useAuth();
@@ -110,6 +127,7 @@ export default function DirectoryPage() {
   const [categoryError, setCategoryError] = useState("");
   const [selectedProfessionCategoryId, setSelectedProfessionCategoryId] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchFocused, setSearchFocused] = useState(false);
   const copy = {
     ru: { label: "Проверенный каталог", title: "Найдите нужного специалиста", text: "Настоящие люди и организации с подтверждёнными данными", search: "Поиск", placeholder: "Профессия, услуга или имя", find: "Найти", categories: "Категории", all: "Все специалисты в одном месте", verifiedOnly: "Публикация только после проверки", profiles: "профилей", newProfiles: "Новые профили", verified: "Проверенные специалисты", publish: "Добавить мою визитку", publishHint: "Уже есть визитка? Добавьте к ней профессию, город и услуги", checked: "Проверено Vizora", open: "Открыть визитку", modalTitle: "Визитка специалиста", modalText: "Основные контакты берутся из вашей визитки. Заполните только профессиональную информацию.", chooseCard: "Ваша визитка", chooseCategory: "Категория", specialty: "Специальность", city: "Город", tags: "Услуги и теги", tagsHint: "Например: письменный перевод, английский, нотариальное заверение", experience: "Опыт", experienceHint: "Например: 8 лет", summary: "О профессиональной деятельности", summaryHint: "Коротко расскажите, чем вы полезны клиенту", proof: "Подтверждающий документ", proofHint: "Обязателен для лицензируемых профессий. Видит только модератор.", add: "Отправить на проверку", cancel: "Отмена", noCard: "Сначала создайте личную визитку", success: "Заявка отправлена. После проверки визитка станет доступна всем в выбранной категории.", categoryNames: ["Врачи и клиники", "Юристы", "Переводчики", "Преподаватели", "Ремонт и мастера", "Фото и дизайн", "Компании", "Другие специалисты"], roles: ["Переводчик английского языка", "Преподаватель математики", "Специалист по ремонту техники"] },
     tj: { label: "Феҳристи тасдиқшуда", title: "Мутахассиси лозимиро ёбед", text: "Шахсон ва ташкилотҳои воқеӣ бо маълумоти тасдиқшуда", search: "Ҷустуҷӯ", placeholder: "Касб, хизмат ё ном", find: "Ёфтан", categories: "Категорияҳо", all: "Ҳамаи мутахассисон дар як ҷой", verifiedOnly: "Нашр танҳо пас аз санҷиш", profiles: "профил", newProfiles: "Профилҳои нав", verified: "Мутахассисони тасдиқшуда", publish: "Ҷойгир кардани профил", checked: "Аз ҷониби Vizora тасдиқ шудааст", open: "Кушодани варақа", categoryNames: ["Табибон ва клиникаҳо", "Ҳуқуқшиносон", "Тарҷумонҳо", "Омӯзгорон", "Таъмир ва устоҳо", "Акс ва дизайн", "Ширкатҳо", "Дигар мутахассисон"], roles: ["Тарҷумони забони англисӣ", "Омӯзгори математика", "Мутахассиси таъмири техника"] },
@@ -131,6 +149,13 @@ export default function DirectoryPage() {
   const categories = copy.categoryNames.map((name, index) => ({ name, icon: icons[index] }));
   const selectedProfessionCategory = professionCategories.find((item) => item.id === selectedProfessionCategoryId);
   const availableTags = selectedProfessionCategory ? getCategoryTags(selectedProfessionCategory.slug, language) : [];
+  const searchSuggestions = useMemo(() => {
+    if (!query.trim()) return [];
+    const categoryTerms = Object.values(categoryTags[language]).flat();
+    const profileTerms = profiles.flatMap((profile) => [profile.specialistTitle, profile.role, ...profile.tags]).filter(Boolean);
+    const unique = Array.from(new Map([...specialtySeeds[language], ...categoryTerms, ...profileTerms].map((term) => [normalizeSearch(term), term])).values());
+    return unique.filter((term) => fuzzyTermMatch(term, query)).slice(0, 8);
+  }, [language, profiles, query]);
   useEffect(() => {
     let active = true;
     const loadProfiles = () => void directoryRepository.list().then((items) => { if (active) setProfiles(items); });
@@ -219,6 +244,7 @@ export default function DirectoryPage() {
       ? ["Verified doctors, clinics and medical services.", "Lawyers and professional legal advice.", "Translators and language services.", "Teachers, tutors and education providers.", "Repair experts and technical trades.", "Photographers, designers and creative professionals.", "Companies and professional services.", "Other permitted platform professionals."]
       : ["Проверенные врачи, клиники и медицинские услуги.", "Юристы и профессиональная правовая помощь.", "Переводчики и профессиональные языковые услуги.", "Преподаватели, репетиторы и образовательные центры.", "Мастера по ремонту и техническому обслуживанию.", "Фотографы, дизайнеры и творческие специалисты.", "Компании и профессиональные услуги для бизнеса.", "Другие разрешённые специалисты платформы."];
   const selectedCard = myCards.find((card) => card.id === selectedCardId) ?? myCards[0];
+  const showResults = () => window.setTimeout(() => document.getElementById("specialist-results")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   return (
     <>
       <main>
@@ -227,11 +253,14 @@ export default function DirectoryPage() {
             <span className="section-label">{copy.label}</span>
             <h1>{copy.title}</h1>
             <p>{copy.text}</p>
-            <form className="directory-search" onSubmit={(event) => event.preventDefault()}>
+            <form className="directory-search" onSubmit={(event) => { event.preventDefault(); setSearchFocused(false); showResults(); }}>
               <Search size={21} />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={copy.search} placeholder={copy.placeholder} />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} onFocus={() => setSearchFocused(true)} onBlur={() => window.setTimeout(() => setSearchFocused(false), 120)} onKeyDown={(event) => { if (event.key === "Escape") setSearchFocused(false); }} autoComplete="off" aria-label={copy.search} aria-expanded={searchFocused && !!query.trim()} aria-controls="directory-search-suggestions" placeholder={copy.placeholder} />
               <span><MapPin size={17} /> {language === "en" ? "Dushanbe" : "Душанбе"}</span>
               <button type="submit" className="button button-primary">{copy.find}</button>
+              {searchFocused && query.trim() && <div className="directory-search-suggestions" id="directory-search-suggestions" role="listbox">
+                {searchSuggestions.length ? searchSuggestions.map((suggestion) => <button type="button" role="option" key={suggestion} onMouseDown={(event) => event.preventDefault()} onClick={() => { setQuery(suggestion); setSearchFocused(false); showResults(); }}><Search size={15} /><span>{suggestion}</span></button>) : <p>{language === "tj" ? "Калимаи наздик ёфт нашуд — ҷустуҷӯ аз рӯи матни воридшуда анҷом мешавад." : language === "en" ? "No close suggestion — search will use the entered text." : "Близкой подсказки пока нет — поиск выполнится по введённому тексту."}</p>}
+              </div>}
             </form>
           </div>
         </section>
@@ -263,7 +292,7 @@ export default function DirectoryPage() {
           </div>
         </section>
 
-        {profiles.length > 0 && <section className="section section-muted">
+        {profiles.length > 0 && <section className="section section-muted" id="specialist-results">
           <div className="site-container">
             <div className="platform-section-head">
               <div>
