@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Building2,
+  BriefcaseBusiness,
   Check,
   Download,
   Facebook,
   Globe2,
+  Images,
   Instagram,
   LockKeyhole,
   Mail,
@@ -20,7 +22,7 @@ import {
   PhoneCall,
   WalletCards
 } from "lucide-react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useSearchParams } from "react-router";
 import QRCodeImage from "../components/QRCode";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
@@ -41,6 +43,8 @@ import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import ReportCardButton from "../components/ReportCardButton";
+import { verificationRepository } from "../lib/verificationRepository";
+import "./CardPage.css";
 
 type AccentStyle = CSSProperties & {
   "--profile-accent": string;
@@ -148,8 +152,15 @@ const profileCopy = {
   }
 } as const;
 
+const specialistCopy = {
+  ru: { professional: "Профессиональная визитка", verified: "Проверенный специалист", pro: "Специалист PRO", about: "О специалисте", category: "Категория", specialty: "Специальность", city: "Город", experience: "Опыт", serviceArea: "География работы", consultation: "Формат консультации", services: "Услуги и направления", portfolio: "Портфолио" },
+  tj: { professional: "Варақаи касбӣ", verified: "Мутахассиси тасдиқшуда", pro: "Мутахассиси PRO", about: "Дар бораи мутахассис", category: "Категория", specialty: "Ихтисос", city: "Шаҳр", experience: "Таҷриба", serviceArea: "Минтақаи кор", consultation: "Намуди машварат", services: "Хизматҳо ва самтҳо", portfolio: "Портфолио" },
+  en: { professional: "Professional business card", verified: "Verified specialist", pro: "Specialist PRO", about: "About the specialist", category: "Category", specialty: "Specialty", city: "City", experience: "Experience", serviceArea: "Service area", consultation: "Consultation format", services: "Services and expertise", portfolio: "Portfolio" }
+} as const;
+
 export default function CardPage() {
   const { slug = "" } = useParams();
+  const [searchParams] = useSearchParams();
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const { user } = useAuth();
   const [toast, setToast] = useState("");
@@ -160,8 +171,10 @@ export default function CardPage() {
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
   const [activating, setActivating] = useState(false);
+  const [professionCategoryName, setProfessionCategoryName] = useState("");
   const cardUrl = window.location.href;
   const labels = profileCopy[language];
+  const professionalLabels = specialistCopy[language];
 
   useEffect(() => {
     let active = true;
@@ -201,6 +214,17 @@ export default function CardPage() {
     if (!user || !card || card.reviewStatus !== "draft") return;
     void promoRepository.status().then(setPromo).catch(() => setPromo(null));
   }, [card, user]);
+
+  const isSpecialistView = searchParams.get("profile") === "specialist" && Boolean(card?.specialistTitle);
+
+  useEffect(() => {
+    if (!isSpecialistView || !card?.professionCategoryId) { setProfessionCategoryName(""); return; }
+    let active = true;
+    void verificationRepository.categories(language).then((categories) => {
+      if (active) setProfessionCategoryName(categories.find((item) => item.id === card.professionCategoryId)?.name ?? "");
+    }).catch(() => { if (active) setProfessionCategoryName(""); });
+    return () => { active = false; };
+  }, [card?.professionCategoryId, isSpecialistView, language]);
 
   if (loading) {
     return (
@@ -408,13 +432,13 @@ export default function CardPage() {
                 )}
               </span>
               <div>
-                <small>{labels.digitalCard}</small>
+                <small>{isSpecialistView ? professionalLabels.professional : labels.digitalCard}</small>
                 <strong>{card.organization || "Vizora.tj"}</strong>
               </div>
             </div>
             <span className={`profile-status ${isLocked ? "is-preview" : ""}`}>
               {isLocked ? <LockKeyhole size={13} /> : <Check size={13} />}
-              {isLocked ? (needsActivation ? labels.preview : labels.pending) : labels.verified}
+              {isLocked ? (needsActivation ? labels.preview : labels.pending) : isSpecialistView ? (card.specialistPlan === "pro" ? professionalLabels.pro : professionalLabels.verified) : labels.verified}
             </span>
           </div>
           <div className="profile-content">
@@ -435,7 +459,7 @@ export default function CardPage() {
 
             <div className="profile-identity">
               <h1>{card.fullName}</h1>
-              <p className="profile-role">{card.position}</p>
+              <p className="profile-role">{isSpecialistView ? card.specialistTitle : card.position}</p>
               {card.organization && (
                 <p className="profile-company">
                   <Building2 size={16} /> {card.organization}
@@ -443,9 +467,22 @@ export default function CardPage() {
               )}
             </div>
 
-            {card.description && (
-              <p className="profile-description">{card.description}</p>
+            {(isSpecialistView ? card.specialistSummary : card.description) && (
+              <p className="profile-description">{isSpecialistView ? card.specialistSummary : card.description}</p>
             )}
+
+            {isSpecialistView && <section className="profile-specialist-panel">
+              <header><div><small>{professionalLabels.professional}</small><h2>{professionalLabels.about}</h2></div><span>{card.specialistPlan === "pro" ? "PRO" : "VERIFIED"}</span></header>
+              <div className="profile-specialist-facts">
+                {professionCategoryName && <div><span><BriefcaseBusiness size={18} /></span><small>{professionalLabels.category}</small><strong>{professionCategoryName}</strong></div>}
+                {card.specialistTitle && <div><span><BriefcaseBusiness size={18} /></span><small>{professionalLabels.specialty}</small><strong>{card.specialistTitle}</strong></div>}
+                {card.specialistCity && <div><span><MapPin size={18} /></span><small>{professionalLabels.city}</small><strong>{card.specialistCity}</strong></div>}
+                {card.specialistExperience && <div><span><Check size={18} /></span><small>{professionalLabels.experience}</small><strong>{card.specialistExperience}</strong></div>}
+                {card.specialistServiceArea && <div><span><Globe2 size={18} /></span><small>{professionalLabels.serviceArea}</small><strong>{card.specialistServiceArea}</strong></div>}
+                {card.specialistConsultation && <div><span><MessageCircle size={18} /></span><small>{professionalLabels.consultation}</small><strong>{card.specialistConsultation}</strong></div>}
+              </div>
+              {!!card.specialistTags?.length && <div className="profile-specialist-tags"><small>{professionalLabels.services}</small><div>{card.specialistTags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>}
+            </section>}
 
             <div className="profile-action-grid">
               {actionLinks.map(({ href, icon: Icon, label, primary }) => (
@@ -569,6 +606,11 @@ export default function CardPage() {
                 )}
               </div>
             )}
+
+            {isSpecialistView && !!card.specialistPortfolio?.length && <section className="profile-specialist-portfolio">
+              <header><Images size={19} /><h2>{professionalLabels.portfolio}</h2><span>{card.specialistPortfolio.length}</span></header>
+              <div>{card.specialistPortfolio.map((image, index) => <a href={image} target="_blank" rel="noreferrer" key={`${image}-${index}`}><img src={image} alt={`${professionalLabels.portfolio} ${index + 1}`} loading="lazy" /></a>)}</div>
+            </section>}
           </div>
         </section>
 
