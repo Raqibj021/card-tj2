@@ -85,9 +85,6 @@
 .dark .about-founder-role { color: #47d9bd; }
 .about-hero-lead { max-width: 650px; margin: 18px 0 0; color: var(--muted); font-size: clamp(16px, 1.2vw, 19px); line-height: 1.62; }
 .about-hero-action { margin-top: 25px; }
-.about-hero-signals { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 19px; }
-.about-hero-signals span { display: inline-flex; min-height: 33px; align-items: center; gap: 6px; border-bottom: 1px solid color-mix(in srgb, var(--about-blue) 32%, var(--line)); padding: 0 4px; color: var(--muted); font-size: 11px; font-weight: 850; }
-.about-hero-signals svg { color: var(--about-blue); }
 
 .about-founder-visual { position: relative; width: 100%; height: 550px; justify-self: stretch; align-self: end; grid-column: 2; grid-row: 1 / 3; }
 .about-founder-glow { position: absolute; right: 8%; bottom: 4%; width: 82%; height: 72%; border-radius: 50%; background: radial-gradient(circle, rgba(31, 126, 243, .2), transparent 68%); filter: blur(26px); }
@@ -107,7 +104,7 @@
 .about-nfc-card::before { position: absolute; z-index: 2; inset: 0; background: linear-gradient(120deg, transparent 15%, rgba(255, 255, 255, .38) 38%, transparent 61%); content: ""; transform: translateX(-120%); animation: about-card-shine 7s ease-in-out infinite; pointer-events: none; }
 .about-card-bg { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .about-card-logo { position: absolute; z-index: 2; top: 16px; left: 16px; }
-.about-card-logo .vizora-brand-full { width: 125px; height: auto; }
+.about-card-logo { width: 92px; height: auto; }
 .about-card-contactless { position: absolute; z-index: 3; bottom: 13px; left: 16px; display: grid; justify-items: center; gap: 1px; color: #062865; }
 .about-card-contactless span { font-size: 8px; font-weight: 900; letter-spacing: .12em; }
 
@@ -322,8 +319,6 @@
   .about-founder-role { align-items: flex-start; font-size: 11px; line-height: 1.35; }
   .about-hero-lead { max-width: none; margin-top: 0; font-size: 14.5px; line-height: 1.58; }
   .about-hero-action { width: 100%; min-height: 46px; margin-top: 17px; padding-inline: 11px; font-size: 11px; }
-  .about-hero-signals { justify-content: flex-start; gap: 5px; margin-top: 11px; }
-  .about-hero-signals span { min-height: 27px; font-size: 9px; }
   .about-founder-visual { width: 100%; height: 270px; overflow: visible; margin: 0; justify-self: stretch; align-self: end; grid-column: 2; grid-row: 1; }
   .about-founder-glow { right: -10%; bottom: 0; width: 120%; height: 80%; }
   .about-founder-portrait { left: 50%; bottom: -1px; width: 205px; height: auto; max-width: none; transform: translateX(-50%); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, .82) 82%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, .82) 82%, transparent 100%); }
@@ -336,7 +331,7 @@
   .about-hero-card-stack.is-mobile { display: block; width: 150px; height: 103px; margin: 11px 0 0 5px; transform: none; pointer-events: none; }
   .about-nfc-card { width: 142px; border-radius: 11px; box-shadow: 0 12px 26px rgba(9, 45, 94, .2); }
   .about-card-logo { top: 7px; left: 7px; }
-  .about-card-logo .vizora-brand-full { width: 72px; }
+  .about-card-logo { width: 58px; }
   .about-card-contactless { bottom: 6px; left: 7px; }
   .about-card-contactless svg { width: 15px; height: 15px; }
   .about-card-contactless span { font-size: 5px; }
