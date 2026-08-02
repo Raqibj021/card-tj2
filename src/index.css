@@ -338,20 +338,36 @@ body {
 .category-photo-design { --category-color: #b443a0; background-image: radial-gradient(circle at 100% 0%, rgba(180,67,160,.1), transparent 55%); }
 .category-companies { --category-color: #09896e; background-image: radial-gradient(circle at 100% 0%, rgba(9,137,110,.1), transparent 55%); }
 .category-other { --category-color: #52647b; background-image: radial-gradient(circle at 100% 0%, rgba(82,100,123,.1), transparent 55%); }
-.specialist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.specialist-card { border: 1px solid var(--line); border-radius: 20px; background: var(--panel); padding: 22px; box-shadow: var(--shadow-sm); }
-.specialist-card { position: relative; }
+.specialist-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.specialist-card { position: relative; display: grid; min-height: 104px; align-items: center; gap: 3px 18px; border: 1px solid var(--line); border-radius: 17px; background: var(--panel); padding: 15px 17px; box-shadow: var(--shadow-sm); grid-template-columns: 62px minmax(180px,1.1fr) minmax(150px,.75fr) minmax(170px,.7fr); grid-template-rows: auto auto; transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.specialist-card:hover { border-color: color-mix(in srgb,#1478ee 34%,var(--line)); transform: translateY(-2px); box-shadow: 0 13px 30px rgba(11,63,126,.1); }
 .specialist-top-badge { position: absolute; top: 17px; right: 17px; border-radius: 999px; background: linear-gradient(135deg,#f2b632,#e67a18); padding: 6px 10px; color: #fff; font-size: 9px; letter-spacing: .12em; box-shadow: 0 8px 20px rgba(219,132,28,.28); }
-.specialist-avatar { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 18px; color: white; font-weight: 800; object-fit: cover; object-position: center; }
+.specialist-avatar { display: grid; width: 58px; height: 58px; place-items: center; border-radius: 16px; color: white; font-weight: 800; object-fit: cover; object-position: center; grid-column: 1; grid-row: 1 / 3; }
 .specialist-avatar-blue { background: #1677ea; }
 .specialist-avatar-violet { background: #7253d7; }
 .specialist-avatar-emerald { background: #078664; }
-.specialist-verified { display: inline-flex; align-items: center; gap: 5px; margin-top: 18px; color: #087451; font-size: 11px; font-weight: 800; }
-.specialist-card h3 { margin: 10px 0 5px; font-size: 18px; }
-.specialist-card p { min-height: 40px; margin: 0; color: var(--muted); font-size: 13px; }
-.specialist-card > span { display: flex; align-items: center; gap: 5px; margin: 14px 0 20px; color: var(--muted); font-size: 12px; }
-.specialist-tags { display: flex; min-height: 25px; flex-wrap: wrap; gap: 5px; margin: -10px 0 15px; }
+.specialist-verified { display: inline-flex; align-items: center; gap: 5px; margin: 0; color: #087451; font-size: 10px; font-weight: 800; grid-column: 2; grid-row: 1; }
+.specialist-card h3 { margin: 2px 0 0; font-size: 17px; grid-column: 2; grid-row: 2; }
+.specialist-card p { min-height: 0; margin: 0; color: var(--ink); font-size: 13px; font-weight: 750; grid-column: 3; grid-row: 1; }
+.specialist-card > span { display: flex; align-items: center; gap: 5px; margin: 0; color: var(--muted); font-size: 11px; grid-column: 3; grid-row: 2; }
+.specialist-tags { display: flex; min-height: 0; flex-wrap: wrap; gap: 5px; margin: 0; padding-right: 105px; grid-column: 4; grid-row: 1; }
 .specialist-tags small { border-radius: 999px; background: color-mix(in srgb, #1478ee 9%, var(--panel)); padding: 5px 8px; color: #1767bd; font-size: 9px; font-weight: 750; }
+.specialist-card > .button { width: 100%; min-height: 38px; padding-inline: 14px; grid-column: 4; grid-row: 2; }
+.category-explorer-body .specialist-grid { max-height: 430px; overflow-y: auto; padding: 2px 7px 2px 2px; scrollbar-color: color-mix(in srgb,var(--category-color) 45%,transparent) transparent; scrollbar-width: thin; }
+.category-explorer-body .specialist-card { background: color-mix(in srgb,var(--panel) 92%,transparent); }
+
+@media (max-width: 760px) {
+  .specialist-card { min-height: 0; gap: 4px 12px; padding: 13px; grid-template-columns: 52px minmax(0,1fr); grid-template-rows: auto auto auto auto auto; }
+  .specialist-avatar { width: 48px; height: 48px; border-radius: 13px; grid-column: 1; grid-row: 1 / 3; }
+  .specialist-verified { grid-column: 2; grid-row: 1; }
+  .specialist-card h3 { font-size: 15px; grid-column: 2; grid-row: 2; }
+  .specialist-card p { margin-top: 8px; grid-column: 1 / -1; grid-row: 3; }
+  .specialist-card > span { margin-top: 2px; grid-column: 1 / -1; grid-row: 4; }
+  .specialist-tags { margin-top: 5px; padding-right: 0; grid-column: 1 / -1; grid-row: 5; }
+  .specialist-card > .button { margin-top: 7px; grid-column: 1 / -1; grid-row: 6; }
+  .specialist-top-badge { top: 11px; right: 11px; }
+  .category-explorer-body .specialist-grid { max-height: 390px; }
+}
 .directory-publish-backdrop { position: fixed; z-index: 120; inset: 0; display: grid; overflow-y: auto; place-items: center; background: rgba(4,15,31,.68); padding: 22px; backdrop-filter: blur(7px); }
 .directory-publish-modal { width: min(760px, 100%); max-height: calc(100vh - 44px); overflow-y: auto; border: 1px solid var(--line); border-radius: 25px; background: var(--panel); padding: 25px; box-shadow: 0 35px 100px rgba(0,0,0,.32); }
 .directory-publish-modal > header { display: flex; align-items: start; justify-content: space-between; gap: 18px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }

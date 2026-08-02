@@ -63,7 +63,17 @@ export default function DirectoryPage() {
   const icons = [Stethoscope, Scale, Languages, GraduationCap, Wrench, Camera, Building2, BriefcaseBusiness];
   const categories = copy.categoryNames.map((name, index) => ({ name, icon: icons[index] }));
   useEffect(() => {
-    void directoryRepository.list().then(setProfiles);
+    let active = true;
+    const loadProfiles = () => void directoryRepository.list().then((items) => { if (active) setProfiles(items); });
+    const refreshVisible = () => { if (document.visibilityState === "visible") loadProfiles(); };
+    loadProfiles();
+    const interval = window.setInterval(loadProfiles, 30_000);
+    document.addEventListener("visibilitychange", refreshVisible);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refreshVisible);
+    };
   }, []);
   async function openPublisher(plan: "" | "specialist" | "pro" = "") {
     if (!user) { navigate(`/login?redirect=${encodeURIComponent(`/directory${plan ? `?publish=${plan}` : ""}`)}`); return; }
