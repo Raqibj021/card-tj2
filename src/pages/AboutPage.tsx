@@ -705,7 +705,7 @@ function ContactNetwork() {
 
     const rotation = window.setInterval(() => {
       setTopDesign((current) => (current + 1) % heroCardDesigns.length);
-    }, 1500);
+    }, 3000);
 
     return () => window.clearInterval(rotation);
   }, []);
