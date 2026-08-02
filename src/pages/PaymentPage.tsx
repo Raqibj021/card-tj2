@@ -100,7 +100,7 @@ export default function PaymentPage() {
                 <h1>{c.title}</h1>
                 <p className="form-intro">{c.intro}</p>
                 <div className="payment-details">
-                  <div><CreditCard size={21} /><span><small>DC Bank / Alif Bank</small><strong>929213537</strong></span><button type="button" onClick={async () => { await navigator.clipboard.writeText("929213537"); setCopied(true); }}><Copy size={17} /> {copied ? c.copied : c.copy}</button></div>
+                  <div><CreditCard size={21} /><span><small>DC Bank / Alif Bank</small><strong>084785555</strong></span><button type="button" onClick={async () => { await navigator.clipboard.writeText("084785555"); setCopied(true); }}><Copy size={17} /> {copied ? c.copied : c.copy}</button></div>
                   <div><FileCheck2 size={21} /><span><small>{c.amount}</small><strong>{plan.amount} {c.currency}</strong></span></div>
                   <div><LockKeyhole size={21} /><span><small>{c.order}</small><strong>{language === "ru" ? "После отправки" : language === "tj" ? "Пас аз фиристодан" : "Assigned after submission"}</strong></span></div>
                 </div>

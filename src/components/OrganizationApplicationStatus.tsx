@@ -79,6 +79,7 @@ export default function OrganizationApplicationStatus({
   const changes = status === "changes_requested";
   const rejected = status === "rejected";
   const suspended = status === "suspended";
+  const needsPayment = !tariffActive && !paymentWaiting && !changes && !rejected && !suspended;
   const Icon = tariffActive ? CheckCircle2 : changes || rejected || suspended ? ShieldAlert : Clock3;
   const title = tariffActive ? copy.approved : paymentWaiting ? copy.paymentWaiting : approvedUnpaid ? copy.approvedUnpaid : changes ? copy.changes : rejected ? copy.rejected : suspended ? copy.suspended : copy.pending;
   const text = tariffActive ? copy.approvedText : paymentWaiting ? copy.paymentWaitingText : approvedUnpaid ? copy.approvedUnpaidText : changes ? copy.changesText : rejected ? copy.rejectedText : suspended ? copy.suspendedText : copy.pendingText;
@@ -96,7 +97,7 @@ export default function OrganizationApplicationStatus({
       </div>
       <div className="organization-status-actions">
         {tariffActive && <Link className="button button-primary" to="/organization/dashboard">{copy.open}</Link>}
-        {approvedUnpaid && (
+        {needsPayment && (
           <Link className="button button-primary" to={`/payment?plan=${organization.planCode}&organization=${organization.id}`}>
             {copy.payment}
           </Link>

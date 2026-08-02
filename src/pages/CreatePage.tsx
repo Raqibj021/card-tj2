@@ -819,6 +819,7 @@ export default function CreatePage() {
             </div>
           </section>
 
+          {!existing && <div className="inline-payment-summary"><ShieldCheck size={20} /><div><strong>{language === "ru" ? "Личная визитка — 20 сомони в год" : language === "tj" ? "Варақаи шахсӣ — 20 сомонӣ дар як сол" : "Personal card — 20 somoni per year"}</strong><span>{language === "ru" ? "Оплата: DC Bank / Alif Bank — 084785555. После создания визитки откроется шаг загрузки чека." : language === "tj" ? "Пардохт: DC Bank / Alif Bank — 084785555. Пас аз сохтани варақа қадами боркунии расид кушода мешавад." : "Payment: DC Bank / Alif Bank — 084785555. After creating the card, the receipt upload step will open."}</span></div></div>}
           <button type="submit" className="button button-primary button-large w-full" disabled={saving}>
             <Save size={19} />
             {saving ? builderCopy.saving : existing ? t("updateCard") : t("saveCard")}
