@@ -252,8 +252,8 @@ export default function DashboardPage() {
           <Link to="/dashboard/orders" className="button button-secondary">{language === "ru" ? "Открыть" : language === "tj" ? "Кушодан" : "Open"}{counts.services > 0 && <b className="button-notification-badge">{counts.services > 99 ? "99+" : counts.services}</b>}</Link>
         </div>
         <div className="dashboard-crm-banner mt-3">
-          <div><ShieldCheck size={22} /><span><strong>{language === "ru" ? "Проверка специалиста" : language === "tj" ? "Санҷиши мутахассис" : "Professional verification"}</strong><small>{language === "ru" ? "Подтвердите профессию перед публикацией в открытом каталоге" : language === "tj" ? "Пеш аз нашр касби худро тасдиқ кунед" : "Verify your profession before directory publication"}</small></span></div>
-          <Link to="/verification" className="button button-secondary">{language === "ru" ? "Загрузить документы" : language === "tj" ? "Бор кардани ҳуҷҷатҳо" : "Upload documents"}{counts.cards > 0 && <b className="button-notification-badge">{counts.cards > 99 ? "99+" : counts.cards}</b>}</Link>
+          <div><ShieldCheck size={22} /><span><strong>{language === "ru" ? "Добавить в специалисты" : language === "tj" ? "Илова ба мутахассисон" : "Join the specialist directory"}</strong><small>{language === "ru" ? "Выберите тариф и добавьте профессиональный профиль в открытый каталог" : language === "tj" ? "Тарофаро интихоб карда, профили касбиро ба феҳристи кушода илова намоед" : "Choose a plan and add your professional profile to the public directory"}</small></span></div>
+          <Link to="/directory?publish=choose" className="button button-secondary">{language === "ru" ? "Добавить в специалисты" : language === "tj" ? "Илова ба мутахассисон" : "Join directory"}{counts.cards > 0 && <b className="button-notification-badge">{counts.cards > 99 ? "99+" : counts.cards}</b>}</Link>
         </div>
         <div className="dashboard-section-head">
           <div>

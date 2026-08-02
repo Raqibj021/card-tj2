@@ -190,7 +190,8 @@ export default function DirectoryPage() {
   }
   useEffect(() => {
     const requested = searchParams.get("publish");
-    if (requested === "specialist" || requested === "pro") void openPublisher(requested);
+    if (requested === "choose") void openPublisher();
+    else if (requested === "specialist" || requested === "pro") void openPublisher(requested);
   // Query-controlled modal intentionally opens once after authentication.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

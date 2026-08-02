@@ -18,13 +18,14 @@
 .profile-specialist-portfolio > header { display: flex; align-items: center; gap: 8px; }
 .profile-specialist-portfolio h2 { margin: 0; font-size: 16px; }
 .profile-specialist-portfolio > header > span { border-radius: 999px; background: var(--profile-soft); padding: 4px 7px; color: var(--profile-accent); font-size: 9px; font-weight: 850; }
-.profile-specialist-portfolio > div { display: grid; gap: 8px; grid-template-columns: repeat(3,minmax(0,1fr)); }
-.profile-specialist-portfolio a { overflow: hidden; border-radius: 13px; background: var(--panel-2); aspect-ratio: 4 / 3; }
-.profile-specialist-portfolio img { width: 100%; height: 100%; object-fit: cover; transition: transform .25s ease; }
+.profile-specialist-portfolio > div { display: grid; gap: 10px; grid-template-columns: repeat(4,minmax(0,1fr)); }
+.profile-specialist-portfolio a { position: relative; display: grid; overflow: hidden; place-items: center; border: 1px solid color-mix(in srgb,var(--profile-accent) 18%,var(--line)); border-radius: 11px; background: #f8fafc; padding: 7px; box-shadow: 0 7px 18px rgba(8,25,48,.12); aspect-ratio: 210 / 297; }
+.profile-specialist-portfolio a::after { position: absolute; top: 0; right: 0; width: 18px; height: 18px; background: linear-gradient(225deg,var(--panel) 50%,rgba(120,140,166,.2) 51%); content: ""; }
+.profile-specialist-portfolio img { width: 100%; height: 100%; border-radius: 5px; object-fit: contain; transition: transform .25s ease; }
 .profile-specialist-portfolio a:hover img { transform: scale(1.04); }
 
 @media (max-width: 620px) {
   .profile-specialist-panel { padding: 14px; }
   .profile-specialist-facts { grid-template-columns: 1fr; }
-  .profile-specialist-portfolio > div { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .profile-specialist-portfolio > div { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
