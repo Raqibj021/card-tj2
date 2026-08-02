@@ -85,7 +85,6 @@ export default function DirectoryPage() {
                 <span className="section-label">{copy.newProfiles}</span>
                 <h2>{copy.verified}</h2>
               </div>
-              <Link to="/verification" className="text-link">{copy.publish} <ChevronRight size={16} /></Link>
             </div>
             <div className="specialist-grid">
               {filteredProfiles.map((item, index) => (
