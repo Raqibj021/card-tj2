@@ -101,26 +101,25 @@
 .about-founder-orbit-lang { right: 7%; bottom: 18%; animation-delay: -3.2s; }
 .dark .about-founder-orbit { background: rgba(8, 28, 53, .72); color: #7bd7ff; }
 
-.about-hero-card-stack { position: relative; z-index: 4; width: 225px; height: 330px; justify-self: center; align-self: center; grid-column: 3; grid-row: 1 / 3; perspective: 900px; }
-.about-nfc-card { position: absolute; display: block; width: 218px; aspect-ratio: 1.585 / 1; overflow: hidden; border-radius: 18px; box-shadow: 0 24px 48px rgba(9, 45, 94, .2); }
-.about-nfc-card::before { position: absolute; inset: 0; background: radial-gradient(circle at 86% 12%, rgba(64, 207, 255, .24), transparent 42%), repeating-linear-gradient(125deg, transparent 0 15px, rgba(255, 255, 255, .045) 16px 17px); content: ""; pointer-events: none; }
-.about-nfc-card-dark { top: 20px; left: 0; border: 1px solid rgba(124, 204, 255, .25); background: linear-gradient(145deg, #061a3e, #0a438f 62%, #087f9d); color: white; transform: rotate(-6deg); animation: about-card-float-dark 7s ease-in-out infinite; }
-.about-nfc-card-light { right: 0; bottom: 20px; border: 1px solid rgba(35, 115, 209, .2); background: linear-gradient(145deg, rgba(255, 255, 255, .98), #eaf5ff); color: #071a3c; transform: rotate(5deg); animation: about-card-float-light 7.8s ease-in-out infinite; }
-.dark .about-nfc-card-light { background: linear-gradient(145deg, #eef7ff, #dceeff); }
+.about-hero-card-stack { position: relative; z-index: 4; width: 245px; height: 350px; justify-self: center; align-self: center; grid-column: 3; grid-row: 1 / 3; perspective: 1000px; }
+.about-hero-card-stack.is-mobile { display: none; }
+.about-nfc-card { --card-index: 0; position: absolute; top: 50%; left: 50%; display: block; width: 232px; aspect-ratio: 1.585 / 1; overflow: hidden; border: 1px solid rgba(158, 220, 255, .28); border-radius: 19px; color: white; box-shadow: 0 25px 54px rgba(5, 34, 77, .28); transform-origin: 50% 120%; animation: about-card-deck 17.5s cubic-bezier(.45, 0, .18, 1) infinite; animation-delay: calc(var(--card-index) * -3.5s); }
+.about-nfc-card::before { position: absolute; inset: 0; background: radial-gradient(circle at 86% 12%, rgba(255, 255, 255, .25), transparent 38%), repeating-linear-gradient(125deg, transparent 0 15px, rgba(255, 255, 255, .045) 16px 17px); content: ""; pointer-events: none; }
+.about-nfc-card-classic { background: linear-gradient(145deg, #061a3e, #0a438f 62%, #087f9d); }
+.about-nfc-card-somoni { background: linear-gradient(145deg, #7b1527, #bd1739 52%, #d69a2b); }
+.about-nfc-card-istiqlol { background: linear-gradient(145deg, #071d45, #1859a4 58%, #3bc1d4); }
+.about-nfc-card-hissar { background: linear-gradient(145deg, #392719, #8b5a31 52%, #c79858); }
+.about-nfc-card-pamir { background: linear-gradient(145deg, #063746, #137a87 55%, #8ed8d4); }
 .about-card-logo { position: absolute; z-index: 2; top: 16px; left: 16px; }
 .about-card-logo .vizora-brand-full { width: 125px; height: auto; }
 .about-card-contactless { position: absolute; z-index: 2; top: 16px; right: 15px; display: grid; justify-items: center; gap: 2px; color: #8ee4ff; }
 .about-card-contactless span { font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.about-card-art { position: absolute; z-index: 1; right: 7px; bottom: 7px; width: 74%; height: 72%; fill: none; stroke: rgba(255, 255, 255, .42); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.about-nfc-card-somoni .about-card-art { stroke: rgba(255, 232, 161, .52); }
+.about-nfc-card-hissar .about-card-art { stroke: rgba(255, 233, 194, .5); }
 .about-card-footer { position: absolute; z-index: 2; right: 16px; bottom: 15px; left: 16px; display: flex; align-items: end; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, .18); padding-top: 10px; }
-.about-card-footer strong { font-size: 11px; letter-spacing: .08em; }
-.about-card-footer small { color: #9dc8ec; font-size: 8px; }
-.about-card-mark { position: absolute; z-index: 2; top: 14px; left: 14px; }
-.about-card-mark .vizora-brand-mark { width: 47px; height: 38px; }
-.about-nfc-card-light > img { position: absolute; z-index: 2; top: 14px; right: 14px; width: 55px; height: 55px; border-radius: 8px; }
-.about-card-meta { position: absolute; z-index: 2; right: 14px; bottom: 15px; left: 14px; }
-.about-card-meta strong, .about-card-meta span { display: block; }
-.about-card-meta strong { font-size: 12px; letter-spacing: .08em; }
-.about-card-meta span { margin-top: 4px; color: #4e6f96; font-size: 9px; font-weight: 800; }
+.about-card-footer strong { max-width: 64%; font-size: 10px; letter-spacing: .06em; }
+.about-card-footer small { max-width: 34%; color: rgba(235, 248, 255, .78); font-size: 7px; text-align: right; }
 
 .about-section { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(58px, 5vw, 72px); }
 .about-section::before { position: absolute; z-index: 0; top: 44px; right: -75px; width: 330px; height: 330px; background-image: radial-gradient(circle, rgba(23, 111, 242, .42) 1.1px, transparent 1.6px); background-size: 19px 19px; content: ""; opacity: .2; mask-image: radial-gradient(circle, black, transparent 70%); pointer-events: none; }
@@ -288,6 +287,14 @@
 @keyframes about-card-float-mobile-one { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 @keyframes about-card-float-mobile-two { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 @keyframes about-icon-float { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); } 50% { transform: translate3d(0, -9px, 0) rotate(3deg); } }
+@keyframes about-card-deck {
+  0%, 15% { z-index: 5; opacity: 1; transform: translate3d(-50%, -50%, 32px) rotate(-5deg) scale(1); }
+  20% { z-index: 5; opacity: 0; transform: translate3d(-25%, -64%, 18px) rotate(13deg) scale(.94); }
+  21%, 72% { z-index: 1; opacity: 0; transform: translate3d(-70%, -43%, -30px) rotate(-12deg) scale(.82); }
+  78% { z-index: 2; opacity: .2; transform: translate3d(-63%, -42%, -18px) rotate(-10deg) scale(.86); }
+  84% { z-index: 3; opacity: .42; transform: translate3d(-58%, -45%, -10px) rotate(-8deg) scale(.9); }
+  100% { z-index: 4; opacity: .78; transform: translate3d(-53%, -48%, 0) rotate(-6deg) scale(.96); }
+}
 
 @media (max-width: 1180px) {
   .about-hero-layout { gap: 0 10px; grid-template-columns: minmax(0, 1fr) minmax(285px, .53fr) minmax(185px, .32fr); }
@@ -334,26 +341,18 @@
   .about-founder-orbit-qr { top: 24%; left: -5px; }
   .about-founder-orbit-nfc { top: 42%; right: -4px; }
   .about-founder-orbit-lang { right: 4px; bottom: 22%; }
-  .about-hero-card-stack { position: relative; z-index: 6; display: block; width: 105px; height: 112px; margin: 0 0 8px; justify-self: end; align-self: end; transform: none; grid-column: 2; grid-row: 1; pointer-events: none; }
-  .about-nfc-card { position: absolute; width: 96px; border-radius: 9px; transform: none; animation-duration: 8s; box-shadow: 0 11px 22px rgba(9, 45, 94, .18); }
-  .about-nfc-card-dark { top: 0; left: 0; }
-  .about-nfc-card-light { right: 0; bottom: 0; }
-  .about-nfc-card-dark { animation-name: about-card-float-mobile-one; }
-  .about-nfc-card-light { animation-name: about-card-float-mobile-two; }
-  .about-card-logo { top: 6px; left: 6px; }
-  .about-card-logo .vizora-brand-full { width: 55px; }
-  .about-card-contactless { top: 5px; right: 5px; }
-  .about-card-contactless svg { width: 13px; height: 13px; }
+  .about-hero-card-stack.is-desktop { display: none; }
+  .about-hero-card-stack.is-mobile { display: block; width: 150px; height: 103px; margin: 11px 0 0 5px; transform: none; pointer-events: none; }
+  .about-nfc-card { width: 142px; border-radius: 11px; box-shadow: 0 12px 26px rgba(9, 45, 94, .2); }
+  .about-card-logo { top: 7px; left: 7px; }
+  .about-card-logo .vizora-brand-full { width: 72px; }
+  .about-card-contactless { top: 6px; right: 6px; }
+  .about-card-contactless svg { width: 15px; height: 15px; }
   .about-card-contactless span { font-size: 5px; }
-  .about-card-footer { right: 6px; bottom: 5px; left: 6px; padding-top: 3px; }
-  .about-card-footer strong { font-size: 5px; }
-  .about-card-footer small { font-size: 4px; }
-  .about-card-mark { top: 5px; left: 5px; }
-  .about-card-mark .vizora-brand-mark { width: 21px; height: 18px; }
-  .about-nfc-card-light > img { top: 5px; right: 5px; width: 24px; height: 24px; border-radius: 4px; }
-  .about-card-meta { right: 5px; bottom: 5px; left: 5px; }
-  .about-card-meta strong { font-size: 5.5px; }
-  .about-card-meta span { margin-top: 1px; font-size: 4.5px; }
+  .about-card-art { right: 4px; bottom: 4px; stroke-width: 5; }
+  .about-card-footer { right: 7px; bottom: 6px; left: 7px; padding-top: 4px; }
+  .about-card-footer strong { font-size: 5.8px; }
+  .about-card-footer small { font-size: 4.5px; }
   .about-hero-pattern svg { width: 145%; transform: translateX(-15%); opacity: .47; }
   .about-section { padding-block: 43px; }
   .about-section::before { top: 28px; right: -95px; width: 230px; height: 230px; opacity: .16; }
