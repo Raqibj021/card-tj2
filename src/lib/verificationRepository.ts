@@ -24,16 +24,12 @@ export interface SpecialistSubmission {
 
 export const verificationRepository = {
   categories: async (language: "ru" | "tj" | "en"): Promise<ProfessionCategory[]> => {
-    if (!supabase) return [];
-    const { data, error } = await supabase
-      .from("profession_categories")
-      .select("id, name_ru, name_tj, name_en, requires_license")
-      .eq("enabled", true)
-      .order("name_ru");
-    if (error) return [];
-    return (data ?? []).map((row) => ({
+    if (!supabase) throw new Error("Сервер категорий временно недоступен.");
+    const { data, error } = await supabase.rpc("get_enabled_profession_categories", { language_code: language });
+    if (error) throw new Error(`Не удалось загрузить категории: ${error.message}`);
+    return (data ?? []).map((row: { id: string; name: string; requires_license: boolean }) => ({
       id: String(row.id),
-      name: String(language === "tj" ? row.name_tj : language === "en" ? row.name_en : row.name_ru),
+      name: String(row.name),
       requiresLicense: Boolean(row.requires_license)
     }));
   },
@@ -80,7 +76,7 @@ export const verificationRepository = {
     const tags = submission.tags.map((tag) => tag.trim()).filter(Boolean).slice(0, 12);
     const portfolioPaths: string[] = [];
     if (submission.plan === "pro") {
-      for (const file of submission.portfolio.slice(0, 20)) {
+      for (const file of submission.portfolio.filter((item) => item.size <= 5 * 1024 * 1024).slice(0, 20)) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
         const path = `${auth.user.id}/${submission.cardId}/portfolio/${createUuid()}-${safeName}`;
         const { error } = await supabase.storage.from("card-assets").upload(path, file, { contentType: file.type });
@@ -88,26 +84,13 @@ export const verificationRepository = {
         portfolioPaths.push(supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl);
       }
     }
-    const { error: cardError } = await supabase.from("cards").update({
-      profession_category_id: submission.categoryId,
-      specialist_title: submission.title.trim(),
-      specialist_city: submission.city.trim(),
-      specialist_tags: tags,
-      specialist_experience: submission.experience.trim(),
-      specialist_summary: submission.summary.trim(),
-      specialist_plan: submission.plan,
-      specialist_service_area: submission.plan === "pro" ? submission.serviceArea.trim() : "",
-      specialist_consultation: submission.plan === "pro" ? submission.consultation.trim() : "",
-      specialist_portfolio: submission.plan === "pro" ? portfolioPaths : [],
-      directory_hidden: false,
-      review_status: "pending"
-    }).eq("id", submission.cardId).eq("owner_id", auth.user.id);
-    if (cardError) throw cardError;
-    const { error } = await supabase.from("verification_requests").insert({
-      profile_id: auth.user.id,
-      card_id: submission.cardId,
-      document_paths: paths,
-      status: "pending"
+    const { error } = await supabase.rpc("submit_specialist_profile", {
+      target_card_id: submission.cardId, target_category_id: submission.categoryId,
+      professional_title: submission.title.trim(), professional_city: submission.city.trim(),
+      professional_tags: tags, professional_experience: submission.experience.trim(),
+      professional_summary: submission.summary.trim(), selected_plan: submission.plan,
+      service_area: submission.serviceArea.trim(), consultation_format: submission.consultation.trim(),
+      portfolio_urls: portfolioPaths, document_paths: paths
     });
     if (error) throw error;
   }
