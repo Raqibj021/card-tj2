@@ -71,6 +71,18 @@ const pageCopy = {
     supportTitle: "Создано при поддержке Бюро «Тезаурус»",
     supportText: "Платформа Vizora.tj разработана при поддержке Бюро «Тезаурус». Многолетний опыт в сфере переводов, полиграфии, дизайна, наружной рекламы, брендинга и цифровых технологий помог создать продукт, отвечающий реальным потребностям бизнеса, государственных учреждений и частных специалистов.",
     services: ["Переводы", "Полиграфия", "Дизайн", "Наружная реклама", "Брендинг", "Цифровые решения", "Документооборот"],
+    ecosystemLabel: "Экосистема Vizora",
+    ecosystemTitle: "Одна платформа для профессиональной идентичности",
+    ecosystemText: "Vizora объединяет личный профиль, структуру организации и современные способы обмена контактами — всё работает как единая понятная система.",
+    ecosystemItems: [
+      ["Цифровая визитка", "Живой профиль с актуальными контактами, ссылками и фирменным оформлением."],
+      ["Организации и команды", "Структура подразделений, сотрудники и визитки под контролем организации."],
+      ["QR и NFC", "Мгновенный обмен контактами со смартфона, стойки, карты или печатных материалов."],
+      ["Открытый каталог", "Удобный поиск проверенных специалистов, компаний и профессиональных услуг."]
+    ],
+    audienceLabel: "Создано для",
+    audiences: ["Специалистов", "Предпринимателей", "Компаний", "Учебных заведений", "Госучреждений", "Профессиональных команд"],
+    madeIn: "Создано в Душанбе — для профессиональных связей без границ",
     missionLabel: "Наша миссия",
     missionTitle: "Сделать профессиональное общение проще",
     missionText: "Чтобы каждый человек, предприниматель, компания и государственная организация могли представить себя современно, красиво и профессионально — без технических сложностей.",
@@ -136,6 +148,18 @@ const pageCopy = {
     supportTitle: "Бо дастгирии Бюрои «Тезаурус» сохта шудааст",
     supportText: "Платформаи Vizora.tj бо дастгирии Бюрои «Тезаурус» таҳия шудааст. Таҷрибаи бисёрсола дар соҳаи тарҷума, полиграфия, дизайн, рекламаи берунӣ, брендинг ва технологияҳои рақамӣ имкон дод, ки маҳсулоти ҷавобгӯ ба ниёзҳои воқеии соҳибкорон, муассисаҳои давлатӣ ва мутахассисон сохта шавад.",
     services: ["Тарҷума", "Полиграфия", "Дизайн", "Рекламаи берунӣ", "Брендинг", "Қарорҳои рақамӣ", "Ҳуҷҷатгузорӣ"],
+    ecosystemLabel: "Экосистемаи Vizora",
+    ecosystemTitle: "Як платформа барои ҳувияти касбӣ",
+    ecosystemText: "Vizora профили шахсӣ, сохтори ташкилот ва роҳҳои муосири мубодилаи тамосро дар як низоми ягона ва фаҳмо муттаҳид мекунад.",
+    ecosystemItems: [
+      ["Варақаи рақамӣ", "Профили зинда бо тамосҳои нав, пайвандҳо ва ороиши фирмавӣ."],
+      ["Ташкилот ва дастаҳо", "Сохтори воҳидҳо, кормандон ва варақаҳо таҳти назорати ташкилот."],
+      ["QR ва NFC", "Мубодилаи фаврии тамос тавассути смартфон, лавҳа, корт ё маводи чопӣ."],
+      ["Феҳристи кушода", "Ҷустуҷӯи қулайи мутахассисон, ширкатҳо ва хизматрасониҳои касбӣ."]
+    ],
+    audienceLabel: "Барои инҳо сохта шудааст",
+    audiences: ["Мутахассисон", "Соҳибкорон", "Ширкатҳо", "Муассисаҳои таълимӣ", "Муассисаҳои давлатӣ", "Дастаҳои касбӣ"],
+    madeIn: "Дар Душанбе сохта шудааст — барои робитаҳои касбии бидуни марз",
     missionLabel: "Рисолати мо",
     missionTitle: "Муоширати касбиро осонтар гардонем",
     missionText: "То ҳар шахс, соҳибкор, ширкат ва ташкилоти давлатӣ тавонад худро муосир, зебо ва касбӣ — бе мушкилоти техникӣ муаррифӣ намояд.",
@@ -201,6 +225,18 @@ const pageCopy = {
     supportTitle: "Created with the support of Buro Tezaurus",
     supportText: "Vizora.tj was developed with the support of Buro Tezaurus. Years of experience in translation, printing, design, outdoor advertising, branding and digital technologies made it possible to create a platform built around the real needs of businesses, public institutions and independent professionals.",
     services: ["Translation", "Printing", "Design", "Outdoor advertising", "Branding", "Digital solutions", "Document workflow"],
+    ecosystemLabel: "The Vizora ecosystem",
+    ecosystemTitle: "One platform for professional identity",
+    ecosystemText: "Vizora brings personal profiles, organization structures and modern contact sharing together in one clear, connected system.",
+    ecosystemItems: [
+      ["Digital business card", "A living profile with current contacts, links and professional branding."],
+      ["Organizations and teams", "Departments, employees and digital cards managed within one organization."],
+      ["QR and NFC", "Instant contact sharing from a phone, desk stand, physical card or printed material."],
+      ["Open directory", "A convenient way to discover verified specialists, companies and services."]
+    ],
+    audienceLabel: "Built for",
+    audiences: ["Professionals", "Entrepreneurs", "Companies", "Educational institutions", "Public institutions", "Professional teams"],
+    madeIn: "Created in Dushanbe — for professional connections without borders",
     missionLabel: "Our mission",
     missionTitle: "Make professional communication simpler",
     missionText: "So every person, entrepreneur, company and public organization can present themselves in a modern, beautiful and professional way — without technical complexity.",
@@ -246,6 +282,7 @@ const pageCopy = {
 
 const serviceIcons: LucideIcon[] = [Languages, FileText, Palette, Megaphone, BadgeCheck, Workflow, ContactRound];
 const valueIcons: LucideIcon[] = [ShieldCheck, Lightbulb, CheckCircle2, Palette, Rocket, HeartHandshake];
+const ecosystemIcons: LucideIcon[] = [ContactRound, Building2, SmartphoneNfc, Globe2];
 
 const revealVariants = {
   hidden: { opacity: 0, y: 46 },
@@ -334,6 +371,7 @@ export default function AboutPage() {
           <div className="about-ambient about-ambient-one" />
           <div className="about-ambient about-ambient-two" />
           <div className="about-grid" aria-hidden="true" />
+          <HeroPattern />
           <div className="site-container about-hero-layout">
             <motion.div
               className="about-hero-copy"
@@ -401,6 +439,47 @@ export default function AboutPage() {
               <ContactNetwork />
               <div className="about-network-meta">
                 <span><QrCode size={17} />QR</span><span><SmartphoneNfc size={17} />NFC</span><span><Globe2 size={17} />WEB</span>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="about-section about-ecosystem-section">
+          <div className="site-container">
+            <Reveal className="about-ecosystem-shell">
+              <div className="about-ecosystem-heading">
+                <div>
+                  <SectionHeading label={text.ecosystemLabel} title={text.ecosystemTitle} />
+                  <p>{text.ecosystemText}</p>
+                </div>
+                <span className="about-made-in"><Globe2 size={18} />{text.madeIn}</span>
+              </div>
+              <div className="about-marquee about-ecosystem-marquee">
+                <div className="about-ecosystem-grid about-marquee-track">
+                  {[...text.ecosystemItems, ...text.ecosystemItems].map(([title, description], index) => {
+                    const Icon = ecosystemIcons[index % ecosystemIcons.length];
+                    const duplicate = index >= text.ecosystemItems.length;
+                    return (
+                      <motion.article
+                        key={`${title}-${index}`}
+                        className={`about-ecosystem-item ${duplicate ? "about-marquee-copy" : ""}`}
+                        aria-hidden={duplicate || undefined}
+                        whileHover={reduceMotion ? undefined : { y: -6 }}
+                      >
+                        <span><Icon size={23} /></span>
+                        <h3>{title}</h3>
+                        <p>{description}</p>
+                        <small>{String((index % text.ecosystemItems.length) + 1).padStart(2, "0")}</small>
+                      </motion.article>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="about-audience-row">
+                <strong><UsersRound size={17} />{text.audienceLabel}</strong>
+                <div className="about-audience-tags">
+                  {text.audiences.map((audience) => <span key={audience}>{audience}</span>)}
+                </div>
               </div>
             </Reveal>
           </div>
@@ -532,6 +611,32 @@ function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; 
 
 function SectionHeading({ label, title, centered = false }: { label: string; title: string; centered?: boolean }) {
   return <div className={`about-section-heading ${centered ? "is-centered" : ""}`}><span className="about-kicker">{label}</span><h2>{title}</h2></div>;
+}
+
+function HeroPattern() {
+  return (
+    <div className="about-hero-pattern" aria-hidden="true">
+      <svg viewBox="0 0 1600 680" preserveAspectRatio="none">
+        <g className="about-pattern-curves" fill="none">
+          <path d="M-40 540C240 350 330 610 610 420S1040 160 1640 350" />
+          <path d="M-70 605C230 430 390 665 690 470S1160 245 1680 420" />
+          <path d="M160 70C390 225 500 35 740 178S1170 420 1500 140" />
+        </g>
+        <g className="about-pattern-nodes">
+          <circle cx="162" cy="466" r="5" /><circle cx="452" cy="511" r="4" />
+          <circle cx="730" cy="444" r="5" /><circle cx="1082" cy="266" r="4" />
+          <circle cx="1390" cy="292" r="5" /><circle cx="547" cy="120" r="4" />
+        </g>
+        <g className="about-pattern-tiles">
+          <rect x="70" y="180" width="28" height="28" rx="8" />
+          <rect x="113" y="180" width="13" height="13" rx="4" />
+          <rect x="113" y="210" width="21" height="21" rx="6" />
+          <rect x="1484" y="500" width="28" height="28" rx="8" />
+          <rect x="1445" y="509" width="16" height="16" rx="5" />
+        </g>
+      </svg>
+    </div>
+  );
 }
 
 type ContactItem = readonly [string, string, string, LucideIcon];
