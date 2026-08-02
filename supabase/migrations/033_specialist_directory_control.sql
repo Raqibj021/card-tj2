@@ -45,7 +45,7 @@ begin
   if new.plan_code = 'pro' and new.expires_at > now() then
     update public.cards set directory_featured_until = new.expires_at, updated_at = now()
     where owner_id = new.profile_id and directory_removed_at is null;
-  elsif old.plan_code = 'pro' and new.plan_code <> 'pro' then
+  elsif tg_op = 'UPDATE' and old.plan_code = 'pro' and new.plan_code <> 'pro' then
     update public.cards set directory_featured_until = null, updated_at = now()
     where owner_id = new.profile_id;
   end if;
@@ -63,4 +63,3 @@ update public.cards set directory_hidden = true
 where profession_category_id is not null
   and specialist_summary = ''
   and cardinality(specialist_tags) = 0;
-
