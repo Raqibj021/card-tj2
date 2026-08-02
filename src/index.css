@@ -2715,10 +2715,10 @@ summary:focus-visible {
 .home-hero-card-deck {
   position: absolute;
   z-index: 4;
-  bottom: 138px;
-  left: -42px;
-  width: 242px;
-  height: 205px;
+  right: -48px;
+  bottom: 105px;
+  width: 270px;
+  height: 220px;
   perspective: 1000px;
   pointer-events: none;
 }
@@ -2728,7 +2728,7 @@ summary:focus-visible {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 228px;
+  width: 252px;
   aspect-ratio: 1.585 / 1;
   overflow: hidden;
   border: 1px solid rgba(65, 145, 215, .32);
@@ -2755,7 +2755,7 @@ summary:focus-visible {
 }
 
 @media (max-width: 1200px) {
-  .home-hero-card-deck { left: -25px; transform: scale(.84); transform-origin: center right; }
+  .home-hero-card-deck { right: -25px; transform: scale(.84); transform-origin: center left; }
 }
 
 @media (max-width: 900px) {
