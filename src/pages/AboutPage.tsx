@@ -695,12 +695,16 @@ function ContactGroup({ title, note, contacts, brand }: { title: string; note: s
 }
 
 function ContactNetwork() {
-  const [designOffset, setDesignOffset] = useState(0);
+  const [topDesign, setTopDesign] = useState(0);
+  const [previousTopDesign, setPreviousTopDesign] = useState<number | null>(null);
 
   useEffect(() => {
     const rotation = window.setInterval(() => {
-      setDesignOffset((current) => (current + 1) % heroCardDesigns.length);
-    }, 2800);
+      setTopDesign((current) => {
+        setPreviousTopDesign(current);
+        return (current + 1) % heroCardDesigns.length;
+      });
+    }, 3600);
 
     return () => window.clearInterval(rotation);
   }, []);
@@ -708,16 +712,28 @@ function ContactNetwork() {
   return (
     <div className="about-network-visual about-layered-cards" aria-hidden="true">
       <div className="about-layered-stage">
-        {Array.from({ length: 14 }, (_, index) => (
-          <span className="about-layered-card" key={index} style={{ "--layer": index } as CSSProperties}>
-            <img
-              key={`${index}-${designOffset}`}
-              src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[(index + designOffset) % heroCardDesigns.length].image}`}
-              alt=""
-              loading="lazy"
-            />
-          </span>
-        ))}
+        {Array.from({ length: 14 }, (_, index) => {
+          const isTopCard = index === 13;
+          return (
+            <span className={`about-layered-card${isTopCard ? " is-top-card" : ""}`} key={index} style={{ "--layer": index } as CSSProperties}>
+              {isTopCard && previousTopDesign !== null && (
+                <img
+                  className="about-top-card-outgoing"
+                  src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[previousTopDesign].image}`}
+                  alt=""
+                  onAnimationEnd={() => setPreviousTopDesign(null)}
+                />
+              )}
+              <img
+                key={isTopCard ? topDesign : index}
+                className={isTopCard && previousTopDesign !== null ? "about-top-card-incoming" : undefined}
+                src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[isTopCard ? topDesign : index % heroCardDesigns.length].image}`}
+                alt=""
+                loading="lazy"
+              />
+            </span>
+          );
+        })}
       </div>
       <span className="about-layered-signal signal-one"><QrCode size={17} /></span>
       <span className="about-layered-signal signal-two"><SmartphoneNfc size={17} /></span>
