@@ -68,13 +68,16 @@
   z-index: 2;
   display: grid;
   min-height: clamp(600px, 74vh, 680px);
-  align-items: center;
-  gap: clamp(12px, 2.2vw, 34px);
+  align-content: center;
+  align-items: start;
+  gap: 0 clamp(14px, 1.8vw, 27px);
   padding-block: 34px 0;
-  grid-template-columns: minmax(0, 1fr) minmax(430px, .84fr);
+  grid-template-columns: minmax(0, 1fr) minmax(205px, .37fr) minmax(330px, .6fr);
+  grid-template-rows: auto auto;
 }
 
-.about-hero-copy { position: relative; z-index: 3; }
+.about-hero-copy { position: relative; z-index: 5; align-self: end; grid-column: 1; grid-row: 1; }
+.about-hero-details { position: relative; z-index: 5; align-self: start; grid-column: 1; grid-row: 2; }
 .about-kicker, .about-dark-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--about-blue); font-size: 12px; font-weight: 900; letter-spacing: .115em; text-transform: uppercase; }
 .dark .about-kicker { color: #70caff; }
 .about-hero h1 { max-width: 690px; margin: 18px 0 15px; font-size: clamp(48px, 5vw, 74px); font-weight: 800; letter-spacing: -.058em; line-height: .98; text-wrap: balance; }
@@ -86,21 +89,31 @@
 .about-hero-signals span { display: inline-flex; min-height: 33px; align-items: center; gap: 6px; border-bottom: 1px solid color-mix(in srgb, var(--about-blue) 32%, var(--line)); padding: 0 4px; color: var(--muted); font-size: 11px; font-weight: 850; }
 .about-hero-signals svg { color: var(--about-blue); }
 
-.about-founder-visual { position: relative; width: min(100%, 555px); height: 540px; justify-self: start; align-self: end; }
+.about-founder-visual { position: relative; width: 100%; height: 520px; justify-self: stretch; align-self: end; grid-column: 3; grid-row: 1 / 3; }
 .about-founder-glow { position: absolute; right: 8%; bottom: 4%; width: 82%; height: 72%; border-radius: 50%; background: radial-gradient(circle, rgba(31, 126, 243, .2), transparent 68%); filter: blur(26px); }
-.about-founder-portrait { position: absolute; z-index: 2; right: 0; bottom: -2px; display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 28px 28px rgba(12, 43, 86, .18)); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, rgba(0, 0, 0, .82) 86%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 74%, rgba(0, 0, 0, .82) 86%, transparent 100%); }
+.about-founder-portrait { position: absolute; z-index: 2; right: 0; bottom: -2px; display: block; width: min(100%, 430px); height: auto; max-width: none; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 28px 28px rgba(12, 43, 86, .18)); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, rgba(0, 0, 0, .82) 86%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 74%, rgba(0, 0, 0, .82) 86%, transparent 100%); }
 .dark .about-founder-portrait { filter: drop-shadow(0 34px 36px rgba(0, 0, 0, .38)); }
 
-.about-float { position: absolute; z-index: 4; border: 1px solid color-mix(in srgb, var(--line) 75%, #75c5ff); background: color-mix(in srgb, var(--panel) 86%, transparent); box-shadow: 0 15px 45px rgba(11, 43, 91, .14); backdrop-filter: blur(16px); }
-.dark .about-float { background: rgba(11, 25, 47, .82); box-shadow: 0 17px 48px rgba(0, 0, 0, .27); }
-.about-float-qr { right: -25px; bottom: 58px; display: grid; align-items: center; gap: 8px; border-radius: 16px; padding: 7px; grid-template-columns: auto 1fr; }
-.about-float-qr img { width: 58px; height: 58px; border-radius: 10px; }
-.about-float-qr strong, .about-float-qr span { display: block; }
-.about-float-qr strong { font-size: 11px; }
-.about-float-qr span { max-width: 110px; margin-top: 3px; color: var(--muted); font-size: 9px; line-height: 1.35; }
-.about-float-nfc { top: 130px; left: -12px; display: flex; min-height: 40px; align-items: center; gap: 7px; border-radius: 12px; padding: 0 11px; color: var(--about-blue); }
-.about-float-language { top: 60px; right: -4px; display: flex; min-height: 37px; align-items: center; gap: 6px; border-radius: 12px; padding: 0 10px; color: var(--about-blue); }
-.about-float-nfc span, .about-float-language span { color: var(--ink); font-size: 11px; font-weight: 850; }
+.about-hero-card-stack { position: relative; z-index: 4; width: 225px; height: 330px; justify-self: center; align-self: center; grid-column: 2; grid-row: 1 / 3; perspective: 900px; }
+.about-nfc-card { position: absolute; display: block; width: 218px; aspect-ratio: 1.585 / 1; overflow: hidden; border-radius: 18px; box-shadow: 0 24px 48px rgba(9, 45, 94, .2); }
+.about-nfc-card::before { position: absolute; inset: 0; background: radial-gradient(circle at 86% 12%, rgba(64, 207, 255, .24), transparent 42%), repeating-linear-gradient(125deg, transparent 0 15px, rgba(255, 255, 255, .045) 16px 17px); content: ""; pointer-events: none; }
+.about-nfc-card-dark { top: 20px; left: 0; border: 1px solid rgba(124, 204, 255, .25); background: linear-gradient(145deg, #061a3e, #0a438f 62%, #087f9d); color: white; transform: rotate(-6deg); animation: about-card-float-dark 7s ease-in-out infinite; }
+.about-nfc-card-light { right: 0; bottom: 20px; border: 1px solid rgba(35, 115, 209, .2); background: linear-gradient(145deg, rgba(255, 255, 255, .98), #eaf5ff); color: #071a3c; transform: rotate(5deg); animation: about-card-float-light 7.8s ease-in-out infinite; }
+.dark .about-nfc-card-light { background: linear-gradient(145deg, #eef7ff, #dceeff); }
+.about-card-logo { position: absolute; z-index: 2; top: 16px; left: 16px; }
+.about-card-logo .vizora-brand-full { width: 125px; height: auto; }
+.about-card-contactless { position: absolute; z-index: 2; top: 16px; right: 15px; display: grid; justify-items: center; gap: 2px; color: #8ee4ff; }
+.about-card-contactless span { font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.about-card-footer { position: absolute; z-index: 2; right: 16px; bottom: 15px; left: 16px; display: flex; align-items: end; justify-content: space-between; border-top: 1px solid rgba(255, 255, 255, .18); padding-top: 10px; }
+.about-card-footer strong { font-size: 11px; letter-spacing: .08em; }
+.about-card-footer small { color: #9dc8ec; font-size: 8px; }
+.about-card-mark { position: absolute; z-index: 2; top: 14px; left: 14px; }
+.about-card-mark .vizora-brand-mark { width: 47px; height: 38px; }
+.about-nfc-card-light > img { position: absolute; z-index: 2; top: 14px; right: 14px; width: 55px; height: 55px; border-radius: 8px; }
+.about-card-meta { position: absolute; z-index: 2; right: 14px; bottom: 15px; left: 14px; }
+.about-card-meta strong, .about-card-meta span { display: block; }
+.about-card-meta strong { font-size: 12px; letter-spacing: .08em; }
+.about-card-meta span { margin-top: 4px; color: #4e6f96; font-size: 9px; font-weight: 800; }
 
 .about-section { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(58px, 5vw, 72px); }
 .about-section::before { position: absolute; z-index: 0; top: 44px; right: -75px; width: 330px; height: 330px; background-image: radial-gradient(circle, rgba(23, 111, 242, .42) 1.1px, transparent 1.6px); background-size: 19px 19px; content: ""; opacity: .2; mask-image: radial-gradient(circle, black, transparent 70%); pointer-events: none; }
@@ -160,10 +173,12 @@
 .about-ecosystem-item p { position: relative; z-index: 2; margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .about-ecosystem-item small { position: absolute; right: 12px; bottom: -9px; color: rgba(23, 111, 242, .065); font-size: 74px; font-weight: 900; letter-spacing: -.08em; line-height: 1; }
 .dark .about-ecosystem-item small { color: rgba(105, 209, 255, .055); }
-.about-audience-row { position: relative; z-index: 2; display: grid; align-items: center; gap: 17px; margin-top: 23px; border-top: 1px solid var(--line); padding-top: 19px; grid-template-columns: auto 1fr; }
+.about-audience-row { position: relative; z-index: 2; display: grid; min-width: 0; align-items: center; gap: 17px; margin-top: 23px; border-top: 1px solid var(--line); padding-top: 19px; grid-template-columns: auto minmax(0, 1fr); }
 .about-audience-row > strong { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-size: 12px; text-transform: uppercase; }
 .about-audience-row > strong svg { color: var(--about-blue); }
-.about-audience-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+.about-audience-marquee { min-width: 0; overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 4%, black 96%, transparent); }
+.about-audience-tags { display: flex; width: max-content; flex-wrap: nowrap; gap: 7px; will-change: transform; animation: about-audience-scroll 27s linear infinite; }
+.about-audience-marquee:hover .about-audience-tags { animation-play-state: paused; }
 .about-audience-tags span { display: inline-flex; min-height: 30px; align-items: center; border: 1px solid color-mix(in srgb, var(--line) 76%, #74beff); border-radius: 999px; background: color-mix(in srgb, var(--panel) 88%, transparent); padding: 0 11px; color: var(--muted); font-size: 11px; font-weight: 750; }
 
 .about-support-section { background: linear-gradient(180deg, var(--page), color-mix(in srgb, var(--page) 96%, #eef7ff)); }
@@ -260,22 +275,26 @@
 @keyframes about-pattern-drift { from { transform: translate3d(-8px, 0, 0); } to { transform: translate3d(10px, -6px, 0); } }
 @keyframes about-dashes { to { stroke-dashoffset: -180; } }
 @keyframes about-marquee-left { to { transform: translateX(calc(-50% - 5px)); } }
+@keyframes about-audience-scroll { to { transform: translateX(calc(-50% - 3.5px)); } }
+@keyframes about-card-float-dark { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-7px) rotate(-4.5deg); } }
+@keyframes about-card-float-light { 0%, 100% { transform: translateY(0) rotate(5deg); } 50% { transform: translateY(7px) rotate(3.5deg); } }
+@keyframes about-card-float-mobile-one { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes about-card-float-mobile-two { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
 @media (max-width: 1180px) {
-  .about-hero-layout { gap: 10px; grid-template-columns: minmax(0, 1fr) minmax(360px, .76fr); }
-  .about-founder-visual { height: 530px; }
-  .about-float-qr { right: 0; }
+  .about-hero-layout { gap: 0 10px; grid-template-columns: minmax(0, 1fr) minmax(185px, .32fr) minmax(285px, .53fr); }
+  .about-founder-visual { height: 500px; }
+  .about-hero-card-stack { transform: scale(.88); }
   .about-service-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .about-stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 920px) {
   .about-hero, .about-hero-layout { min-height: 570px; }
-  .about-hero-layout { gap: 0; padding-top: 34px; grid-template-columns: minmax(0, 1fr) minmax(285px, .72fr); }
+  .about-hero-layout { gap: 0 6px; padding-top: 34px; grid-template-columns: minmax(0, 1fr) minmax(155px, .29fr) minmax(225px, .44fr); }
   .about-hero h1 { font-size: clamp(46px, 6.7vw, 60px); }
-  .about-founder-visual { width: min(100%, 430px); height: 470px; justify-self: start; }
-  .about-float-nfc { left: -5px; }
-  .about-float-language { right: 0; }
+  .about-founder-visual { width: 100%; height: 450px; justify-self: stretch; }
+  .about-hero-card-stack { transform: scale(.74); }
   .about-story-layout { grid-template-columns: 1fr; }
   .about-network-card { width: min(100%, 570px); min-height: 310px; justify-self: center; }
   .about-ecosystem-heading { align-items: start; grid-template-columns: 1fr; }
@@ -288,23 +307,37 @@
 }
 
 @media (max-width: 680px) {
-  .about-hero, .about-hero-layout { min-height: 510px; }
-  .about-hero-layout { align-items: end; gap: 0; padding-block: 28px 0; grid-template-columns: minmax(0, 1.22fr) minmax(132px, .78fr); }
-  .about-hero-copy { z-index: 5; align-self: center; padding-bottom: 22px; text-align: left; }
+  .about-hero, .about-hero-layout { min-height: 0; }
+  .about-hero-layout { align-content: start; align-items: start; gap: 17px 8px; padding-block: 28px 25px; grid-template-columns: minmax(0, 1fr) minmax(132px, .7fr); grid-template-rows: auto auto auto; }
+  .about-hero-copy { z-index: 5; align-self: center; padding: 0; text-align: left; grid-column: 1; grid-row: 1; }
+  .about-hero-details { z-index: 5; width: 100%; grid-column: 1 / -1; grid-row: 2; }
   .about-kicker, .about-dark-kicker { gap: 5px; font-size: 10px; letter-spacing: .08em; }
   .about-hero h1 { max-width: 225px; margin-top: 12px; font-size: clamp(31px, 9vw, 39px); line-height: 1; }
   .about-founder-role { align-items: flex-start; font-size: 11px; line-height: 1.35; }
-  .about-hero-lead { max-width: 230px; margin-top: 13px; font-size: 12.5px; line-height: 1.5; }
+  .about-hero-lead { max-width: none; margin-top: 0; font-size: 14.5px; line-height: 1.58; }
   .about-hero-action { width: 100%; min-height: 46px; margin-top: 17px; padding-inline: 11px; font-size: 11px; }
   .about-hero-signals { justify-content: flex-start; gap: 5px; margin-top: 11px; }
   .about-hero-signals span { min-height: 27px; font-size: 9px; }
-  .about-founder-visual { width: 182px; height: 385px; margin-right: -22px; justify-self: end; }
-  .about-founder-portrait { right: -8px; bottom: -1px; width: auto; height: 350px; max-width: none; transform: none; }
-  .about-float-nfc, .about-float-language { display: none; }
-  .about-float-qr { right: 3px; bottom: 45px; gap: 5px; padding: 4px; }
-  .about-float-qr img { width: 44px; height: 44px; }
-  .about-float-qr strong { font-size: 8px; }
-  .about-float-qr span { display: none; }
+  .about-founder-visual { width: 100%; height: 255px; overflow: hidden; margin: 0; justify-self: stretch; align-self: end; grid-column: 2; grid-row: 1; }
+  .about-founder-glow { right: -10%; bottom: 0; width: 120%; height: 80%; }
+  .about-founder-portrait { right: -12px; bottom: -1px; width: 190px; height: auto; max-width: none; transform: none; }
+  .about-hero-card-stack { display: grid; width: 100%; height: auto; gap: 9px; margin-top: -2px; transform: none; grid-column: 1 / -1; grid-row: 3; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .about-nfc-card { position: relative; inset: auto; width: 100%; border-radius: 14px; transform: none; animation-duration: 8s; }
+  .about-nfc-card-dark { animation-name: about-card-float-mobile-one; }
+  .about-nfc-card-light { animation-name: about-card-float-mobile-two; }
+  .about-card-logo { top: 11px; left: 11px; }
+  .about-card-logo .vizora-brand-full { width: 92px; }
+  .about-card-contactless { top: 10px; right: 10px; }
+  .about-card-contactless svg { width: 20px; height: 20px; }
+  .about-card-footer { right: 11px; bottom: 10px; left: 11px; padding-top: 7px; }
+  .about-card-footer strong { font-size: 8px; }
+  .about-card-footer small { font-size: 6.5px; }
+  .about-card-mark { top: 10px; left: 10px; }
+  .about-card-mark .vizora-brand-mark { width: 36px; height: 30px; }
+  .about-nfc-card-light > img { top: 9px; right: 9px; width: 42px; height: 42px; }
+  .about-card-meta { right: 10px; bottom: 10px; left: 10px; }
+  .about-card-meta strong { font-size: 9px; }
+  .about-card-meta span { font-size: 7px; }
   .about-hero-pattern svg { width: 145%; transform: translateX(-15%); opacity: .47; }
   .about-section { padding-block: 43px; }
   .about-section::before { top: 28px; right: -95px; width: 230px; height: 230px; opacity: .16; }
@@ -331,8 +364,8 @@
   .about-ecosystem-item h3 { margin-top: 12px; font-size: 17px; }
   .about-ecosystem-item p { font-size: 12.5px; }
   .about-audience-row { align-items: start; gap: 11px; margin-top: 18px; grid-template-columns: 1fr; }
-  .about-audience-tags { flex-wrap: nowrap; overflow-x: auto; margin-right: -17px; padding-right: 17px; scrollbar-width: none; }
-  .about-audience-tags::-webkit-scrollbar { display: none; }
+  .about-audience-marquee { margin-right: -17px; }
+  .about-audience-tags { flex-wrap: nowrap; }
   .about-audience-tags span { flex: 0 0 auto; }
   .about-support-card { border-radius: 22px; padding: 23px 17px; }
   .about-support-head { gap: 19px; grid-template-columns: 1fr; }
@@ -378,16 +411,18 @@
 }
 
 @media (max-width: 390px) {
-  .about-hero-layout { grid-template-columns: minmax(0, 1.28fr) minmax(118px, .72fr); }
+  .about-hero-layout { grid-template-columns: minmax(0, 1fr) minmax(124px, .68fr); }
   .about-hero h1 { max-width: 205px; font-size: 30px; }
-  .about-founder-visual { width: 165px; height: 365px; margin-right: -21px; }
-  .about-founder-portrait { right: -11px; width: auto; height: 334px; }
+  .about-founder-visual { width: 100%; height: 238px; margin: 0; }
+  .about-founder-portrait { right: -14px; width: 174px; height: auto; }
   .about-network-meta { gap: 11px; }
   .about-contact-group > header { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .about-ambient, .about-hero-pattern svg, .about-network-lines, .about-cta-orb, .about-marquee-track { animation: none !important; }
+  .about-ambient, .about-hero-pattern svg, .about-network-lines, .about-cta-orb, .about-marquee-track, .about-audience-tags, .about-nfc-card { animation: none !important; }
   .about-marquee { overflow-x: auto; }
   .about-marquee-copy { display: none !important; }
+  .about-audience-marquee { overflow-x: auto; }
+  .about-audience-tag-copy { display: none !important; }
 }
