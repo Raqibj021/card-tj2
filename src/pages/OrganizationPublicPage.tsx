@@ -157,10 +157,13 @@ export default function OrganizationPublicPage() {
     return result;
   }, [data, departmentId]);
 
-  const employees = useMemo(() => (data?.employees ?? []).filter((item) =>
-    `${item.name} ${item.position}`.toLowerCase().includes(query.trim().toLowerCase())
-    && (!visibleDepartmentIds || (!!item.departmentId && visibleDepartmentIds.has(item.departmentId)))
-  ), [data, query, visibleDepartmentIds]);
+  const employees = useMemo(() => (data?.employees ?? []).filter((item) => {
+    const department = data?.departments.find((entry) => entry.id === item.departmentId);
+    const haystack = `${item.name} ${item.position} ${department ? departmentPath(department, data?.departments ?? []) : ""}`.toLocaleLowerCase();
+    const words = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+    return words.every((word) => haystack.includes(word))
+      && (!visibleDepartmentIds || (!!item.departmentId && visibleDepartmentIds.has(item.departmentId)));
+  }), [data, query, visibleDepartmentIds]);
 
   if (loading) return <main className="route-loading"><span /><p>...</p></main>;
   if (!data) return <main className="card-missing"><BrandLogo /><div className="empty-state"><Building2 size={30} /><h1>{copy.missing}</h1>{loadError && <p>{loadError}</p>}</div></main>;
@@ -168,8 +171,8 @@ export default function OrganizationPublicPage() {
   const description = publicDescription(data.organization.description);
   const organizationMark = initials(data.organization.name);
   const employeePhotos = data.employees.filter((employee) => employee.photo).slice(0, 3);
-  const isFiltering = Boolean(query.trim() || departmentId);
   const organizationUrl = publicSiteUrl(`/organization/${slug}`);
+  const selectedDepartment = data.departments.find((item) => item.id === departmentId);
 
   return <main className="organization-public-page">
     <section className="org-public-hero">
@@ -228,40 +231,28 @@ export default function OrganizationPublicPage() {
       <div className="site-container">
         <header className="org-public-directory-head org-public-reveal">
           <div>
-            <span className="org-public-section-label"><Users size={15} /> {copy.employees}</span>
+            <span className="org-public-section-label"><Network size={15} /> {copy.structure}</span>
             <h2>{copy.title}</h2>
             <p>{copy.subtitle}</p>
           </div>
-          <div className="org-public-filters">
+          <div className="org-public-filters org-public-filters-search-only">
             <label className="org-public-search">
               <Search size={18} />
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} aria-label={copy.search} />
             </label>
-            <label className="org-public-select">
-              <Network size={17} />
-              <select value={departmentId} onChange={(event) => setDepartmentId(event.target.value)} aria-label={copy.all}>
-                <option value="">{copy.all}</option>
-                {data.departments.map((item) => <option key={item.id} value={item.id}>{departmentPath(item, data.departments)}</option>)}
-              </select>
-              <ChevronDown size={16} />
-            </label>
           </div>
         </header>
 
-        {isFiltering ? <EmployeeGrid employees={employees} departments={data.departments} copy={copy} /> : <>
-          {employees.some((item) => !item.departmentId) && <section className="org-public-department org-public-reveal">
-            <DepartmentHeader name={copy.common} count={employees.filter((item) => !item.departmentId).length} index={0} label={copy.structure} />
-            <EmployeeGrid employees={employees.filter((item) => !item.departmentId)} departments={data.departments} copy={copy} />
-          </section>}
-          <PublicDepartmentTree departments={data.departments} employees={employees.filter((item) => item.departmentId)} copy={copy} />
-        </>}
+        <PublicDepartmentTree departments={data.departments} employees={data.employees.filter((item) => item.departmentId)} copy={copy} onOpen={setDepartmentId} />
       </div>
     </section>
+    {query.trim() && <div className="org-public-directory-modal-backdrop" onMouseDown={() => setQuery("")}><section className="org-public-directory-modal" onMouseDown={(event) => event.stopPropagation()}><header><div><span>{copy.search}</span><h2>{copy.employees}</h2></div><button onClick={() => setQuery("")}>×</button></header><label className="org-modal-search"><Search size={17} /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} /></label><EmployeeGrid employees={employees} departments={data.departments} copy={copy} /></section></div>}
+    {selectedDepartment && <div className="org-public-directory-modal-backdrop" onMouseDown={() => setDepartmentId("")}><section className="org-public-directory-modal" onMouseDown={(event) => event.stopPropagation()}><header><div><span>{copy.structure}</span><h2>{selectedDepartment.name}</h2></div><button onClick={() => setDepartmentId("")}>×</button></header><EmployeeGrid employees={employees} departments={data.departments} copy={copy} emptyText={copy.emptyDepartment} /></section></div>}
   </main>;
 }
 
-function EmployeeGrid({ employees, departments, copy }: { employees: PublicOrganization["employees"]; departments: PublicOrganization["departments"]; copy: PublicCopy }) {
-  if (!employees.length) return <div className="org-public-empty"><Search size={20} /><span>{copy.empty}</span></div>;
+function EmployeeGrid({ employees, departments, copy, emptyText }: { employees: PublicOrganization["employees"]; departments: PublicOrganization["departments"]; copy: PublicCopy; emptyText?: string }) {
+  if (!employees.length) return <div className="org-public-empty"><Search size={20} /><span>{emptyText ?? copy.empty}</span></div>;
   return <div className="org-public-employee-grid">{employees.map((employee, index) => {
     const department = departments.find((item) => item.id === employee.departmentId);
     return <article className="org-public-employee org-public-reveal" style={{ animationDelay: `${Math.min(index, 6) * 55}ms` }} key={employee.id || employee.slug}>
@@ -290,19 +281,15 @@ function DepartmentHeader({ name, count, index, label }: { name: string; count: 
   </header>;
 }
 
-function PublicDepartmentTree({ departments, employees, copy, parentId = null, depth = 0 }: { departments: PublicOrganization["departments"]; employees: PublicOrganization["employees"]; copy: PublicCopy; parentId?: string | null; depth?: number }) {
+function PublicDepartmentTree({ departments, employees, copy, onOpen, parentId = null, depth = 0 }: { departments: PublicOrganization["departments"]; employees: PublicOrganization["employees"]; copy: PublicCopy; onOpen: (id: string) => void; parentId?: string | null; depth?: number }) {
   const children = departments.filter((item) => item.parentId === parentId);
   if (!children.length) return parentId === null && employees.length ? <EmployeeGrid employees={employees} departments={departments} copy={copy} /> : null;
   return <div className={depth ? "org-public-subdepartments" : "org-public-department-list"}>{children.map((department, index) => {
     const nested = descendantIds(department.id, departments);
-    const directEmployees = employees.filter((item) => item.departmentId === department.id);
     const total = employees.filter((item) => item.departmentId && nested.has(item.departmentId)).length;
     return <section className="org-public-department org-public-reveal" style={{ animationDelay: `${Math.min(index, 5) * 70}ms` }} key={department.id}>
-      <DepartmentHeader name={department.name} count={total} index={index} label={copy.structure} />
-      {directEmployees.length > 0
-        ? <EmployeeGrid employees={directEmployees} departments={departments} copy={copy} />
-        : !departments.some((item) => item.parentId === department.id) && <p className="org-public-department-empty">{copy.emptyDepartment}</p>}
-      <PublicDepartmentTree departments={departments} employees={employees} copy={copy} parentId={department.id} depth={depth + 1} />
+      <button className="org-public-department-button" onClick={() => onOpen(department.id)}><DepartmentHeader name={department.name} count={total} index={index} label={copy.structure} /><ArrowUpRight size={18} /></button>
+      <PublicDepartmentTree departments={departments} employees={employees} copy={copy} onOpen={onOpen} parentId={department.id} depth={depth + 1} />
     </section>;
   })}</div>;
 }
