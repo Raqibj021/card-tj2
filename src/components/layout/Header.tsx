@@ -24,15 +24,16 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const copy = {
-    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", dashboard: "Кабинет", leads: "Лиды", notifications: "Уведомления", login: "Войти", account: "Личный кабинет", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
-    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", notifications: "Огоҳиномаҳо", login: "Ворид шудан", account: "Утоқи шахсӣ", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
-    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", dashboard: "Dashboard", leads: "Leads", notifications: "Notifications", login: "Sign in", account: "Personal account", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
+    ru: { home: "Главная", directory: "Специалисты", organizations: "Организации", services: "Услуги", about: "О нас", dashboard: "Кабинет", leads: "Лиды", notifications: "Уведомления", login: "Войти", account: "Личный кабинет", mainNav: "Основная навигация", mobileNav: "Мобильная навигация" },
+    tj: { home: "Асосӣ", directory: "Мутахассисон", organizations: "Ташкилотҳо", services: "Хизматҳо", about: "Дар бораи мо", dashboard: "Утоқи шахсӣ", leads: "Дархостҳо", notifications: "Огоҳиномаҳо", login: "Ворид шудан", account: "Утоқи шахсӣ", mainNav: "Менюи асосӣ", mobileNav: "Менюи мобилӣ" },
+    en: { home: "Home", directory: "Specialists", organizations: "Organizations", services: "Services", about: "About", dashboard: "Dashboard", leads: "Leads", notifications: "Notifications", login: "Sign in", account: "Personal account", mainNav: "Main navigation", mobileNav: "Mobile navigation" }
   }[language];
   const navItems = [
     { to: "/", text: copy.home },
     { to: "/directory", text: copy.directory, icon: Search },
     { to: "/organizations", text: copy.organizations, icon: Building2 },
     { to: "/services", text: copy.services },
+    { to: "/about", text: copy.about },
     { to: "/dashboard", text: copy.dashboard, icon: LayoutDashboard },
     ...(user ? [{ to: "/dashboard/leads", text: copy.leads }] : [])
   ];
@@ -50,7 +51,7 @@ export default function Header() {
           <BrandLogo />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label={copy.mainNav}>
+        <nav className="hidden items-center gap-1 xl:flex" aria-label={copy.mainNav}>
           {navItems.map(({ to, text }) => (
             <NavLink
               key={to}
@@ -109,7 +110,7 @@ export default function Header() {
 
         <button
           type="button"
-          className="icon-button sm:hidden"
+          className="icon-button xl:hidden"
           onClick={() => setOpen((value) => !value)}
           aria-label={t("navMenu")}
           aria-expanded={open}
@@ -119,7 +120,7 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="mobile-menu sm:hidden">
+        <div className="mobile-menu xl:hidden">
           <nav className="grid gap-1" aria-label={copy.mobileNav}>
             {navItems.map(({ to, text, icon: Icon }) => (
               <NavLink
