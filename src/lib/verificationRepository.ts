@@ -22,6 +22,29 @@ export interface SpecialistSubmission {
   portfolio: File[];
 }
 
+const optimizePortfolioImage = async (file: File): Promise<File> => {
+  if (!file.type.startsWith("image/")) return file;
+  if (!("createImageBitmap" in window)) return file;
+  const bitmap = await createImageBitmap(file).catch(() => null);
+  if (!bitmap) return file;
+  const maxSide = 2200;
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+  const context = canvas.getContext("2d");
+  if (!context) { bitmap.close(); return file; }
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const toBlob = (quality: number) => new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", quality));
+  let blob = await toBlob(.9);
+  if (blob && blob.size > 5 * 1024 * 1024) blob = await toBlob(.82);
+  if (!blob || (blob.size >= file.size && file.size <= 5 * 1024 * 1024)) return file;
+  return new File([blob], `${file.name.replace(/\.[^.]+$/, "") || "portfolio"}.webp`, { type: "image/webp", lastModified: Date.now() });
+};
+
 export const verificationRepository = {
   categories: async (language: "ru" | "tj" | "en"): Promise<ProfessionCategory[]> => {
     if (!supabase) throw new Error("Сервер категорий временно недоступен.");
@@ -76,7 +99,9 @@ export const verificationRepository = {
     const tags = submission.tags.map((tag) => tag.trim()).filter(Boolean).slice(0, 12);
     const portfolioPaths: string[] = [];
     if (submission.plan === "pro") {
-      for (const file of submission.portfolio.filter((item) => item.size <= 5 * 1024 * 1024).slice(0, 20)) {
+      for (const source of submission.portfolio.slice(0, 20)) {
+        const file = await optimizePortfolioImage(source);
+        if (file.size > 5 * 1024 * 1024) throw new Error(`Не удалось оптимизировать ${source.name} до 5 МБ.`);
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
         const path = `${auth.user.id}/${submission.cardId}/portfolio/${createUuid()}-${safeName}`;
         const { error } = await supabase.storage.from("card-assets").upload(path, file, { contentType: file.type });
