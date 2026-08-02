@@ -6158,6 +6158,74 @@ summary:focus-visible {
   animation-play-state: paused;
 }
 
+.design-showcase-mobile { display: none; }
+
+.home-landmark-card-track {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 28px;
+  padding: 18px 28px 22px 10px;
+  animation: design-showcase-scroll 68s linear infinite;
+}
+
+.home-landmark-card-track:hover { animation-play-state: paused; }
+
+.home-landmark-card-item {
+  width: 354px;
+  height: 232px;
+  flex: 0 0 354px;
+  perspective: 900px;
+}
+
+.home-landmark-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.585 / 1;
+  overflow: hidden;
+  border: 1px solid rgba(65, 145, 215, .3);
+  border-radius: 25px;
+  background: #edf8ff;
+  box-shadow: 0 24px 46px rgba(10, 63, 126, .2);
+  transform: rotate(-2.2deg) translateY(4px);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+
+.home-landmark-card-item:nth-child(3n + 2) .home-landmark-card { transform: rotate(1.8deg) translateY(-4px); }
+.home-landmark-card-item:nth-child(3n) .home-landmark-card { transform: rotate(-.7deg) translateY(5px); }
+.home-landmark-card-item:hover .home-landmark-card { box-shadow: 0 30px 58px rgba(10, 63, 126, .27); transform: rotate(0) translateY(-7px) scale(1.02); }
+
+.home-landmark-card-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-landmark-card-logo {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 19px;
+  width: 135px;
+  height: auto;
+  object-fit: contain;
+}
+
+.home-landmark-card-nfc {
+  position: absolute;
+  z-index: 2;
+  bottom: 18px;
+  left: 23px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: #062865;
+}
+
+.home-landmark-card-nfc small { font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+
 .design-showcase-item {
   width: 250px;
   height: 392px;
@@ -6279,6 +6347,9 @@ summary:focus-visible {
 }
 
 @media (max-width: 680px) {
+  .landmark-desktop-showcase { display: none; }
+  .design-showcase-mobile { display: block; }
+
   .home-desktop-detail {
     display: none;
   }
@@ -6718,6 +6789,7 @@ summary:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .design-showcase-track,
+  .home-landmark-card-track,
   .mobile-benefits-track,
   .mobile-steps-track {
     animation-play-state: paused;

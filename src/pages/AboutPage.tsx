@@ -396,11 +396,6 @@ export default function AboutPage() {
               <a href="#about-story" className="button button-primary button-large about-hero-action">
                 {text.heroAction}<ArrowDown size={18} />
               </a>
-              <div className="about-hero-signals" aria-label={text.digitalIdentity}>
-                <span><QrCode size={16} />QR</span>
-                <span><SmartphoneNfc size={16} />NFC</span>
-                <span><Languages size={16} />{text.languagesShort}</span>
-              </div>
             </motion.div>
 
             <motion.div
@@ -669,7 +664,7 @@ function HeroNfcCards({ className = "" }: { className?: string }) {
           key={card.name}
         >
           <img className="about-card-bg" src={`${import.meta.env.BASE_URL}images/cards/${card.image}`} alt="" />
-          <BrandLogo className="about-card-logo" />
+          <img className="about-card-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="VIZORA.TJ" />
           <div className="about-card-contactless"><SmartphoneNfc size={25} /><span>NFC</span></div>
         </div>
       ))}
