@@ -38,7 +38,7 @@ export default function HomePage() {
     id: "founder-raqibjon",
     slug: "raqibjon",
     photo: `${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov.webp`,
-    companyLogo: `${import.meta.env.BASE_URL}brand/vizora-mark.webp`,
+    companyLogo: `${import.meta.env.BASE_URL}brand/vizora-mark-clean.webp`,
     fullName: "Муродкулов Ракибджон",
     position: "Основатель VIZORA.TJ",
     organization: "VIZORA.TJ",
