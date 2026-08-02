@@ -310,7 +310,7 @@ export default function DirectoryPage() {
                   <p>{item.specialistTitle || item.role}</p>
                   <span><MapPin size={15} /> {item.city || item.address || item.organization || "—"}</span>
                   {!!item.tags.length && <div className="specialist-tags">{item.tags.slice(0, 3).map((tag) => <small key={tag}>{tag}</small>)}</div>}
-                  <Link to={`/card/${item.slug}`} className="button button-secondary w-full">{copy.open}</Link>
+                  <Link to={`/card/${item.slug}?profile=specialist`} className="button button-secondary w-full">{copy.open}</Link>
                 </article>
               ))}
               {!filteredProfiles.length && <div className="empty-state"><BadgeCheck size={30} /><h2>{copy.verified}</h2><p>{copy.verifiedOnly}</p></div>}
@@ -368,7 +368,7 @@ export default function DirectoryPage() {
             {selectedCategoryProfiles.length ? <div className="specialist-grid">{selectedCategoryProfiles.map((item, index) => <article className="specialist-card" key={item.id}>
               {item.photo ? <img className="specialist-avatar" src={item.photo} alt="" /> : <div className={`specialist-avatar specialist-avatar-${["blue", "violet", "emerald"][index % 3]}`}>{item.name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("")}</div>}
               <div className="specialist-verified"><BadgeCheck size={15} />{copy.checked}</div><h3>{item.name}</h3><p>{item.specialistTitle || item.role}</p><span><MapPin size={15} />{item.city || item.address || "—"}</span>
-              <Link to={`/card/${item.slug}`} className="button button-secondary w-full">{copy.open}</Link>
+              <Link to={`/card/${item.slug}?profile=specialist`} className="button button-secondary w-full">{copy.open}</Link>
             </article>)}</div> : <div className="category-explorer-empty">
               <div className="category-empty-visual"><Search size={32} /><span /><span /></div>
               <h3>{language === "ru" ? "В этой категории пока нет опубликованных специалистов" : language === "tj" ? "Дар ин категория ҳоло мутахассиси нашршуда нест" : "No published specialists in this category yet"}</h3>
