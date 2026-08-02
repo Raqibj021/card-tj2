@@ -2712,6 +2712,56 @@ summary:focus-visible {
   background: #0f766e;
 }
 
+.home-hero-card-deck {
+  position: absolute;
+  z-index: 4;
+  bottom: 138px;
+  left: -42px;
+  width: 242px;
+  height: 205px;
+  perspective: 1000px;
+  pointer-events: none;
+}
+
+.home-hero-nfc-card {
+  --phone-card-index: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 228px;
+  aspect-ratio: 1.585 / 1;
+  overflow: hidden;
+  border: 1px solid rgba(65, 145, 215, .32);
+  border-radius: 17px;
+  background: #edf8ff;
+  box-shadow: 0 22px 46px rgba(8, 52, 110, .25);
+  transform-origin: 50% 115%;
+  animation: home-phone-card-cycle 21s cubic-bezier(.45, 0, .18, 1) infinite;
+  animation-delay: calc(var(--phone-card-index) * -3.5s);
+}
+
+.home-hero-nfc-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.home-hero-nfc-logo { position: absolute; z-index: 2; top: 11px; left: 12px; width: 88px; height: auto; }
+.home-hero-nfc-card > span { position: absolute; z-index: 2; bottom: 10px; left: 13px; display: grid; justify-items: center; color: #062865; }
+.home-hero-nfc-card > span small { font-size: 6px; font-weight: 900; letter-spacing: .1em; }
+
+@keyframes home-phone-card-cycle {
+  0%, 15% { z-index: 6; opacity: 1; transform: translate3d(-50%, -50%, 34px) rotate(-7deg) scale(1); }
+  20% { z-index: 6; opacity: 0; transform: translate3d(-20%, -66%, 20px) rotate(14deg) scale(.93); }
+  21%, 72% { z-index: 1; opacity: 0; transform: translate3d(-72%, -40%, -34px) rotate(-14deg) scale(.82); }
+  78% { z-index: 2; opacity: .2; transform: translate3d(-66%, -42%, -20px) rotate(-12deg) scale(.86); }
+  86% { z-index: 3; opacity: .46; transform: translate3d(-60%, -45%, -10px) rotate(-10deg) scale(.91); }
+  100% { z-index: 5; opacity: .82; transform: translate3d(-54%, -48%, 0) rotate(-8deg) scale(.96); }
+}
+
+@media (max-width: 1200px) {
+  .home-hero-card-deck { left: -25px; transform: scale(.84); transform-origin: center right; }
+}
+
+@media (max-width: 900px) {
+  .home-hero-card-deck { display: none; }
+}
+
 @keyframes promo-progress {
   from { width: 0; }
   to { width: 100%; }
@@ -6790,6 +6840,7 @@ summary:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .design-showcase-track,
   .home-landmark-card-track,
+  .home-hero-nfc-card,
   .mobile-benefits-track,
   .mobile-steps-track {
     animation-play-state: paused;

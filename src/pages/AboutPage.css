@@ -72,7 +72,7 @@
   align-items: start;
   gap: 0 clamp(14px, 1.8vw, 27px);
   padding-block: 34px 0;
-  grid-template-columns: minmax(0, 1fr) minmax(330px, .6fr) minmax(205px, .37fr);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .64fr) minmax(225px, .4fr);
   grid-template-rows: auto auto;
 }
 
@@ -86,9 +86,9 @@
 .about-hero-lead { max-width: 650px; margin: 18px 0 0; color: var(--muted); font-size: clamp(16px, 1.2vw, 19px); line-height: 1.62; }
 .about-hero-action { margin-top: 25px; }
 
-.about-founder-visual { position: relative; width: 100%; height: 550px; justify-self: stretch; align-self: end; grid-column: 2; grid-row: 1 / 3; }
+.about-founder-visual { position: relative; width: 100%; height: 575px; justify-self: stretch; align-self: end; grid-column: 2; grid-row: 1 / 3; }
 .about-founder-glow { position: absolute; right: 8%; bottom: 4%; width: 82%; height: 72%; border-radius: 50%; background: radial-gradient(circle, rgba(31, 126, 243, .2), transparent 68%); filter: blur(26px); }
-.about-founder-portrait { position: absolute; z-index: 2; left: 50%; bottom: -2px; display: block; width: min(122%, 475px); height: auto; max-width: none; object-fit: contain; object-position: center bottom; transform: translateX(-50%); filter: drop-shadow(0 28px 28px rgba(12, 43, 86, .18)); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, rgba(0, 0, 0, .86) 84%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 72%, rgba(0, 0, 0, .86) 84%, transparent 100%); }
+.about-founder-portrait { position: absolute; z-index: 2; left: 50%; bottom: -2px; display: block; width: min(126%, 515px); height: auto; max-width: none; object-fit: contain; object-position: center bottom; transform: translateX(-50%); filter: drop-shadow(0 28px 28px rgba(12, 43, 86, .18)); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 72%, rgba(0, 0, 0, .86) 84%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 72%, rgba(0, 0, 0, .86) 84%, transparent 100%); }
 .dark .about-founder-portrait { filter: drop-shadow(0 34px 36px rgba(0, 0, 0, .38)); }
 
 .about-founder-orbits { position: absolute; z-index: 3; inset: 0; pointer-events: none; }
@@ -98,9 +98,9 @@
 .about-founder-orbit-lang { right: 7%; bottom: 18%; animation-delay: -3.2s; }
 .dark .about-founder-orbit { background: rgba(8, 28, 53, .72); color: #7bd7ff; }
 
-.about-hero-card-stack { position: relative; z-index: 4; width: 245px; height: 350px; justify-self: center; align-self: center; grid-column: 3; grid-row: 1 / 3; perspective: 1000px; }
+.about-hero-card-stack { position: relative; z-index: 4; width: 270px; height: 370px; justify-self: center; align-self: center; grid-column: 3; grid-row: 1 / 3; perspective: 1000px; }
 .about-hero-card-stack.is-mobile { display: none; }
-.about-nfc-card { --card-index: 0; position: absolute; top: 50%; left: 50%; display: block; width: 232px; aspect-ratio: 1.585 / 1; overflow: hidden; border: 1px solid rgba(82, 157, 219, .32); border-radius: 19px; background: #edf8ff; color: #062865; box-shadow: 0 25px 54px rgba(5, 34, 77, .24); transform-origin: 50% 120%; animation: about-card-deck 21s cubic-bezier(.45, 0, .18, 1) infinite; animation-delay: calc(var(--card-index) * -3.5s); }
+.about-nfc-card { --card-index: 0; position: absolute; top: 50%; left: 50%; display: block; width: 255px; aspect-ratio: 1.585 / 1; overflow: hidden; border: 1px solid rgba(82, 157, 219, .32); border-radius: 19px; background: #edf8ff; color: #062865; box-shadow: 0 25px 54px rgba(5, 34, 77, .24); transform-origin: 50% 120%; animation: about-card-deck 21s cubic-bezier(.45, 0, .18, 1) infinite; animation-delay: calc(var(--card-index) * -3.5s); }
 .about-nfc-card::before { position: absolute; z-index: 2; inset: 0; background: linear-gradient(120deg, transparent 15%, rgba(255, 255, 255, .38) 38%, transparent 61%); content: ""; transform: translateX(-120%); animation: about-card-shine 7s ease-in-out infinite; pointer-events: none; }
 .about-card-bg { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .about-card-logo { position: absolute; z-index: 2; top: 16px; left: 16px; }
@@ -321,15 +321,15 @@
   .about-hero-action { width: 100%; min-height: 46px; margin-top: 17px; padding-inline: 11px; font-size: 11px; }
   .about-founder-visual { width: 100%; height: 270px; overflow: visible; margin: 0; justify-self: stretch; align-self: end; grid-column: 2; grid-row: 1; }
   .about-founder-glow { right: -10%; bottom: 0; width: 120%; height: 80%; }
-  .about-founder-portrait { left: 50%; bottom: -1px; width: 205px; height: auto; max-width: none; transform: translateX(-50%); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, .82) 82%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, .82) 82%, transparent 100%); }
+  .about-founder-portrait { left: 50%; bottom: -1px; width: 215px; height: auto; max-width: none; transform: translateX(-50%); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, .82) 82%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 68%, rgba(0, 0, 0, .82) 82%, transparent 100%); }
   .about-founder-orbit { width: 31px; height: 31px; border-radius: 10px; }
   .about-founder-orbit svg { width: 15px; height: 15px; }
   .about-founder-orbit-qr { top: 24%; left: -5px; }
   .about-founder-orbit-nfc { top: 42%; right: -4px; }
   .about-founder-orbit-lang { right: 4px; bottom: 22%; }
   .about-hero-card-stack.is-desktop { display: none; }
-  .about-hero-card-stack.is-mobile { display: block; width: 150px; height: 103px; margin: 11px 0 0 5px; transform: none; pointer-events: none; }
-  .about-nfc-card { width: 142px; border-radius: 11px; box-shadow: 0 12px 26px rgba(9, 45, 94, .2); }
+  .about-hero-card-stack.is-mobile { display: block; width: 160px; height: 108px; margin: 11px 0 0 5px; transform: none; pointer-events: none; }
+  .about-nfc-card { width: 150px; border-radius: 11px; box-shadow: 0 12px 26px rgba(9, 45, 94, .2); }
   .about-card-logo { top: 7px; left: 7px; }
   .about-card-logo { width: 58px; }
   .about-card-contactless { bottom: 6px; left: 7px; }
