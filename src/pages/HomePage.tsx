@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Share2,
   Sparkles,
-  SmartphoneNfc,
   Zap
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,15 +24,6 @@ import { demoCards } from "../data/demo";
 import HomePhoneStory from "../components/HomePhoneStory";
 import HomePromoCarousel from "../components/HomePromoCarousel";
 import type { DigitalCard } from "../types/card";
-
-const landmarkCardDesigns = [
-  "vizora-tajikistan-building.webp",
-  "vizora-tajikistan-palace.webp",
-  "vizora-tajikistan-somoni.webp",
-  "vizora-tajikistan-arch.webp",
-  "vizora-tajikistan-hissar.webp",
-  "vizora-tajikistan-independence.webp"
-] as const;
 
 export default function HomePage() {
   const { t, language } = useApp();
@@ -219,20 +209,7 @@ export default function HomePage() {
               <Link to="/create">{t("create")} <ArrowRight size={15} /></Link>
             </div>
           </div>
-          <div className="design-showcase-marquee landmark-desktop-showcase">
-            <div className="home-landmark-card-track">
-              {[...landmarkCardDesigns, ...landmarkCardDesigns].map((image, index) => (
-                <article className="home-landmark-card-item" key={`${image}-${index}`}>
-                  <div className="home-landmark-card">
-                    <img className="home-landmark-card-bg" src={`${import.meta.env.BASE_URL}images/cards/${image}`} alt="" />
-                    <img className="home-landmark-card-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="VIZORA.TJ" />
-                    <span className="home-landmark-card-nfc"><SmartphoneNfc size={25} /><small>NFC</small></span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-          <div className="design-showcase-marquee design-showcase-mobile">
+          <div className="design-showcase-marquee">
             <div className="design-showcase-track">
               {[...showcaseDesigns, ...showcaseDesigns].map((card, index) => (
                 <button
