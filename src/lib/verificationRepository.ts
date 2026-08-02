@@ -4,6 +4,7 @@ import { createUuid } from "./id";
 export interface ProfessionCategory {
   id: string;
   name: string;
+  slug: string;
   requiresLicense: boolean;
 }
 
@@ -50,9 +51,10 @@ export const verificationRepository = {
     if (!supabase) throw new Error("Сервер категорий временно недоступен.");
     const { data, error } = await supabase.rpc("get_enabled_profession_categories", { language_code: language });
     if (error) throw new Error(`Не удалось загрузить категории: ${error.message}`);
-    return (data ?? []).map((row: { id: string; name: string; requires_license: boolean }) => ({
+    return (data ?? []).map((row: { id: string; name: string; slug?: string; requires_license: boolean }) => ({
       id: String(row.id),
       name: String(row.name),
+      slug: String(row.slug ?? ""),
       requiresLicense: Boolean(row.requires_license)
     }));
   },
