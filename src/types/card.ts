@@ -38,6 +38,15 @@ export interface DigitalCard {
   createdAt: string;
   updatedAt: string;
   organizationManaged?: boolean;
+  professionCategoryId?: string;
+  specialistTitle?: string;
+  specialistCity?: string;
+  specialistTags?: string[];
+  specialistExperience?: string;
+  specialistSummary?: string;
+  directoryHidden?: boolean;
+  directoryRemovedAt?: string | null;
+  directoryFeaturedUntil?: string | null;
 }
 
 export type CardDraft = Omit<
