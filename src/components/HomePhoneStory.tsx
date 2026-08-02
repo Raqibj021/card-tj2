@@ -1,9 +1,18 @@
-import { BadgeCheck, Building2, ContactRound, LayoutGrid, QrCode, Search, Share2, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { BadgeCheck, Building2, ContactRound, LayoutGrid, QrCode, Search, Share2, SmartphoneNfc, Sparkles } from "lucide-react";
+import { useEffect, useState, type CSSProperties } from "react";
 import CardPreview from "./CardPreview";
 import BrandLogo from "./BrandLogo";
 import { useApp } from "../context/AppContext";
 import type { DigitalCard } from "../types/card";
+
+const phoneCardDesigns = [
+  "vizora-tajikistan-building.webp",
+  "vizora-tajikistan-palace.webp",
+  "vizora-tajikistan-somoni.webp",
+  "vizora-tajikistan-arch.webp",
+  "vizora-tajikistan-hissar.webp",
+  "vizora-tajikistan-independence.webp"
+] as const;
 
 export default function HomePhoneStory({ card }: { card: DigitalCard }) {
   const { language } = useApp();
@@ -101,6 +110,15 @@ export default function HomePhoneStory({ card }: { card: DigitalCard }) {
             <div className="phone-org-row"><b>KHURASON PRINT</b><small>24</small></div>
           </section>
         </div>
+      </div>
+      <div className="home-hero-card-deck" aria-hidden="true">
+        {phoneCardDesigns.map((image, index) => (
+          <div className="home-hero-nfc-card" style={{ "--phone-card-index": index } as CSSProperties} key={image}>
+            <img className="home-hero-nfc-bg" src={`${import.meta.env.BASE_URL}images/cards/${image}`} alt="" />
+            <img className="home-hero-nfc-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="" />
+            <span><SmartphoneNfc size={17} /><small>NFC</small></span>
+          </div>
+        ))}
       </div>
       <div className={`floating-chip floating-chip-top${scene === 1 ? " is-highlighted" : ""}`}>
         <QrCode size={19} />
