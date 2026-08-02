@@ -562,3 +562,59 @@
   .about-layered-card,
   .about-layered-signal { animation: none !important; }
 }
+
+.about-card-deck-motion { position: absolute; inset: 0; transform-style: preserve-3d; }
+
+@media (min-width: 681px) {
+  .about-hero-card-stack.is-desktop {
+    --pointer-x: 0;
+    --pointer-y: 0;
+    cursor: crosshair;
+  }
+  .about-hero-card-stack.is-desktop .about-card-deck-motion {
+    transform: rotateX(calc(var(--pointer-y) * -5deg)) rotateY(calc(var(--pointer-x) * 8deg));
+    transition: transform 180ms cubic-bezier(.2,.8,.2,1);
+  }
+  .about-hero-card-stack.is-desktop .about-nfc-card {
+    opacity: 1;
+    animation: about-card-fan-wave 10s cubic-bezier(.45, 0, .18, 1) infinite;
+    animation-delay: calc(var(--card-index) * -180ms);
+    will-change: transform;
+  }
+  .about-hero-card-stack.is-desktop:hover .about-nfc-card {
+    border-color: rgba(82, 157, 219, .48);
+    box-shadow: 0 30px 66px rgba(5, 34, 77, .27);
+  }
+  @supports (animation-timeline: view()) {
+    .about-hero-card-stack.is-desktop .about-card-deck-motion {
+      animation: about-card-scroll-perspective linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 85%;
+    }
+  }
+}
+
+@keyframes about-card-fan-wave {
+  0%, 100% {
+    z-index: calc(10 - var(--card-index));
+    transform: translate3d(calc(-50% + var(--card-index) * 3px), calc(-50% + var(--card-index) * 8px), calc(var(--card-index) * -7px)) rotateZ(calc(-7deg + var(--card-index) * 2.2deg)) rotateY(calc(-4deg + var(--card-index) * 1.3deg)) scale(calc(1 - var(--card-index) * .018));
+  }
+  32% {
+    z-index: calc(10 - var(--card-index));
+    transform: translate3d(calc(-69% + var(--card-index) * 18px), calc(-67% + var(--card-index) * 23px), calc(var(--card-index) * 4px)) rotateZ(calc(-17deg + var(--card-index) * 6deg)) rotateY(calc(-12deg + var(--card-index) * 4deg)) scale(.9);
+  }
+  52% {
+    z-index: calc(10 - var(--card-index));
+    transform: translate3d(calc(-65% + var(--card-index) * 17px), calc(-72% + var(--card-index) * 20px - 10px), calc(var(--card-index) * 7px)) rotateZ(calc(-15deg + var(--card-index) * 5.5deg)) rotateY(calc(-10deg + var(--card-index) * 3.6deg)) scale(.92);
+  }
+  76% {
+    z-index: calc(10 - var(--card-index));
+    transform: translate3d(calc(-58% + var(--card-index) * 10px), calc(-57% + var(--card-index) * 13px), calc(var(--card-index) * 2px)) rotateZ(calc(-10deg + var(--card-index) * 3.4deg)) rotateY(calc(-7deg + var(--card-index) * 2.1deg)) scale(.96);
+  }
+}
+
+@keyframes about-card-scroll-perspective {
+  from { translate: 0 22px; rotate: 0 -5deg; }
+  48% { translate: 0 0; rotate: 0 0deg; }
+  to { translate: 0 -16px; rotate: 0 5deg; }
+}
