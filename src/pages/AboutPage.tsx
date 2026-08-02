@@ -695,13 +695,24 @@ function ContactGroup({ title, note, contacts, brand }: { title: string; note: s
 }
 
 function ContactNetwork() {
+  const [designOffset, setDesignOffset] = useState(0);
+
+  useEffect(() => {
+    const rotation = window.setInterval(() => {
+      setDesignOffset((current) => (current + 1) % heroCardDesigns.length);
+    }, 2800);
+
+    return () => window.clearInterval(rotation);
+  }, []);
+
   return (
     <div className="about-network-visual about-layered-cards" aria-hidden="true">
       <div className="about-layered-stage">
         {Array.from({ length: 14 }, (_, index) => (
           <span className="about-layered-card" key={index} style={{ "--layer": index } as CSSProperties}>
             <img
-              src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[index % heroCardDesigns.length].image}`}
+              key={`${index}-${designOffset}`}
+              src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[(index + designOffset) % heroCardDesigns.length].image}`}
               alt=""
               loading="lazy"
             />
