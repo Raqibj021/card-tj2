@@ -705,7 +705,7 @@ function ContactNetwork() {
 
     const rotation = window.setInterval(() => {
       setTopDesign((current) => (current + 1) % heroCardDesigns.length);
-    }, 4200);
+    }, 1500);
 
     return () => window.clearInterval(rotation);
   }, []);
@@ -714,7 +714,7 @@ function ContactNetwork() {
     <div className="about-network-visual about-layered-cards" aria-hidden="true">
       <div className="about-layered-stage">
         {Array.from({ length: 14 }, (_, index) => {
-          const isTopCard = index === 13;
+          const isTopCard = index === 0;
           return (
             <span className={`about-layered-card${isTopCard ? " is-top-card" : ""}`} key={index} style={{ "--layer": index } as CSSProperties}>
               {isTopCard ? (
@@ -727,7 +727,7 @@ function ContactNetwork() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 1.15, ease: "easeInOut" }}
+                    transition={{ duration: 0.65, ease: "easeInOut" }}
                   />
                 </AnimatePresence>
               ) : (
