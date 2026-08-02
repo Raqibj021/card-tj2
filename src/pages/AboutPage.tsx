@@ -382,6 +382,15 @@ export default function AboutPage() {
               <span className="about-kicker"><Sparkles size={15} />{text.heroLabel}</span>
               <h1 id="about-founder-title">{text.heroTitle}</h1>
               <p className="about-founder-role"><BadgeCheck size={19} />{text.heroRole}</p>
+            </motion.div>
+
+            <motion.div
+              className="about-hero-details"
+              initial={reduceMotion ? false : "hidden"}
+              animate="visible"
+              variants={revealVariants}
+              transition={{ delay: 0.08 }}
+            >
               <p className="about-hero-lead">{text.heroText}</p>
               <a href="#about-story" className="button button-primary button-large about-hero-action">
                 {text.heroAction}<ArrowDown size={18} />
@@ -409,17 +418,8 @@ export default function AboutPage() {
                 loading="eager"
                 fetchPriority="high"
               />
-              <motion.div className="about-float about-float-qr" animate={reduceMotion ? undefined : { y: [0, -8, 0] }} transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut" }}>
-                <QRCodeImage value={publicSiteUrl("/about")} size={72} />
-                <div><strong>{text.digitalIdentity}</strong><span>{text.qrReady}</span></div>
-              </motion.div>
-              <motion.div className="about-float about-float-nfc" animate={reduceMotion ? undefined : { y: [0, 7, 0], rotate: [0, 1.5, 0] }} transition={{ duration: 6.4, repeat: Infinity, ease: "easeInOut" }}>
-                <SmartphoneNfc size={24} /><span>{text.nfcReady}</span>
-              </motion.div>
-              <motion.div className="about-float about-float-language" animate={reduceMotion ? undefined : { x: [0, 5, 0] }} transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}>
-                <Globe2 size={19} /><span>{text.languagesShort}</span>
-              </motion.div>
             </motion.div>
+            <HeroNfcCards />
           </div>
         </section>
 
@@ -477,8 +477,13 @@ export default function AboutPage() {
               </div>
               <div className="about-audience-row">
                 <strong><UsersRound size={17} />{text.audienceLabel}</strong>
-                <div className="about-audience-tags">
-                  {text.audiences.map((audience) => <span key={audience}>{audience}</span>)}
+                <div className="about-audience-marquee">
+                  <div className="about-audience-tags">
+                    {[...text.audiences, ...text.audiences].map((audience, index) => {
+                      const duplicate = index >= text.audiences.length;
+                      return <span className={duplicate ? "about-audience-tag-copy" : ""} aria-hidden={duplicate || undefined} key={`${audience}-${index}`}>{audience}</span>;
+                    })}
+                  </div>
                 </div>
               </div>
             </Reveal>
@@ -635,6 +640,23 @@ function HeroPattern() {
           <rect x="1445" y="509" width="16" height="16" rx="5" />
         </g>
       </svg>
+    </div>
+  );
+}
+
+function HeroNfcCards() {
+  return (
+    <div className="about-hero-card-stack" aria-hidden="true">
+      <div className="about-nfc-card about-nfc-card-dark">
+        <BrandLogo light className="about-card-logo" />
+        <div className="about-card-contactless"><SmartphoneNfc size={27} /><span>NFC</span></div>
+        <div className="about-card-footer"><strong>VIZORA ID</strong><small>Tap to connect</small></div>
+      </div>
+      <div className="about-nfc-card about-nfc-card-light">
+        <BrandLogo compact className="about-card-mark" />
+        <QRCodeImage value={publicSiteUrl("/create")} size={82} />
+        <div className="about-card-meta"><strong>VIZORA.TJ</strong><span>QR · NFC</span></div>
+      </div>
     </div>
   );
 }
