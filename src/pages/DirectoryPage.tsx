@@ -15,7 +15,7 @@ import {
   Wrench
 } from "lucide-react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
@@ -141,19 +141,16 @@ export default function DirectoryPage() {
     <>
       <main>
         <section className="directory-hero">
-          <div className="site-container directory-hero-layout">
-            <div className="directory-hero-copy">
-              <span className="section-label">{copy.label}</span>
-              <h1>{copy.title}</h1>
-              <p>{copy.text}</p>
-              <form className="directory-search" onSubmit={(event) => event.preventDefault()}>
-                <Search size={21} />
-                <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={copy.search} placeholder={copy.placeholder} />
-                <span><MapPin size={17} /> {language === "en" ? "Dushanbe" : "Душанбе"}</span>
-                <button type="submit" className="button button-primary">{copy.find}</button>
-              </form>
-            </div>
-            <DirectoryCardFlow />
+          <div className="site-container py-16 text-center md:py-24">
+            <span className="section-label">{copy.label}</span>
+            <h1>{copy.title}</h1>
+            <p>{copy.text}</p>
+            <form className="directory-search" onSubmit={(event) => event.preventDefault()}>
+              <Search size={21} />
+              <input value={query} onChange={(event) => setQuery(event.target.value)} aria-label={copy.search} placeholder={copy.placeholder} />
+              <span><MapPin size={17} /> {language === "en" ? "Dushanbe" : "Душанбе"}</span>
+              <button type="submit" className="button button-primary">{copy.find}</button>
+            </form>
           </div>
         </section>
 
@@ -267,27 +264,5 @@ export default function DirectoryPage() {
       </div>}
       <Footer />
     </>
-  );
-}
-
-function DirectoryCardFlow() {
-  const cards = [
-    "vizora-tajikistan-building.webp",
-    "vizora-tajikistan-palace.webp",
-    "vizora-tajikistan-somoni.webp",
-    "vizora-tajikistan-arch.webp",
-    "vizora-tajikistan-hissar.webp",
-    "vizora-tajikistan-independence.webp"
-  ];
-  return (
-    <div className="directory-card-flow" aria-hidden="true">
-      <div className="directory-layered-stage">
-        {cards.map((image, index) => (
-          <i className="directory-layered-card" key={image} style={{ "--layer": index } as CSSProperties}>
-            <img src={`${import.meta.env.BASE_URL}images/cards/${image}`} alt="" />
-          </i>
-        ))}
-      </div>
-    </div>
   );
 }
