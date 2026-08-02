@@ -525,8 +525,9 @@
 .about-layered-card > img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; border-radius: calc(17px - 2px); object-fit: cover; }
 .about-layered-card:nth-child(3n),
 .about-layered-card:nth-child(4n) { border-color: #082f67; }
-.about-layered-card .about-top-card-outgoing { z-index: 1; animation: about-top-card-out .95s ease-in-out both; }
-.about-layered-card .about-top-card-incoming { z-index: 2; animation: about-top-card-in .95s ease-in-out both; }
+.about-layered-card > .about-top-card-image { z-index: 2; }
+.about-layered-card > .about-layered-card-logo { z-index: 4; top: 12px; right: auto; bottom: auto; left: 13px; width: 102px; height: auto; border-radius: 0; object-fit: contain; }
+.about-layered-card-nfc { position: absolute; z-index: 4; bottom: 11px; left: 14px; display: inline-flex; align-items: center; gap: 4px; color: #071c3e; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
 
 .about-layered-brand { width: 82px; opacity: .82; filter: drop-shadow(0 8px 15px rgba(23, 111, 242, .2)); }
 .about-layered-brand .vizora-brand-mark { width: 72px; height: auto; }
@@ -539,25 +540,23 @@
   0%, 100% { opacity: 1; transform: rotateX(61deg) rotateZ(-31deg) translate3d(0, 0, calc(var(--layer) * 3px)); }
   48% { opacity: 1; transform: rotateX(57deg) rotateZ(-29deg) translate3d(4px, -11px, calc(var(--layer) * 5px)); }
 }
-@keyframes about-top-card-in { from { opacity: 0; filter: saturate(.92); } to { opacity: 1; filter: none; } }
-@keyframes about-top-card-out { from { opacity: 1; } to { opacity: 0; } }
 @keyframes about-signal-float { 50% { transform: translate3d(0, -9px, 0); } }
 
 @media (max-width: 680px) {
   .about-page { display: block; min-height: 100vh; visibility: visible; }
   .about-network-card { display: block !important; width: min(100%, 390px); min-height: 270px; margin-inline: auto; justify-self: center; visibility: visible; }
   .about-network-visual.about-layered-cards { inset: 0 0 48px; display: grid; place-items: center; }
-  .about-layered-stage { width: 310px; height: 190px; transform: translateY(-2px) scale(.68); transform-origin: center; }
+  .about-layered-stage { width: 310px; height: 190px; transform: translateY(-52px) scale(.62); transform-origin: center; }
   .about-layered-signal { width: 29px; height: 29px; border-radius: 9px; }
   .about-layered-signal svg { width: 14px; height: 14px; }
   .about-layered-signal.signal-one { top: 2%; left: 7%; }
   .about-layered-signal.signal-two { top: 13%; right: 5%; }
   .about-layered-signal.signal-three { right: 13%; bottom: 7%; }
-  .about-network-meta { bottom: 5px; z-index: 30; }
+  .about-network-meta { bottom: 10px; z-index: 30; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .about-layered-card,
   .about-layered-signal { animation: none !important; }
 }
-/* Production refresh: isolated top-card crossfade. */
+/* Production refresh: branded top-card carousel. */
