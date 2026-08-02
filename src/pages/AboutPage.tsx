@@ -700,9 +700,11 @@ function ContactNetwork() {
       <div className="about-layered-stage">
         {Array.from({ length: 14 }, (_, index) => (
           <span className="about-layered-card" key={index} style={{ "--layer": index } as CSSProperties}>
-            {index === 8 && <span className="about-layered-brand"><BrandLogo compact /></span>}
-            {index === 10 && <QrCode size={18} />}
-            {index === 5 && <SmartphoneNfc size={18} />}
+            <img
+              src={`${import.meta.env.BASE_URL}images/cards/${heroCardDesigns[index % heroCardDesigns.length].image}`}
+              alt=""
+              loading="lazy"
+            />
           </span>
         ))}
       </div>
