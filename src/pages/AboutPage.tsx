@@ -30,7 +30,7 @@ import {
   type LucideIcon
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import QRCodeImage from "../components/QRCode";
@@ -655,33 +655,19 @@ const heroCardDesigns = [
 ] as const;
 
 function HeroNfcCards({ className = "" }: { className?: string }) {
-  const moveDeck = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!className.includes("is-desktop")) return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width - .5) * 2;
-    const y = ((event.clientY - bounds.top) / bounds.height - .5) * 2;
-    event.currentTarget.style.setProperty("--pointer-x", x.toFixed(3));
-    event.currentTarget.style.setProperty("--pointer-y", y.toFixed(3));
-  };
-  const resetDeck = (event: ReactPointerEvent<HTMLDivElement>) => {
-    event.currentTarget.style.setProperty("--pointer-x", "0");
-    event.currentTarget.style.setProperty("--pointer-y", "0");
-  };
   return (
-    <div className={`about-hero-card-stack ${className}`} aria-hidden="true" onPointerMove={moveDeck} onPointerLeave={resetDeck}>
-      <div className="about-card-deck-motion">
-        {heroCardDesigns.map((card, index) => (
-          <div
-            className="about-nfc-card"
-            style={{ "--card-index": index } as CSSProperties}
-            key={card.name}
-          >
-            <img className="about-card-bg" src={`${import.meta.env.BASE_URL}images/cards/${card.image}`} alt="" />
-            <img className="about-card-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="VIZORA.TJ" />
-            <div className="about-card-contactless"><SmartphoneNfc size={25} /><span>NFC</span></div>
-          </div>
-        ))}
-      </div>
+    <div className={`about-hero-card-stack ${className}`} aria-hidden="true">
+      {heroCardDesigns.map((card, index) => (
+        <div
+          className="about-nfc-card"
+          style={{ "--card-index": index } as CSSProperties}
+          key={card.name}
+        >
+          <img className="about-card-bg" src={`${import.meta.env.BASE_URL}images/cards/${card.image}`} alt="" />
+          <img className="about-card-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="VIZORA.TJ" />
+          <div className="about-card-contactless"><SmartphoneNfc size={25} /><span>NFC</span></div>
+        </div>
+      ))}
     </div>
   );
 }
