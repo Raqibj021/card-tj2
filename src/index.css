@@ -8428,6 +8428,75 @@ body,
 .specialist-already-state > div { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 @media (max-width: 700px) { .specialist-plan-grid { grid-template-columns: 1fr; } .specialist-plan-card { min-height: 0; } }
 
+/* Mobile-first compact forms and readable organization structure */
+.org-workspace-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 700px) {
+  .platform-modal { place-items: center; padding: 8px; }
+  .platform-modal-card { width: 100%; max-height: calc(100dvh - 16px); overflow-y: auto; border-radius: 18px; padding: 14px; }
+  .modal-head { margin-bottom: 13px; }
+  .modal-head h2 { font-size: 21px; }
+  .platform-form { gap: 11px; }
+  .form-grid { gap: 9px; }
+  .platform-form label > span, .platform-form legend { font-size: 10px; }
+  .platform-form input, .platform-form select, .platform-form textarea { min-height: 40px; padding: 9px 10px; font-size: 12px; }
+  .plan-radio-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .plan-radio-grid label span { min-height: 58px; padding: 8px 5px; font-size: 9px; line-height: 1.35; text-align: center; }
+  .application-panel { padding: 17px 14px; }
+  .application-panel h1 { font-size: 28px; }
+  .application-aside { padding: 16px 14px; }
+  .application-aside ol { gap: 8px; }
+  .org-workspace-head { align-items: stretch; flex-direction: column; gap: 10px; }
+  .org-workspace-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .org-workspace-actions .button { min-height: 38px; justify-content: center; padding: 7px 8px; font-size: 9px; line-height: 1.25; text-align: center; }
+  .org-workspace-actions .button:first-child { grid-column: 1 / -1; }
+  .org-workspace-brand { min-width: 0; }
+  .org-workspace-brand > span { width: 42px; height: 42px; flex: 0 0 auto; }
+  .org-workspace-brand > div { min-width: 0; }
+  .org-workspace-brand h1, .org-switcher { max-width: 100%; font-size: 17px; white-space: normal; overflow-wrap: anywhere; }
+  .org-workspace-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin: 14px 0; }
+  .org-workspace-stats article { min-width: 0; gap: 8px; border-radius: 12px; padding: 10px; }
+  .org-workspace-stats strong { font-size: 14px; }
+  .org-workspace-grid { gap: 10px; }
+  .org-sidebar { border-radius: 14px; padding: 9px; }
+  .org-sidebar > strong { padding: 7px; font-size: 10px; }
+  .org-sidebar button, .org-sidebar a { min-height: 38px; padding: 7px 8px; font-size: 12px; line-height: 1.35; }
+  .org-structure-sidebar { max-height: none; overflow: visible; }
+  .org-structure-tree, .org-structure-children { gap: 6px; }
+  .org-structure-children { margin-left: 10px; padding-left: 6px; }
+  .org-structure-row { align-items: start; }
+  .org-structure-select { min-height: 40px !important; align-items: flex-start !important; }
+  .org-structure-select span { overflow: visible; font-size: 12px; line-height: 1.35; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+  .org-structure-select b { flex: 0 0 auto; font-size: 10px; }
+  .org-structure-actions { padding-top: 4px; opacity: 1; }
+  .org-content-panel { border-radius: 14px; }
+  .org-content-head { align-items: stretch; flex-direction: column; gap: 9px; padding: 13px; }
+  .org-content-head h2 { font-size: 17px; }
+  .org-content-head p { font-size: 11px; line-height: 1.45; }
+  .org-search { width: 100%; }
+  .org-qr-panel { grid-template-columns: 92px minmax(0, 1fr); gap: 12px; margin-top: 12px; border-radius: 15px; padding: 12px; }
+  .org-qr-preview { width: 92px; height: 92px; border-radius: 12px; padding: 7px; }
+  .org-qr-preview img { width: 78px; height: 78px; }
+  .org-qr-panel h2 { font-size: 17px; }
+  .org-qr-panel p { margin-bottom: 9px; font-size: 9px; line-height: 1.4; }
+  .org-qr-panel .button { min-height: 34px; padding: 7px 9px; font-size: 8px; }
+  .org-public-contacts > span > span,
+  .org-public-overview header small,
+  .org-public-employee-body h3,
+  .org-public-employee-body p,
+  .org-public-employee footer > span { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+  .org-card-main strong { font-size: 12px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
+  .org-tree div { min-height: 42px; }
+  .org-tree span { font-size: 11px; white-space: normal; }
+  .org-pricing-grid { display: flex; gap: 9px; margin-inline: -14px; overflow-x: auto; padding: 2px 14px 12px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .org-pricing-grid::-webkit-scrollbar { display: none; }
+  .org-plan { flex: 0 0 min(76vw, 280px); min-height: 0; border-radius: 16px; padding: 15px 13px; scroll-snap-align: center; }
+  .org-plan h3 { font-size: 18px; }
+  .org-plan > div strong { font-size: 30px; }
+  .org-plan ul { gap: 6px; margin: 12px 0; padding: 11px 0; }
+  .org-plan li { font-size: 10px; }
+}
+
+
 
 /* Category explorer: every profession opens as a complete branded destination. */
 .category-explorer-backdrop { position: fixed; z-index: 119; inset: 0; display: grid; overflow-y: auto; place-items: center; background: rgba(5,14,27,.72); padding: 28px; backdrop-filter: blur(9px); }

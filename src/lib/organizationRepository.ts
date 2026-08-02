@@ -79,7 +79,7 @@ const mapOrganization = (row: Record<string, unknown>): OrganizationApplication 
 };
 
 export const organizationRepository = {
-  createApplication: async (data: { name: string; type: string; contactName: string; contactPosition: string; phone: string; email: string; planCode: string; }) => {
+  createApplication: async (data: { name: string; type: string; contactName: string; contactPosition: string; phone: string; email: string; planCode: string; createNew?: boolean; }) => {
     if (!supabase) throw new Error("Сервер временно недоступен.");
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
@@ -87,7 +87,7 @@ export const organizationRepository = {
     const { data: created, error } = await supabase.rpc("submit_organization_application", {
       organization_name: data.name.trim(), organization_type: data.type.trim(),
       contact_name: data.contactName.trim(), contact_position: data.contactPosition.trim(),
-      contact_phone: data.phone.trim(), contact_email: data.email.trim(),
+      contact_phone: data.phone.trim(), contact_email: data.email.trim(), create_new: Boolean(data.createNew),
       selected_plan: data.planCode, requested_slug: baseSlug
     });
     if (error) throw new Error(error.message || "Не удалось сохранить заявку.");
@@ -155,6 +155,8 @@ export const organizationRepository = {
         .from("organizations")
         .select("*")
         .eq("owner_id", auth.user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
         .maybeSingle(),
       "Сервер слишком долго загружает заявку организации."
     );
