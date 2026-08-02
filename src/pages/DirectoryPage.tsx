@@ -14,7 +14,7 @@ import {
   Stethoscope,
   Wrench
 } from "lucide-react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
@@ -28,6 +28,7 @@ export default function DirectoryPage() {
   const { language } = useApp();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [profiles, setProfiles] = useState<DirectoryProfile[]>([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -38,6 +39,8 @@ export default function DirectoryPage() {
   const [publishMessage, setPublishMessage] = useState("");
   const [publishBusy, setPublishBusy] = useState(false);
   const [documents, setDocuments] = useState<File[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<"" | "specialist" | "pro">("");
+  const [portfolio, setPortfolio] = useState<File[]>([]);
   const copy = {
     ru: { label: "Проверенный каталог", title: "Найдите нужного специалиста", text: "Настоящие люди и организации с подтверждёнными данными", search: "Поиск", placeholder: "Профессия, услуга или имя", find: "Найти", categories: "Категории", all: "Все специалисты в одном месте", verifiedOnly: "Публикация только после проверки", profiles: "профилей", newProfiles: "Новые профили", verified: "Проверенные специалисты", publish: "Добавить мою визитку", publishHint: "Уже есть визитка? Добавьте к ней профессию, город и услуги", checked: "Проверено Vizora", open: "Открыть визитку", modalTitle: "Визитка специалиста", modalText: "Основные контакты берутся из вашей визитки. Заполните только профессиональную информацию.", chooseCard: "Ваша визитка", chooseCategory: "Категория", specialty: "Специальность", city: "Город", tags: "Услуги и теги", tagsHint: "Например: письменный перевод, английский, нотариальное заверение", experience: "Опыт", experienceHint: "Например: 8 лет", summary: "О профессиональной деятельности", summaryHint: "Коротко расскажите, чем вы полезны клиенту", proof: "Подтверждающий документ", proofHint: "Обязателен для лицензируемых профессий. Видит только модератор.", add: "Отправить на проверку", cancel: "Отмена", noCard: "Сначала создайте личную визитку", success: "Заявка отправлена. После проверки визитка станет доступна всем в выбранной категории.", categoryNames: ["Врачи и клиники", "Юристы", "Переводчики", "Преподаватели", "Ремонт и мастера", "Фото и дизайн", "Компании", "Другие специалисты"], roles: ["Переводчик английского языка", "Преподаватель математики", "Специалист по ремонту техники"] },
     tj: { label: "Феҳристи тасдиқшуда", title: "Мутахассиси лозимиро ёбед", text: "Шахсон ва ташкилотҳои воқеӣ бо маълумоти тасдиқшуда", search: "Ҷустуҷӯ", placeholder: "Касб, хизмат ё ном", find: "Ёфтан", categories: "Категорияҳо", all: "Ҳамаи мутахассисон дар як ҷой", verifiedOnly: "Нашр танҳо пас аз санҷиш", profiles: "профил", newProfiles: "Профилҳои нав", verified: "Мутахассисони тасдиқшуда", publish: "Ҷойгир кардани профил", checked: "Аз ҷониби Vizora тасдиқ шудааст", open: "Кушодани варақа", categoryNames: ["Табибон ва клиникаҳо", "Ҳуқуқшиносон", "Тарҷумонҳо", "Омӯзгорон", "Таъмир ва устоҳо", "Акс ва дизайн", "Ширкатҳо", "Дигар мутахассисон"], roles: ["Тарҷумони забони англисӣ", "Омӯзгори математика", "Мутахассиси таъмири техника"] },
@@ -48,14 +51,22 @@ export default function DirectoryPage() {
     tj: { hint: "Варақа доред? Касб, шаҳр ва хизматҳоро илова кунед", modalTitle: "Варақаи мутахассис", modalText: "Тамосҳо аз варақаи шумо гирифта мешаванд. Танҳо маълумоти касбиро пур кунед.", chooseCard: "Варақаи шумо", chooseCategory: "Категория", specialty: "Ихтисос", city: "Шаҳр", tags: "Хизматҳо ва барчаспҳо", tagsHint: "Масалан: тарҷумаи хаттӣ, англисӣ, тасдиқи нотариалӣ", experience: "Таҷриба", experienceHint: "Масалан: 8 сол", summary: "Дар бораи фаъолияти касбӣ", summaryHint: "Кӯтоҳ нависед, ки ба муштарӣ чӣ фоида мерасонед", proof: "Ҳуҷҷати тасдиқкунанда", proofHint: "Барои касбҳои иҷозатномадор ҳатмист. Танҳо модератор мебинад.", add: "Ба санҷиш фиристодан", cancel: "Бекор кардан", noCard: "Аввал варақаи шахсӣ созед", success: "Дархост фиристода шуд. Пас аз санҷиш варақа барои ҳама дастрас мешавад.", manage: "Идоракунии профили мутахассис", visible: "Профил барои ҳама дастрас аст", hidden: "Профил муваққатан пинҳон аст", removed: "Профил аз мутахассисон пурра нест карда шуд", hide: "Пинҳон кардан", show: "Боз нишон додан", remove: "Пурра нест кардан", removeConfirm: "Профилро аз «Мутахассисон» пурра нест мекунед? Варақаи шахсӣ нигоҳ дошта мешавад.", top: "Ба TOP баровардан", topBadge: "TOP" },
     en: { hint: "Already have a card? Add your profession, city and services", modalTitle: "Professional business card", modalText: "Contact details come from your existing card. Complete only the professional information.", chooseCard: "Your business card", chooseCategory: "Category", specialty: "Specialty", city: "City", tags: "Services and tags", tagsHint: "For example: written translation, English, notarisation", experience: "Experience", experienceHint: "For example: 8 years", summary: "Professional summary", summaryHint: "Briefly explain how you help clients", proof: "Supporting document", proofHint: "Required for licensed professions. Visible only to moderators.", add: "Submit for review", cancel: "Cancel", noCard: "Create a personal card first", success: "Submitted. Once approved, the card will be public in the selected category.", manage: "Manage specialist profile", visible: "Profile is visible to everyone", hidden: "Profile is temporarily hidden", removed: "Profile was permanently removed from Professionals", hide: "Hide", show: "Show again", remove: "Remove permanently", removeConfirm: "Permanently remove this profile from Professionals? Your personal card will remain.", top: "Move to TOP", topBadge: "TOP" }
   }[language];
+  const planCopy = language === "tj" ? {
+    choose: "Тарофаи мутахассисро интихоб кунед", chooseText: "Аввал тарофаро интихоб кунед, сипас шакли мувофиқ кушода мешавад.", verified: "Мутахассиси тасдиқшуда", pro: "Мутахассиси PRO", perYear: "сомонӣ / сол", back: "Бозгашт ба тарофаҳо", serviceArea: "Минтақаи кор", consultation: "Намуди машварат", portfolio: "Портфолио (то 20 акс)", alreadyVerified: "Шумо аллакай ҳамчун мутахассиси тасдиқшуда дар феҳрист ҳастед.", alreadyPro: "Профили Мутахассиси PRO-и шумо аллакай фаъол аст.", home: "Ба саҳифаи асосӣ", features: [["Нашр дар феҳрист", "Санҷиши ҳуҷҷатҳо", "Хизматҳо ва таҷриба"], ["Ҷойи афзалиятнок", "То 20 акси портфолио", "Минтақаи кор ва машварат", "Ороиши васеъ"]]
+  } : language === "en" ? {
+    choose: "Choose a specialist plan", chooseText: "Choose a plan first, then complete the matching form.", verified: "Verified specialist", pro: "Specialist PRO", perYear: "somoni / year", back: "Back to plans", serviceArea: "Service area", consultation: "Consultation format", portfolio: "Portfolio (up to 20 photos)", alreadyVerified: "You are already listed as a verified specialist.", alreadyPro: "Your Specialist PRO profile is already active.", home: "Home", features: [["Directory publication", "Document verification", "Services and experience"], ["Priority placement", "Up to 20 portfolio photos", "Service area and consultations", "Enhanced presentation"]]
+  } : {
+    choose: "Выберите тариф специалиста", chooseText: "Сначала выберите тариф, затем заполните соответствующую ему форму.", verified: "Проверенный специалист", pro: "Специалист PRO", perYear: "сомони / год", back: "Назад к тарифам", serviceArea: "География работы", consultation: "Формат консультаций", portfolio: "Портфолио (до 20 фотографий)", alreadyVerified: "Вы уже находитесь в каталоге как проверенный специалист.", alreadyPro: "У вас уже активирован профиль Специалист PRO.", home: "На главную", features: [["Публикация в каталоге", "Проверка документов", "Услуги, теги и опыт"], ["Приоритетное место в каталоге", "До 20 фотографий портфолио", "География работы и консультации", "Расширенное оформление"]]
+  };
   const icons = [Stethoscope, Scale, Languages, GraduationCap, Wrench, Camera, Building2, BriefcaseBusiness];
   const categories = copy.categoryNames.map((name, index) => ({ name, icon: icons[index] }));
   useEffect(() => {
     void directoryRepository.list().then(setProfiles);
   }, []);
-  async function openPublisher() {
-    if (!user) { navigate("/login?redirect=/directory"); return; }
+  async function openPublisher(plan: "" | "specialist" | "pro" = "") {
+    if (!user) { navigate(`/login?redirect=${encodeURIComponent(`/directory${plan ? `?publish=${plan}` : ""}`)}`); return; }
     setPublishOpen(true);
+    setSelectedPlan(plan);
     setPublishMessage("");
     const [cards, availableCategories] = await Promise.all([
       cardRepository.listRemote(),
@@ -66,6 +77,12 @@ export default function DirectoryPage() {
     setSelectedCardId(ownCards[0]?.id ?? "");
     setProfessionCategories(availableCategories);
   }
+  useEffect(() => {
+    const requested = searchParams.get("publish");
+    if (requested === "specialist" || requested === "pro") void openPublisher(requested);
+  // Query-controlled modal intentionally opens once after authentication.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
   async function submitSpecialist(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -82,9 +99,10 @@ export default function DirectoryPage() {
         cardId: String(form.get("cardId") ?? ""), categoryId,
         title: String(form.get("title") ?? ""), city: String(form.get("city") ?? ""),
         tags: String(form.get("tags") ?? "").split(/[,;]+/),
-        experience: String(form.get("experience") ?? ""), summary: String(form.get("summary") ?? ""), files: documents
+        experience: String(form.get("experience") ?? ""), summary: String(form.get("summary") ?? ""), files: documents,
+        plan: selectedPlan || "specialist", serviceArea: String(form.get("serviceArea") ?? ""), consultation: String(form.get("consultation") ?? ""), portfolio
       });
-      setPublishMessage(publishCopy.success);
+      navigate(`/payment?plan=${selectedPlan || "specialist"}`);
     } catch (error) {
       setPublishMessage(error instanceof Error ? error.message : "Ошибка отправки");
     } finally { setPublishBusy(false); }
@@ -181,7 +199,11 @@ export default function DirectoryPage() {
       {publishOpen && <div className="directory-publish-backdrop" role="presentation" onMouseDown={() => setPublishOpen(false)}>
         <section className="directory-publish-modal" role="dialog" aria-modal="true" aria-labelledby="directory-publish-title" onMouseDown={(event) => event.stopPropagation()}>
           <header><div><span className="section-label">VIZORA.TJ</span><h2 id="directory-publish-title">{publishCopy.modalTitle}</h2><p>{publishCopy.modalText}</p></div><button type="button" onClick={() => setPublishOpen(false)} aria-label={publishCopy.cancel}>×</button></header>
-          {!myCards.length ? <div className="empty-state"><FileCheck2 size={27} /><h3>{publishCopy.noCard}</h3><Link to="/create" className="button button-primary">{publishCopy.noCard}</Link></div> : <form className="directory-specialist-form" onSubmit={(event) => void submitSpecialist(event)}>
+          {!myCards.length ? <div className="empty-state"><FileCheck2 size={27} /><h3>{publishCopy.noCard}</h3><Link to="/create?plan=personal" className="button button-primary">{publishCopy.noCard}</Link></div> : !selectedPlan ? <div className="specialist-plan-step">
+            <div className="specialist-plan-intro"><h3>{planCopy.choose}</h3><p>{planCopy.chooseText}</p></div>
+            <div className="specialist-plan-grid">{(["specialist", "pro"] as const).map((plan, index) => <article className={plan === "pro" ? "specialist-plan-card pro" : "specialist-plan-card"} key={plan}><span>{plan === "pro" ? "PRO" : "VIZORA VERIFIED"}</span><h3>{plan === "pro" ? planCopy.pro : planCopy.verified}</h3><div className="specialist-plan-price"><strong>{plan === "pro" ? "100" : "50"}</strong> {planCopy.perYear}</div><ul>{planCopy.features[index].map((feature) => <li key={feature}><BadgeCheck size={17} />{feature}</li>)}</ul><button type="button" className="button button-primary" onClick={() => setSelectedPlan(plan)}>{plan === "pro" ? planCopy.pro : planCopy.verified}<ChevronRight size={17} /></button></article>)}</div>
+          </div> : selectedCard?.specialistSummary && selectedCard.specialistPlan === selectedPlan && !selectedCard.directoryRemovedAt ? <div className="specialist-already-state"><BadgeCheck size={42} /><h3>{selectedPlan === "pro" ? planCopy.alreadyPro : planCopy.alreadyVerified}</h3><div><Link to="/" className="button button-primary">{planCopy.home}</Link><button type="button" className="button button-secondary" onClick={() => setSelectedPlan("")}>{planCopy.back}</button></div></div> : <form className="directory-specialist-form" onSubmit={(event) => void submitSpecialist(event)}>
+            <button type="button" className="specialist-plan-back" onClick={() => setSelectedPlan("")}><ChevronRight size={16} />{planCopy.back}</button>
             <label><span>{publishCopy.chooseCard}</span><select name="cardId" required value={selectedCardId} onChange={(event) => setSelectedCardId(event.target.value)}>{myCards.map((card) => <option key={card.id} value={card.id}>{card.fullName} — {card.position}</option>)}</select></label>
             <div className="directory-card-preview">{selectedCard?.photo ? <img src={selectedCard.photo} alt="" /> : <BadgeCheck size={28} />}<div><strong>{selectedCard?.fullName}</strong><span>{selectedCard?.position}</span><small>{selectedCard?.phone}</small></div></div>
             {(selectedCard?.specialistSummary || selectedCard?.directoryRemovedAt) && <div className="directory-profile-management"><div><strong>{publishCopy.manage}</strong><span>{selectedCard.directoryRemovedAt ? publishCopy.removed : selectedCard.directoryHidden ? publishCopy.hidden : publishCopy.visible}</span></div>{!selectedCard.directoryRemovedAt && <div className="directory-profile-actions"><button type="button" onClick={() => void manageSpecialist(selectedCard.directoryHidden ? "show" : "hide")} disabled={publishBusy}>{selectedCard.directoryHidden ? publishCopy.show : publishCopy.hide}</button><Link to="/payment?plan=pro">{publishCopy.top}</Link><button type="button" className="danger" onClick={() => void manageSpecialist("remove")} disabled={publishBusy}>{publishCopy.remove}</button></div>}</div>}
@@ -192,6 +214,11 @@ export default function DirectoryPage() {
               <label><span>{publishCopy.experience}</span><input name="experience" maxLength={80} placeholder={publishCopy.experienceHint} /></label>
               <label className="wide"><span>{publishCopy.tags}</span><input name="tags" required placeholder={publishCopy.tagsHint} /></label>
               <label className="wide"><span>{publishCopy.summary}</span><textarea name="summary" required maxLength={500} placeholder={publishCopy.summaryHint} /></label>
+              {selectedPlan === "pro" && <>
+                <label><span>{planCopy.serviceArea}</span><input name="serviceArea" required maxLength={140} placeholder={language === "ru" ? "Душанбе и онлайн по Таджикистану" : planCopy.serviceArea} /></label>
+                <label><span>{planCopy.consultation}</span><input name="consultation" required maxLength={140} placeholder={language === "ru" ? "Онлайн, в офисе или с выездом" : planCopy.consultation} /></label>
+                <label className="wide directory-proof"><span>{planCopy.portfolio}</span><input type="file" multiple accept="image/png,image/jpeg,image/webp" onChange={(event) => setPortfolio(Array.from(event.target.files ?? []).filter((file) => file.size <= 10 * 1024 * 1024).slice(0, 20))} /><small>{portfolio.length}/20</small></label>
+              </>}
               <label className="wide directory-proof"><span>{publishCopy.proof}</span><input type="file" multiple accept="image/png,image/jpeg,application/pdf" onChange={(event) => setDocuments(Array.from(event.target.files ?? []).filter((file) => file.size <= 10 * 1024 * 1024))} /><small>{publishCopy.proofHint}</small></label>
             </div>
             {publishMessage && <div className="auth-message">{publishMessage}</div>}
