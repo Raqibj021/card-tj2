@@ -88,6 +88,10 @@ class LocalStorageCardRepository implements CardRepository {
       ,directoryHidden: Boolean(row.directory_hidden)
       ,directoryRemovedAt: row.directory_removed_at ? String(row.directory_removed_at) : null
       ,directoryFeaturedUntil: row.directory_featured_until ? String(row.directory_featured_until) : null
+      ,specialistPlan: row.specialist_plan === "pro" ? "pro" : "specialist"
+      ,specialistServiceArea: String(row.specialist_service_area ?? "")
+      ,specialistConsultation: String(row.specialist_consultation ?? "")
+      ,specialistPortfolio: Array.isArray(row.specialist_portfolio) ? row.specialist_portfolio.map(String) : []
     };
   }
 
