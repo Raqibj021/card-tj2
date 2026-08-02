@@ -129,6 +129,13 @@ export default function DirectoryPage() {
     return matchesText && matchesCategory;
   }), [profiles, query, category]);
   const categorySlugs = ["medicine", "law", "translation", "education", "repair", "photo-design", "companies", "other"];
+  const selectedCategoryIndex = categorySlugs.indexOf(category);
+  const selectedCategoryProfiles = category ? profiles.filter((profile) => profile.categorySlug === category) : [];
+  const categoryDescriptions = language === "tj"
+    ? ["Табибон, клиникаҳо ва хизматрасониҳои тиббии тасдиқшуда.", "Ҳуқуқшиносон ва машваратҳои ҳуқуқӣ.", "Тарҷумонҳо ва хизматрасониҳои забонӣ.", "Омӯзгорон, мураббиён ва курсҳои таълимӣ.", "Устоҳо, таъмир ва хизматрасонии техникӣ.", "Суратгирон, дизайнерҳо ва мутахассисони эҷодӣ.", "Ширкатҳо ва хизматрасониҳои касбӣ.", "Дигар мутахассисони иҷозатшудаи платформа."]
+    : language === "en"
+      ? ["Verified doctors, clinics and medical services.", "Lawyers and professional legal advice.", "Translators and language services.", "Teachers, tutors and education providers.", "Repair experts and technical trades.", "Photographers, designers and creative professionals.", "Companies and professional services.", "Other permitted platform professionals."]
+      : ["Проверенные врачи, клиники и медицинские услуги.", "Юристы и профессиональная правовая помощь.", "Переводчики и профессиональные языковые услуги.", "Преподаватели, репетиторы и образовательные центры.", "Мастера по ремонту и техническому обслуживанию.", "Фотографы, дизайнеры и творческие специалисты.", "Компании и профессиональные услуги для бизнеса.", "Другие разрешённые специалисты платформы."];
   const selectedCard = myCards.find((card) => card.id === selectedCardId) ?? myCards[0];
   return (
     <>
@@ -163,7 +170,7 @@ export default function DirectoryPage() {
             </div>
             <div className="category-grid">
               {categories.map(({ name, icon: Icon }, index) => (
-                <button type="button" className={`category-card category-${categorySlugs[index]} ${category === categorySlugs[index] ? "active" : ""}`} key={name} onClick={() => setCategory((current) => current === categorySlugs[index] ? "" : categorySlugs[index])}>
+                <button type="button" className={`category-card category-${categorySlugs[index]} ${category === categorySlugs[index] ? "active" : ""}`} key={name} onClick={() => setCategory(categorySlugs[index])}>
                   <span><Icon size={21} /></span>
                   <strong>{name}</strong>
                   <small>{profiles.filter((profile) => profile.categorySlug === categorySlugs[index]).length} {copy.profiles}</small>
@@ -221,13 +228,38 @@ export default function DirectoryPage() {
               {selectedPlan === "pro" && <>
                 <label><span>{planCopy.serviceArea}</span><input name="serviceArea" required maxLength={140} placeholder={language === "ru" ? "Душанбе и онлайн по Таджикистану" : planCopy.serviceArea} /></label>
                 <label><span>{planCopy.consultation}</span><input name="consultation" required maxLength={140} placeholder={language === "ru" ? "Онлайн, в офисе или с выездом" : planCopy.consultation} /></label>
-                <label className="wide directory-proof"><span>{planCopy.portfolio}</span><input type="file" multiple accept="image/png,image/jpeg,image/webp" onChange={(event) => setPortfolio(Array.from(event.target.files ?? []).filter((file) => file.size <= 5 * 1024 * 1024).slice(0, 20))} /><small>{portfolio.length}/20 · максимум 5 МБ на фотографию</small></label>
+                <label className="wide directory-proof"><span>{planCopy.portfolio}</span><input type="file" multiple accept="image/png,image/jpeg,image/webp" onChange={(event) => setPortfolio(Array.from(event.target.files ?? []).slice(0, 20))} /><small>{portfolio.length}/20 · сайт автоматически уменьшит вес фотографий без заметной потери качества</small></label>
               </>}
               <label className="wide directory-proof"><span>{publishCopy.proof}</span><input type="file" multiple accept="image/png,image/jpeg,application/pdf" onChange={(event) => setDocuments(Array.from(event.target.files ?? []).filter((file) => file.size <= 10 * 1024 * 1024))} /><small>{publishCopy.proofHint}</small></label>
             </div>
             {publishMessage && <div className="auth-message">{publishMessage}</div>}
             <footer><button type="button" className="button button-secondary" onClick={() => setPublishOpen(false)}>{publishCopy.cancel}</button><button type="submit" className="button button-primary" disabled={publishBusy}>{publishBusy ? "…" : publishCopy.add}</button></footer>
           </form>}
+        </section>
+      </div>}
+      {category && selectedCategoryIndex >= 0 && <div className="category-explorer-backdrop" role="presentation" onMouseDown={() => setCategory("")}>
+        <section className={`category-explorer category-${category}`} role="dialog" aria-modal="true" aria-labelledby="category-explorer-title" onMouseDown={(event) => event.stopPropagation()}>
+          <header className="category-explorer-hero">
+            <div className="category-explorer-orbit" aria-hidden="true"><span /><span /><span /></div>
+            <button type="button" onClick={() => setCategory("")} aria-label={publishCopy.cancel}>×</button>
+            <div className="category-explorer-icon">{(() => { const Icon = icons[selectedCategoryIndex]; return <Icon size={30} />; })()}</div>
+            <span className="section-label">{copy.categories} · VIZORA.TJ</span>
+            <h2 id="category-explorer-title">{copy.categoryNames[selectedCategoryIndex]}</h2>
+            <p>{categoryDescriptions[selectedCategoryIndex]}</p>
+            <div className="category-explorer-meta"><span><BadgeCheck size={17} />{copy.verifiedOnly}</span><strong>{selectedCategoryProfiles.length} {copy.profiles}</strong></div>
+          </header>
+          <div className="category-explorer-body">
+            {selectedCategoryProfiles.length ? <div className="specialist-grid">{selectedCategoryProfiles.map((item, index) => <article className="specialist-card" key={item.id}>
+              {item.photo ? <img className="specialist-avatar" src={item.photo} alt="" /> : <div className={`specialist-avatar specialist-avatar-${["blue", "violet", "emerald"][index % 3]}`}>{item.name.split(/\s+/).map((part) => part[0]).slice(0, 2).join("")}</div>}
+              <div className="specialist-verified"><BadgeCheck size={15} />{copy.checked}</div><h3>{item.name}</h3><p>{item.specialistTitle || item.role}</p><span><MapPin size={15} />{item.city || item.address || "—"}</span>
+              <Link to={`/card/${item.slug}`} className="button button-secondary w-full">{copy.open}</Link>
+            </article>)}</div> : <div className="category-explorer-empty">
+              <div className="category-empty-visual"><Search size={32} /><span /><span /></div>
+              <h3>{language === "ru" ? "В этой категории пока нет опубликованных специалистов" : language === "tj" ? "Дар ин категория ҳоло мутахассиси нашршуда нест" : "No published specialists in this category yet"}</h3>
+              <p>{language === "ru" ? "Здесь появятся фотография, имя, специальность и город после проверки первых заявок." : language === "tj" ? "Пас аз санҷиши дархостҳои аввал дар ин ҷо акс, ном, ихтисос ва шаҳр пайдо мешаванд." : "Photo, name, specialty and city will appear here after the first profiles are verified."}</p>
+              <button type="button" className="button button-primary" onClick={() => { setCategory(""); void openPublisher(); }}>{copy.publish}<ChevronRight size={17} /></button>
+            </div>}
+          </div>
         </section>
       </div>}
       <Footer />
