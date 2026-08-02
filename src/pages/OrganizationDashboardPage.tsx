@@ -78,6 +78,7 @@ export default function OrganizationDashboardPage() {
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
   const [selectedOrganizationId, setSelectedOrganizationId] = useState("");
   const [organizations, setOrganizations] = useState<Array<{ id: string; displayName: string }>>([]);
+  const [showOrganizationChooser, setShowOrganizationChooser] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<OrganizationEmployee | null>(null);
   const [message, setMessage] = useState("");
   const [savingEmployee, setSavingEmployee] = useState(false);
@@ -99,6 +100,11 @@ export default function OrganizationDashboardPage() {
       if (!list.length) {
         setWorkspace(null);
         navigate("/organization/apply", { replace: true });
+        return;
+      }
+      if (!organizationId && list.length > 1) {
+        setWorkspace(null);
+        setShowOrganizationChooser(true);
         return;
       }
       const resolvedId = list.some((item) => item.id === organizationId) ? organizationId : list[0].id;
@@ -127,12 +133,17 @@ export default function OrganizationDashboardPage() {
     }
     return result;
   }, [workspace, selectedDepartmentId]);
-  const employees = useMemo(() => (workspace?.employees ?? []).filter((item) =>
-    (!selectedDepartmentId || (item.departmentId && descendantIds.has(item.departmentId))) &&
-    `${item.name} ${item.position} ${item.department}`.toLowerCase().includes(query.toLowerCase())
-  ), [workspace, query, selectedDepartmentId, descendantIds]);
+  const employees = useMemo(() => (workspace?.employees ?? []).filter((item) => {
+    const haystack = `${item.name} ${item.position} ${item.department}`.toLocaleLowerCase();
+    const words = query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+    return words.every((word) => haystack.includes(word));
+  }), [workspace, query]);
+  const departmentEmployees = useMemo(() => (workspace?.employees ?? []).filter((item) =>
+    selectedDepartmentId && item.departmentId && descendantIds.has(item.departmentId)
+  ), [workspace, selectedDepartmentId, descendantIds]);
 
   if (loading) return <main className="route-loading"><span /><p>...</p></main>;
+  if (showOrganizationChooser && organizations.length > 1) return <main className="org-dashboard-page org-organization-choice"><section><Building2 size={32} /><span className="section-label">VIZORA.TJ</span><h1>{language === "tj" ? "Ташкилотро интихоб кунед" : language === "en" ? "Choose an organization" : "Выберите организацию"}</h1><p>{language === "tj" ? "Барои кушодани сохтор ташкилоти лозимаро интихоб кунед." : language === "en" ? "Select the organization whose structure you want to open." : "Выберите организацию, структуру которой хотите открыть."}</p><div>{organizations.map((item) => <button type="button" key={item.id} onClick={() => { setShowOrganizationChooser(false); setSelectedOrganizationId(item.id); void refresh(item.id); }}><Building2 size={20} /><span>{item.displayName}</span><ChevronRight size={18} /></button>)}</div></section></main>;
   if (!workspace) return <main className="card-missing"><div className="empty-state"><Building2 size={32} /><h1>{copy.noOrg}</h1><Link className="button button-primary" to="/organization/apply">{copy.register}</Link></div></main>;
 
   const organization = workspace.organization;
@@ -159,7 +170,7 @@ export default function OrganizationDashboardPage() {
         </div>
         <div className="org-workspace-head">
           <div className="org-workspace-brand"><span><Building2 size={22} /></span><div><small>{copy.workspace}</small>{organizations.length > 1 ? <select className="org-switcher" value={organization.id} onChange={(event) => { setSelectedDepartmentId(null); setSelectedOrganizationId(event.target.value); void refresh(event.target.value); }}>{organizations.map((item) => <option value={item.id} key={item.id}>{item.displayName}</option>)}</select> : <h1>{organization.displayName}</h1>}</div></div>
-          <div className="org-workspace-actions"><Link className="button button-secondary" to="/organization/apply?new=1"><Plus size={17} /> {language === "tj" ? "Иловаи ташкилот" : language === "en" ? "Add organization" : "Добавить организацию"}</Link><button className="button button-secondary" onClick={() => { setEditingDepartment(null); setDepartmentParentId(selectedDepartmentId); setShowDepartmentForm(true); }}><Network size={17} /> {copy.newDepartment}</button>{limitReached ? <Link className="button button-primary" to="/organization/apply"><Building2 size={17} /> {copy.tariffs}</Link> : <button className="button button-primary" onClick={() => setShowEmployeeForm(true)}><Plus size={17} /> {copy.add}</button>}</div>
+          <div className="org-workspace-actions">{organizations.length < 2 && <Link className="button button-secondary" to="/organization/apply?new=1"><Plus size={17} /> {language === "tj" ? "Иловаи ташкилот" : language === "en" ? "Add organization" : "Добавить организацию"}</Link>}<button className="button button-secondary" onClick={() => { setEditingDepartment(null); setDepartmentParentId(selectedDepartmentId); setShowDepartmentForm(true); }}><Network size={17} /> {copy.newDepartment}</button>{limitReached ? <Link className="button button-primary" to="/organization/apply"><Building2 size={17} /> {copy.tariffs}</Link> : <button className="button button-primary" onClick={() => setShowEmployeeForm(true)}><Plus size={17} /> {copy.add}</button>}</div>
         </div>
         {message && <div className="admin-notice mt-5"><ShieldCheck size={18} /><span>{message}</span></div>}
         <div className="org-workspace-stats">
@@ -168,11 +179,11 @@ export default function OrganizationDashboardPage() {
           <article><QrCode size={21} /><div><strong>1</strong><span>{copy.scans}</span></div></article>
           <article><ShieldCheck size={21} /><div><strong>{organization.planCode || "—"}</strong><span>{copy.plan}</span></div></article>
         </div>
+        <div className="org-directory-search"><Search size={20} /><div><strong>{copy.search}</strong><span>{language === "tj" ? "Бо ному насаб, вазифа ё сохтор" : language === "en" ? "By name, position or structure" : "По ФИО, должности или подразделению"}</span></div><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} /></div>
         {limitReached && <div className="admin-notice mt-5"><ShieldCheck size={18} /><span>{copy.limitReached}</span><Link className="button button-secondary" to="/organization/apply">{copy.tariffs}</Link></div>}
         <div className="org-workspace-grid">
           <aside className="org-sidebar org-structure-sidebar">
             <strong>{copy.departments}</strong>
-            <button className={!selectedDepartmentId ? "active" : ""} onClick={() => setSelectedDepartmentId(null)}><Users size={17} /> {copy.allEmployees}<b>{workspace.employees.length}</b></button>
             {workspace.departments.length ? <DepartmentTree
               departments={workspace.departments}
               employees={workspace.employees}
@@ -189,17 +200,7 @@ export default function OrganizationDashboardPage() {
             <button onClick={() => { setEditingDepartment(null); setDepartmentParentId(null); setShowDepartmentForm(true); }}><Plus size={17} /> {copy.newDepartment}</button>
             <hr /><a href="#organization-qr"><QrCode size={17} /> {copy.scans}</a><Link to="/organization/apply"><Building2 size={17} /> {copy.plan}</Link>
           </aside>
-          <section className="org-content-panel">
-            <div className="org-content-head"><div><h2>{copy.staff}</h2><p>{copy.inviteInfo}</p><p className="org-responsibility-note">{copy.responsibility}</p></div><div className="org-search"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} /></div></div>
-            <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>{copy.person}</th><th>{copy.position}</th><th>{copy.department}</th><th>{copy.status}</th><th /></tr></thead><tbody>
-              {employees.map((item) => <tr key={item.id}><td><div className="table-person"><span>{item.name[0]}</span><div><strong>{item.name}</strong><small>{item.email || copy.card}</small></div></div></td><td>{item.position}</td><td>{item.department}</td><td><span className={item.status === "approved" ? "status-pill" : "status-pill status-review"}>{item.status === "approved" ? copy.active : item.status === "invited" ? copy.invited : copy.review}</span></td><td><div className="employee-actions">
-                {item.cardSlug && <button title={copy.openCard} onClick={() => window.open(employeePublicUrl(item.cardSlug), "_blank", "noopener,noreferrer")}><ExternalLink size={16} /></button>}
-                {item.cardSlug && <button title={copy.cardQr} onClick={() => void downloadQrCode(employeePublicUrl(item.cardSlug), item.cardSlug)}><QrCode size={16} /></button>}
-                <button title={copy.moveEmployee} onClick={() => setEditingEmployee(item)}><Edit3 size={16} /></button>
-                <button title={copy.revoke} onClick={async () => { if (!window.confirm(item.name)) return; await organizationRepository.removeEmployee(item.id); await refresh(); }}><Trash2 size={16} /></button>
-              </div></td></tr>)}
-            </tbody></table>{!employees.length && <div className="table-empty">{copy.staff}: 0</div>}</div>
-          </section>
+          <section className="org-content-panel org-structure-guide"><Network size={32} /><h2>{language === "tj" ? "Сохтори ташкилот" : language === "en" ? "Organization structure" : "Структура организации"}</h2><p>{language === "tj" ? "Барои дидани кормандон яке аз воҳидҳои сохториро интихоб кунед." : language === "en" ? "Select a structure unit to view its employees." : "Нажмите на подразделение слева, чтобы увидеть его сотрудников."}</p></section>
         </div>
         <section className="org-qr-panel" id="organization-qr">
           <div className="org-qr-preview"><QRCodeImage value={url} size={220} /></div>
@@ -207,12 +208,16 @@ export default function OrganizationDashboardPage() {
         </section>
       </div>
 
+      {query.trim() && <div className="platform-modal" onMouseDown={() => setQuery("")}><section className="platform-modal-card org-employee-directory-modal" onMouseDown={(event) => event.stopPropagation()}><div className="modal-head"><div><span className="section-label">{copy.search}</span><h2>{language === "tj" ? "Натиҷаҳои ҷустуҷӯ" : language === "en" ? "Search results" : "Результаты поиска"}</h2></div><button type="button" onClick={() => setQuery("")}>×</button></div><label className="org-modal-search"><Search size={17} /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder={copy.search} /></label><EmployeeDirectoryList employees={employees} copy={copy} onOpen={(item) => item.cardSlug && window.open(employeePublicUrl(item.cardSlug), "_blank", "noopener,noreferrer")} onEdit={setEditingEmployee} onRemove={async (item) => { if (!window.confirm(item.name)) return; await organizationRepository.removeEmployee(item.id); await refresh(); }} /></section></div>}
+
+      {selectedDepartmentId && <div className="platform-modal" onMouseDown={() => setSelectedDepartmentId(null)}><section className="platform-modal-card org-employee-directory-modal" onMouseDown={(event) => event.stopPropagation()}><div className="modal-head"><div><span className="section-label">{copy.departments}</span><h2>{workspace.departments.find((item) => item.id === selectedDepartmentId)?.name}</h2></div><button type="button" onClick={() => setSelectedDepartmentId(null)}>×</button></div>{departmentEmployees.length ? <EmployeeDirectoryList employees={departmentEmployees} copy={copy} onOpen={(item) => item.cardSlug && window.open(employeePublicUrl(item.cardSlug), "_blank", "noopener,noreferrer")} onEdit={setEditingEmployee} onRemove={async (item) => { if (!window.confirm(item.name)) return; await organizationRepository.removeEmployee(item.id); await refresh(); }} /> : <div className="org-department-empty"><Users size={28} /><h3>{language === "tj" ? "Дар ин воҳид ҳоло корманд нест" : language === "en" ? "No employees in this unit yet" : "В этом подразделении пока нет сотрудников"}</h3><button className="button button-primary" onClick={() => setShowEmployeeForm(true)}><Plus size={17} /> {copy.add}</button></div>}</section></div>}
+
       {showEmployeeForm && <div className="platform-modal"><form className="platform-modal-card" onSubmit={async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (savingEmployee) return;
         setSavingEmployee(true); setMessage("");
         try { await organizationRepository.createEmployee(await employeeValues(event.currentTarget, organization.id)); setMessage(copy.active); setShowEmployeeForm(false); await refresh(); } catch (error) { setMessage(error instanceof Error ? error.message : "Error"); } finally { setSavingEmployee(false); }
-      }}><div className="modal-head"><div><span className="section-label">{copy.card}</span><h2>{copy.add}</h2></div><button type="button" onClick={() => setShowEmployeeForm(false)}>×</button></div><EmployeeFields copy={copy} departments={workspace.departments} /><div className="modal-note"><ShieldCheck size={18} /> {copy.inviteInfo}</div><button className="button button-primary button-large"><Plus size={18} /> {copy.invite}</button></form></div>}
+      }}><div className="modal-head"><div><span className="section-label">{copy.card}</span><h2>{copy.add}</h2></div><button type="button" onClick={() => setShowEmployeeForm(false)}>×</button></div><EmployeeFields copy={copy} departments={workspace.departments} defaultDepartmentId={selectedDepartmentId} /><div className="modal-note"><ShieldCheck size={18} /> {copy.inviteInfo}</div><button className="button button-primary button-large"><Plus size={18} /> {copy.invite}</button></form></div>}
 
       {editingEmployee && <div className="platform-modal"><form className="platform-modal-card" onSubmit={async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -241,8 +246,27 @@ export default function OrganizationDashboardPage() {
   );
 }
 
-function EmployeeFields({ copy, departments, employee }: {
-  copy: Record<string, string>; departments: OrganizationDepartment[]; employee?: OrganizationEmployee;
+function EmployeeDirectoryList({ employees, copy, onOpen, onEdit, onRemove }: {
+  employees: OrganizationEmployee[];
+  copy: Record<string, string>;
+  onOpen: (employee: OrganizationEmployee) => void;
+  onEdit: (employee: OrganizationEmployee) => void;
+  onRemove: (employee: OrganizationEmployee) => void | Promise<void>;
+}) {
+  if (!employees.length) return <div className="org-department-empty"><Search size={26} /><h3>{copy.staff}: 0</h3></div>;
+  return <div className="org-employee-directory-list">{employees.map((item) => <article key={item.id}>
+    {item.photo ? <img src={item.photo} alt="" /> : <span>{item.name[0]}</span>}
+    <div><strong>{item.name}</strong><small>{item.position}</small><em><Network size={12} />{item.department}</em></div>
+    <div className="employee-actions">
+      {item.cardSlug && <button title={copy.openCard} onClick={() => onOpen(item)}><ExternalLink size={16} /></button>}
+      <button title={copy.moveEmployee} onClick={() => onEdit(item)}><Edit3 size={16} /></button>
+      <button title={copy.revoke} onClick={() => void onRemove(item)}><Trash2 size={16} /></button>
+    </div>
+  </article>)}</div>;
+}
+
+function EmployeeFields({ copy, departments, employee, defaultDepartmentId }: {
+  copy: Record<string, string>; departments: OrganizationDepartment[]; employee?: OrganizationEmployee; defaultDepartmentId?: string | null;
 }) {
   return <div className="platform-form employee-card-form">
     <div className="form-grid">
@@ -257,7 +281,7 @@ function EmployeeFields({ copy, departments, employee }: {
       <label><span>Второй телефон</span><input name="secondPhone" type="tel" inputMode="tel" pattern="\+?992[0-9]{9}" placeholder="+992900000000" defaultValue={employee?.secondPhone ?? ""} /></label>
       <label><span>{copy.email}</span><input name="email" type="email" defaultValue={employee?.email ?? ""} /></label>
     </div>
-    <label><span>{copy.department}</span><select name="departmentId" defaultValue={employee?.departmentId ?? ""}><option value="">—</option>{departments.map((item) => <option key={item.id} value={item.id}>{departmentPath(item, departments)}</option>)}</select></label>
+    <label><span>{copy.department}</span><select name="departmentId" defaultValue={employee?.departmentId ?? defaultDepartmentId ?? ""}><option value="">—</option>{departments.map((item) => <option key={item.id} value={item.id}>{departmentPath(item, departments)}</option>)}</select></label>
     <label><span>Краткое описание</span><textarea name="description" maxLength={240} defaultValue={employee?.description ?? ""} /></label>
     <div className="form-grid">
       <label><span>Сайт</span><input name="website" type="url" placeholder="https://" defaultValue={employee?.website ?? ""} /></label>
