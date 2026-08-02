@@ -45,6 +45,10 @@ export const directoryRepository = {
       error = fallback.error;
     }
     if (error) return [];
+    const { data: categoryRows } = await supabase.rpc("get_enabled_profession_categories", { language_code: "ru" });
+    const categoryById = new Map(
+      (categoryRows ?? []).map((item: { id: string; slug?: string }) => [String(item.id), String(item.slug ?? "")])
+    );
     return (rows ?? []).map((row) => {
       const relation = row.profession_categories as unknown;
       const category = Array.isArray(relation) ? relation[0] : relation;
@@ -56,7 +60,7 @@ export const directoryRepository = {
         organization: String(row.organization_name ?? ""),
         address: String(row.address ?? ""),
         photo: String(row.photo_path ?? ""),
-        categorySlug: String((category as { slug?: string } | null)?.slug ?? "")
+        categorySlug: String((category as { slug?: string } | null)?.slug ?? categoryById.get(String(row.profession_category_id ?? "")) ?? "")
         ,specialistTitle: String(row.specialist_title ?? row.position ?? "")
         ,city: String(row.specialist_city ?? "")
         ,tags: Array.isArray(row.specialist_tags) ? row.specialist_tags.map(String) : []
