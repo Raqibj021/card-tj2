@@ -59,9 +59,9 @@
 .about-hero-signals span { display: inline-flex; min-height: 33px; align-items: center; gap: 6px; border-bottom: 1px solid color-mix(in srgb, var(--about-blue) 32%, var(--line)); padding: 0 4px; color: var(--muted); font-size: 11px; font-weight: 850; }
 .about-hero-signals svg { color: var(--about-blue); }
 
-.about-founder-visual { position: relative; width: min(100%, 555px); height: 590px; justify-self: start; align-self: end; }
+.about-founder-visual { position: relative; width: min(100%, 555px); height: 540px; justify-self: start; align-self: end; }
 .about-founder-glow { position: absolute; right: 8%; bottom: 4%; width: 82%; height: 72%; border-radius: 50%; background: radial-gradient(circle, rgba(31, 126, 243, .2), transparent 68%); filter: blur(26px); }
-.about-founder-portrait { position: absolute; z-index: 2; right: 0; bottom: -2px; display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 30px 30px rgba(12, 43, 86, .2)); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 80%, rgba(0, 0, 0, .88) 87%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 80%, rgba(0, 0, 0, .88) 87%, transparent 100%); }
+.about-founder-portrait { position: absolute; z-index: 2; right: 0; bottom: -2px; display: block; width: auto; height: 100%; max-width: 100%; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 28px 28px rgba(12, 43, 86, .18)); -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 74%, rgba(0, 0, 0, .82) 86%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 74%, rgba(0, 0, 0, .82) 86%, transparent 100%); }
 .dark .about-founder-portrait { filter: drop-shadow(0 34px 36px rgba(0, 0, 0, .38)); }
 
 .about-float { position: absolute; z-index: 4; border: 1px solid color-mix(in srgb, var(--line) 75%, #75c5ff); background: color-mix(in srgb, var(--panel) 86%, transparent); box-shadow: 0 15px 45px rgba(11, 43, 91, .14); backdrop-filter: blur(16px); }
@@ -211,7 +211,7 @@
   .about-hero, .about-hero-layout { min-height: 570px; }
   .about-hero-layout { gap: 0; padding-top: 34px; grid-template-columns: minmax(0, 1fr) minmax(285px, .72fr); }
   .about-hero h1 { font-size: clamp(46px, 6.7vw, 60px); }
-  .about-founder-visual { width: min(100%, 430px); height: 500px; justify-self: start; }
+  .about-founder-visual { width: min(100%, 430px); height: 470px; justify-self: start; }
   .about-float-nfc { left: -5px; }
   .about-float-language { right: 0; }
   .about-story-layout { grid-template-columns: 1fr; }
@@ -234,7 +234,7 @@
   .about-hero-signals { justify-content: flex-start; gap: 5px; margin-top: 11px; }
   .about-hero-signals span { min-height: 27px; font-size: 9px; }
   .about-founder-visual { width: 182px; height: 385px; margin-right: -22px; justify-self: end; }
-  .about-founder-portrait { right: 0; bottom: -1px; width: 205px; height: auto; max-width: none; transform: none; }
+  .about-founder-portrait { right: -8px; bottom: -1px; width: auto; height: 350px; max-width: none; transform: none; }
   .about-float-nfc, .about-float-language { display: none; }
   .about-float-qr { right: 3px; bottom: 45px; gap: 5px; padding: 4px; }
   .about-float-qr img { width: 44px; height: 44px; }
@@ -296,7 +296,7 @@
   .about-hero-layout { grid-template-columns: minmax(0, 1.28fr) minmax(118px, .72fr); }
   .about-hero h1 { max-width: 205px; font-size: 30px; }
   .about-founder-visual { width: 165px; height: 365px; margin-right: -21px; }
-  .about-founder-portrait { width: 192px; }
+  .about-founder-portrait { right: -11px; width: auto; height: 334px; }
   .about-network-meta { gap: 11px; }
   .about-contact-group > header { grid-template-columns: 1fr; }
 }

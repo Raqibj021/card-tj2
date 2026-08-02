@@ -364,10 +364,10 @@ export default function AboutPage() {
               <div className="about-founder-glow" aria-hidden="true" />
               <img
                 className="about-founder-portrait"
-                src={`${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov-founder-light-v2.webp`}
+                src={`${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov-founder-suit-v3.webp`}
                 alt={`${text.heroTitle}. ${text.heroRole}`}
                 width="780"
-                height="1150"
+                height="854"
                 loading="eager"
                 fetchPriority="high"
               />
