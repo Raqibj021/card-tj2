@@ -696,25 +696,19 @@ function ContactGroup({ title, note, contacts, brand }: { title: string; note: s
 
 function ContactNetwork() {
   return (
-    <div className="about-network-visual" aria-hidden="true">
-      <svg viewBox="0 0 620 500" role="img">
-        <defs>
-          <linearGradient id="about-network-line" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#57d6ff" /><stop offset="1" stopColor="#4074ff" /></linearGradient>
-          <mask id="about-network-mask"><rect width="620" height="500" fill="white" /><rect x="238" y="195" width="144" height="110" rx="32" fill="black" /></mask>
-        </defs>
-        <g className="about-network-lines" fill="none" stroke="url(#about-network-line)" mask="url(#about-network-mask)">
-          <path d="M310 250 130 116M310 250 500 105M310 250 520 340M310 250 125 378M130 116 500 105M125 378 520 340" />
-          <circle cx="310" cy="250" r="112" /><circle cx="310" cy="250" r="178" />
-        </g>
-        <g className="about-network-points">
-          <circle cx="310" cy="250" r="5" /><circle cx="130" cy="116" r="5" /><circle cx="500" cy="105" r="5" /><circle cx="520" cy="340" r="5" /><circle cx="125" cy="378" r="5" />
-        </g>
-      </svg>
-      <div className="about-network-center"><BrandLogo compact className="about-network-brand" /></div>
-      <div className="about-network-node node-one"><ContactRound size={21} /></div>
-      <div className="about-network-node node-two"><Building2 size={21} /></div>
-      <div className="about-network-node node-three"><QrCode size={21} /></div>
-      <div className="about-network-node node-four"><SmartphoneNfc size={21} /></div>
+    <div className="about-network-visual about-layered-cards" aria-hidden="true">
+      <div className="about-layered-stage">
+        {Array.from({ length: 14 }, (_, index) => (
+          <span className="about-layered-card" key={index} style={{ "--layer": index } as CSSProperties}>
+            {index === 8 && <span className="about-layered-brand"><BrandLogo compact /></span>}
+            {index === 10 && <QrCode size={18} />}
+            {index === 5 && <SmartphoneNfc size={18} />}
+          </span>
+        ))}
+      </div>
+      <span className="about-layered-signal signal-one"><QrCode size={17} /></span>
+      <span className="about-layered-signal signal-two"><SmartphoneNfc size={17} /></span>
+      <span className="about-layered-signal signal-three"><Globe2 size={17} /></span>
     </div>
   );
 }
