@@ -22,6 +22,7 @@ export interface OrganizationApplication {
   reviewStatus: string; slug?: string; activeUntil?: string | null;
   paymentStatus?: string; paymentOrderNumber?: string;
   contactName?: string; contactPosition?: string;
+  address?: string; publicDescription?: string; logo?: string;
 }
 export interface OrganizationDepartment { id: string; name: string; parentId: string | null; }
 export interface OrganizationEmployee {
@@ -74,7 +75,10 @@ const mapOrganization = (row: Record<string, unknown>): OrganizationApplication 
     paymentStatus: String(row.payment_status ?? "none"),
     paymentOrderNumber: String(row.payment_order_number ?? ""),
     contactName: String(applicationDetails.contactName ?? ""),
-    contactPosition: String(applicationDetails.contactPosition ?? "")
+    contactPosition: String(applicationDetails.contactPosition ?? ""),
+    address: String(row.address ?? ""),
+    publicDescription: String(applicationDetails.publicDescription ?? applicationDetails.description ?? ""),
+    logo: String(row.logo_path ?? "")
   };
 };
 
@@ -204,6 +208,23 @@ export const organizationRepository = {
       theme: String(item.theme ?? "teal"), template: String(item.template ?? "executive")
     }));
     return { organization: mapOrganization(payload.organization), departments, employees: accepted };
+  },
+
+  updateProfile: async (data: {
+    organizationId: string; name: string; type: string; phone: string; email: string;
+    address: string; description: string; logo: string;
+  }) => {
+    if (!supabase) throw new Error("Сервер недоступен.");
+    const logo = await uploadEmployeeAsset(data.organizationId, "logo", data.logo);
+    const { data: updated, error } = await supabase.rpc("update_approved_organization_profile", {
+      target_organization_id: data.organizationId,
+      organization_name: data.name.trim(), organization_type: data.type.trim(),
+      organization_phone: data.phone.trim(), organization_email: data.email.trim(),
+      organization_address: data.address.trim(), public_description: data.description.trim(),
+      organization_logo: logo
+    });
+    if (error) throw new Error(error.message || "Не удалось обновить организацию.");
+    return mapOrganization(updated as Record<string, unknown>);
   },
 
   addDepartment: async (organizationId: string, name: string, parentId: string | null = null) => {

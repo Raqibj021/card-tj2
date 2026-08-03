@@ -8798,3 +8798,31 @@ body,
   .directory-hero + .section { padding-block: 30px 38px; }
   .directory-hero + .section .directory-publish-banner { margin-bottom: 22px; }
 }
+
+/* Approved organization profile editor. */
+.organization-profile-form { width: min(760px, 100%); }
+.organization-profile-logo-row { display: flex; align-items: center; gap: 14px; margin: 4px 0 18px; padding: 13px; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--panel) 88%, var(--accent) 12%); }
+.organization-profile-logo-row > span,
+.organization-profile-logo-preview { width: 72px; height: 72px; flex: 0 0 72px; border-radius: 14px; border: 1px solid var(--line); background: var(--panel); object-fit: contain; padding: 8px; }
+.organization-profile-logo-row > span { display: grid; place-items: center; color: var(--accent); }
+.organization-profile-logo-row label { display: grid; gap: 5px; min-width: 0; }
+.organization-profile-logo-row input { max-width: 100%; font-size: 11px; }
+.organization-profile-logo-row small { color: var(--muted); font-size: 10px; }
+.organization-profile-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.organization-profile-grid label { display: grid; gap: 7px; min-width: 0; }
+.organization-profile-grid label > span { font-size: 11px; font-weight: 700; }
+.organization-profile-grid input,
+.organization-profile-grid textarea { width: 100%; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); padding: 12px 13px; outline: none; }
+.organization-profile-grid textarea { min-height: 92px; resize: vertical; }
+.organization-profile-grid input:focus,
+.organization-profile-grid textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 13%, transparent); }
+.organization-profile-grid .wide { grid-column: 1 / -1; }
+.organization-profile-form .modal-note { margin: 14px 0; }
+.organization-profile-form > .button-large { width: 100%; }
+@media (max-width: 640px) {
+  .organization-profile-grid { grid-template-columns: 1fr; gap: 10px; }
+  .organization-profile-grid .wide { grid-column: auto; }
+  .organization-profile-logo-row { align-items: flex-start; }
+  .organization-profile-logo-row > span,
+  .organization-profile-logo-preview { width: 58px; height: 58px; flex-basis: 58px; }
+}
