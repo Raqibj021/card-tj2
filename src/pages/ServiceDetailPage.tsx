@@ -215,7 +215,7 @@ export default function ServiceDetailPage() {
   const orderUrl = `/service-order?service=${service.order}&qty=${quantity}${selectedVariant ? `&variant=${encodeURIComponent(selectedVariant)}` : ""}${selectedImageKey ? `&image=${selectedImageKey}` : ""}`;
   return (
     <>
-      <main className={`service-detail-page${isOrganization ? " service-detail-page-compact" : ""}`}>
+      <main className={`service-detail-page service-detail-${service.visual}${isOrganization ? " service-detail-page-compact" : ""}`}>
         <div className="services-orb services-orb-one" />
         <div className="services-orb services-orb-two" />
         <section className="site-container service-detail-shell">
@@ -289,7 +289,7 @@ export default function ServiceDetailPage() {
               </ul>
               {(service.visual === "nfc" || service.visual === "signs") && (
                 <>
-                  <label>{labels.examples}</label>
+                  <label className="service-variant-label">{labels.examples}</label>
                   <div className="service-variant-list">
                     {variants.map((item, index) => (
                       <button
