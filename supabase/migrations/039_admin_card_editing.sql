@@ -54,6 +54,7 @@ returns jsonb language plpgsql security definer set search_path = public
 as $$
 declare target public.cards%rowtype;
 declare before_data jsonb;
+declare after_data jsonb;
 declare clean_slug text;
 declare clean_contacts jsonb;
 declare result jsonb;
@@ -115,10 +116,7 @@ begin
     updated_at=now()
   where id=target_card_id;
 
-  insert into public.admin_audit_log(admin_id,action,details)
-  select auth.uid(),'admin_card_updated',jsonb_build_object(
-    'cardId',target_card_id,'ownerId',target.owner_id,'before',before_data,
-    'after',jsonb_build_object(
+  select jsonb_build_object(
       'slug',c.slug,'fullName',c.full_name,'position',c.position,'organization',c.organization_name,
       'description',c.description,'photo',c.photo_path,'contacts',c.contacts,'address',c.address,
       'language',c.language,'theme',c.theme,'template',c.template,
@@ -126,8 +124,14 @@ begin
       'specialistTags',c.specialist_tags,'specialistExperience',c.specialist_experience,
       'specialistSummary',c.specialist_summary,'specialistServiceArea',c.specialist_service_area,
       'specialistConsultation',c.specialist_consultation,'specialistPortfolio',c.specialist_portfolio
-    )
-  ) from public.cards c where c.id=target_card_id;
+    ) into after_data from public.cards c where c.id=target_card_id;
+
+  insert into public.admin_audit_log(admin_id,action,details)
+  values(auth.uid(),'admin_card_updated',jsonb_build_object(
+    'cardId',target_card_id,'ownerId',target.owner_id,
+    'changedFields',coalesce((select jsonb_agg(key) from jsonb_object_keys(before_data) key
+      where before_data->key is distinct from after_data->key),'[]'::jsonb)
+  ));
 
   select jsonb_build_object(
     'id',c.id,'ownerId',c.owner_id,'ownerName',p.full_name,'ownerEmail',coalesce(p.email,''),
