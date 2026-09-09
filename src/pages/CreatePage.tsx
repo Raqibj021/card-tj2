@@ -157,10 +157,7 @@ export default function CreatePage() {
   const [accountCard, setAccountCard] = useState<DigitalCard | null>(null);
   const [checkingCard, setCheckingCard] = useState(Boolean(user));
   const [slugTouched, setSlugTouched] = useState(Boolean(existing));
-  const requestedPlan = searchParams.get("plan");
-  const [selectedPlan, setSelectedPlan] = useState<"promo" | "personal" | "specialist" | "pro">(
-    requestedPlan === "specialist" || requestedPlan === "pro" ? requestedPlan : "personal"
-  );
+  const [selectedPlan, setSelectedPlan] = useState<"promo" | "personal">("personal");
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
   const [submitError, setSubmitError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
@@ -487,8 +484,6 @@ export default function CreatePage() {
         if (selectedPlan === "promo") {
           await promoRepository.claim(remoteCard.id);
           navigate("/dashboard");
-        } else if (selectedPlan === "specialist" || selectedPlan === "pro") {
-          navigate(`/directory?publish=${selectedPlan}`);
         } else {
           navigate("/payment?plan=personal");
         }
@@ -875,7 +870,7 @@ export default function CreatePage() {
             <div className="form-section-title"><span><CreditCard size={19} /></span><div><h2>{language === "ru" ? "Выберите тариф" : language === "tj" ? "Тарофаро интихоб кунед" : "Choose a plan"}</h2><p>{language === "ru" ? "После сохранения откроется следующий нужный шаг" : language === "tj" ? "Пас аз нигоҳдорӣ қадами навбатӣ кушода мешавад" : "The correct next step opens after saving"}</p></div></div>
             <div className="builder-plan-grid">
               {promo?.eligible && !promo.hasEntitlement && promo.remaining > 0 && <button type="button" className={`builder-plan-card promo${selectedPlan === "promo" ? " active" : ""}`} onClick={() => setSelectedPlan("promo")}><Gift size={20} /><span><strong>{language === "ru" ? "Стартовая акция" : language === "tj" ? "Иқдоми оғоз" : "Launch offer"}</strong><small>{language === "ru" ? `Бесплатно на 1 год · осталось ${promo.remaining}` : language === "tj" ? `1 сол ройгон · ${promo.remaining} ҷой монд` : `Free for 1 year · ${promo.remaining} left`}</small></span><b>0</b></button>}
-              {[{ id: "personal" as const, price: 20, ru: "Личная визитка", tj: "Варақаи шахсӣ", en: "Personal card" }, { id: "specialist" as const, price: 50, ru: "Проверенный специалист", tj: "Мутахассиси тасдиқшуда", en: "Verified specialist" }, { id: "pro" as const, price: 100, ru: "Специалист PRO", tj: "Мутахассиси PRO", en: "Specialist PRO" }].map((plan) => <button type="button" key={plan.id} className={`builder-plan-card${plan.id === "pro" ? " pro" : ""}${selectedPlan === plan.id ? " active" : ""}`} onClick={() => setSelectedPlan(plan.id)}><ShieldCheck size={20} /><span><strong>{plan[language]}</strong><small>{language === "ru" ? "Оплата после сохранения" : language === "tj" ? "Пардохт пас аз нигоҳдорӣ" : "Payment after saving"}</small></span><b>{plan.price}</b></button>)}
+              <button type="button" className={`builder-plan-card${selectedPlan === "personal" ? " active" : ""}`} onClick={() => setSelectedPlan("personal")}><ShieldCheck size={20} /><span><strong>{language === "ru" ? "Личная визитка" : language === "tj" ? "Варақаи шахсӣ" : "Personal card"}</strong><small>{language === "ru" ? "Оплата после сохранения" : language === "tj" ? "Пардохт пас аз нигоҳдорӣ" : "Payment after saving"}</small></span><b>20</b></button>
             </div>
           </section>}
           {submitError && <div className="auth-message" role="alert">{submitError}</div>}
