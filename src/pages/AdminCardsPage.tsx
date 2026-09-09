@@ -1,11 +1,11 @@
 import {
-  Activity, CheckCircle2, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Phone, RefreshCw,
-  RotateCcw, Search, ShieldCheck, Trash2, UserRound, WalletCards, X, XCircle
+  Activity, CheckCircle2, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Pencil, Phone, RefreshCw,
+  RotateCcw, Save, Search, ShieldCheck, Trash2, UserRound, WalletCards, X, XCircle
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
 import {
-  adminCardsRepository, type AdminCardDetails, type AdminCardSummary, type AdminCardWorkspace
+  adminCardsRepository, type AdminCardDetails, type AdminCardSummary, type AdminCardUpdate, type AdminCardWorkspace
 } from "../lib/adminCardsRepository";
 import "./AdminCardsPage.css";
 
@@ -31,6 +31,7 @@ export default function AdminCardsPage() {
   const [status, setStatus] = useState("all");
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState("");
+  const [editing, setEditing] = useState(false);
 
   const refresh = async () => {
     setLoading(true);
@@ -51,12 +52,26 @@ export default function AdminCardsPage() {
   }), [workspace, search, visibility, status]);
 
   const openDetails = async (card: AdminCardSummary) => {
+    setEditing(false);
     setNotice("");
     try {
       setDetails(await adminCardsRepository.details(card.id,
         ["public", "public_organization"].includes(card.visibility) ? "administrative_review" : "private_card_administration"));
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Не удалось открыть данные визитки.");
+    }
+  };
+
+  const saveCard = async (changes: AdminCardUpdate) => {
+    if (!details) return;
+    try {
+      const saved = await adminCardsRepository.update(details.id, changes);
+      setDetails(saved);
+      setEditing(false);
+      await refresh();
+      setNotice("Изменения визитки сохранены. Владелец и статус публикации не изменены.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Не удалось сохранить изменения визитки.");
     }
   };
 
@@ -153,7 +168,7 @@ export default function AdminCardsPage() {
         {!workspace?.accessHistory.length && <p>Журнал пока пуст.</p>}
       </section>
 
-      {details && <CardDrawer card={details} onClose={() => setDetails(null)} onDelete={() => void deleteForever(details)} onReview={(decision) => void review(details, decision)} />}
+      {details && <CardDrawer card={details} editing={editing} onEdit={() => setEditing(true)} onCancelEdit={() => setEditing(false)} onSave={saveCard} onClose={() => setDetails(null)} onDelete={() => void deleteForever(details)} onReview={(decision) => void review(details, decision)} />}
       {details && <button aria-label="Закрыть" className="admin-drawer-backdrop" onClick={() => setDetails(null)} />}
     </AdminShell>
   );
@@ -163,12 +178,17 @@ function Kpi({ icon: Icon, label, value }: { icon: typeof WalletCards; label: st
   return <article><span><Icon size={19} /></span><div><strong>{value.toLocaleString("ru-RU")}</strong><small>{label}</small></div></article>;
 }
 
-function CardDrawer({ card, onClose, onDelete, onReview }: {
+function CardDrawer({ card, editing, onEdit, onCancelEdit, onSave, onClose, onDelete, onReview }: {
   card: AdminCardDetails;
+  editing: boolean;
+  onEdit: () => void;
+  onCancelEdit: () => void;
+  onSave: (changes: AdminCardUpdate) => Promise<void>;
   onClose: () => void;
   onDelete: () => void;
   onReview: (decision: "approved" | "changes_requested" | "rejected") => void;
 }) {
+  if (editing) return <CardEditForm card={card} onCancel={onCancelEdit} onSave={onSave} />;
   const contacts = Object.entries(card.contacts ?? {}).filter(([key, value]) => key !== "companyLogo" && String(value).trim());
   return <aside className="admin-card-drawer">
     <button className="admin-drawer-close" onClick={onClose}><X size={18} /></button>
@@ -201,6 +221,9 @@ function CardDrawer({ card, onClose, onDelete, onReview }: {
       <span><small>Просмотры</small><strong>{card.views}</strong></span>
     </div>
     <div className="admin-card-drawer-foot"><FileCheck2 size={17} /> Данные доступны только главному администратору</div>
+    <button type="button" className="admin-card-edit-button" onClick={onEdit}>
+      <Pencil size={17} /> Редактировать визитку
+    </button>
     {card.reviewStatus !== "approved" && (
       <div className="admin-card-review-actions">
         <button type="button" className="button button-primary" onClick={() => onReview("approved")}>
@@ -218,4 +241,70 @@ function CardDrawer({ card, onClose, onDelete, onReview }: {
       <Trash2 size={17} /> Удалить визитку навсегда
     </button>
   </aside>;
+}
+
+const contactKeys = ["phone", "secondPhone", "whatsapp", "telegram", "instagram", "facebook", "email", "website"] as const;
+
+function CardEditForm({ card, onCancel, onSave }: {
+  card: AdminCardDetails;
+  onCancel: () => void;
+  onSave: (changes: AdminCardUpdate) => Promise<void>;
+}) {
+  const [form, setForm] = useState<AdminCardUpdate>(() => ({
+    slug: card.slug, fullName: card.fullName, position: card.position,
+    organization: card.organization, description: card.description, photo: card.photo,
+    companyLogo: card.companyLogo, contacts: { ...card.contacts }, address: card.address,
+    language: card.language, theme: card.theme, template: card.template,
+    specialistTitle: card.specialistTitle ?? "", specialistCity: card.specialistCity ?? "",
+    specialistTags: card.specialistTags ?? [], specialistExperience: card.specialistExperience ?? "",
+    specialistSummary: card.specialistSummary ?? "", specialistServiceArea: card.specialistServiceArea ?? "",
+    specialistConsultation: card.specialistConsultation ?? "", specialistPortfolio: card.specialistPortfolio ?? []
+  }));
+  const [saving, setSaving] = useState(false);
+  const field = (key: keyof AdminCardUpdate, value: string | string[]) => setForm((current) => ({ ...current, [key]: value }));
+  const contact = (key: string, value: string) => setForm((current) => ({ ...current, contacts: { ...current.contacts, [key]: value } }));
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
+    try { await onSave(form); } finally { setSaving(false); }
+  };
+  const isSpecialist = Boolean(card.professionCategoryId || card.specialistTitle);
+
+  return <aside className="admin-card-drawer admin-card-editor">
+    <button className="admin-drawer-close" onClick={onCancel}><X size={18} /></button>
+    <header><small>РЕДАКТИРОВАНИЕ АДМИНИСТРАТОРОМ</small><h2>{card.fullName}</h2><p>Владелец: {card.ownerName || card.ownerEmail}</p></header>
+    <div className="admin-edit-warning"><ShieldCheck size={18} /><span>Владелец, тариф, оплата и текущий статус одобрения не изменятся.</span></div>
+    <form onSubmit={(event) => void submit(event)}>
+      <h3>Основные данные</h3>
+      <EditField label="Адрес визитки"><input required value={form.slug} onChange={(e) => field("slug", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} /></EditField>
+      <EditField label="Имя и фамилия"><input required value={form.fullName} onChange={(e) => field("fullName", e.target.value)} /></EditField>
+      <div className="admin-edit-row"><EditField label="Должность"><input required value={form.position} onChange={(e) => field("position", e.target.value)} /></EditField><EditField label="Организация"><input required value={form.organization} onChange={(e) => field("organization", e.target.value)} /></EditField></div>
+      <EditField label="Описание"><textarea rows={4} value={form.description} onChange={(e) => field("description", e.target.value)} /></EditField>
+      <EditField label="Адрес"><input value={form.address} onChange={(e) => field("address", e.target.value)} /></EditField>
+      <div className="admin-edit-row"><EditField label="Фото (URL)"><input value={form.photo} onChange={(e) => field("photo", e.target.value)} /></EditField><EditField label="Логотип (URL)"><input value={form.companyLogo} onChange={(e) => field("companyLogo", e.target.value)} /></EditField></div>
+
+      <h3>Контакты</h3>
+      <div className="admin-edit-row">{contactKeys.map((key) => <EditField key={key} label={contactLabels[key]}><input value={form.contacts[key] ?? ""} onChange={(e) => contact(key, e.target.value)} /></EditField>)}</div>
+
+      <h3>Оформление</h3>
+      <div className="admin-edit-row">
+        <EditField label="Язык"><select value={form.language} onChange={(e) => field("language", e.target.value)}><option value="ru">Русский</option><option value="tj">Тоҷикӣ</option><option value="en">English</option></select></EditField>
+        <EditField label="Шаблон"><select value={form.template} onChange={(e) => field("template", e.target.value)}><option value="executive">Executive</option><option value="minimal">Minimal</option><option value="creative">Creative</option></select></EditField>
+        <EditField label="Тема"><select value={form.theme} onChange={(e) => field("theme", e.target.value)}>{["teal","blue","plum","amber","graphite","navy","violet","burgundy"].map((value) => <option key={value} value={value}>{value}</option>)}</select></EditField>
+      </div>
+
+      {isSpecialist && <><h3>Профиль специалиста</h3>
+        <div className="admin-edit-row"><EditField label="Название профессии"><input value={form.specialistTitle} onChange={(e) => field("specialistTitle", e.target.value)} /></EditField><EditField label="Город"><input value={form.specialistCity} onChange={(e) => field("specialistCity", e.target.value)} /></EditField></div>
+        <EditField label="Навыки (через запятую)"><input value={form.specialistTags.join(", ")} onChange={(e) => field("specialistTags", e.target.value.split(",").map((v) => v.trim()).filter(Boolean).slice(0, 12))} /></EditField>
+        <EditField label="Опыт"><input value={form.specialistExperience} onChange={(e) => field("specialistExperience", e.target.value)} /></EditField>
+        <EditField label="Описание специалиста"><textarea rows={4} value={form.specialistSummary} onChange={(e) => field("specialistSummary", e.target.value)} /></EditField>
+        {card.specialistPlan === "pro" && <><EditField label="Регион работы"><input value={form.specialistServiceArea} onChange={(e) => field("specialistServiceArea", e.target.value)} /></EditField><EditField label="Формат консультации"><input value={form.specialistConsultation} onChange={(e) => field("specialistConsultation", e.target.value)} /></EditField><EditField label="Портфолио (одна ссылка в строке)"><textarea rows={4} value={form.specialistPortfolio.join("\n")} onChange={(e) => field("specialistPortfolio", e.target.value.split("\n").map((v) => v.trim()).filter(Boolean).slice(0, 20))} /></EditField></>}
+      </>}
+      <div className="admin-edit-actions"><button type="button" className="button button-secondary" onClick={onCancel}>Отмена</button><button type="submit" className="button button-primary" disabled={saving}><Save size={17} /> {saving ? "Сохранение…" : "Сохранить изменения"}</button></div>
+    </form>
+  </aside>;
+}
+
+function EditField({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="admin-edit-field"><span>{label}</span>{children}</label>;
 }
