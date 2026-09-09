@@ -48,6 +48,35 @@ const countContacts = (contacts: unknown) =>
   Object.values((contacts && typeof contacts === "object" ? contacts : {}) as Record<string, unknown>)
     .filter((value) => typeof value === "string" && value.trim()).length;
 
+const errorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error) return error.message;
+  if (error && typeof error === "object" && "message" in error) return String(error.message);
+  return fallback;
+};
+
+async function loadDetailsDirectly(cardId: string): Promise<AdminCardDetails> {
+  if (!supabase) throw new Error("Supabase не подключён.");
+  const { data: row, error } = await supabase.from("cards").select("*").eq("id", cardId).single();
+  if (error) throw new Error(errorMessage(error, "Не удалось прочитать визитку."));
+  const { data: owner } = await supabase.from("profiles").select("full_name,email,phone").eq("id", row.owner_id).maybeSingle();
+  const contacts = (row.contacts && typeof row.contacts === "object" ? row.contacts : {}) as Record<string, string>;
+  return {
+    id: String(row.id), ownerId: String(row.owner_id), ownerName: String(owner?.full_name ?? ""),
+    ownerEmail: String(owner?.email ?? ""), ownerPhone: String(owner?.phone ?? ""), slug: String(row.slug ?? ""),
+    fullName: String(row.full_name ?? ""), position: String(row.position ?? ""), organization: String(row.organization_name ?? ""),
+    description: String(row.description ?? ""), photo: String(row.photo_path ?? ""), companyLogo: String(contacts.companyLogo ?? ""),
+    contacts, address: String(row.address ?? ""), language: String(row.language ?? "ru"), theme: String(row.theme ?? "blue"),
+    template: String(row.template ?? "executive"), visibility: String(row.visibility ?? "private"),
+    reviewStatus: String(row.review_status ?? "draft"), views: Number(row.views ?? 0), verifiedAt: row.verified_at ? String(row.verified_at) : null,
+    contactsCount: countContacts(contacts), createdAt: String(row.created_at ?? ""), updatedAt: String(row.updated_at ?? ""),
+    professionCategoryId: String(row.profession_category_id ?? ""), specialistTitle: String(row.specialist_title ?? ""),
+    specialistCity: String(row.specialist_city ?? ""), specialistTags: Array.isArray(row.specialist_tags) ? row.specialist_tags.map(String) : [],
+    specialistExperience: String(row.specialist_experience ?? ""), specialistSummary: String(row.specialist_summary ?? ""),
+    specialistPlan: row.specialist_plan === "pro" ? "pro" : "specialist", specialistServiceArea: String(row.specialist_service_area ?? ""),
+    specialistConsultation: String(row.specialist_consultation ?? ""), specialistPortfolio: Array.isArray(row.specialist_portfolio) ? row.specialist_portfolio.map(String) : []
+  };
+}
+
 async function loadWorkspaceDirectly(): Promise<AdminCardWorkspace> {
   if (!supabase) return empty;
   const { data: rows, error } = await supabase
@@ -135,7 +164,12 @@ export const adminCardsRepository = {
       target_card_id: cardId,
       access_reason: reason
     });
-    if (error) throw error;
+    if (error) {
+      try { return await loadDetailsDirectly(cardId); }
+      catch (fallbackError) {
+        throw new Error(`${errorMessage(error, "Ошибка защищённого запроса")}. ${errorMessage(fallbackError, "Резервное чтение также не выполнено")}`);
+      }
+    }
     return data as AdminCardDetails;
   },
   async update(cardId: string, changes: AdminCardUpdate): Promise<AdminCardDetails> {
