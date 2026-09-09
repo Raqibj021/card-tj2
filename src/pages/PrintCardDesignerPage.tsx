@@ -115,7 +115,7 @@ export default function PrintCardDesignerPage() {
   const [logo, setLogo] = useState("");
   const [photo, setPhoto] = useState("");
   const [logoMark, setLogoMark] = useState<LogoId>("orbit");
-  const [data, setData] = useState({ name: "Фируз Саидов", position: "Архитектор и основатель", organization: "FORMA Studio", phone: "+992 93 555 21 21", email: "hello@forma.tj", website: "forma.tj", address: "Душанбе, проспект Рудаки, 70", instagram: "@forma.tj", facebook: "forma.tj", telegram: "@forma_tj", whatsapp: "+992 93 555 21 21", qr: publicSiteUrl("/card/demo") });
+  const [data, setData] = useState({ name: "Фируз Саидов", position: "Архитектор и основатель", organization: "FORMA Studio", phone: "+992 93 555 21 21", email: "hello@forma.tj", website: "forma.tj", address: "Душанбе, проспект Рудаки, 70", instagram: "@forma.tj", facebook: "forma.tj", telegram: "@forma_tj", whatsapp: "+992 93 555 21 21", qr: publicSiteUrl("/demo") });
   const [positions, setPositions] = useState<Positions>(() => defaultPositions(false));
   const [sizes, setSizes] = useState<Record<MoveKey, number>>({ logo: 1, brand: 1, person: 1, company: 1, contacts: 1, socials: 1, qr: 1, photo: 1 });
   const [selected, setSelected] = useState<MoveKey>("person");

@@ -76,7 +76,7 @@ export default function ModerationPage() {
           <article key={card.id}>
             <div className="moderation-main"><span className="moderation-avatar">{card.name?.[0] || "V"}</span><div><strong>{card.name}</strong><p>{card.position || "Должность не указана"} · {card.organization || "Без организации"}</p><small>{card.phone || card.email || "Контакт не указан"}</small></div></div>
             <div className="moderation-flags">{card.riskSignals.map(signal => <span key={signal}><AlertTriangle size={14} /> {signal}</span>)}{!card.riskSignals.length && <span className="safe"><ShieldCheck size={14} /> Автопроверка пройдена</span>}</div>
-            <div className="moderation-actions"><Link to={`/card/${card.slug}`} target="_blank"><ExternalLink size={16} /></Link><button className="approve" onClick={() => void reviewCard(card, "approved")}><Check size={16} /> Одобрить</button><button onClick={() => void reviewCard(card, "changes_requested")}>Исправить</button><button className="reject" onClick={() => void reviewCard(card, "rejected")}><X size={16} /> Отклонить</button></div>
+            <div className="moderation-actions"><Link to={`/${card.slug}`} target="_blank"><ExternalLink size={16} /></Link><button className="approve" onClick={() => void reviewCard(card, "approved")}><Check size={16} /> Одобрить</button><button onClick={() => void reviewCard(card, "changes_requested")}>Исправить</button><button className="reject" onClick={() => void reviewCard(card, "rejected")}><X size={16} /> Отклонить</button></div>
           </article>
         ))}{!workspace.cards.length && <Empty text="Новых визиток для проверки нет." />}</div>}
         {tab === "documents" && <div className="moderation-list">{workspace.verifications.map(item => (
@@ -90,7 +90,7 @@ export default function ModerationPage() {
           <article key={item.id}>
             <div className="moderation-main"><span className="moderation-avatar report"><ShieldAlert size={20} /></span><div><strong>{item.cardName}</strong><p>{item.reason}</p><small>{item.reporter} · {new Date(item.createdAt).toLocaleString("ru-RU")}</small></div></div>
             <p className="moderation-report-text">{item.details || "Дополнительное описание не указано."}</p>
-            <div className="moderation-actions"><Link to={`/card/${item.cardSlug}`} target="_blank"><ExternalLink size={16} /></Link><button className="approve" onClick={() => void resolveReport(item, "dismiss")}>Отклонить жалобу</button><button className="reject" onClick={() => void resolveReport(item, "hide_card")}>Скрыть визитку</button></div>
+            <div className="moderation-actions"><Link to={`/${item.cardSlug}`} target="_blank"><ExternalLink size={16} /></Link><button className="approve" onClick={() => void resolveReport(item, "dismiss")}>Отклонить жалобу</button><button className="reject" onClick={() => void resolveReport(item, "hide_card")}>Скрыть визитку</button></div>
           </article>
         ))}{!workspace.reports.length && <Empty text="Необработанных жалоб нет." />}</div>}
         {tab === "history" && <div className="moderation-history">{workspace.audit.map(item => <article key={item.id}><span><History size={16} /></span><div><strong>{actionLabel(item.action)}</strong><p>{String(item.details.note ?? item.details.reason ?? "Решение администратора")}</p><small>{new Date(item.createdAt).toLocaleString("ru-RU")}</small></div></article>)}{!workspace.audit.length && <Empty text="История решений пока пуста." />}</div>}

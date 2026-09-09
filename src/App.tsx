@@ -51,7 +51,12 @@ function ScrollToTop() {
 
 export default function App() {
   const location = useLocation();
-  const standaloneCard = location.pathname.startsWith("/card/");
+  const rootSlug = /^\/[^/]+\/?$/.test(location.pathname) && !new Set([
+    "/", "/directory", "/organizations", "/organization", "/payment", "/notifications",
+    "/support", "/services", "/about", "/service-order", "/contract", "/print-card",
+    "/login", "/register", "/forgot-password", "/reset-password", "/create", "/dashboard", "/verification"
+  ]).has(location.pathname.replace(/\/$/, "") || "/");
+  const standaloneCard = location.pathname.startsWith("/card/") || rootSlug;
   const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname);
   const standaloneAdmin = location.pathname.startsWith("/admin");
 
@@ -102,6 +107,7 @@ export default function App() {
         <Route path="/admin/commerce" element={<AdminProtectedRoute><AdminCommercePage /></AdminProtectedRoute>} />
         <Route path="/admin/support" element={<AdminProtectedRoute><AdminSupportPage /></AdminProtectedRoute>} />
         <Route path="/card/:slug" element={<CardPage />} />
+        <Route path="/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       {!standaloneCard && !standaloneAuth && !standaloneAdmin && <HelpWidget />}

@@ -256,7 +256,7 @@ function EmployeeGrid({ employees, departments, copy, emptyText }: { employees: 
   return <div className="org-public-employee-grid">{employees.map((employee, index) => {
     const department = departments.find((item) => item.id === employee.departmentId);
     return <article className="org-public-employee org-public-reveal" style={{ animationDelay: `${Math.min(index, 6) * 55}ms` }} key={employee.id || employee.slug}>
-      <Link to={`/card/${employee.slug}`} aria-label={`${copy.open}: ${employee.name}`}>
+      <Link to={`/${employee.slug}`} aria-label={`${copy.open}: ${employee.name}`}>
         <div className="org-public-employee-top">
           {employee.photo
             ? <img className="org-public-employee-avatar" src={employee.photo} alt={employee.name} loading="lazy" />

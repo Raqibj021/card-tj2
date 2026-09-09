@@ -22,7 +22,7 @@ const publicUrl = (slug: string) => {
 };
 
 const employeePublicUrl = (slug: string) => {
-  return publicSiteUrl(`/card/${slug}`);
+  return publicSiteUrl(`/${slug}`);
 };
 
 const compressImage = (file: File) => new Promise<string>((resolve, reject) => {
