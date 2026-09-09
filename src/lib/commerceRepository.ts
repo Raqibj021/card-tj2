@@ -6,6 +6,7 @@ export interface OrderItem {
   category: "digital" | "design" | "print" | "materials" | "extras";
   quantity: number;
   unitPrice: number;
+  imageKey?: string;
 }
 
 export interface CustomerDetails {

@@ -1,12 +1,12 @@
 import { adminSupabase } from "./supabase";
 
 export type AdminNavCounts = {
-  total: number; accounts: number; cards: number; moderation: number; payments: number; support: number;
+  total: number; accounts: number; cards: number; moderation: number; payments: number; services: number; support: number;
 };
 
 export const adminCountsChangedEvent = "vizora:admin-counts-changed";
 export const signalAdminCountsChanged = () => window.dispatchEvent(new Event(adminCountsChangedEvent));
-export const emptyAdminNavCounts: AdminNavCounts = { total: 0, accounts: 0, cards: 0, moderation: 0, payments: 0, support: 0 };
+export const emptyAdminNavCounts: AdminNavCounts = { total: 0, accounts: 0, cards: 0, moderation: 0, payments: 0, services: 0, support: 0 };
 
 export const adminNotificationRepository = {
   async counts(): Promise<AdminNavCounts> {
