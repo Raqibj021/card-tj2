@@ -5,6 +5,7 @@ import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
+import { promoRepository } from "../lib/promoRepository";
 import { authRedirectUrl } from "../lib/siteUrl";
 import type { Language } from "../types/card";
 
@@ -61,6 +62,7 @@ export default function UserAuthPage({ mode }: { mode: "login" | "register" }) {
   const [pendingEmail, setPendingEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [showLaunchOffer, setShowLaunchOffer] = useState(false);
 
   const destination = (location.state as { from?: string } | null)?.from ?? "/dashboard";
 
@@ -73,6 +75,15 @@ export default function UserAuthPage({ mode }: { mode: "login" | "register" }) {
     const timer = window.setTimeout(() => setResendCooldown((value) => Math.max(0, value - 1)), 1000);
     return () => window.clearTimeout(timer);
   }, [resendCooldown]);
+
+  useEffect(() => {
+    if (!isRegister) return;
+    let active = true;
+    void promoRepository.status()
+      .then((status) => { if (active) setShowLaunchOffer(status.remaining > 0); })
+      .catch(() => { if (active) setShowLaunchOffer(false); });
+    return () => { active = false; };
+  }, [isRegister]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -127,12 +138,12 @@ export default function UserAuthPage({ mode }: { mode: "login" | "register" }) {
   return (
     <main className="auth-page">
       <section className="auth-side">
-        <div className="auth-topbar"><Link to="/" aria-label="Vizora"><BrandLogo light /></Link><Language value={language} setValue={setLanguage} /></div>
-        <div><span className="section-label">VIZORA.TJ</span><h1>{isRegister ? text.registerHero : text.loginHero}</h1><p>{text.heroText}</p>{isRegister && <div className="auth-gift"><Gift size={22} /><div><strong>{text.launch}</strong><span>{text.launchText}</span></div></div>}</div>
+        <div className="auth-topbar"><Link to="/" aria-label="Vizora"><BrandLogo /></Link><Language value={language} setValue={setLanguage} /></div>
+        <div><span className="section-label">VIZORA.TJ</span><h1>{isRegister ? text.registerHero : text.loginHero}</h1><p>{text.heroText}</p>{isRegister && showLaunchOffer && <div className="auth-gift"><Gift size={22} /><div><strong>{text.launch}</strong><span>{text.launchText}</span></div></div>}</div>
         <small>© {new Date().getFullYear()} Vizora.tj</small>
       </section>
       <section className="auth-form-wrap">
-        <div className="auth-mobile-topbar"><Link to="/" className="auth-mobile-logo"><BrandLogo light /></Link><Language value={language} setValue={setLanguage} /></div>
+        <div className="auth-mobile-topbar"><Link to="/" className="auth-mobile-logo"><BrandLogo /></Link><Language value={language} setValue={setLanguage} /></div>
         <div className="auth-form-card">
           <span className="section-label">{isRegister ? text.newAccount : text.cabinet}</span>
           <h2>{pendingEmail ? text.codeTitle : isRegister ? text.register : text.login}</h2>
