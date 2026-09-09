@@ -2254,6 +2254,12 @@ summary:focus-visible {
   padding-top: 15px;
 }
 
+.home-promo-wide {
+  width: calc(100% - 28px);
+  max-width: 1740px;
+  margin-inline: auto;
+}
+
 .home-promo-carousel {
   position: relative;
   overflow: hidden;
