@@ -6,6 +6,8 @@ export type AdminPayment = {
   receiptPath: string; status: string; createdAt: string; reviewedAt?: string; activatedAt?: string;
   rejectionReason: string; adminNote: string; email: string; organization: string;
   customer: { fullName?: string; phone?: string };
+  cardId?: string; cardName?: string; cardSlug?: string; cardStatus?: string;
+  documentPaths: string[]; verificationStatus?: string; requiresLicense?: boolean;
 };
 export type AdminServiceOrder = {
   id: string; orderNumber: string; customer: { fullName?: string; phone?: string };
@@ -31,7 +33,7 @@ const empty: CommerceWorkspace = {
 export const commerceAdminRepository = {
   async workspace() {
     if (!supabase) return empty;
-    const { data, error } = await supabase.rpc("get_admin_commerce_workspace");
+    const { data, error } = await supabase.rpc("get_admin_unified_commerce_workspace");
     if (error) throw error;
     return (data ?? empty) as CommerceWorkspace;
   },
@@ -41,9 +43,15 @@ export const commerceAdminRepository = {
     if (error) throw error;
     return data.signedUrl;
   },
+  async documentUrl(path: string) {
+    if (!supabase || !path) throw new Error("Документ не найден");
+    const { data, error } = await supabase.storage.from("verification-documents").createSignedUrl(path, 300);
+    if (error) throw error;
+    return data.signedUrl;
+  },
   async approvePayment(id: string, note: string) {
     if (!supabase) throw new Error("Supabase не подключён");
-    const { data, error } = await supabase.rpc("admin_approve_payment", { target_order_id: id, note });
+    const { data, error } = await supabase.rpc("admin_approve_publication", { target_order_id: id, note });
     if (error) throw new Error(error.message || "Сервер не смог подтвердить оплату.");
     signalAdminCountsChanged();
     return data;
@@ -52,6 +60,14 @@ export const commerceAdminRepository = {
     if (!supabase) throw new Error("Supabase не подключён");
     const { error } = await supabase.rpc("admin_reject_payment", { target_order_id: id, reason });
     if (error) throw new Error(error.message || "Сервер не смог отклонить оплату.");
+    signalAdminCountsChanged();
+  },
+  async requestCardChanges(cardId: string, note: string) {
+    if (!supabase) throw new Error("Supabase не подключён");
+    const { error } = await supabase.rpc("admin_review_card", {
+      target_card_id: cardId, decision: "changes_requested", note
+    });
+    if (error) throw new Error(error.message || "Не удалось запросить исправление визитки.");
     signalAdminCountsChanged();
   },
   async updateServiceOrder(id: string, status: string, paymentStatus: string, comment: string) {
