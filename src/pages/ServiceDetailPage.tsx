@@ -55,29 +55,29 @@ const content = {
     visual: "organization",
     ru: [
       "Визитки организации под ключ",
-      "Создадим единую цифровую систему визиток для руководителей, отделов и сотрудников.",
+      "Один QR-код открывает страницу организации со всеми визитками сотрудников. Мы полностью настраиваем систему и передаём её готовой к работе.",
       [
         "Единый корпоративный дизайн",
-        "Создание карточек сотрудников",
-        "Страница организации и общий QR-код",
+        "Визитки всех сотрудников в одном месте",
+        "Общий QR-код и управление составом команды",
       ],
     ],
     tj: [
       "Варақаҳои ташкилот бо омодасозии пурра",
-      "Барои роҳбарон, шуъбаҳо ва кормандон низоми ягонаи варақаҳои рақамиро месозем.",
+      "Як QR-код саҳифаи ташкилотро бо ҳамаи варақаҳои кормандон мекушояд. Мо низомро пурра омода карда, барои истифода месупорем.",
       [
         "Дизайни ягонаи корпоративӣ",
-        "Сохтани варақаҳои кормандон",
-        "Саҳифаи ташкилот ва QR-код",
+        "Варақаҳои ҳамаи кормандон дар як ҷой",
+        "QR-коди умумӣ ва идоракунии ҳайати даста",
       ],
     ],
     en: [
       "Turnkey organization cards",
-      "A unified digital business-card system for managers, departments and employees.",
+      "One QR code opens an organization page with every employee card. We configure the complete system and deliver it ready to use.",
       [
         "Unified corporate design",
-        "Employee card setup",
-        "Organization page and QR code",
+        "Every employee card in one place",
+        "Shared QR code and team management",
       ],
     ],
   },
@@ -155,12 +155,13 @@ export default function ServiceDetailPage() {
   const [quantity, setQuantity] = useState(1);
   if (!service) return <Navigate to="/services" replace />;
   const [title, description, benefits] = service[language];
+  const isOrganization = service.visual === "organization";
   const Icon = service.icon;
   const labels =
     language === "ru"
       ? {
           back: "Все услуги",
-          included: "Что входит",
+          included: isOrganization ? "Что значит «под ключ»" : "Что входит",
           examples: "Выберите вариант",
           quantity: "Количество",
           order: "Заказать",
@@ -174,7 +175,7 @@ export default function ServiceDetailPage() {
       : language === "tj"
         ? {
             back: "Ҳамаи хизматҳо",
-            included: "Ба хизмат дохил мешавад",
+            included: isOrganization ? "«Омодасозии пурра» чӣ маъно дорад" : "Ба хизмат дохил мешавад",
             examples: "Навъро интихоб кунед",
             quantity: "Миқдор",
             order: "Фармоиш додан",
@@ -187,7 +188,7 @@ export default function ServiceDetailPage() {
           }
         : {
             back: "All services",
-            included: "What is included",
+            included: isOrganization ? "What “turnkey” means" : "What is included",
             examples: "Choose an option",
             quantity: "Quantity",
             order: "Order now",
@@ -204,15 +205,17 @@ export default function ServiceDetailPage() {
       : language === "tj"
         ? ["NFC-и рӯимизӣ", "QR барои пештахта", "Деворӣ", "Часпак бо NFC"]
         : ["Desktop NFC", "Counter QR", "Wall sign", "NFC sticker"];
-  const variants =
-    service.visual === "signs"
-      ? signVariants
-      : nfcCardDesigns.map((card) => card.title[language]);
+  const variants = service.visual === "signs"
+    ? signVariants
+    : service.visual === "nfc"
+      ? nfcCardDesigns.map((card) => card.title[language])
+      : [];
   const selectedImageKey = service.visual === "nfc" ? nfcCardDesigns[variant]?.id : "";
-  const orderUrl = `/service-order?service=${service.order}&qty=${quantity}&variant=${encodeURIComponent(variants[variant])}${selectedImageKey ? `&image=${selectedImageKey}` : ""}`;
+  const selectedVariant = variants[variant] ?? "";
+  const orderUrl = `/service-order?service=${service.order}&qty=${quantity}${selectedVariant ? `&variant=${encodeURIComponent(selectedVariant)}` : ""}${selectedImageKey ? `&image=${selectedImageKey}` : ""}`;
   return (
     <>
-      <main className="service-detail-page">
+      <main className={`service-detail-page${isOrganization ? " service-detail-page-compact" : ""}`}>
         <div className="services-orb services-orb-one" />
         <div className="services-orb services-orb-two" />
         <section className="site-container service-detail-shell">
@@ -233,13 +236,16 @@ export default function ServiceDetailPage() {
           <div className="service-detail-grid">
             <section className="service-showcase">
               {service.visual === "organization" ? (
-                <div className="organization-service-visual">
-                  <Building2 size={54} />
-                  <strong>VIZORA.TJ</strong>
-                  <span>01</span>
-                  <span>02</span>
-                  <span>03</span>
-                </div>
+                <picture className="organization-service-picture">
+                  <source
+                    media="(min-width: 821px)"
+                    srcSet={`${import.meta.env.BASE_URL}images/services/organization/organization-desktop.webp`}
+                  />
+                  <img
+                    src={`${import.meta.env.BASE_URL}images/services/organization/organization-mobile.webp`}
+                    alt={title}
+                  />
+                </picture>
               ) : service.visual === "cards" ? (
                 <img
                   className="service-single-image"
