@@ -20,7 +20,7 @@ const navigation = [
   { to: "/admin/accounts", label: "Аккаунты", icon: Building2, count: "accounts" as const },
   { to: "/admin/cards", label: "Визитки", icon: ContactRound, count: "cards" as const },
   { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck, count: "moderation" as const },
-  { to: "/admin/payments", label: "Оплаты и заказы", icon: Banknote, count: "payments" as const },
+  { to: "/admin/payments", label: "Заявки и оплаты", icon: Banknote, count: "payments" as const },
   { to: "/admin/support", label: "Поддержка", icon: Headphones, count: "support" as const }
 ];
 
