@@ -31,6 +31,7 @@ export default function ServiceOrderPage() {
   const requestedService = searchParams.get("service");
   const requestedQuantity = Math.max(1, Number(searchParams.get("qty")) || 1);
   const requestedVariant = searchParams.get("variant")?.trim() ?? "";
+  const requestedImageKey = searchParams.get("image")?.trim() ?? "";
   const text = [
     { label: "Заказ услуг", title: "Соберите заказ", note: "Стоимость предварительная. Менеджер проверит параметры и согласует итог до оплаты.", quantity: "Количество", customer: "Контактные данные", submit: "Отправить заказ", total: "Предварительный итог", success: "Заказ принят", byAgreement: "По договору" },
     { label: "Фармоиши хизмат", title: "Фармоишро ҷамъ кунед", note: "Арзиш пешакӣ аст. Менеҷер параметрҳоро месанҷад ва маблағи ниҳоиро тасдиқ мекунад.", quantity: "Миқдор", customer: "Маълумоти тамос", submit: "Фиристодани фармоиш", total: "Ҷамъбасти пешакӣ", success: "Фармоиш қабул шуд", byAgreement: "Бо шартнома" },
@@ -44,8 +45,8 @@ export default function ServiceOrderPage() {
   const items = useMemo<OrderItem[]>(() => catalog.flatMap((service) => {
     const quantity = selected[service.id] ?? 0;
     const title = requestedVariant && service.id === requestedService ? `${service.title[lang]} — ${requestedVariant}` : service.title[lang];
-    return quantity ? [{ id: service.id, title, category: service.category, quantity, unitPrice: service.price }] : [];
-  }), [selected, lang, requestedService, requestedVariant]);
+    return quantity ? [{ id: service.id, title, category: service.category, quantity, unitPrice: service.price, imageKey: service.id === requestedService ? requestedImageKey || undefined : undefined }] : [];
+  }), [selected, lang, requestedService, requestedVariant, requestedImageKey]);
   const total = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
   const submit = async () => {
