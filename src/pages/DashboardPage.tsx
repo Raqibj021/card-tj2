@@ -40,7 +40,7 @@ interface DashboardNotification {
 }
 
 const getCardUrl = (slug: string) => {
-  return publicSiteUrl(`/card/${slug}`);
+  return publicSiteUrl(`/${slug}`);
 };
 
 const avatarText = (name: string) =>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
     return dashboardCopy.draft;
   };
   const mainAction = primaryCard ? (
-    primaryCard.reviewStatus === "approved" ? { to: `/card/${primaryCard.slug}`, label: dashboardCopy.openResult } :
+    primaryCard.reviewStatus === "approved" ? { to: `/${primaryCard.slug}`, label: dashboardCopy.openResult } :
     primaryCard.reviewStatus === "draft" ? { to: "/payment?plan=personal", label: dashboardCopy.payAndSubmit } :
     primaryCard.reviewStatus === "changes_requested" || primaryCard.reviewStatus === "rejected"
       ? { to: `/create?edit=${primaryCard.id}`, label: dashboardCopy.fixAndSubmit }
@@ -171,7 +171,7 @@ export default function DashboardPage() {
             </div>
             <div className="dashboard-profile-actions">
               {primaryCard && (
-                <Link to={`/card/${primaryCard.slug}`} className="button button-secondary">
+                <Link to={`/${primaryCard.slug}`} className="button button-secondary">
                   <ExternalLink size={16} /> {dashboardCopy.viewCard}
                 </Link>
               )}
@@ -303,7 +303,7 @@ export default function DashboardPage() {
                     </button>
                   </div>
 
-                  <Link to={`/card/${card.slug}`} className="dashboard-card-link">
+                  <Link to={`/${card.slug}`} className="dashboard-card-link">
                     <span>vizora.tj/{card.slug}</span>
                     <Eye size={16} />
                   </Link>
