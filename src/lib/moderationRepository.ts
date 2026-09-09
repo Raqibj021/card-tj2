@@ -36,7 +36,7 @@ const empty: ModerationWorkspace = {
 export const moderationRepository = {
   async workspace(): Promise<ModerationWorkspace> {
     if (!supabase) return empty;
-    const { data, error } = await supabase.rpc("get_admin_moderation_workspace");
+    const { data, error } = await supabase.rpc("get_admin_unified_moderation_workspace");
     if (error) throw error;
     return { ...empty, ...((data ?? {}) as ModerationWorkspace) };
   },
