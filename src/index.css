@@ -8919,3 +8919,70 @@ body,
   }
   .services-choice-card strong svg { width: 16px; height: 16px; }
 }
+
+/* Compact inner service pages on phones and small tablets. */
+@media (max-width: 820px) {
+  .service-detail-page { min-height: 0; padding: 20px 0 38px; }
+  .service-back { min-height: 38px; align-items: center; font-size: 14px; }
+  .service-detail-head {
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    margin: 14px 0 18px;
+  }
+  .service-detail-head .services-choice-icon {
+    grid-column: auto;
+    grid-row: auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+  }
+  .service-detail-head .services-choice-icon svg { width: 22px; height: 22px; }
+  .service-detail-head .section-label { font-size: 9px; }
+  .service-detail-head h1 {
+    margin: 4px 0 7px;
+    font-size: clamp(27px, 7.8vw, 36px);
+    letter-spacing: -.045em;
+    line-height: 1.06;
+  }
+  .service-detail-head p { font-size: 14px; line-height: 1.48; }
+  .service-detail-grid { gap: 10px; }
+  .service-showcase,
+  .service-order-panel { border-radius: 17px; }
+  .service-showcase { padding: 10px; }
+  .service-order-panel { padding: 17px; }
+  .service-order-panel h2 { margin-bottom: 12px; font-size: 19px; }
+  .service-order-panel ul { gap: 8px; margin-bottom: 16px; }
+  .service-order-panel li { gap: 8px; font-size: 14px; line-height: 1.4; }
+  .service-single-image,
+  .service-sign-image { min-height: 0; aspect-ratio: 16/10; border-radius: 12px; object-fit: cover; }
+  .organization-service-picture { border-radius: 12px; }
+  .organization-service-picture img { width: 100%; height: min(122vw, 480px); aspect-ratio: auto; object-fit: cover; }
+  .service-detail-nfc .service-showcase { overflow: visible; }
+  .service-detail-nfc .service-card-gallery {
+    display: flex;
+    overflow-x: auto;
+    gap: 9px;
+    padding: 2px 2px 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+  .service-detail-nfc .service-card-gallery button {
+    flex: 0 0 min(76vw, 290px);
+    border-radius: 13px;
+    scroll-snap-align: start;
+  }
+  .service-detail-nfc .service-card-gallery span { padding: 8px 9px; font-size: 12px; }
+  .service-detail-nfc .service-variant-label,
+  .service-detail-nfc .service-variant-list { display: none; }
+  .service-detail-signs .service-variant-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .service-order-panel label { margin-top: 14px; }
+  .service-quantity { margin-bottom: 14px; }
+  .service-process { margin-top: 24px; }
+  .service-process > div { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-top: 10px; }
+  .service-process article { min-width: 0; border-radius: 13px; padding: 11px 9px; }
+  .service-process article p { margin-top: 6px; font-size: 13px; line-height: 1.32; }
+  .service-detail-page-compact .service-detail-head { margin: 14px 0 18px; }
+  .service-detail-page-compact .service-showcase { padding: 10px; }
+  .service-detail-page-compact .service-process { margin-top: 24px; }
+}
