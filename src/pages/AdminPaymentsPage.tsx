@@ -1,4 +1,4 @@
-import { Banknote, Check, ClipboardList, ExternalLink, FileSignature, History, RefreshCw, X } from "lucide-react";
+import { Banknote, Check, ClipboardList, ExternalLink, FileSearch, FileSignature, History, RefreshCw, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
 import { commerceAdminRepository, type CommerceWorkspace } from "../lib/commerceAdminRepository";
@@ -39,10 +39,13 @@ export default function AdminPaymentsPage() {
   useEffect(() => { void refresh(); }, []);
   const payments = useMemo(() => data.payments.filter((p) => filter === "all" || p.status === filter), [data.payments, filter]);
 
-  const approve = async (id: string) => {
-    if (!window.confirm("Вы проверили поступление денег, тариф, сумму и чек? После подтверждения тариф активируется автоматически — код не потребуется.")) return;
+  const approve = async (id: string, hasCard: boolean) => {
+    const message = hasCard
+      ? "Вы проверили чек, данные визитки и документы специалиста (если они есть)? Оплата будет подтверждена, тариф активирован, а визитка опубликована одним действием."
+      : "Вы проверили поступление денег, тариф и чек? После подтверждения тариф организации активируется автоматически.";
+    if (!window.confirm(message)) return;
     setBusy(id);
-    try { await commerceAdminRepository.approvePayment(id, ""); await refresh(); setNotice("Оплата подтверждена. Тариф активирован автоматически."); }
+    try { await commerceAdminRepository.approvePayment(id, ""); await refresh(); setNotice(hasCard ? "Заявка одобрена: оплата подтверждена, тариф активирован, визитка опубликована." : "Оплата подтверждена, тариф организации активирован."); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка подтверждения"); }
     finally { setBusy(""); }
   };
@@ -64,14 +67,26 @@ export default function AdminPaymentsPage() {
     try { window.open(await commerceAdminRepository.receiptUrl(path), "_blank", "noopener,noreferrer"); }
     catch (error) { setNotice(error instanceof Error ? error.message : "Чек не найден"); }
   };
+  const requestChanges = async (cardId: string) => {
+    const reason = window.prompt("Что пользователю нужно исправить в визитке?", "Пожалуйста, исправьте указанные данные и повторно отправьте визитку.")?.trim();
+    if (!reason || reason.length < 3) return;
+    setBusy(cardId);
+    try { await commerceAdminRepository.requestCardChanges(cardId, reason); await refresh(); setNotice("Запрос на исправление отправлен. Оплата сохранена и ждёт исправленной визитки."); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Не удалось запросить исправление"); }
+    finally { setBusy(""); }
+  };
+  const openDocument = async (path: string) => {
+    try { window.open(await commerceAdminRepository.documentUrl(path), "_blank", "noopener,noreferrer"); }
+    catch (error) { setNotice(error instanceof Error ? error.message : "Документ не найден"); }
+  };
 
-  return <AdminShell title="Оплаты и заказы" description="Контроль тарифов, ручных оплат, изготовления продукции и договоров в одном рабочем пространстве."
+  return <AdminShell title="Заявки, оплаты и публикация" description="Чек, визитка и документы собраны в одной заявке. Одно решение активирует тариф и публикует визитку."
     actions={<button className="admin-toolbar-button" disabled={busy === "refresh"} onClick={() => void refresh()}><RefreshCw size={16}/> Обновить</button>}>
     <div className="admin-subpage commerce-console">
       {notice && <div className="commerce-alert">{notice}<button onClick={() => setNotice("")}><X size={16}/></button></div>}
 
       <div className="commerce-kpis">
-        <article><small>Ждут решения</small><strong>{data.stats.pendingPayments}</strong><span>оплат</span></article>
+        <article><small>Ждут решения</small><strong>{data.stats.pendingPayments}</strong><span>единых заявок</span></article>
         <article><small>Активные тарифы</small><strong>{data.stats.activePlans}</strong><span>{data.stats.expiringPlans} скоро истекают</span></article>
         <article><small>Доход по тарифам</small><strong>{Number(data.stats.tariffRevenue).toLocaleString()} c.</strong><span>подтверждённые оплаты</span></article>
         <article><small>Заказы услуг</small><strong>{data.stats.serviceOrders}</strong><span>{Number(data.stats.serviceRevenue).toLocaleString()} c. оплачено</span></article>
@@ -79,14 +94,14 @@ export default function AdminPaymentsPage() {
       </div>
 
       <div className="commerce-tabs">
-        <button className={tab==="payments"?"active":""} onClick={() => setTab("payments")}><Banknote size={17}/> Тарифы и оплаты <b>{data.payments.length}</b></button>
+        <button className={tab==="payments"?"active":""} onClick={() => setTab("payments")}><Banknote size={17}/> Проверка заявок <b>{data.payments.length}</b></button>
         <button className={tab==="orders"?"active":""} onClick={() => setTab("orders")}><ClipboardList size={17}/> Заказы <b>{data.serviceOrders.length}</b></button>
         <button className={tab==="contracts"?"active":""} onClick={() => setTab("contracts")}><FileSignature size={17}/> Договоры <b>{data.contracts.length}</b></button>
         <button className={tab==="history"?"active":""} onClick={() => setTab("history")}><History size={17}/> История</button>
       </div>
 
       {tab === "payments" && <section className="commerce-section">
-        <header><div><h2>Проверка ручных оплат</h2><p>Код отсутствует до вашего подтверждения. Сервер сам проверяет цену выбранного тарифа.</p></div>
+        <header><div><h2>Чек и визитка — в одном месте</h2><p>Проверьте оплату и содержание, затем подтвердите и опубликуйте одним действием.</p></div>
           <select value={filter} onChange={(e) => setFilter(e.target.value)}><option value="all">Все статусы</option><option value="payment_review">На проверке</option><option value="active">Активированы</option><option value="rejected">Отклонены</option></select>
         </header>
         <div className="commerce-payment-list">{payments.map((item) => {
@@ -97,9 +112,13 @@ export default function AdminPaymentsPage() {
               <p>{item.email || item.customer?.phone || "Контакт не указан"}</p></div>
             <div><small>Тариф</small><strong>{planNames[item.planCode] ?? item.planCode}</strong><span>{item.organization}</span></div>
             <div><small>Сумма</small><strong>{Number(item.amount).toLocaleString()} сомони</strong><span>{new Date(item.createdAt).toLocaleString("ru-RU")}</span></div>
-            <div className="commerce-payment-buttons"><button className="receipt" onClick={() => void openReceipt(item.receiptPath)}><ExternalLink size={16}/> Открыть чек</button>
-              {awaiting && <><button className="approve" disabled={busy===item.id} onClick={() => void approve(item.id)}><Check size={16}/> Подтвердить</button><button className="reject" disabled={busy===item.id} onClick={() => void reject(item.id)}><X size={16}/> Отклонить</button></>}
+            <div className="commerce-payment-buttons"><button className="receipt" onClick={() => void openReceipt(item.receiptPath)}><ExternalLink size={16}/> Чек</button>
+              {item.cardSlug && <a className="receipt" href={`/card/${item.cardSlug}`} target="_blank" rel="noreferrer"><ExternalLink size={16}/> Визитка</a>}
+              {(item.documentPaths ?? []).map((path, index) => <button className="receipt" key={path} onClick={() => void openDocument(path)}><FileSearch size={16}/> Документ {index + 1}</button>)}
+              {awaiting && <><button className="approve" disabled={busy===item.id || (!item.cardId && !item.organization)} onClick={() => void approve(item.id, Boolean(item.cardId))}><Check size={16}/> {item.cardId ? "Подтвердить и опубликовать" : "Подтвердить оплату"}</button>{item.cardId && <button disabled={busy===item.cardId} onClick={() => void requestChanges(item.cardId!)}>Исправить визитку</button>}<button className="reject" disabled={busy===item.id} onClick={() => void reject(item.id)}><X size={16}/> Отклонить оплату</button></>}
             </div>
+            {item.cardId && <p className="commerce-reason">Визитка: {item.cardName || "Без названия"} · {statusNames[item.cardStatus ?? ""] ?? item.cardStatus}</p>}
+            {awaiting && !item.cardId && !item.organization && <p className="commerce-reason">Визитка не найдена. Попросите пользователя сначала сохранить визитку.</p>}
             {item.rejectionReason && <p className="commerce-reason">Причина: {item.rejectionReason}</p>}
           </article>;
         })}{!payments.length && <div className="table-empty">Заявок с выбранным статусом нет.</div>}</div>
