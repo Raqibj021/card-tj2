@@ -113,7 +113,7 @@ export default function AdminPaymentsPage() {
             <div><small>Тариф</small><strong>{planNames[item.planCode] ?? item.planCode}</strong><span>{item.organization}</span></div>
             <div><small>Сумма</small><strong>{Number(item.amount).toLocaleString()} сомони</strong><span>{new Date(item.createdAt).toLocaleString("ru-RU")}</span></div>
             <div className="commerce-payment-buttons"><button className="receipt" onClick={() => void openReceipt(item.receiptPath)}><ExternalLink size={16}/> Чек</button>
-              {item.cardSlug && <a className="receipt" href={`/card/${item.cardSlug}`} target="_blank" rel="noreferrer"><ExternalLink size={16}/> Визитка</a>}
+              {item.cardSlug && <a className="receipt" href={`/${item.cardSlug}`} target="_blank" rel="noreferrer"><ExternalLink size={16}/> Визитка</a>}
               {(item.documentPaths ?? []).map((path, index) => <button className="receipt" key={path} onClick={() => void openDocument(path)}><FileSearch size={16}/> Документ {index + 1}</button>)}
               {awaiting && <><button className="approve" disabled={busy===item.id || (!item.cardId && !item.organization)} onClick={() => void approve(item.id, Boolean(item.cardId))}><Check size={16}/> {item.cardId ? "Подтвердить и опубликовать" : "Подтвердить оплату"}</button>{item.cardId && <button disabled={busy===item.cardId} onClick={() => void requestChanges(item.cardId!)}>Исправить визитку</button>}<button className="reject" disabled={busy===item.id} onClick={() => void reject(item.id)}><X size={16}/> Отклонить оплату</button></>}
             </div>
