@@ -6,6 +6,8 @@ import {
   Building2,
   Camera,
   Check,
+  CreditCard,
+  Gift,
   Globe2,
   ImagePlus,
   Link2,
@@ -33,6 +35,7 @@ import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
 import { emptyCard } from "../data/demo";
 import { cardRepository } from "../lib/cardRepository";
+import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import { createSlug, themeColors } from "../lib/cardUtils";
 import type {
   CardDraft,
@@ -154,6 +157,12 @@ export default function CreatePage() {
   const [accountCard, setAccountCard] = useState<DigitalCard | null>(null);
   const [checkingCard, setCheckingCard] = useState(Boolean(user));
   const [slugTouched, setSlugTouched] = useState(Boolean(existing));
+  const requestedPlan = searchParams.get("plan");
+  const [selectedPlan, setSelectedPlan] = useState<"promo" | "personal" | "specialist" | "pro">(
+    requestedPlan === "specialist" || requestedPlan === "pro" ? requestedPlan : "personal"
+  );
+  const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
+  const [submitError, setSubmitError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
   const builderCopy = {
@@ -233,6 +242,15 @@ export default function CreatePage() {
       });
     return () => { active = false; };
   }, [user]);
+
+  useEffect(() => {
+    if (existing) return;
+    let active = true;
+    void promoRepository.status()
+      .then((status) => { if (active) setPromo(status); })
+      .catch(() => { if (active) setPromo(null); });
+    return () => { active = false; };
+  }, [existing]);
 
   const statusCard = accountCard ?? existing ?? null;
   const shouldShowStatus =
@@ -340,7 +358,7 @@ export default function CreatePage() {
           <p>{text}</p>
           <div className="card-status-actions">
             {status === "approved" && (
-              <Link to={`/card/${statusCard.slug}`} className="button button-primary">
+              <Link to={`/${statusCard.slug}`} className="button button-primary">
                 {statusCopy.open}
               </Link>
             )}
@@ -457,14 +475,28 @@ export default function CreatePage() {
       return;
     }
     setSaving(true);
+    setSubmitError("");
     try {
       const card = cardRepository.save(form, existing?.id);
       if (existing && ["changes_requested", "rejected"].includes(existing.reviewStatus ?? "")) {
         const result = await cardRepository.requestPublication(card.id);
-        navigate(result.ok ? "/dashboard" : `/card/${card.slug}`);
+        navigate(result.ok ? "/dashboard" : `/${card.slug}`);
+      } else if (!existing) {
+        const remoteCards = await cardRepository.listRemote();
+        const remoteCard = remoteCards.find((item) => item.slug === card.slug) ?? card;
+        if (selectedPlan === "promo") {
+          await promoRepository.claim(remoteCard.id);
+          navigate("/dashboard");
+        } else if (selectedPlan === "specialist" || selectedPlan === "pro") {
+          navigate(`/directory?publish=${selectedPlan}`);
+        } else {
+          navigate("/payment?plan=personal");
+        }
       } else {
-        navigate(`/card/${card.slug}`);
+        navigate(`/${card.slug}`);
       }
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : (language === "ru" ? "Не удалось продолжить. Попробуйте ещё раз." : language === "tj" ? "Идома додан муяссар нашуд. Боз кӯшиш кунед." : "Could not continue. Please try again."));
     } finally {
       setSaving(false);
     }
@@ -650,7 +682,7 @@ export default function CreatePage() {
                 hint={t("slugHint")}
               >
                 <div className="slug-input">
-                  <span>card.tj/</span>
+                  <span>vizora.tj/</span>
                   <input
                     value={form.slug}
                     onChange={(event) => {
@@ -839,7 +871,14 @@ export default function CreatePage() {
             </div>
           </section>
 
-          {!existing && <div className="inline-payment-summary" id="payment-next"><ShieldCheck size={20} /><div><strong>{language === "ru" ? "Следующий шаг: оплата 20 сомони в год" : language === "tj" ? "Қадами навбатӣ: пардохти 20 сомонӣ дар як сол" : "Next step: payment of 20 somoni per year"}</strong><span>{language === "ru" ? "Сначала сохраните и проверьте визитку. Затем загрузите чек — отдельная отправка на модерацию не потребуется." : language === "tj" ? "Аввал варақаро нигоҳ дошта санҷед. Сипас расидро бор кунед — фиристодани алоҳида ба санҷиш лозим нест." : "Save and check the card first. Then upload the receipt—no separate moderation submission is required."}</span></div></div>}
+          {!existing && <section className="form-section builder-plan-section" id="payment-next">
+            <div className="form-section-title"><span><CreditCard size={19} /></span><div><h2>{language === "ru" ? "Выберите тариф" : language === "tj" ? "Тарофаро интихоб кунед" : "Choose a plan"}</h2><p>{language === "ru" ? "После сохранения откроется следующий нужный шаг" : language === "tj" ? "Пас аз нигоҳдорӣ қадами навбатӣ кушода мешавад" : "The correct next step opens after saving"}</p></div></div>
+            <div className="builder-plan-grid">
+              {promo?.eligible && !promo.hasEntitlement && promo.remaining > 0 && <button type="button" className={`builder-plan-card promo${selectedPlan === "promo" ? " active" : ""}`} onClick={() => setSelectedPlan("promo")}><Gift size={20} /><span><strong>{language === "ru" ? "Стартовая акция" : language === "tj" ? "Иқдоми оғоз" : "Launch offer"}</strong><small>{language === "ru" ? `Бесплатно на 1 год · осталось ${promo.remaining}` : language === "tj" ? `1 сол ройгон · ${promo.remaining} ҷой монд` : `Free for 1 year · ${promo.remaining} left`}</small></span><b>0</b></button>}
+              {[{ id: "personal" as const, price: 20, ru: "Личная визитка", tj: "Варақаи шахсӣ", en: "Personal card" }, { id: "specialist" as const, price: 50, ru: "Проверенный специалист", tj: "Мутахассиси тасдиқшуда", en: "Verified specialist" }, { id: "pro" as const, price: 100, ru: "Специалист PRO", tj: "Мутахассиси PRO", en: "Specialist PRO" }].map((plan) => <button type="button" key={plan.id} className={`builder-plan-card${plan.id === "pro" ? " pro" : ""}${selectedPlan === plan.id ? " active" : ""}`} onClick={() => setSelectedPlan(plan.id)}><ShieldCheck size={20} /><span><strong>{plan[language]}</strong><small>{language === "ru" ? "Оплата после сохранения" : language === "tj" ? "Пардохт пас аз нигоҳдорӣ" : "Payment after saving"}</small></span><b>{plan.price}</b></button>)}
+            </div>
+          </section>}
+          {submitError && <div className="auth-message" role="alert">{submitError}</div>}
           <button type="submit" className="button button-primary button-large w-full" disabled={saving}>
             <Save size={19} />
             {saving ? builderCopy.saving : existing && ["changes_requested", "rejected"].includes(existing.reviewStatus ?? "") ? builderCopy.resubmit : existing ? t("updateCard") : builderCopy.saveContinue}
