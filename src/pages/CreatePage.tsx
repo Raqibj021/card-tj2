@@ -42,6 +42,7 @@ import type {
   Language
 } from "../types/card";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
+import "./CreatePageFlow.css";
 
 type FormErrors = Partial<Record<keyof CardDraft, string>>;
 
