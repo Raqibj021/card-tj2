@@ -1,5 +1,6 @@
 import { Check, Minus, Plus, ShoppingBag } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
@@ -26,20 +27,25 @@ export default function ServiceOrderPage() {
   const { language } = useApp();
   const { user, profile } = useAuth();
   const lang = language === "ru" ? 0 : language === "tj" ? 1 : 2;
+  const [searchParams] = useSearchParams();
+  const requestedService = searchParams.get("service");
+  const requestedQuantity = Math.max(1, Number(searchParams.get("qty")) || 1);
+  const requestedVariant = searchParams.get("variant")?.trim() ?? "";
   const text = [
     { label: "Заказ услуг", title: "Соберите заказ", note: "Стоимость предварительная. Менеджер проверит параметры и согласует итог до оплаты.", quantity: "Количество", customer: "Контактные данные", submit: "Отправить заказ", total: "Предварительный итог", success: "Заказ принят", byAgreement: "По договору" },
     { label: "Фармоиши хизмат", title: "Фармоишро ҷамъ кунед", note: "Арзиш пешакӣ аст. Менеҷер параметрҳоро месанҷад ва маблағи ниҳоиро тасдиқ мекунад.", quantity: "Миқдор", customer: "Маълумоти тамос", submit: "Фиристодани фармоиш", total: "Ҷамъбасти пешакӣ", success: "Фармоиш қабул шуд", byAgreement: "Бо шартнома" },
     { label: "Service order", title: "Build your order", note: "Pricing is preliminary. A manager will verify specifications and confirm the final total before payment.", quantity: "Quantity", customer: "Contact details", submit: "Submit order", total: "Estimated total", success: "Order received", byAgreement: "By agreement" }
   ][lang];
-  const [selected, setSelected] = useState<Record<string, number>>({});
+  const [selected, setSelected] = useState<Record<string, number>>(() => requestedService ? { [requestedService]: requestedQuantity } : {});
   const [customer, setCustomer] = useState({ fullName: profile?.fullName ?? "", phone: profile?.phone ?? "", email: profile?.email ?? "" });
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState("");
 
   const items = useMemo<OrderItem[]>(() => catalog.flatMap((service) => {
     const quantity = selected[service.id] ?? 0;
-    return quantity ? [{ id: service.id, title: service.title[lang], category: service.category, quantity, unitPrice: service.price }] : [];
-  }), [selected, lang]);
+    const title = requestedVariant && service.id === requestedService ? `${service.title[lang]} — ${requestedVariant}` : service.title[lang];
+    return quantity ? [{ id: service.id, title, category: service.category, quantity, unitPrice: service.price }] : [];
+  }), [selected, lang, requestedService, requestedVariant]);
   const total = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
   const submit = async () => {

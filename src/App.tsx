@@ -12,6 +12,7 @@ import OrganizationsPage from "./pages/OrganizationsPage";
 import OrganizationApplyPage from "./pages/OrganizationApplyPage";
 import SupportPage from "./pages/SupportPage";
 import ServicesPage from "./pages/ServicesPage";
+import ServiceDetailPage from "./pages/ServiceDetailPage";
 import UserAuthPage from "./pages/UserAuthPage";
 import OrganizationDashboardPage from "./pages/OrganizationDashboardPage";
 import PaymentPage from "./pages/PaymentPage";
@@ -78,6 +79,7 @@ export default function App() {
         <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/services" element={<ServicesPage />} />
+        <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
         <Route
           path="/about"
           element={
