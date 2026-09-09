@@ -42,6 +42,7 @@ import type {
   Language
 } from "../types/card";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
+import "./CreatePageFlow.css";
 
 type FormErrors = Partial<Record<keyof CardDraft, string>>;
 
@@ -170,7 +171,9 @@ export default function CreatePage() {
       invalidPhone: "Введите полный номер: +992 и 9 цифр номера.",
       invalidWebsite: "Введите корректный сайт, например: example.tj.",
       invalidSocial: "Введите корректное имя пользователя или ссылку.",
-      invalidAddress: "Введите корректный адрес (минимум 5 символов)."
+      invalidAddress: "Введите корректный адрес (минимум 5 символов).",
+      flow: ["Данные", "Дизайн", "Предпросмотр", "Оплата", "Проверка"],
+      saveContinue: "Сохранить и продолжить", resubmit: "Сохранить и отправить повторно"
     },
     tj: {
       invalidImage: "Файли тасвирро интихоб кунед", imageFailed: "Коркарди тасвир муяссар нашуд",
@@ -186,7 +189,9 @@ export default function CreatePage() {
       invalidPhone: "Рақами пурраро ворид кунед: +992 ва 9 рақами телефон.",
       invalidWebsite: "Суроғаи дурусти сомонаро нависед, масалан: example.tj.",
       invalidSocial: "Номи корбар ё пайванди дурустро ворид кунед.",
-      invalidAddress: "Суроғаи дурустро ворид кунед (на кам аз 5 аломат)."
+      invalidAddress: "Суроғаи дурустро ворид кунед (на кам аз 5 аломат).",
+      flow: ["Маълумот", "Ороиш", "Пешнамоиш", "Пардохт", "Санҷиш"],
+      saveContinue: "Нигоҳ доштан ва идома додан", resubmit: "Нигоҳ доштан ва дубора фиристодан"
     },
     en: {
       invalidImage: "Choose an image file", imageFailed: "Could not process the image",
@@ -202,7 +207,9 @@ export default function CreatePage() {
       invalidPhone: "Enter the complete number: +992 followed by 9 digits.",
       invalidWebsite: "Enter a valid website, for example: example.tj.",
       invalidSocial: "Enter a valid username or link.",
-      invalidAddress: "Enter a valid address (at least 5 characters)."
+      invalidAddress: "Enter a valid address (at least 5 characters).",
+      flow: ["Details", "Design", "Preview", "Payment", "Review"],
+      saveContinue: "Save and continue", resubmit: "Save and resubmit"
     }
   }[language];
 
@@ -438,7 +445,7 @@ export default function CreatePage() {
     return Object.keys(next).length === 0;
   };
 
-  const submit = (event: React.FormEvent) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!validate()) {
       requestAnimationFrame(() =>
@@ -452,7 +459,12 @@ export default function CreatePage() {
     setSaving(true);
     try {
       const card = cardRepository.save(form, existing?.id);
-      navigate(`/card/${card.slug}`);
+      if (existing && ["changes_requested", "rejected"].includes(existing.reviewStatus ?? "")) {
+        const result = await cardRepository.requestPublication(card.id);
+        navigate(result.ok ? "/dashboard" : `/card/${card.slug}`);
+      } else {
+        navigate(`/card/${card.slug}`);
+      }
     } finally {
       setSaving(false);
     }
@@ -497,9 +509,17 @@ export default function CreatePage() {
         </div>
       </section>
 
+      <nav className="site-container builder-flow" aria-label={language === "ru" ? "Этапы публикации визитки" : language === "tj" ? "Марҳилаҳои нашри варақа" : "Card publication steps"}>
+        {builderCopy.flow.map((label, index) => (
+          <a key={label} className={index < 3 ? "active" : ""} href={index === 0 ? "#card-details" : index === 1 ? "#card-design" : index === 2 ? "#card-preview" : index === 3 ? "#payment-next" : "#payment-next"}>
+            <span>{index + 1}</span><strong>{label}</strong>
+          </a>
+        ))}
+      </nav>
+
       <div className="site-container mt-8 grid items-start gap-8 xl:grid-cols-[minmax(0,1.08fr)_minmax(400px,.92fr)]">
         <form onSubmit={submit} className="grid gap-6" noValidate>
-          <section className="form-section">
+          <section className="form-section" id="card-details">
             <div className="form-section-title">
               <span><UserRound size={19} /></span>
               <div><h2>{t("formProfile")}</h2><p>{builderCopy.profileHint}</p></div>
@@ -655,7 +675,7 @@ export default function CreatePage() {
             </Field>
           </section>
 
-          <section className="form-section">
+          <section className="form-section" id="card-contacts">
             <div className="form-section-title">
               <span><Phone size={19} /></span>
               <div><h2>{t("formContacts")}</h2><p>{builderCopy.contactsHint}</p></div>
@@ -728,7 +748,7 @@ export default function CreatePage() {
             </div>
           </section>
 
-          <section className="form-section">
+          <section className="form-section" id="card-social">
             <div className="form-section-title">
               <span><MessageCircle size={19} /></span>
               <div><h2>{t("formSocial")}</h2><p>{builderCopy.socialHint}</p></div>
@@ -753,7 +773,7 @@ export default function CreatePage() {
             </div>
           </section>
 
-          <section className="form-section">
+          <section className="form-section" id="card-design">
             <div className="form-section-title">
               <span><Palette size={19} /></span>
               <div><h2>{t("formDesign")}</h2><p>{builderCopy.designHint}</p></div>
@@ -819,15 +839,15 @@ export default function CreatePage() {
             </div>
           </section>
 
-          {!existing && <div className="inline-payment-summary"><ShieldCheck size={20} /><div><strong>{language === "ru" ? "Личная визитка — 20 сомони в год" : language === "tj" ? "Варақаи шахсӣ — 20 сомонӣ дар як сол" : "Personal card — 20 somoni per year"}</strong><span>{language === "ru" ? "Оплата: DC Bank / Alif Bank — 084785555. После создания визитки откроется шаг загрузки чека." : language === "tj" ? "Пардохт: DC Bank / Alif Bank — 084785555. Пас аз сохтани варақа қадами боркунии расид кушода мешавад." : "Payment: DC Bank / Alif Bank — 084785555. After creating the card, the receipt upload step will open."}</span></div></div>}
+          {!existing && <div className="inline-payment-summary" id="payment-next"><ShieldCheck size={20} /><div><strong>{language === "ru" ? "Следующий шаг: оплата 20 сомони в год" : language === "tj" ? "Қадами навбатӣ: пардохти 20 сомонӣ дар як сол" : "Next step: payment of 20 somoni per year"}</strong><span>{language === "ru" ? "Сначала сохраните и проверьте визитку. Затем загрузите чек — отдельная отправка на модерацию не потребуется." : language === "tj" ? "Аввал варақаро нигоҳ дошта санҷед. Сипас расидро бор кунед — фиристодани алоҳида ба санҷиш лозим нест." : "Save and check the card first. Then upload the receipt—no separate moderation submission is required."}</span></div></div>}
           <button type="submit" className="button button-primary button-large w-full" disabled={saving}>
             <Save size={19} />
-            {saving ? builderCopy.saving : existing ? t("updateCard") : t("saveCard")}
+            {saving ? builderCopy.saving : existing && ["changes_requested", "rejected"].includes(existing.reviewStatus ?? "") ? builderCopy.resubmit : existing ? t("updateCard") : builderCopy.saveContinue}
             <ArrowRight size={19} />
           </button>
         </form>
 
-        <aside className="preview-column">
+        <aside className="preview-column" id="card-preview">
           <div className="preview-heading">
             <span className="live-dot" />
             {t("livePreview")}

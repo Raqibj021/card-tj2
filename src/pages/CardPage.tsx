@@ -87,7 +87,8 @@ const profileCopy = {
     pending: "ОЖИДАЕТ ПРОВЕРКИ",
     pendingText: "Визитка сохранена. Администратор проверит данные и одобрит её в ближайшее время.",
     pendingQrTitle: "QR-код появится после проверки",
-    pendingQrText: "До одобрения администратора QR-код, ссылка и контактные действия не работают.",
+    pendingQrText: "Заявка проверяется целиком. После одного решения станут доступны QR-код, ссылка и контакты.",
+    fixAndResubmit: "Исправить и отправить повторно",
     missingInfo: "Информация не добавлена"
   },
   tj: {
@@ -117,7 +118,8 @@ const profileCopy = {
     pending: "ИНТИЗОРИ САНҶИШ",
     pendingText: "Варақа нигоҳ дошта шуд. Администратор маълумотро месанҷад ва ба наздикӣ онро тасдиқ мекунад.",
     pendingQrTitle: "QR-код пас аз санҷиш пайдо мешавад",
-    pendingQrText: "То тасдиқи администратор QR-код, пайванд ва амалҳои тамос кор намекунанд.",
+    pendingQrText: "Дархост пурра санҷида мешавад. Пас аз як қарор QR-код, пайванд ва тамосҳо дастрас мешаванд.",
+    fixAndResubmit: "Ислоҳ ва дубора фиристодан",
     missingInfo: "Маълумот илова нашудааст"
   },
   en: {
@@ -147,7 +149,8 @@ const profileCopy = {
     pending: "AWAITING REVIEW",
     pendingText: "The card has been saved. An administrator will review and approve it shortly.",
     pendingQrTitle: "QR code will appear after review",
-    pendingQrText: "The QR code, public link and contact actions remain disabled until administrator approval.",
+    pendingQrText: "The complete application is under review. One decision will enable the QR code, public link and contacts.",
+    fixAndResubmit: "Fix and resubmit",
     missingInfo: "Information not provided"
   }
 } as const;
@@ -256,6 +259,7 @@ export default function CardPage() {
   const palette = themeColors[card.theme];
   const isLocked = card.reviewStatus !== "approved";
   const needsActivation = card.reviewStatus === "draft";
+  const needsCorrection = card.reviewStatus === "changes_requested" || card.reviewStatus === "rejected";
   const style: AccentStyle = {
     "--profile-accent": palette.accent,
     "--profile-soft": palette.soft
@@ -419,6 +423,7 @@ export default function CardPage() {
                     {activating ? labels.activating : labels.submitReview}
                   </button>
                 ) : needsActivation && <Link to="/payment?plan=personal" className="button button-secondary">{labels.payButton}</Link>}
+                {needsCorrection && <Link to={`/create?edit=${card.id}`} className="button button-primary">{labels.fixAndResubmit}</Link>}
               </div>
             </>
           )}
@@ -633,6 +638,7 @@ export default function CardPage() {
                   {activating ? labels.activating : labels.submitReview}
                 </button>
               ) : needsActivation && <Link to="/payment?plan=personal" className="button button-secondary mt-3 w-full">{labels.payButton}</Link>}
+              {needsCorrection && <Link to={`/create?edit=${card.id}`} className="button button-primary mt-3 w-full">{labels.fixAndResubmit}</Link>}
             </div>
           ) : (
             <div className="profile-qr-card">
