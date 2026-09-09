@@ -65,9 +65,9 @@ export default function DashboardPage() {
   const [latestNotification, setLatestNotification] = useState<DashboardNotification | null>(null);
   const leads = leadRepository.list();
   const dashboardCopy = {
-    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "На проверке", approved: "Опубликована", draft: "Черновик", changesRequested: "Требуются исправления", rejected: "Отклонена", suspended: "Заблокирована", lockedActions: "QR-код и публичная ссылка появятся после одобрения.", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
-    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Дар санҷиш", approved: "Нашр шудааст", draft: "Нусхаи муваққатӣ", changesRequested: "Ислоҳ талаб мешавад", rejected: "Рад шудааст", suspended: "Манъ шудааст", lockedActions: "QR-код ва пайванди оммавӣ пас аз тасдиқ дастрас мешаванд.", account: "Ҳисоби шахсӣ", positionEmpty: "Вазифа ҳоло нишон дода нашудааст", organizationEmpty: "Ташкилот ҳоло нишон дода нашудааст", viewCard: "Кушодани варақа", notifications: "Огоҳиномаҳо", logout: "Баромадан", myCards: "Варақаҳои ман", myCardsText: "Варақаҳои электронии худро созед, таҳрир ва идора намоед.", accountEmail: "Почтаи ҳисоб" },
-    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Draft", changesRequested: "Changes required", rejected: "Rejected", suspended: "Suspended", lockedActions: "The QR code and public link will become available after approval.", account: "Personal account", positionEmpty: "Position not specified yet", organizationEmpty: "Organization not specified yet", viewCard: "Open card", notifications: "Notifications", logout: "Sign out", myCards: "My business cards", myCardsText: "Create, edit and manage your digital business cards.", accountEmail: "Account email" }
+    ru: { clients: "Клиенты", newLeads: "Новые лиды", crm: "Мини-CRM Vizora", crmText: "Обращения из публичных визиток, статусы, заметки и оплата", openLeads: "Открыть лиды", publish: "Отправить на проверку", pending: "Проверяется", approved: "Опубликована", draft: "Ожидает оплаты", changesRequested: "Требуются исправления", rejected: "Нужно исправить", suspended: "Заблокирована", lockedActions: "После одного решения появятся QR-код и публичная ссылка.", payAndSubmit: "Оплатить и отправить", fixAndSubmit: "Исправить и отправить", openResult: "Открыть визитку", viewStatus: "Посмотреть статус", account: "Личный аккаунт", positionEmpty: "Должность пока не указана", organizationEmpty: "Организация пока не указана", viewCard: "Открыть визитку", notifications: "Уведомления", logout: "Выйти", myCards: "Мои визитки", myCardsText: "Создавайте, редактируйте и управляйте своими электронными визитками.", accountEmail: "Email аккаунта" },
+    tj: { clients: "Мизоҷон", newLeads: "Дархостҳои нав", crm: "Мини-CRM Vizora", crmText: "Дархостҳо аз варақаҳои оммавӣ, ҳолатҳо, қайдҳо ва пардохт", openLeads: "Кушодани дархостҳо", publish: "Ба санҷиш фиристодан", pending: "Санҷида мешавад", approved: "Нашр шудааст", draft: "Интизори пардохт", changesRequested: "Ислоҳ талаб мешавад", rejected: "Ислоҳ лозим", suspended: "Манъ шудааст", lockedActions: "Пас аз як қарор QR-код ва пайванди оммавӣ дастрас мешаванд.", payAndSubmit: "Пардохт ва фиристодан", fixAndSubmit: "Ислоҳ ва фиристодан", openResult: "Кушодани варақа", viewStatus: "Дидани ҳолат", account: "Ҳисоби шахсӣ", positionEmpty: "Вазифа ҳоло нишон дода нашудааст", organizationEmpty: "Ташкилот ҳоло нишон дода нашудааст", viewCard: "Кушодани варақа", notifications: "Огоҳиномаҳо", logout: "Баромадан", myCards: "Варақаҳои ман", myCardsText: "Варақаҳои электронии худро созед, таҳрир ва идора намоед.", accountEmail: "Почтаи ҳисоб" },
+    en: { clients: "Clients", newLeads: "New leads", crm: "Vizora mini CRM", crmText: "Public-card enquiries, statuses, notes and payments", openLeads: "Open leads", publish: "Submit for review", pending: "Under review", approved: "Published", draft: "Awaiting payment", changesRequested: "Changes required", rejected: "Needs correction", suspended: "Suspended", lockedActions: "The QR code and public link appear after one approval decision.", payAndSubmit: "Pay and submit", fixAndSubmit: "Fix and resubmit", openResult: "Open card", viewStatus: "View status", account: "Personal account", positionEmpty: "Position not specified yet", organizationEmpty: "Organization not specified yet", viewCard: "Open card", notifications: "Notifications", logout: "Sign out", myCards: "My business cards", myCardsText: "Create, edit and manage your digital business cards.", accountEmail: "Account email" }
   }[language];
 
   useEffect(() => {
@@ -138,6 +138,13 @@ export default function DashboardPage() {
     if (status === "suspended") return dashboardCopy.suspended;
     return dashboardCopy.draft;
   };
+  const mainAction = primaryCard ? (
+    primaryCard.reviewStatus === "approved" ? { to: `/card/${primaryCard.slug}`, label: dashboardCopy.openResult } :
+    primaryCard.reviewStatus === "draft" ? { to: "/payment?plan=personal", label: dashboardCopy.payAndSubmit } :
+    primaryCard.reviewStatus === "changes_requested" || primaryCard.reviewStatus === "rejected"
+      ? { to: `/create?edit=${primaryCard.id}`, label: dashboardCopy.fixAndSubmit }
+      : { to: "/notifications", label: dashboardCopy.viewStatus }
+  ) : { to: "/create", label: t("create") };
 
   const leaveAccount = async () => {
     await signOut();
@@ -184,11 +191,11 @@ export default function DashboardPage() {
               <p className="page-copy">{t("dashboardText")}</p>
             </div>
             <Link
-              to="/create"
+              to={mainAction.to}
               className="button button-primary button-large shrink-0"
             >
               {primaryCard ? <ShieldCheck size={19} /> : <Plus size={19} />}
-              {primaryCard ? statusLabel(primaryCard.reviewStatus) : t("create")}
+              {mainAction.label}
             </Link>
           </div>
 
@@ -374,21 +381,9 @@ export default function DashboardPage() {
                       </button>
                     )}
                     {card.reviewStatus !== "approved" && card.reviewStatus !== "pending" && card.reviewStatus !== "draft" && (
-                      <button
-                        type="button"
-                        className="button button-ghost"
-                        onClick={async () => {
-                          const result = await cardRepository.requestPublication(card.id);
-                          notify(result.message);
-                          if (result.ok) {
-                            setCards((items) => items.map((item) =>
-                              item.id === card.id ? { ...item, reviewStatus: "pending" } : item
-                            ));
-                          }
-                        }}
-                      >
-                        <ShieldCheck size={16} /> {dashboardCopy.publish}
-                      </button>
+                      <Link to={`/create?edit=${card.id}`} className="button button-primary">
+                        <Edit3 size={16} /> {dashboardCopy.fixAndSubmit}
+                      </Link>
                     )}
                     <button
                       type="button"
