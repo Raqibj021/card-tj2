@@ -259,7 +259,7 @@ export default function ServiceDetailPage() {
                   alt="NFC и QR таблички Vizora"
                 />
               ) : (
-                <div className="service-card-gallery">
+                <div className="service-card-gallery nfc-card-gallery">
                   {nfcCardDesigns.map((card, index) => (
                     <button
                       type="button"
