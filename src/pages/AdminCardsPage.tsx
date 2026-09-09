@@ -144,7 +144,7 @@ export default function AdminCardsPage() {
           {cards.map((card) => <article key={card.id}>
             <span className="admin-card-photo">{card.photo ? <img src={card.photo} alt="" /> : <UserRound size={20} />}</span>
             <div className="admin-card-identity"><strong>{card.fullName || "Без имени"}</strong><small>{card.position || card.organization || card.ownerEmail}</small></div>
-            <div><small>Адрес</small><b>/card/{card.slug}</b></div>
+            <div><small>Адрес</small><b>vizora.tj/{card.slug}</b></div>
             <div><small>Контакты</small><b>{card.contactsCount}</b></div>
             <div><small>Просмотры</small><b>{card.views}</b></div>
             <span className={`admin-card-visibility ${["public","public_organization"].includes(card.visibility) ? "public" : "private"}`}>
@@ -161,7 +161,7 @@ export default function AdminCardsPage() {
       <section className="admin-access-log">
         <header><div><ShieldCheck size={19} /><span><strong>Журнал доступа</strong><small>Кто и когда открывал полные данные визиток</small></span></div></header>
         {(workspace?.accessHistory ?? []).slice(0, 20).map((item) => <div key={item.id}>
-          <span><strong>{item.cardName}</strong><small>/card/{item.cardSlug}</small></span>
+          <span><strong>{item.cardName}</strong><small>vizora.tj/{item.cardSlug}</small></span>
           <span><strong>{item.adminName || item.adminEmail}</strong><small>{item.reason}</small></span>
           <time>{new Date(item.accessedAt).toLocaleString("ru-RU")}</time>
         </div>)}
