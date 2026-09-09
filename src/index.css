@@ -8874,7 +8874,7 @@ body,
 }
 
 /* Compact service choices on phones. */
-@media (max-width: 560px) {
+@media (max-width: 820px) {
   .services-hero { padding: 42px 0 26px; }
   .services-hero h1 { margin: 10px auto 12px; font-size: 34px; line-height: 1.04; }
   .services-hero p { padding-inline: 8px; font-size: 14px; line-height: 1.5; }
