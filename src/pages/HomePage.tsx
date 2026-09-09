@@ -160,7 +160,7 @@ export default function HomePage() {
     <>
       <main className="home-page">
         <div className="home-digital-atmosphere" aria-hidden="true"><i /><i /><i /><span /><span /><span /></div>
-        <div className="site-container home-promo-wrap">
+        <div className="home-promo-wrap home-promo-wide">
           <HomePromoCarousel />
         </div>
         <section className="hero-section overflow-hidden">
