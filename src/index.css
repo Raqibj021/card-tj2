@@ -8797,6 +8797,13 @@ body,
   background: linear-gradient(125deg, var(--home-glass), color-mix(in srgb, var(--home-glow) 70%, transparent));
 }
 
+@media (min-width: 721px) {
+  .home-page > .home-promo-wrap {
+    width: calc(100% - 28px);
+    max-width: 1740px;
+  }
+}
+
 .home-page .section-muted,
 .home-page .section-dark,
 .home-page .design-showcase-section {
