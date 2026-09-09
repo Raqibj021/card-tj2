@@ -12,9 +12,9 @@ export default function Footer() {
   }[language];
 
   return (
-    <footer className="border-t border-white/10 bg-[#0b1220] text-white">
-      <div className="site-container grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
-        <div className="max-w-sm">
+    <footer className="site-footer border-t border-white/10 bg-[#0b1220] text-white">
+      <div className="site-footer-grid site-container grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="site-footer-brand max-w-sm">
           <Link to="/" className="brand-mark text-white">
             <BrandLogo light />
           </Link>
@@ -22,7 +22,7 @@ export default function Footer() {
             {t("footerText")}
           </p>
         </div>
-        <div>
+        <div className="site-footer-product">
           <p className="footer-title">{t("product")}</p>
           <div className="footer-links">
             <Link to="/create">{t("create")}</Link>
@@ -33,7 +33,7 @@ export default function Footer() {
             <Link to="/about">{copy.about}</Link>
           </div>
         </div>
-        <div>
+        <div className="site-footer-contacts">
           <p className="footer-title">{t("contacts")}</p>
           <div className="footer-links">
             <a href="mailto:vizora.platform.tj@gmail.com">
@@ -46,7 +46,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="site-container flex flex-col gap-2 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="site-footer-bottom site-container flex flex-col gap-2 py-5 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Vizora.tj. {t("rights")}</span>
           <span>{copy.made}</span>
         </div>
