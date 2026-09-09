@@ -12,6 +12,21 @@ export type AdminCardDetails = AdminCardSummary & {
   ownerPhone: string; description: string; companyLogo: string;
   contacts: Record<string, string>; address: string; theme: string; template: string;
   verifiedAt: string | null;
+  professionCategoryId: string; specialistTitle: string; specialistCity: string;
+  specialistTags: string[]; specialistExperience: string; specialistSummary: string;
+  specialistPlan: "specialist" | "pro"; specialistServiceArea: string;
+  specialistConsultation: string; specialistPortfolio: string[];
+};
+
+export type AdminCardUpdate = {
+  slug: string; fullName: string; position: string; organization: string;
+  description: string; photo: string; companyLogo: string;
+  contacts: Record<string, string>; address: string;
+  language: string; theme: string; template: string;
+  specialistTitle: string; specialistCity: string; specialistTags: string[];
+  specialistExperience: string; specialistSummary: string;
+  specialistServiceArea: string; specialistConsultation: string;
+  specialistPortfolio: string[];
 };
 
 export type AdminCardWorkspace = {
@@ -121,6 +136,16 @@ export const adminCardsRepository = {
       access_reason: reason
     });
     if (error) throw error;
+    return data as AdminCardDetails;
+  },
+  async update(cardId: string, changes: AdminCardUpdate): Promise<AdminCardDetails> {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { data, error } = await supabase.rpc("admin_update_card", {
+      target_card_id: cardId,
+      changes
+    });
+    if (error) throw error;
+    signalAdminCountsChanged();
     return data as AdminCardDetails;
   }
 };
