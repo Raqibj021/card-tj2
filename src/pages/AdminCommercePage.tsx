@@ -1,4 +1,4 @@
-import { Banknote, FileSignature, PackageCheck, RefreshCw, ShoppingBag } from "lucide-react";
+import { Banknote, Bell, FileSignature, PackageCheck, RefreshCw, ShoppingBag } from "lucide-react";
 import { useEffect, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
 import {
@@ -13,6 +13,7 @@ import {
   type PaymentStatus,
   type ServiceOrderRecord
 } from "../lib/commerceRepository";
+import { getNfcCardDesign } from "../lib/nfcCardCatalog";
 
 const orderStatuses: OrderStatus[] = ["new", "clarifying", "approved", "in_progress", "ready", "completed", "cancelled"];
 const paymentStatuses: PaymentStatus[] = ["unpaid", "pending", "paid", "refunded"];
@@ -44,10 +45,11 @@ export default function AdminCommercePage() {
       <article><div className="admin-stat-icon"><FileSignature size={20} /></div><p>Договоры</p><strong>{stats.contracts}</strong></article>
     </div>
     {notice && <div className="activation-result">{notice}</div>}
+    {stats.newOrders > 0 && <div className="admin-service-alert"><Bell size={20} /><div><strong>Новые заказы услуг: {stats.newOrders}</strong><span>Откройте заказ, проверьте выбранный вариант и свяжитесь с клиентом.</span></div></div>}
     <div className="commerce-tabs"><button className={tab === "orders" ? "active" : ""} onClick={() => setTab("orders")}><ShoppingBag size={17} /> Заказы <b>{orders.length}</b></button><button className={tab === "contracts" ? "active" : ""} onClick={() => setTab("contracts")}><FileSignature size={17} /> Договоры <b>{contracts.length}</b></button></div>
     {tab === "orders" ? <div className="admin-order-list">{orders.map((order) => <article key={order.id}>
       <header><div><strong>{order.order_number}</strong><small>{order.customer.fullName} · {order.customer.phone}</small></div><b>{Number(order.total).toLocaleString()} c.</b></header>
-      <p>{order.items.map((item) => `${item.title} × ${item.quantity}`).join(" · ")}</p>
+      <div className="admin-order-items">{order.items.map((item) => { const design = getNfcCardDesign(item.imageKey); return <div key={`${item.id}-${item.imageKey ?? "plain"}`}>{design && <img src={`${import.meta.env.BASE_URL}${design.image.slice(1)}`} alt={item.title} />}<span>{item.title} × {item.quantity}</span></div>; })}</div>
       <div className="admin-order-controls"><label>Статус<select value={order.status} onChange={(e) => void updateOrder(order, { status: e.target.value as OrderStatus })}>{orderStatuses.map((status) => <option value={status} key={status}>{labels[status]}</option>)}</select></label><label>Оплата<select value={order.payment_status} onChange={(e) => void updateOrder(order, { payment_status: e.target.value as PaymentStatus })}>{paymentStatuses.map((status) => <option value={status} key={status}>{labels[status]}</option>)}</select></label><label className="manager-comment">Комментарий<input defaultValue={order.manager_comment} onBlur={(e) => { if (e.target.value !== order.manager_comment) void updateOrder(order, { manager_comment: e.target.value }); }} placeholder="Комментарий для клиента" /></label></div>
     </article>)}{!orders.length && <div className="table-empty">Заказов пока нет.</div>}</div> :
     <div className="admin-order-list">{contracts.map((contract) => <article key={contract.id}><header><div><strong>{contract.contract_number}</strong><small>{contract.customer.fullName} · {contract.customer.phone}</small></div><b>{Number(contract.total).toLocaleString()} c.</b></header><p>{contract.services.join(" · ")}</p><div className="admin-order-controls"><label>Статус договора<select value={contract.status} onChange={async (e) => { try { await updateContractStatus(contract.id, e.target.value as ContractStatus); setNotice(`Договор ${contract.contract_number} обновлён`); await refresh(); } catch (error) { setNotice(error instanceof Error ? error.message : "Ошибка"); } }}>{contractStatuses.map((status) => <option value={status} key={status}>{labels[status]}</option>)}</select></label></div></article>)}{!contracts.length && <div className="table-empty">Договоров пока нет.</div>}</div>}
