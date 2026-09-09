@@ -7,7 +7,6 @@ export type NfcCardDesign = {
 export const nfcCardDesigns: NfcCardDesign[] = [
   { id: "nfc-06", image: "/images/services/nfc/nfc-06.webp", title: { ru: "Классический Vizora", tj: "Vizora-и классикӣ", en: "Classic Vizora" } },
   { id: "nfc-01", image: "/images/services/nfc/nfc-01.webp", title: { ru: "Парк Рудаки", tj: "Боғи Рӯдакӣ", en: "Rudaki Park" } },
-  { id: "nfc-02", image: "/images/services/nfc/nfc-02.webp", title: { ru: "Здание Правительства РТ", tj: "Бинои Ҳукумати Ҷумҳурии Тоҷикистон", en: "Government Building of Tajikistan" } },
   { id: "nfc-03", image: "/images/services/nfc/nfc-03.webp", title: { ru: "Здание Правительства РТ — синий", tj: "Бинои Ҳукумати Ҷумҳурии Тоҷикистон — кабуд", en: "Government Building of Tajikistan — blue" } },
   { id: "nfc-04", image: "/images/services/nfc/nfc-04.webp", title: { ru: "Монумент Исмоили Сомони", tj: "Муҷассамаи Исмоили Сомонӣ", en: "Ismoili Somoni Monument" } },
   { id: "nfc-05", image: "/images/services/nfc/nfc-05.webp", title: { ru: "Монумент — светлый", tj: "Муҷассама — равшан", en: "Monument — light" } },
