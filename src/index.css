@@ -8958,19 +8958,20 @@ body,
   .service-sign-image { min-height: 0; aspect-ratio: 16/10; border-radius: 12px; object-fit: cover; }
   .organization-service-picture { border-radius: 12px; }
   .organization-service-picture img { width: 100%; height: min(122vw, 480px); aspect-ratio: auto; object-fit: cover; }
-  .service-detail-nfc .service-showcase { overflow: visible; }
+  .service-detail-nfc .service-showcase { overflow: hidden; }
   .service-detail-nfc .service-card-gallery {
-    display: flex;
-    overflow-x: auto;
-    gap: 9px;
-    padding: 2px 2px 8px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    gap: 8px;
+    padding: 0;
+    scroll-snap-type: none;
   }
   .service-detail-nfc .service-card-gallery button {
-    flex: 0 0 min(76vw, 290px);
+    min-width: 0;
+    flex: initial;
     border-radius: 13px;
-    scroll-snap-align: start;
+    scroll-snap-align: none;
   }
   .service-detail-nfc .service-card-gallery span { padding: 8px 9px; font-size: 12px; }
   .service-detail-nfc .service-variant-label,
