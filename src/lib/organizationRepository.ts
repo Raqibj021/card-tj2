@@ -43,8 +43,26 @@ export interface OrganizationWorkspace {
   organization: OrganizationApplication; departments: OrganizationDepartment[]; employees: OrganizationEmployee[];
 }
 
+const cardAssetPath = (value: string) => {
+  if (!value) return "";
+  try {
+    const marker = "/storage/v1/object/public/card-assets/";
+    const pathname = new URL(value).pathname;
+    const index = pathname.indexOf(marker);
+    return index === -1 ? "" : decodeURIComponent(pathname.slice(index + marker.length));
+  } catch {
+    return "";
+  }
+};
+
+const removeCardAssets = async (paths: string[]) => {
+  if (!supabase) return;
+  const uniquePaths = [...new Set(paths.filter(Boolean))];
+  if (uniquePaths.length) await supabase.storage.from("card-assets").remove(uniquePaths);
+};
+
 const uploadEmployeeAsset = async (organizationId: string, kind: "photo" | "logo", value: string) => {
-  if (!supabase || !value.startsWith("data:")) return value;
+  if (!supabase || !value.startsWith("data:")) return { url: value, path: "" };
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) throw new Error("Сначала войдите в аккаунт.");
   const blob = await (await fetch(value)).blob();
@@ -54,7 +72,7 @@ const uploadEmployeeAsset = async (organizationId: string, kind: "photo" | "logo
     contentType: blob.type, cacheControl: "31536000", upsert: false
   });
   if (error) throw new Error("Не удалось загрузить изображение.");
-  return supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl;
+  return { url: supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl, path };
 };
 
 const mapOrganization = (row: Record<string, unknown>): OrganizationApplication => {
@@ -248,7 +266,7 @@ export const organizationRepository = {
   },
   createEmployee: async (data: OrganizationEmployeeDraft) => {
     if (!supabase) throw new Error("Сервер недоступен.");
-    const [photo, companyLogo] = await Promise.all([
+    const [photoAsset, logoAsset] = await Promise.all([
       uploadEmployeeAsset(data.organizationId, "photo", data.photo ?? ""),
       uploadEmployeeAsset(data.organizationId, "logo", data.companyLogo ?? "")
     ]);
@@ -260,11 +278,12 @@ export const organizationRepository = {
       employee_website: data.website?.trim() ?? "", employee_address: data.address?.trim() ?? "",
       employee_telegram: data.telegram?.trim() ?? "", employee_instagram: data.instagram?.trim() ?? "",
       employee_facebook: data.facebook?.trim() ?? "", employee_description: data.description?.trim() ?? "",
-      employee_photo: photo, employee_company_logo: companyLogo,
+      employee_photo: photoAsset.url, employee_company_logo: logoAsset.url,
       employee_language: data.language ?? "ru", employee_theme: data.theme ?? "teal",
       employee_template: data.template ?? "executive"
     }), "Сервер не ответил. Повторите создание сотрудника.");
     if (error) {
+      await removeCardAssets([photoAsset.path, logoAsset.path]);
       if (error.message.includes("create_organization_employee_card")) {
         throw new Error("Функция сотрудников ещё не активирована в Supabase. Выполните миграцию 031.");
       }
@@ -295,7 +314,7 @@ export const organizationRepository = {
     description?: string; photo?: string; companyLogo?: string; language?: string; theme?: string; template?: string;
   }) => {
     if (!supabase) throw new Error("Сервер недоступен.");
-    const [photo, companyLogo] = await Promise.all([
+    const [photoAsset, logoAsset] = await Promise.all([
       uploadEmployeeAsset(data.organizationId, "photo", data.photo ?? ""),
       uploadEmployeeAsset(data.organizationId, "logo", data.companyLogo ?? "")
     ]);
@@ -310,11 +329,18 @@ export const organizationRepository = {
       employee_second_phone: data.secondPhone?.trim() ?? "", employee_website: data.website?.trim() ?? "",
       employee_address: data.address?.trim() ?? "", employee_telegram: data.telegram?.trim() ?? "",
       employee_instagram: data.instagram?.trim() ?? "", employee_facebook: data.facebook?.trim() ?? "",
-      employee_description: data.description?.trim() ?? "", employee_photo: photo,
-      employee_company_logo: companyLogo, employee_language: data.language ?? "ru",
+      employee_description: data.description?.trim() ?? "", employee_photo: photoAsset.url,
+      employee_company_logo: logoAsset.url, employee_language: data.language ?? "ru",
       employee_theme: data.theme ?? "teal", employee_template: data.template ?? "executive",
       employee_is_public: data.isPublic ?? true
     });
-    if (error) throw error;
+    if (error) {
+      await removeCardAssets([photoAsset.path, logoAsset.path]);
+      throw error;
+    }
+    await removeCardAssets([
+      photoAsset.path ? cardAssetPath(data.photo ?? "") : "",
+      logoAsset.path ? cardAssetPath(data.companyLogo ?? "") : ""
+    ]);
   }
 };
