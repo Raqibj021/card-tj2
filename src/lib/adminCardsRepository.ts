@@ -134,6 +134,18 @@ async function loadWorkspaceDirectly(): Promise<AdminCardWorkspace> {
 }
 
 export const adminCardsRepository = {
+  async uploadImage(cardId: string, kind: "photo" | "logo", file: File): Promise<string> {
+    if (!supabase) throw new Error("Supabase не подключён.");
+    const { data: auth } = await supabase.auth.getUser();
+    if (!auth.user) throw new Error("Сначала войдите в кабинет администратора.");
+    const extension = file.type.includes("png") ? "png" : file.type.includes("jpeg") ? "jpg" : "webp";
+    const path = `${auth.user.id}/admin-cards/${cardId}/${kind}-${Date.now()}.${extension}`;
+    const { error } = await supabase.storage.from("card-assets").upload(path, file, {
+      contentType: file.type, cacheControl: "31536000", upsert: false
+    });
+    if (error) throw new Error(error.message || "Не удалось загрузить изображение.");
+    return supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl;
+  },
   async workspace(): Promise<AdminCardWorkspace> {
     if (!supabase) return empty;
     const { data, error } = await supabase.rpc("get_admin_cards_workspace");

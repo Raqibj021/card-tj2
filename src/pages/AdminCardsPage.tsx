@@ -261,6 +261,7 @@ function CardEditForm({ card, onCancel, onSave }: {
     specialistConsultation: card.specialistConsultation ?? "", specialistPortfolio: card.specialistPortfolio ?? []
   }));
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState<"photo" | "logo" | null>(null);
   const field = (key: keyof AdminCardUpdate, value: string | string[]) => setForm((current) => ({ ...current, [key]: value }));
   const contact = (key: string, value: string) => setForm((current) => ({ ...current, contacts: { ...current.contacts, [key]: value } }));
   const submit = async (event: React.FormEvent) => {
@@ -269,6 +270,16 @@ function CardEditForm({ card, onCancel, onSave }: {
     try { await onSave(form); } finally { setSaving(false); }
   };
   const isSpecialist = Boolean(card.professionCategoryId || card.specialistTitle);
+  const upload = async (kind: "photo" | "logo", file?: File) => {
+    if (!file) return;
+    setUploading(kind);
+    try {
+      const url = await adminCardsRepository.uploadImage(card.id, kind, file);
+      field(kind === "photo" ? "photo" : "companyLogo", url);
+    } finally {
+      setUploading(null);
+    }
+  };
 
   return <aside className="admin-card-drawer admin-card-editor">
     <button className="admin-drawer-close" onClick={onCancel}><X size={18} /></button>
@@ -281,7 +292,7 @@ function CardEditForm({ card, onCancel, onSave }: {
       <div className="admin-edit-row"><EditField label="Должность"><input required value={form.position} onChange={(e) => field("position", e.target.value)} /></EditField><EditField label="Организация"><input required value={form.organization} onChange={(e) => field("organization", e.target.value)} /></EditField></div>
       <EditField label="Описание"><textarea rows={4} value={form.description} onChange={(e) => field("description", e.target.value)} /></EditField>
       <EditField label="Адрес"><input value={form.address} onChange={(e) => field("address", e.target.value)} /></EditField>
-      <div className="admin-edit-row"><EditField label="Фото (URL)"><input value={form.photo} onChange={(e) => field("photo", e.target.value)} /></EditField><EditField label="Логотип (URL)"><input value={form.companyLogo} onChange={(e) => field("companyLogo", e.target.value)} /></EditField></div>
+      <div className="admin-edit-row"><EditField label="Главное фото"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void upload("photo", e.target.files?.[0])} /><small>{uploading === "photo" ? "Загрузка…" : form.photo ? "Фото загружено" : "PNG, JPG или WEBP"}</small></EditField><EditField label="Логотип"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => void upload("logo", e.target.files?.[0])} /><small>{uploading === "logo" ? "Загрузка…" : form.companyLogo ? "Логотип загружен" : "PNG, JPG или WEBP"}</small></EditField></div>
 
       <h3>Контакты</h3>
       <div className="admin-edit-row">{contactKeys.map((key) => <EditField key={key} label={contactLabels[key]}><input value={form.contacts[key] ?? ""} onChange={(e) => contact(key, e.target.value)} /></EditField>)}</div>
@@ -300,7 +311,7 @@ function CardEditForm({ card, onCancel, onSave }: {
         <EditField label="Описание специалиста"><textarea rows={4} value={form.specialistSummary} onChange={(e) => field("specialistSummary", e.target.value)} /></EditField>
         {card.specialistPlan === "pro" && <><EditField label="Регион работы"><input value={form.specialistServiceArea} onChange={(e) => field("specialistServiceArea", e.target.value)} /></EditField><EditField label="Формат консультации"><input value={form.specialistConsultation} onChange={(e) => field("specialistConsultation", e.target.value)} /></EditField><EditField label="Портфолио (одна ссылка в строке)"><textarea rows={4} value={form.specialistPortfolio.join("\n")} onChange={(e) => field("specialistPortfolio", e.target.value.split("\n").map((v) => v.trim()).filter(Boolean).slice(0, 20))} /></EditField></>}
       </>}
-      <div className="admin-edit-actions"><button type="button" className="button button-secondary" onClick={onCancel}>Отмена</button><button type="submit" className="button button-primary" disabled={saving}><Save size={17} /> {saving ? "Сохранение…" : "Сохранить изменения"}</button></div>
+      <div className="admin-edit-actions"><button type="button" className="button button-secondary" onClick={onCancel}>Отмена</button><button type="submit" className="button button-primary" disabled={saving || Boolean(uploading)}><Save size={17} /> {saving ? "Сохранение…" : "Сохранить изменения"}</button></div>
     </form>
   </aside>;
 }
