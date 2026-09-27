@@ -95,22 +95,40 @@ class LocalStorageCardRepository implements CardRepository {
     };
   }
 
+  private assetPath(value: string) {
+    if (!value) return "";
+    try {
+      const marker = "/storage/v1/object/public/card-assets/";
+      const pathname = new URL(value).pathname;
+      const index = pathname.indexOf(marker);
+      return index === -1 ? "" : decodeURIComponent(pathname.slice(index + marker.length));
+    } catch {
+      return "";
+    }
+  }
+
+  private async removeAssets(paths: string[]) {
+    if (!supabase) return;
+    const uniquePaths = [...new Set(paths.filter(Boolean))];
+    if (uniquePaths.length) await supabase.storage.from("card-assets").remove(uniquePaths);
+  }
+
   private async uploadAsset(
     userId: string,
     cardId: string,
     kind: "photo" | "logo",
     value: string
   ) {
-    if (!supabase || !value.startsWith("data:")) return value;
+    if (!supabase || !value.startsWith("data:")) return { url: value, path: "" };
     const response = await fetch(value);
     const blob = await response.blob();
     const extension = blob.type.includes("png") ? "png" : blob.type.includes("jpeg") ? "jpg" : "webp";
-    const path = `${userId}/${cardId}/${kind}.${extension}`;
+    const path = `${userId}/${cardId}/${kind}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`;
     const { error } = await supabase.storage
       .from("card-assets")
-      .upload(path, blob, { upsert: true, contentType: blob.type, cacheControl: "3600" });
-    if (error) return value;
-    return supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl;
+      .upload(path, blob, { upsert: false, contentType: blob.type, cacheControl: "31536000" });
+    if (error) throw new Error(error.message || "Не удалось загрузить изображение.");
+    return { url: supabase.storage.from("card-assets").getPublicUrl(path).data.publicUrl, path };
   }
 
   private async saveRemote(card: DigitalCard) {
@@ -121,15 +139,21 @@ class LocalStorageCardRepository implements CardRepository {
 
     const { data: existing } = await supabase
       .from("cards")
-      .select("id, visibility, review_status")
+      .select("id, visibility, review_status, photo_path, contacts")
       .eq("owner_id", auth.user.id)
       .maybeSingle();
 
     const remoteId = String(existing?.id ?? card.id);
-    const photo = await this.uploadAsset(auth.user.id, remoteId, "photo", card.photo);
-    const companyLogo = await this.uploadAsset(auth.user.id, remoteId, "logo", card.companyLogo);
-    if (this.removedIds().has(card.id) || this.removedIds().has(remoteId)) return;
-    const { data: saved } = await supabase.from("cards").upsert(
+    const oldContacts = (existing?.contacts ?? {}) as Record<string, unknown>;
+    const [photoAsset, logoAsset] = await Promise.all([
+      this.uploadAsset(auth.user.id, remoteId, "photo", card.photo),
+      this.uploadAsset(auth.user.id, remoteId, "logo", card.companyLogo)
+    ]);
+    if (this.removedIds().has(card.id) || this.removedIds().has(remoteId)) {
+      await this.removeAssets([photoAsset.path, logoAsset.path]);
+      return;
+    }
+    const { data: saved, error: saveError } = await supabase.from("cards").upsert(
       {
         id: remoteId,
         owner_id: auth.user.id,
@@ -138,7 +162,7 @@ class LocalStorageCardRepository implements CardRepository {
         position: card.position,
         organization_name: card.organization,
         description: card.description,
-        photo_path: photo.startsWith("http") ? photo : null,
+        photo_path: photoAsset.url.startsWith("http") ? photoAsset.url : null,
         contacts: {
           phone: card.phone,
           secondPhone: card.secondPhone,
@@ -148,7 +172,7 @@ class LocalStorageCardRepository implements CardRepository {
           facebook: card.facebook,
           email: card.email,
           website: card.website,
-          companyLogo: companyLogo.startsWith("http") ? companyLogo : ""
+          companyLogo: logoAsset.url.startsWith("http") ? logoAsset.url : ""
         },
         address: card.address,
         language: card.language,
@@ -167,6 +191,16 @@ class LocalStorageCardRepository implements CardRepository {
       },
       { onConflict: "owner_id" }
     ).select("*").single();
+
+    if (saveError || !saved) {
+      await this.removeAssets([photoAsset.path, logoAsset.path]);
+      throw new Error(saveError?.message || "Не удалось сохранить визитку.");
+    }
+
+    await this.removeAssets([
+      photoAsset.path ? this.assetPath(String(existing?.photo_path ?? "")) : "",
+      logoAsset.path ? this.assetPath(String(oldContacts.companyLogo ?? "")) : ""
+    ]);
 
     if (saved) {
       const remoteCard = this.fromDatabase(saved);
