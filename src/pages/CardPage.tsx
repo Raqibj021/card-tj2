@@ -20,6 +20,7 @@ import {
   UserPlus,
   ClipboardPenLine,
   PhoneCall,
+  SmartphoneNfc,
   WalletCards
 } from "lucide-react";
 import { Link, useParams, useSearchParams } from "react-router";
@@ -97,7 +98,9 @@ const profileCopy = {
     saveImage: "Как фото визитки",
     imageSaved: "Фото визитки загружено",
     imageError: "Не удалось сохранить фото визитки.",
-    close: "Закрыть"
+    close: "Закрыть",
+    orderNfc: "Заказать NFC-карту",
+    qrActions: "QR-код визитки"
   },
   tj: {
     digitalCard: "Варақаи рақамӣ",
@@ -135,7 +138,9 @@ const profileCopy = {
     saveImage: "Ҳамчун сурати варақа",
     imageSaved: "Сурати варақа бор шуд",
     imageError: "Сурати варақаро нигоҳ дошта натавонистем.",
-    close: "Пӯшидан"
+    close: "Пӯшидан",
+    orderNfc: "Фармоиши корти NFC",
+    qrActions: "QR-коди варақа"
   },
   en: {
     digitalCard: "Digital business card",
@@ -173,7 +178,9 @@ const profileCopy = {
     saveImage: "Download card image",
     imageSaved: "Card image downloaded",
     imageError: "Could not download the card image.",
-    close: "Close"
+    close: "Close",
+    orderNfc: "Order an NFC card",
+    qrActions: "Business card QR code"
   }
 } as const;
 
@@ -517,6 +524,19 @@ export default function CardPage() {
               {card.website && <a href={isLocked ? undefined : normalizeUrl(card.website)} target="_blank" rel="noreferrer" aria-label={t("website")} className="profile-contact-action"><Globe2 size={24} /><span>{t("website")}</span></a>}
               {card.address && <a href={isLocked ? undefined : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`} target="_blank" rel="noreferrer" aria-label={t("address")} className="profile-contact-action"><MapPin size={24} /><span>{t("address")}</span></a>}
             </div>
+
+            {!isLocked && <section className="profile-mobile-tools" aria-label={labels.qrActions}>
+              <div className="profile-mobile-qr">
+                <QRCodeImage value={cardUrl} size={116} />
+              </div>
+              <div className="profile-mobile-qr-actions">
+                <button type="button" onClick={copyLink}><Share2 size={20} /><span>{t("copyLink")}</span></button>
+                <button type="button" onClick={() => downloadQrCode(cardUrl, card.slug)}><Download size={20} /><span>{t("downloadQr")}</span></button>
+              </div>
+              <Link className="profile-nfc-button" to="/services/nfc-cards">
+                <SmartphoneNfc size={22} /><span>{labels.orderNfc}</span>
+              </Link>
+            </section>}
 
             <button type="button" className="profile-save-button" disabled={isLocked} onClick={() => isLocked ? showToast(labels.pendingQrText) : setShowSaveDialog(true)}>
               <UserPlus size={20} />{t("saveContact")}
