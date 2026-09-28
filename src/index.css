@@ -9117,3 +9117,8 @@ body,
   }
   .home-page .home-promo-carousel { border-radius: 17px; }
 }
+
+/* Match the Vizora mark to the surface on every loading and card screen. */
+.dark .vizora-brand .vizora-brand-default-image { display: none; }
+.dark .vizora-brand .vizora-brand-light-image { display: block; }
+.card-missing { background: var(--page); color: var(--ink); }
