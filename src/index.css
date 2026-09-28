@@ -9107,3 +9107,13 @@ body,
 .card-live-preview .card-live-bottom > span { color: #071f45; }
 .card-live-preview .card-live-actions span,
 .card-live-preview .card-live-bottom small { font-size: 12px; font-weight: 700; }
+
+/* Restore the mobile rotating banner's inset and rounded edges. */
+@media (max-width: 680px) {
+  .home-page .home-promo-wrap.home-promo-wide {
+    width: calc(100% - 24px);
+    max-width: 470px;
+    margin-inline: auto;
+  }
+  .home-page .home-promo-carousel { border-radius: 17px; }
+}
