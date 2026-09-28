@@ -415,3 +415,82 @@
 @media (prefers-reduced-motion: reduce) {
   .card-modal-backdrop, .profile-page .profile-main-card { animation: none; }
 }
+
+/* The card itself has a quiet animated surface on both screen sizes. */
+.profile-page:not(.profile-creative) .profile-main-card { isolation: isolate; }
+.profile-page:not(.profile-creative) .profile-ambient {
+  position: absolute;
+  z-index: 0;
+  inset: 76px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 7% 22%, color-mix(in srgb, var(--profile-accent) 15%, transparent), transparent 56%),
+    radial-gradient(ellipse at 100% 78%, rgba(10, 166, 188, .13), transparent 56%);
+}
+.profile-ambient i { position: absolute; display: block; border-radius: 50%; pointer-events: none; }
+.profile-ambient i:first-child {
+  top: 2%; left: -32%; width: 110%; height: 40%;
+  background: radial-gradient(ellipse, color-mix(in srgb, var(--profile-accent) 27%, transparent), transparent 68%);
+  filter: blur(25px);
+  animation: vizora-glow-one 15s ease-in-out infinite alternate;
+}
+.profile-ambient i:nth-child(2) {
+  right: -42%; bottom: 5%; width: 115%; height: 43%;
+  background: radial-gradient(ellipse, rgba(29, 171, 192, .24), transparent 68%);
+  filter: blur(26px);
+  animation: vizora-glow-two 19s ease-in-out infinite alternate;
+}
+.profile-ambient i:nth-child(3) {
+  top: 35%; right: -18%; width: 64%; height: 25%;
+  border: 1px solid color-mix(in srgb, var(--profile-accent) 14%, transparent);
+  box-shadow: 0 0 0 22px color-mix(in srgb, var(--profile-accent) 3%, transparent), 0 0 0 55px color-mix(in srgb, var(--profile-accent) 2%, transparent);
+  animation: vizora-ring 24s ease-in-out infinite alternate;
+}
+.profile-page .profile-main-card > .profile-cover,
+.profile-page .profile-main-card > .profile-content,
+.profile-page .profile-main-card > .trial-countdown,
+.profile-page .profile-main-card > .trial-watermark { position: relative; z-index: 1; }
+.dark .profile-page:not(.profile-creative) .profile-ambient {
+  background:
+    radial-gradient(ellipse at 5% 20%, color-mix(in srgb, var(--profile-accent) 23%, transparent), transparent 58%),
+    radial-gradient(ellipse at 100% 86%, rgba(13, 142, 177, .2), transparent 58%);
+}
+.dark .profile-page:not(.profile-creative) .profile-ambient i:first-child { opacity: .85; }
+.dark .profile-page:not(.profile-creative) .profile-ambient i:nth-child(2) { opacity: .8; }
+.dark .profile-page:not(.profile-creative) .profile-role { color: color-mix(in srgb, var(--profile-accent) 42%, white); }
+.dark .profile-page:not(.profile-creative) .profile-company { color: #acbdd2; }
+.profile-creative .profile-ambient { display: none; }
+@keyframes vizora-glow-one { from { transform: translate3d(-12%, -9%, 0) rotate(-8deg); } to { transform: translate3d(26%, 32%, 0) rotate(12deg); } }
+@keyframes vizora-glow-two { from { transform: translate3d(14%, 12%, 0) scale(.9); } to { transform: translate3d(-32%, -27%, 0) scale(1.18); } }
+@keyframes vizora-ring { from { transform: translate3d(10%, 15%, 0) rotate(-16deg); opacity: .5; } to { transform: translate3d(-22%, -18%, 0) rotate(18deg); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .profile-ambient i { animation: none !important; } }
+
+/* Echo the homepage's drifting grid, rings and light points. */
+.profile-page:not(.profile-creative) .profile-ambient::before {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--profile-accent) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--profile-accent) 10%, transparent) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
+  content: "";
+  animation: vizora-grid-drift 26s linear infinite;
+}
+.profile-page:not(.profile-creative) .profile-ambient span {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--profile-accent) 65%, #46d6ff);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--profile-accent) 10%, transparent), 0 0 24px 7px color-mix(in srgb, var(--profile-accent) 32%, transparent);
+  animation: home-node-drift 12s ease-in-out infinite;
+}
+.profile-ambient span:nth-of-type(1) { top: 13%; left: 8%; }
+.profile-ambient span:nth-of-type(2) { top: 55%; right: 8%; animation-delay: -4s; }
+.profile-ambient span:nth-of-type(3) { bottom: 11%; left: 15%; animation-delay: -8s; }
+@keyframes vizora-grid-drift { to { background-position: 42px 42px, 42px 42px; } }
+@media (prefers-reduced-motion: reduce) {
+  .profile-ambient::before, .profile-ambient span { animation: none !important; }
+}
