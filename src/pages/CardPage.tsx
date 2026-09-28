@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -196,6 +196,7 @@ const specialistCopy = {
 } as const;
 
 export default function CardPage() {
+  const pageRef = useRef<HTMLElement>(null);
   const { slug = "" } = useParams();
   const [searchParams] = useSearchParams();
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
@@ -373,18 +374,19 @@ export default function CardPage() {
   const saveAsImage = async () => {
     setSavingImage(true);
     try {
-      await downloadCardImage(card);
+      if (!pageRef.current) throw new Error("Card is not ready");
+      await downloadCardImage(card, pageRef.current);
       setShowSaveDialog(false);
       showToast(labels.imageSaved);
     } catch {
-      showToast(labels.imageError);
+      setContactSaveError(labels.imageError);
     } finally {
       setSavingImage(false);
     }
   };
 
   return (
-    <main className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
+    <main ref={pageRef} className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
@@ -662,7 +664,7 @@ export default function CardPage() {
                 <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>{labels.savePhoneHint}</small></div>
               </button>
               <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
-                <span><Images size={22} /></span><div><strong>{labels.saveImage}</strong><small>PNG · 1080 × 1350</small></div>
+                <span><Images size={22} /></span><div><strong>{labels.saveImage}</strong><small>PNG · 9:16 · 1080 × 1920</small></div>
               </button>
             </div>
             {contactSaveError && <p role="status">{contactSaveError}</p>}
