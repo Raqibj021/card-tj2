@@ -505,14 +505,12 @@ export default function CardPage() {
               {!!card.specialistTags?.length && <div className="profile-specialist-tags"><small>{professionalLabels.services}</small><div>{card.specialistTags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>}
             </section>}
 
-            {(card.instagram || card.facebook || card.whatsapp || card.telegram) && (
-              <div className="profile-social-row profile-social-primary">
-                {card.instagram && <a href={isLocked ? undefined : socialUrl("instagram", card.instagram)} target="_blank" rel="noreferrer" aria-label="Instagram" className={isLocked ? "is-disabled" : undefined}><Instagram size={25} /></a>}
-                {card.facebook && <a href={isLocked ? undefined : socialUrl("facebook", card.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook" className={isLocked ? "is-disabled" : undefined}><Facebook size={25} /></a>}
-                {card.whatsapp && <a href={isLocked ? undefined : `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={isLocked ? "is-disabled" : undefined}><WhatsAppIcon size={25} /></a>}
-                {card.telegram && <a href={isLocked ? undefined : socialUrl("telegram", card.telegram)} target="_blank" rel="noreferrer" aria-label="Telegram" className={isLocked ? "is-disabled" : undefined}><Send size={25} /></a>}
-              </div>
-            )}
+            <div className="profile-social-row profile-social-primary">
+              <a href={isLocked || !card.telegram ? undefined : socialUrl("telegram", card.telegram)} target={card.telegram ? "_blank" : undefined} rel="noreferrer" aria-label="Telegram" className={isLocked || !card.telegram ? "is-disabled" : undefined} onClick={!card.telegram ? (event) => { event.preventDefault(); showToast(labels.missingInfo); } : undefined}><Send size={26} /></a>
+              <a href={isLocked || !card.whatsapp ? undefined : `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target={card.whatsapp ? "_blank" : undefined} rel="noreferrer" aria-label="WhatsApp" className={isLocked || !card.whatsapp ? "is-disabled" : undefined} onClick={!card.whatsapp ? (event) => { event.preventDefault(); showToast(labels.missingInfo); } : undefined}><WhatsAppIcon size={26} /></a>
+              <a href={isLocked || !card.instagram ? undefined : socialUrl("instagram", card.instagram)} target={card.instagram ? "_blank" : undefined} rel="noreferrer" aria-label="Instagram" className={isLocked || !card.instagram ? "is-disabled" : undefined} onClick={!card.instagram ? (event) => { event.preventDefault(); showToast(labels.missingInfo); } : undefined}><Instagram size={26} /></a>
+              <a href={isLocked || !card.facebook ? undefined : socialUrl("facebook", card.facebook)} target={card.facebook ? "_blank" : undefined} rel="noreferrer" aria-label="Facebook" className={isLocked || !card.facebook ? "is-disabled" : undefined} onClick={!card.facebook ? (event) => { event.preventDefault(); showToast(labels.missingInfo); } : undefined}><Facebook size={26} /></a>
+            </div>
 
             <div className="profile-contact-actions">
               {phoneNumbers.length > 0 && (phoneAction ? (
