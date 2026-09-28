@@ -379,3 +379,39 @@
   .card-modal-window .profile-page::before { display: none; }
   .card-modal-window .profile-background-shape { display: none; }
 }
+
+/* Gentle moving color behind the open card, with readable surfaces. */
+@keyframes vizora-card-ambient {
+  0% { background-position: 0% 20%, 100% 80%, 50% 50%; }
+  50% { background-position: 95% 5%, 10% 95%, 50% 50%; }
+  100% { background-position: 0% 20%, 100% 80%, 50% 50%; }
+}
+@media (min-width: 681px) {
+  .card-modal-backdrop {
+    background-image:
+      radial-gradient(circle at 18% 18%, color-mix(in srgb, #1e9bd2 35%, transparent), transparent 38%),
+      radial-gradient(circle at 82% 80%, color-mix(in srgb, #1b9e78 30%, transparent), transparent 42%),
+      linear-gradient(135deg, rgba(3,12,27,.88), rgba(14,29,57,.83));
+    background-size: 155% 155%, 165% 165%, 100% 100%;
+    animation: vizora-card-ambient 18s ease-in-out infinite;
+  }
+}
+@media (max-width: 680px) {
+  .profile-page .profile-main-card {
+    background-image:
+      radial-gradient(circle at 10% 33%, color-mix(in srgb, var(--profile-accent) 9%, transparent), transparent 38%),
+      radial-gradient(circle at 90% 76%, color-mix(in srgb, var(--profile-accent) 8%, transparent), transparent 40%),
+      linear-gradient(var(--panel), var(--panel));
+    background-size: 170% 170%, 170% 170%, 100% 100%;
+    animation: vizora-card-ambient 20s ease-in-out infinite;
+  }
+  .dark .profile-page .profile-main-card {
+    background-image:
+      radial-gradient(circle at 10% 33%, color-mix(in srgb, var(--profile-accent) 20%, transparent), transparent 38%),
+      radial-gradient(circle at 90% 76%, rgba(27,151,183,.13), transparent 42%),
+      linear-gradient(#0d1522, #0d1522);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-modal-backdrop, .profile-page .profile-main-card { animation: none; }
+}
