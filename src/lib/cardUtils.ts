@@ -126,68 +126,29 @@ export const buildVCard = (card: DigitalCard) => {
   return lines.filter(Boolean).join("\r\n");
 };
 
-export const openVCardSaveDialog = async (card: DigitalCard) => {
-  if (/Android/i.test(navigator.userAgent)) {
-    const notes = [
-      card.description,
-      card.website ? `Сайт: ${normalizeUrl(card.website)}` : "",
-      card.telegram ? `Telegram: ${socialUrl("telegram", card.telegram)}` : "",
-      card.instagram ? `Instagram: ${socialUrl("instagram", card.instagram)}` : "",
-      card.facebook ? `Facebook: ${socialUrl("facebook", card.facebook)}` : ""
-    ].filter(Boolean).join("\n");
-    const extras = [
-      ["name", card.fullName],
-      ["phone", sanitizePhone(card.phone)],
-      ["secondary_phone", sanitizePhone(card.secondPhone)],
-      ["email", card.email],
-      ["company", card.organization],
-      ["job_title", card.position],
-      ["postal", card.address],
-      ["notes", notes]
-    ]
-      .filter(([, value]) => Boolean(value))
-      .map(([key, value]) => `S.${key}=${encodeURIComponent(value)}`)
-      .join(";");
-
-    window.location.href =
-      `intent:#Intent;action=android.intent.action.INSERT;` +
-      `type=vnd.android.cursor.dir/contact;${extras};end`;
-    return;
-  }
-
-  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    window.location.href =
-      `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(card))}`;
-    return;
-  }
-
+export const openVCardSaveDialog = async (card: DigitalCard): Promise<boolean> => {
   const file = new File(
     [buildVCard(card)],
     `${card.slug || "contact"}.vcf`,
-    { type: "text/vcard;charset=utf-8" }
+    { type: "text/vcard" }
   );
 
+  // Let the OS offer compatible apps; never silently download a contact or
+  // navigate to a data URL (blocked by modern mobile browsers).
   if (
-    typeof navigator.share === "function" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files: [file] })
-  ) {
-    try {
-      await navigator.share({
-        files: [file],
-        title: card.fullName,
-        text: card.organization || card.position || undefined
-      });
-      return;
-    } catch (error) {
-      if ((error as Error).name === "AbortError") return;
-    }
-  }
+    typeof navigator.share !== "function" ||
+    typeof navigator.canShare !== "function" ||
+    !navigator.canShare({ files: [file] })
+  ) return false;
 
-  // iOS/Safari understands a vCard opened in the current tab and displays the
-  // native contact preview with the "Create New Contact" action.
-  window.location.href =
-    `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(card))}`;
+  try {
+    await navigator.share({ files: [file], title: card.fullName });
+    return true;
+  } catch (error) {
+    // Cancelling the native picker is not a failed save.
+    if ((error as Error).name === "AbortError") return true;
+    return false;
+  }
 };
 
 const loadCanvasImage = (source: string) =>
