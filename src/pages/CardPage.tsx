@@ -46,7 +46,6 @@ import { walletAdapter } from "../lib/wallet";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import ReportCardButton from "../components/ReportCardButton";
 import { verificationRepository } from "../lib/verificationRepository";
-import "./CardPage.css";
 
 type AccentStyle = CSSProperties & {
   "--profile-accent": string;
@@ -95,6 +94,8 @@ const profileCopy = {
     phoneNumbers: "Номера для звонка",
     saveTitle: "Как сохранить визитку?",
     savePhone: "В контакты телефона",
+    savePhoneHint: "Выберите «Контакты» в системном меню, если доступно",
+    contactUnsupported: "Браузер не поддерживает передачу контакта приложению. Автоматическое скачивание отключено.",
     saveImage: "Как фото визитки",
     imageSaved: "Фото визитки загружено",
     imageError: "Не удалось сохранить фото визитки.",
@@ -135,6 +136,8 @@ const profileCopy = {
     phoneNumbers: "Рақамҳо барои занг",
     saveTitle: "Варақаро чӣ гуна нигоҳ дорем?",
     savePhone: "Ба тамосҳои телефон",
+    savePhoneHint: "Дар менюи телефон «Тамосҳо»-ро интихоб кунед, агар дастрас бошад",
+    contactUnsupported: "Браузер интиқоли тамосро дастгирӣ намекунад. Боргирии худкор хомӯш аст.",
     saveImage: "Ҳамчун сурати варақа",
     imageSaved: "Сурати варақа бор шуд",
     imageError: "Сурати варақаро нигоҳ дошта натавонистем.",
@@ -175,6 +178,8 @@ const profileCopy = {
     phoneNumbers: "Phone numbers",
     saveTitle: "How would you like to save it?",
     savePhone: "Save to phone contacts",
+    savePhoneHint: "Choose Contacts in the system menu, if available",
+    contactUnsupported: "This browser cannot pass a contact to an app. Automatic downloads are disabled.",
     saveImage: "Download card image",
     imageSaved: "Card image downloaded",
     imageError: "Could not download the card image.",
@@ -523,6 +528,10 @@ export default function CardPage() {
               {card.address && <a href={isLocked ? undefined : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`} target="_blank" rel="noreferrer" aria-label={t("address")} className="profile-contact-action"><MapPin size={24} /><span>{t("address")}</span></a>}
             </div>
 
+            <button type="button" className="profile-save-button" disabled={isLocked} onClick={() => isLocked ? showToast(labels.pendingQrText) : setShowSaveDialog(true)}>
+              <UserPlus size={20} />{t("saveContact")}
+            </button>
+
             {!isLocked && <section className="profile-mobile-tools" aria-label={labels.qrActions}>
               <div className="profile-mobile-qr">
                 <QRCodeImage value={cardUrl} size={116} />
@@ -535,10 +544,6 @@ export default function CardPage() {
                 <SmartphoneNfc size={22} /><span>{labels.orderNfc}</span>
               </Link>
             </section>}
-
-            <button type="button" className="profile-save-button" disabled={isLocked} onClick={() => isLocked ? showToast(labels.pendingQrText) : setShowSaveDialog(true)}>
-              <UserPlus size={20} />{t("saveContact")}
-            </button>
 
             {!card.organizationManaged && <div className="profile-lead-panel">
               <div>
@@ -652,8 +657,8 @@ export default function CardPage() {
           <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
             <h2 id="save-dialog-title">{labels.saveTitle}</h2>
             <div className="profile-dialog-options">
-              <button type="button" onClick={() => { setShowSaveDialog(false); void openVCardSaveDialog(card); }}>
-                <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>VCF · Android / iPhone</small></div>
+              <button type="button" onClick={() => { void openVCardSaveDialog(card).then((supported) => { if (!supported) showToast(labels.contactUnsupported); }).catch(() => showToast(labels.contactUnsupported)); }}>
+                <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>{labels.savePhoneHint}</small></div>
               </button>
               <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
                 <span><Images size={22} /></span><div><strong>{labels.saveImage}</strong><small>PNG · 1080 × 1350</small></div>

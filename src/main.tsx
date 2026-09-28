@@ -7,6 +7,8 @@ import { AuthProvider } from "./context/AuthContext";
 import { AdminAuthProvider } from "./context/AdminAuthContext";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 import "./index.css";
+// Page refinements must follow the legacy shared template styles.
+import "./pages/CardPage.css";
 
 const basename = import.meta.env.BASE_URL === "/"
   ? "/"
