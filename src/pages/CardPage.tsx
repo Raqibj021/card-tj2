@@ -31,6 +31,7 @@ import { cardRepository } from "../lib/cardRepository";
 import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import {
   downloadQrCode,
+  downloadCardImage,
   openVCardSaveDialog,
   normalizeUrl,
   sanitizePhone,
@@ -89,7 +90,14 @@ const profileCopy = {
     pendingQrTitle: "QR-код появится после проверки",
     pendingQrText: "Заявка проверяется целиком. После одного решения станут доступны QR-код, ссылка и контакты.",
     fixAndResubmit: "Исправить и отправить повторно",
-    missingInfo: "Информация не добавлена"
+    missingInfo: "Информация не добавлена",
+    phoneNumbers: "Номера для звонка",
+    saveTitle: "Как сохранить визитку?",
+    savePhone: "В контакты телефона",
+    saveImage: "Как фото визитки",
+    imageSaved: "Фото визитки загружено",
+    imageError: "Не удалось сохранить фото визитки.",
+    close: "Закрыть"
   },
   tj: {
     digitalCard: "Варақаи рақамӣ",
@@ -120,7 +128,14 @@ const profileCopy = {
     pendingQrTitle: "QR-код пас аз санҷиш пайдо мешавад",
     pendingQrText: "Дархост пурра санҷида мешавад. Пас аз як қарор QR-код, пайванд ва тамосҳо дастрас мешаванд.",
     fixAndResubmit: "Ислоҳ ва дубора фиристодан",
-    missingInfo: "Маълумот илова нашудааст"
+    missingInfo: "Маълумот илова нашудааст",
+    phoneNumbers: "Рақамҳо барои занг",
+    saveTitle: "Варақаро чӣ гуна нигоҳ дорем?",
+    savePhone: "Ба тамосҳои телефон",
+    saveImage: "Ҳамчун сурати варақа",
+    imageSaved: "Сурати варақа бор шуд",
+    imageError: "Сурати варақаро нигоҳ дошта натавонистем.",
+    close: "Пӯшидан"
   },
   en: {
     digitalCard: "Digital business card",
@@ -151,7 +166,14 @@ const profileCopy = {
     pendingQrTitle: "QR code will appear after review",
     pendingQrText: "The complete application is under review. One decision will enable the QR code, public link and contacts.",
     fixAndResubmit: "Fix and resubmit",
-    missingInfo: "Information not provided"
+    missingInfo: "Information not provided",
+    phoneNumbers: "Phone numbers",
+    saveTitle: "How would you like to save it?",
+    savePhone: "Save to phone contacts",
+    saveImage: "Download card image",
+    imageSaved: "Card image downloaded",
+    imageError: "Could not download the card image.",
+    close: "Close"
   }
 } as const;
 
@@ -175,6 +197,9 @@ export default function CardPage() {
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
   const [activating, setActivating] = useState(false);
   const [professionCategoryName, setProfessionCategoryName] = useState("");
+  const [showPhoneDialog, setShowPhoneDialog] = useState(false);
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [savingImage, setSavingImage] = useState(false);
   const cardUrl = window.location.href;
   const labels = profileCopy[language];
   const professionalLabels = specialistCopy[language];
@@ -329,37 +354,21 @@ export default function CardPage() {
     showToast(result.message);
   };
 
-  const actionLinks = [
-    card.phone && {
-      href: `tel:${sanitizePhone(card.phone)}`,
-      icon: Phone,
-      label: t("call"),
-      primary: true
-    },
-    card.whatsapp && {
-      href: `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`,
-      icon: WhatsAppIcon,
-      label: "WhatsApp",
-      primary: true
-    },
-    (card.telegram || card.organizationManaged) && {
-      href: card.telegram ? socialUrl("telegram", card.telegram) : null,
-      icon: Send,
-      label: "Telegram",
-      primary: false
-    },
-    (card.email || card.organizationManaged) && {
-      href: card.email ? `mailto:${card.email}` : null,
-      icon: Mail,
-      label: "E-mail",
-      primary: false
+  const phoneNumbers = Array.from(new Set([card.phone, card.secondPhone].map((phone) => phone.trim()).filter(Boolean)));
+  const phoneAction = phoneNumbers.length === 1 ? `tel:${sanitizePhone(phoneNumbers[0])}` : undefined;
+
+  const saveAsImage = async () => {
+    setSavingImage(true);
+    try {
+      await downloadCardImage(card);
+      setShowSaveDialog(false);
+      showToast(labels.imageSaved);
+    } catch {
+      showToast(labels.imageError);
+    } finally {
+      setSavingImage(false);
     }
-  ].filter(Boolean) as Array<{
-    href: string | null;
-    icon: typeof Phone;
-    label: string;
-    primary: boolean;
-  }>;
+  };
 
   return (
     <main className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
@@ -489,31 +498,28 @@ export default function CardPage() {
               {!!card.specialistTags?.length && <div className="profile-specialist-tags"><small>{professionalLabels.services}</small><div>{card.specialistTags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>}
             </section>}
 
-            <div className="profile-action-grid">
-              {actionLinks.map(({ href, icon: Icon, label, primary }) => (
-                <a
-                  href={isLocked || !href ? undefined : href}
-                  key={label}
-                  className={`profile-action ${primary ? "profile-action-primary" : ""} ${isLocked || !href ? "is-disabled" : ""}`}
-                  aria-disabled={isLocked || !href}
-                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : !href ? (event) => { event.preventDefault(); showToast(labels.missingInfo); } : undefined}
-                  target={href?.startsWith("http") ? "_blank" : undefined}
-                  rel="noreferrer"
-                >
-                  <Icon size={19} />
-                  <span>{label}</span>
-                </a>
+            {(card.instagram || card.facebook || card.whatsapp || card.telegram) && (
+              <div className="profile-social-row profile-social-primary">
+                {card.instagram && <a href={isLocked ? undefined : socialUrl("instagram", card.instagram)} target="_blank" rel="noreferrer" aria-label="Instagram" className={isLocked ? "is-disabled" : undefined}><Instagram size={25} /></a>}
+                {card.facebook && <a href={isLocked ? undefined : socialUrl("facebook", card.facebook)} target="_blank" rel="noreferrer" aria-label="Facebook" className={isLocked ? "is-disabled" : undefined}><Facebook size={25} /></a>}
+                {card.whatsapp && <a href={isLocked ? undefined : `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={isLocked ? "is-disabled" : undefined}><WhatsAppIcon size={25} /></a>}
+                {card.telegram && <a href={isLocked ? undefined : socialUrl("telegram", card.telegram)} target="_blank" rel="noreferrer" aria-label="Telegram" className={isLocked ? "is-disabled" : undefined}><Send size={25} /></a>}
+              </div>
+            )}
+
+            <div className="profile-contact-actions">
+              {phoneNumbers.length > 0 && (phoneAction ? (
+                <a href={isLocked ? undefined : phoneAction} aria-label={t("call")} className="profile-contact-action"><Phone size={24} /><span>{t("call")}</span></a>
+              ) : (
+                <button type="button" disabled={isLocked} onClick={() => setShowPhoneDialog(true)} className="profile-contact-action"><Phone size={24} /><span>{t("call")}</span><em>{phoneNumbers.length}</em></button>
               ))}
+              {card.email && <a href={isLocked ? undefined : `mailto:${card.email}`} aria-label="E-mail" className="profile-contact-action"><Mail size={24} /><span>E-mail</span></a>}
+              {card.website && <a href={isLocked ? undefined : normalizeUrl(card.website)} target="_blank" rel="noreferrer" aria-label={t("website")} className="profile-contact-action"><Globe2 size={24} /><span>{t("website")}</span></a>}
+              {card.address && <a href={isLocked ? undefined : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`} target="_blank" rel="noreferrer" aria-label={t("address")} className="profile-contact-action"><MapPin size={24} /><span>{t("address")}</span></a>}
             </div>
 
-            <button
-              type="button"
-              className="profile-save-button"
-              disabled={isLocked}
-              onClick={() => isLocked ? showToast(labels.pendingQrText) : void openVCardSaveDialog(card)}
-            >
-              <UserPlus size={20} />
-              {t("saveContact")}
+            <button type="button" className="profile-save-button" disabled={isLocked} onClick={() => isLocked ? showToast(labels.pendingQrText) : setShowSaveDialog(true)}>
+              <UserPlus size={20} />{t("saveContact")}
             </button>
 
             {!card.organizationManaged && <div className="profile-lead-panel">
@@ -534,83 +540,6 @@ export default function CardPage() {
               </div>
             </div>}
 
-            <div className="profile-detail-list">
-              {card.phone && (
-                <a
-                  href={isLocked ? undefined : `tel:${sanitizePhone(card.phone)}`}
-                  aria-disabled={isLocked}
-                  className={isLocked ? "is-disabled" : undefined}
-                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
-                >
-                  <span><Phone size={18} /></span>
-                  <div><small>{t("phone")}</small><strong>{card.phone}</strong></div>
-                </a>
-              )}
-              {card.secondPhone && (
-                <a
-                  href={isLocked ? undefined : `tel:${sanitizePhone(card.secondPhone)}`}
-                  aria-disabled={isLocked}
-                  className={isLocked ? "is-disabled" : undefined}
-                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
-                >
-                  <span><Phone size={18} /></span>
-                  <div><small>{t("secondPhone")}</small><strong>{card.secondPhone}</strong></div>
-                </a>
-              )}
-              {card.website && (
-                <a
-                  href={isLocked ? undefined : normalizeUrl(card.website)}
-                  target={isLocked ? undefined : "_blank"}
-                  rel="noreferrer"
-                  aria-disabled={isLocked}
-                  className={isLocked ? "is-disabled" : undefined}
-                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
-                >
-                  <span><Globe2 size={18} /></span>
-                  <div><small>{t("website")}</small><strong>{card.website.replace(/^https?:\/\//, "")}</strong></div>
-                </a>
-              )}
-              {card.address && (
-                <a
-                  href={isLocked ? undefined : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`}
-                  target={isLocked ? undefined : "_blank"}
-                  rel="noreferrer"
-                  aria-disabled={isLocked}
-                  className={isLocked ? "is-disabled" : undefined}
-                  onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}
-                >
-                  <span><MapPin size={18} /></span>
-                  <div><small>{t("address")}</small><strong>{card.address}</strong><em>{t("map")}</em></div>
-                </a>
-              )}
-              {card.organizationManaged && !card.website && <button type="button" className="is-disabled" onClick={() => showToast(labels.missingInfo)}><span><Globe2 size={18} /></span><div><small>{t("website")}</small><strong>{labels.missingInfo}</strong></div></button>}
-              {card.organizationManaged && !card.address && <button type="button" className="is-disabled" onClick={() => showToast(labels.missingInfo)}><span><MapPin size={18} /></span><div><small>{t("address")}</small><strong>{labels.missingInfo}</strong></div></button>}
-            </div>
-
-            {(card.instagram || card.facebook || card.whatsapp || card.telegram) && (
-              <div className="profile-social-row">
-                {card.instagram && (
-                  <a href={isLocked ? undefined : socialUrl("instagram", card.instagram)} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="Instagram" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
-                    <Instagram size={20} />
-                  </a>
-                )}
-                {card.facebook && (
-                  <a href={isLocked ? undefined : socialUrl("facebook", card.facebook)} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="Facebook" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
-                    <Facebook size={20} />
-                  </a>
-                )}
-                {card.whatsapp && (
-                  <a href={isLocked ? undefined : `https://wa.me/${sanitizePhone(card.whatsapp).replace("+", "")}`} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="WhatsApp" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
-                    <WhatsAppIcon size={20} />
-                  </a>
-                )}
-                {card.telegram && (
-                  <a href={isLocked ? undefined : socialUrl("telegram", card.telegram)} target={isLocked ? undefined : "_blank"} rel="noreferrer" aria-label="Telegram" aria-disabled={isLocked} className={isLocked ? "is-disabled" : undefined} onClick={isLocked ? (event) => { event.preventDefault(); showToast(labels.pendingQrText); } : undefined}>
-                    <Send size={20} />
-                  </a>
-                )}
-              </div>
-            )}
 
             {isSpecialistView && !!card.specialistPortfolio?.length && <section className="profile-specialist-portfolio">
               <header><Images size={19} /><h2>{professionalLabels.portfolio}</h2><span>{card.specialistPortfolio.length}</span></header>
@@ -684,6 +613,37 @@ export default function CardPage() {
           source={leadSource}
           onClose={() => setLeadSource(null)}
         />
+      )}
+      {showPhoneDialog && (
+        <div className="profile-dialog-backdrop" role="presentation" onMouseDown={() => setShowPhoneDialog(false)}>
+          <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="phone-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
+            <h2 id="phone-dialog-title">{labels.phoneNumbers}</h2>
+            <div className="profile-dialog-options">
+              {phoneNumbers.map((phone, index) => (
+                <a href={`tel:${sanitizePhone(phone)}`} key={phone} onClick={() => setShowPhoneDialog(false)}>
+                  <span><Phone size={22} /></span><div><small>{index === 0 ? t("phone") : t("secondPhone")}</small><strong>{phone}</strong></div>
+                </a>
+              ))}
+            </div>
+            <button type="button" className="profile-dialog-cancel" onClick={() => setShowPhoneDialog(false)}>{labels.close}</button>
+          </section>
+        </div>
+      )}
+      {showSaveDialog && (
+        <div className="profile-dialog-backdrop" role="presentation" onMouseDown={() => setShowSaveDialog(false)}>
+          <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
+            <h2 id="save-dialog-title">{labels.saveTitle}</h2>
+            <div className="profile-dialog-options">
+              <button type="button" onClick={() => { setShowSaveDialog(false); void openVCardSaveDialog(card); }}>
+                <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>VCF · Android / iPhone</small></div>
+              </button>
+              <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
+                <span><Images size={22} /></span><div><strong>{labels.saveImage}</strong><small>PNG · 1080 × 1350</small></div>
+              </button>
+            </div>
+            <button type="button" className="profile-dialog-cancel" onClick={() => setShowSaveDialog(false)}>{labels.close}</button>
+          </section>
+        </div>
       )}
     </main>
   );
