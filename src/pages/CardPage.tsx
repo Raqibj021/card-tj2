@@ -472,6 +472,8 @@ export default function CardPage() {
             </span>
           </div>
           <div className="profile-content">
+            <div className="profile-hero">
+              <div className="profile-hero-art" aria-hidden="true"><i /><i /><i /><span /><span /></div>
             <div className="profile-avatar-wrap">
               {card.photo ? (
                 <img src={card.photo} alt={card.fullName} className="profile-avatar" />
@@ -495,6 +497,7 @@ export default function CardPage() {
                   <Building2 size={16} /> {card.organization}
                 </p>
               )}
+            </div>
             </div>
 
             {(isSpecialistView ? card.specialistSummary : card.description) && (
