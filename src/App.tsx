@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from "react";
-import { Route, Routes, useLocation } from "react-router";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router";
 import Header from "./components/layout/Header";
 import HomePage from "./pages/HomePage";
 import CreatePage from "./pages/CreatePage";
@@ -52,12 +52,31 @@ function ScrollToTop() {
 
 export default function App() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const previousPage = useRef<typeof location | null>(null);
+  const [desktop, setDesktop] = useState(() => window.matchMedia("(min-width: 681px)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 681px)");
+    const update = () => setDesktop(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const rootSlug = /^\/[^/]+\/?$/.test(location.pathname) && !new Set([
     "/", "/directory", "/organizations", "/organization", "/payment", "/notifications",
     "/support", "/services", "/about", "/service-order", "/contract", "/print-card",
     "/login", "/register", "/forgot-password", "/reset-password", "/create", "/dashboard", "/verification"
   ]).has(location.pathname.replace(/\/$/, "") || "/");
   const standaloneCard = location.pathname.startsWith("/card/") || rootSlug;
+  const modalCard = desktop && standaloneCard;
+  const background = previousPage.current ?? { ...location, pathname: "/", search: "", hash: "" };
+  if (!standaloneCard) previousPage.current = location;
+  const closeCard = () => previousPage.current ? navigate(`${background.pathname}${background.search}${background.hash}`) : navigate("/");
+  useEffect(() => {
+    if (!modalCard) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") closeCard(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [modalCard, location.pathname]);
   const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname);
   const standaloneAdmin = location.pathname.startsWith("/admin");
 
@@ -65,8 +84,9 @@ export default function App() {
     <div className="app-shell min-h-screen text-[var(--ink)]">
       <LoadingScreen />
       <ScrollToTop />
-      {!standaloneCard && !standaloneAuth && !standaloneAdmin && <Header />}
-      <Routes>
+      {(!standaloneCard || modalCard) && !standaloneAuth && !standaloneAdmin && <Header />}
+      <div className={modalCard ? "card-modal-background" : undefined} aria-hidden={modalCard || undefined}>
+      <Routes location={modalCard ? background : location}>
         <Route path="/" element={<HomePage />} />
         <Route path="/directory" element={<DirectoryPage />} />
         <Route path="/organizations" element={<OrganizationsPage />} />
@@ -112,7 +132,14 @@ export default function App() {
         <Route path="/:slug" element={<CardPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      {!standaloneCard && !standaloneAuth && !standaloneAdmin && <HelpWidget />}
+      </div>
+      {modalCard && <div className="card-modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) closeCard(); }}>
+        <section className="card-modal-window" role="dialog" aria-modal="true" aria-label="Цифровая визитка">
+          <button type="button" className="card-modal-close" onClick={closeCard} aria-label="Закрыть визитку">×</button>
+          <Routes location={location}><Route path="/card/:slug" element={<CardPage />} /><Route path="/:slug" element={<CardPage />} /></Routes>
+        </section>
+      </div>}
+      {(!standaloneCard || modalCard) && !standaloneAuth && !standaloneAdmin && <HelpWidget />}
     </div>
   );
 }

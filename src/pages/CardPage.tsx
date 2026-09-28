@@ -214,7 +214,7 @@ export default function CardPage() {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [contactSaveError, setContactSaveError] = useState("");
   const [savingImage, setSavingImage] = useState(false);
-  const cardUrl = window.location.href;
+  const cardUrl = `${window.location.origin}/${slug}`;
   const labels = profileCopy[language];
   const professionalLabels = specialistCopy[language];
 

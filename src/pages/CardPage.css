@@ -331,3 +331,51 @@
   .profile-page .profile-content { gap: 8px; padding-top: 10px; padding-bottom: 10px; }
   .profile-page .profile-avatar { width: 80px; height: 80px; }
 }
+
+/* Desktop card window uses the same card composition as the phone view. */
+@media (min-width: 681px) {
+  .card-modal-background { min-height: 100dvh; filter: blur(7px); pointer-events: none; user-select: none; }
+  .card-modal-backdrop { position: fixed; z-index: 900; inset: 0; display: grid; place-items: center; overflow: auto; background: rgba(3, 12, 27, .52); padding: 24px; }
+  .card-modal-window { position: relative; width: min(440px, 100%); height: min(850px, calc(100dvh - 48px)); overflow: auto; border-radius: 28px; background: var(--panel); box-shadow: 0 30px 100px rgba(0,0,0,.45); scrollbar-width: thin; }
+  .card-modal-close { position: sticky; top: 10px; float: right; z-index: 20; display: grid; width: 36px; height: 36px; margin: 10px 10px -46px 0; place-items: center; border: 0; border-radius: 50%; background: rgba(13, 28, 48, .75); color: white; font-size: 28px; line-height: 1; cursor: pointer; }
+  .card-modal-window .profile-page { min-height: 100%; padding: 0; }
+  .card-modal-window .profile-background-shape,
+  .card-modal-window .profile-toolbar,
+  .card-modal-window .profile-side,
+  .card-modal-window .profile-footer,
+  .card-modal-window .profile-lead-panel { display: none; }
+  .card-modal-window .profile-layout { display: block; width: 100%; max-height: none; margin: 0; }
+  .card-modal-window .profile-main-card { width: 100%; max-height: none; overflow: visible; border: 0; border-radius: 0; box-shadow: none; }
+  .card-modal-window .profile-cover { height: 76px; min-height: 76px; align-items: center; padding: 10px 16px; }
+  .card-modal-window .profile-cover::after { display: none; }
+  .card-modal-window .profile-cover-logo { width: 44px; height: 44px; flex: 0 0 44px; }
+  .card-modal-window .profile-content { display: flex; flex-direction: column; align-items: center; justify-content: space-evenly; gap: 14px; min-height: 690px; padding: 20px 18px; }
+  .card-modal-window .profile-content > * { flex-shrink: 0; }
+  .card-modal-window .profile-avatar-wrap { margin: 0; }
+  .card-modal-window .profile-avatar { width: 104px; height: 104px; border-radius: 50%; }
+  .card-modal-window .profile-identity { width: 100%; margin: 0; text-align: center; }
+  .card-modal-window .profile-identity h1 { font-size: 30px; overflow-wrap: anywhere; }
+  .card-modal-window .profile-company { justify-content: center; }
+  .card-modal-window .profile-description { display: none; }
+  .card-modal-window .profile-social-primary { display: grid; width: min(360px,100%); margin: 0; grid-template-columns: repeat(4,1fr); }
+  .card-modal-window .profile-social-primary a { display: grid; width: 100%; height: 52px; place-items: center; }
+  .card-modal-window .profile-contact-actions { width: min(360px,100%); margin: 0; gap: 8px; grid-template-columns: repeat(auto-fit,minmax(60px,1fr)); }
+  .card-modal-window .profile-contact-action { min-height: 60px; }
+  .card-modal-window .profile-save-button { width: min(360px,100%); min-height: 48px; margin: 0; }
+  .card-modal-window .profile-mobile-tools { display: grid; width: min(360px,100%); gap: 8px; margin: 0; grid-template-columns: 104px minmax(0,1fr); }
+  .card-modal-window .profile-mobile-qr { display: grid; place-items: center; grid-row: 1 / 3; border: 1px solid var(--line); border-radius: 16px; background: white; padding: 6px; }
+  .card-modal-window .profile-mobile-qr img { width: 90px !important; height: 90px !important; }
+  .card-modal-window .profile-mobile-qr-actions { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
+  .card-modal-window .profile-mobile-qr-actions button,
+  .card-modal-window .profile-nfc-button { display: flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--line); border-radius: 13px; padding: 8px 5px; background: var(--panel); color: inherit; font: inherit; cursor: pointer; }
+  .card-modal-window .profile-mobile-qr-actions button { flex-direction: column; }
+  .card-modal-window .profile-mobile-qr-actions button span { font-size: 11px; font-weight: 700; }
+  .card-modal-window .profile-nfc-button { grid-column: 2; min-height: 44px; background: var(--profile-accent); color: white; font-size: 13px; font-weight: 750; }
+  .card-modal-window .profile-specialist-panel,
+  .card-modal-window .profile-specialist-portfolio { width: 100%; }
+}
+@media (min-width: 681px) {
+  .app-shell:has(.card-modal-backdrop) > header { filter: blur(7px); pointer-events: none; }
+  .card-modal-window .profile-page::before { display: none; }
+  .card-modal-window .profile-background-shape { display: none; }
+}

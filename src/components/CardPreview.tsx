@@ -64,106 +64,21 @@ export default function CardPreview({
   const displayName = formatDisplayName(card.fullName || t("fullName"));
 
   return (
-    <article
-      data-card-id={"id" in card ? card.id : undefined}
-      className={`digital-card digital-card-${card.template} ${
-        compact ? "digital-card-compact" : ""
-      }`}
-      style={style}
-    >
-      <div className="card-preview-cover">
-        <div className="card-preview-orb" />
-        <span className="card-preview-brand">
-          <span className={card.companyLogo ? "has-company-logo" : ""}>
-            {card.companyLogo ? (
-              <img src={card.companyLogo} alt="" />
-            ) : (
-              (card.organization || "V").charAt(0)
-            )}
-          </span>
-          {card.organization || "VIZORA.TJ"}
+    <article className="card-live-preview" style={style} aria-label={t("livePreview")}>
+      <div className="card-live-cover">
+        <span className="card-live-brand">
+          <span className="card-live-logo">{card.companyLogo ? <img src={card.companyLogo} alt="" /> : (card.organization || "V").charAt(0)}</span>
+          <span><small>{copy.kicker}</small><strong>{card.organization || "Vizora.tj"}</strong></span>
         </span>
-        <span className="card-preview-qr"><QrCode size={18} /></span>
+        <span className="card-live-status"><Check size={12} /> VIZORA</span>
       </div>
-
-      <div className="card-preview-body">
-        <div className="card-profile">
-          <div className="card-avatar-wrap">
-            {card.photo ? (
-              <img
-                src={card.photo}
-                alt={displayName}
-                className="card-avatar"
-              />
-            ) : (
-              <div className="card-avatar card-avatar-fallback">
-                {initials(card.fullName)}
-              </div>
-            )}
-            <span className="card-preview-verified"><Check size={12} /></span>
-          </div>
-          <div className="min-w-0">
-            <span className="card-kicker">{copy.kicker}</span>
-            <h3 className="card-name">{displayName}</h3>
-            <p className="card-role">{card.position || t("position")}</p>
-          </div>
-        </div>
-
-        <p className="card-description">
-          {card.description ||
-            copy.description}
-        </p>
-
-        {!compact && (
-          <div className="card-organization">
-            <Building2 size={16} />
-            <span>{card.organization || t("organization")}</span>
-          </div>
-        )}
-
-        <div className="card-primary-actions">
-          <div className="card-primary-button">
-            <Phone size={18} />
-            <span>{t("call")}</span>
-          </div>
-          <div className="card-primary-button card-primary-button-light">
-            <WhatsAppIcon size={18} />
-            <span>WhatsApp</span>
-          </div>
-        </div>
-
-        {!compact && (
-          <>
-            <div className="card-contact-list">
-              <div>
-                <Phone size={16} />
-                <span>{card.phone || "+992 00 000 00 00"}</span>
-              </div>
-              <div>
-                <Mail size={16} />
-                <span>{card.email || "name@example.tj"}</span>
-              </div>
-              <div>
-                <Globe2 size={16} />
-                <span>{card.website || "www.example.tj"}</span>
-              </div>
-              <div>
-                <MapPin size={16} />
-                <span>{card.address || t("address")}</span>
-              </div>
-            </div>
-            <div className="card-socials">
-              <span><Send size={15} /> Telegram</span>
-              <span><Instagram size={15} /> Instagram</span>
-              <span><Facebook size={15} /> Facebook</span>
-            </div>
-          </>
-        )}
-
-        <div className="card-signature">
-          <span className="mini-logo">V</span>
-          <span>vizora.tj/demo</span>
-        </div>
+      <div className="card-live-content">
+        {card.photo ? <img className="card-live-avatar" src={card.photo} alt="" /> : <span className="card-live-avatar card-live-fallback">{initials(card.fullName)}</span>}
+        <div className="card-live-identity"><h3>{displayName}</h3><p>{card.position || t("position")}</p>{card.organization && <small><Building2 size={14} /> {card.organization}</small>}</div>
+        <div className="card-live-socials" aria-hidden="true"><Send /><WhatsAppIcon size={23} /><Instagram /><Facebook /></div>
+        <div className="card-live-actions" aria-hidden="true"><span><Phone />{t("call")}</span><span><Mail />E-mail</span><span><Globe2 />{t("website")}</span><span><MapPin />{t("address")}</span></div>
+        <div className="card-live-save"><Check size={18} /> {t("saveContact")}</div>
+        {!compact && <div className="card-live-bottom"><span><QrCode size={68} /></span><div><small>{t("copyLink")}</small><small>{t("downloadQr")}</small><strong>⌁ NFC</strong></div></div>}
       </div>
     </article>
   );
