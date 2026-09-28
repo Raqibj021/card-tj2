@@ -9122,3 +9122,57 @@ body,
 .dark .vizora-brand .vizora-brand-default-image { display: none; }
 .dark .vizora-brand .vizora-brand-light-image { display: block; }
 .card-missing { background: var(--page); color: var(--ink); }
+
+/* Personal account: mobile density without horizontal clipping. */
+@media (max-width: 680px) {
+  .dashboard-page { overflow-x: clip; }
+  .dashboard-page .site-container { min-width: 0; }
+  .dashboard-hero .site-container { padding-top: 16px; padding-bottom: 18px; }
+  .dashboard-profile-panel { gap: 12px; margin-bottom: 16px; padding: 12px; border-radius: 17px; }
+  .dashboard-profile-identity { min-width: 0; gap: 10px; }
+  .dashboard-profile-identity > img, .dashboard-profile-identity > span { width: 48px; height: 48px; border-radius: 14px; }
+  .dashboard-profile-identity > div { min-width: 0; }
+  .dashboard-profile-identity h2 { margin-top: 2px; font-size: 17px; line-height: 1.2; overflow-wrap: anywhere; }
+  .dashboard-profile-identity p { margin-top: 2px; font-size: 11px; line-height: 1.3; overflow-wrap: anywhere; }
+  .dashboard-profile-identity em { margin-top: 2px; font-size: 10px; overflow-wrap: anywhere; }
+  .dashboard-profile-actions { display: grid; width: 100%; gap: 6px; grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .dashboard-profile-actions .button, .dashboard-profile-actions .dashboard-logout { grid-column: auto; min-width: 0; min-height: 38px; justify-content: center; gap: 4px; padding: 5px 3px; font-size: 10px; line-height: 1.15; text-align: center; white-space: normal; }
+  .dashboard-profile-actions svg { width: 14px; height: 14px; flex: 0 0 auto; }
+  .dashboard-hero .page-title { margin-top: 3px; font-size: 23px; }
+  .dashboard-hero .page-copy { display: none; }
+  .dashboard-hero .section-label { font-size: 10px; }
+  .dashboard-hero .button-large { min-height: 40px; align-self: flex-start; padding: 8px 12px; font-size: 12px; }
+  .dashboard-hero .flex.flex-col.gap-7 { gap: 9px; }
+  .dashboard-stats { gap: 6px; margin-top: 15px; grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .dashboard-stats article { min-width: 0; min-height: 68px; gap: 5px; padding: 8px; border-radius: 12px; }
+  .dashboard-stats article > span { width: 26px; height: 26px; flex: 0 0 auto; border-radius: 8px; }
+  .dashboard-stats article > span svg { width: 15px; height: 15px; }
+  .dashboard-stats article > div { min-width: 0; }
+  .dashboard-stats strong { font-size: 16px; }
+  .dashboard-stats small { margin-top: 3px; font-size: 10px; line-height: 1.12; overflow-wrap: anywhere; }
+  .dashboard-page > section.site-container { padding-top: 16px; padding-bottom: 24px; }
+  .dashboard-crm-banner { min-width: 0; min-height: 54px; flex-direction: row; align-items: center; gap: 8px; margin-bottom: 7px; padding: 8px 10px; border-radius: 12px; }
+  .dashboard-crm-banner.mt-3 { margin-top: 0; }
+  .dashboard-crm-banner > div { min-width: 0; gap: 7px; }
+  .dashboard-crm-banner > div > svg { width: 17px; height: 17px; flex: 0 0 auto; }
+  .dashboard-crm-banner > div > span { min-width: 0; }
+  .dashboard-crm-banner strong { font-size: 11px; line-height: 1.2; overflow-wrap: anywhere; }
+  .dashboard-crm-banner small { display: none; }
+  .dashboard-crm-banner .button { min-width: 0; min-height: 34px; flex: 0 0 auto; padding: 5px 7px; font-size: 10px; line-height: 1.1; text-align: center; }
+  .dashboard-section-head { align-items: center; flex-direction: row; gap: 8px; margin-top: 20px; }
+  .dashboard-section-head > div { min-width: 0; }
+  .dashboard-section-head h2 { font-size: 20px; }
+  .dashboard-section-head p, .dashboard-section-head .section-label { display: none; }
+  .dashboard-section-head .button { width: auto; max-width: 48%; min-height: 36px; flex: 0 0 auto; padding: 5px 9px; font-size: 10px; line-height: 1.1; text-align: center; white-space: normal; }
+  .dashboard-card { min-width: 0; padding: 14px; border-radius: 15px; }
+  .dashboard-card-head { min-width: 0; gap: 8px; }
+  .dashboard-card-head > img, .dashboard-card-head > span { width: 42px; height: 42px; }
+  .dashboard-card-link { min-width: 0; margin-top: 11px; padding: 8px 10px; }
+  .dashboard-card-link span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dashboard-card-meta { flex-wrap: wrap; justify-content: flex-start; gap: 6px 10px; margin-top: 10px; }
+  .dashboard-card-meta span { min-width: 0; overflow-wrap: anywhere; }
+  .dashboard-card-actions { gap: 5px; margin-top: 11px; padding-top: 11px; }
+  .dashboard-card-actions .button { min-width: 0; min-height: 36px; padding: 6px 8px; font-size: 10px; white-space: normal; }
+  .dashboard-review-notice { min-width: 0; padding: 10px; }
+  .dashboard-review-notice > div { min-width: 0; overflow-wrap: anywhere; }
+}
