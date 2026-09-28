@@ -430,6 +430,7 @@ export default function CardPage() {
 
       <div className="profile-layout">
         <section className="profile-main-card">
+          <div className="profile-ambient" aria-hidden="true"><i /><i /><i /><span /><span /><span /></div>
           {isLocked && (
             <>
               <div className="trial-watermark" aria-hidden="true">{needsActivation ? labels.trial : labels.pending}</div>
