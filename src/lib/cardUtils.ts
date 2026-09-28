@@ -127,6 +127,40 @@ export const buildVCard = (card: DigitalCard) => {
 };
 
 export const openVCardSaveDialog = async (card: DigitalCard) => {
+  if (/Android/i.test(navigator.userAgent)) {
+    const notes = [
+      card.description,
+      card.website ? `Сайт: ${normalizeUrl(card.website)}` : "",
+      card.telegram ? `Telegram: ${socialUrl("telegram", card.telegram)}` : "",
+      card.instagram ? `Instagram: ${socialUrl("instagram", card.instagram)}` : "",
+      card.facebook ? `Facebook: ${socialUrl("facebook", card.facebook)}` : ""
+    ].filter(Boolean).join("\n");
+    const extras = [
+      ["name", card.fullName],
+      ["phone", sanitizePhone(card.phone)],
+      ["secondary_phone", sanitizePhone(card.secondPhone)],
+      ["email", card.email],
+      ["company", card.organization],
+      ["job_title", card.position],
+      ["postal", card.address],
+      ["notes", notes]
+    ]
+      .filter(([, value]) => Boolean(value))
+      .map(([key, value]) => `S.${key}=${encodeURIComponent(value)}`)
+      .join(";");
+
+    window.location.href =
+      `intent:#Intent;action=android.intent.action.INSERT;` +
+      `type=vnd.android.cursor.dir/contact;${extras};end`;
+    return;
+  }
+
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    window.location.href =
+      `data:text/vcard;charset=utf-8,${encodeURIComponent(buildVCard(card))}`;
+    return;
+  }
+
   const file = new File(
     [buildVCard(card)],
     `${card.slug || "contact"}.vcf`,
