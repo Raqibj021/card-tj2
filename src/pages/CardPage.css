@@ -449,8 +449,7 @@
 }
 .profile-page .profile-main-card > .profile-cover,
 .profile-page .profile-main-card > .profile-content,
-.profile-page .profile-main-card > .trial-countdown,
-.profile-page .profile-main-card > .trial-watermark { position: relative; z-index: 1; }
+.profile-page .profile-main-card > .trial-countdown { position: relative; z-index: 1; }
 .dark .profile-page:not(.profile-creative) .profile-ambient {
   background:
     radial-gradient(ellipse at 5% 20%, color-mix(in srgb, var(--profile-accent) 23%, transparent), transparent 58%),
