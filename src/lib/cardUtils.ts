@@ -151,144 +151,88 @@ export const openVCardSaveDialog = async (card: DigitalCard): Promise<boolean> =
   }
 };
 
-const loadCanvasImage = (source: string) =>
-  new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.onload = () => resolve(image);
-    image.onerror = reject;
-    image.src = source;
-  });
+/** Capture the actual card markup using its mobile styles, not a second design. */
+export const downloadCardImage = async (card: DigitalCard, page: HTMLElement) => {
+  const { toCanvas } = await import("html-to-image");
+  const frame = document.createElement("iframe");
+  frame.setAttribute("aria-hidden", "true");
+  frame.tabIndex = -1;
+  // A fixed mobile viewport makes the same export available on desktop too.
+  frame.style.cssText = "position:fixed;left:-10000px;top:0;width:360px;height:640px;border:0;pointer-events:none";
+  document.body.appendChild(frame);
 
-const drawCoverImage = (
-  context: CanvasRenderingContext2D,
-  image: HTMLImageElement,
-  x: number,
-  y: number,
-  width: number,
-  height: number
-) => {
-  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
-  const sourceWidth = width / scale;
-  const sourceHeight = height / scale;
-  const sourceX = (image.naturalWidth - sourceWidth) / 2;
-  const sourceY = (image.naturalHeight - sourceHeight) / 2;
-  context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
-};
+  try {
+    const doc = frame.contentDocument;
+    if (!doc || !frame.contentWindow) throw new Error("Could not prepare card capture");
+    doc.open();
+    doc.write("<!doctype html><html><head></head><body></body></html>");
+    doc.close();
+    doc.documentElement.className = document.documentElement.className;
+    doc.documentElement.lang = document.documentElement.lang;
+    doc.body.className = document.body.className;
 
-export const downloadCardImage = async (card: DigitalCard) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = 1080;
-  canvas.height = 1350;
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("Canvas is not supported");
+    const stylesReady = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).map((style) => {
+      const copy = style.cloneNode(true) as HTMLStyleElement | HTMLLinkElement;
+      if (copy instanceof HTMLLinkElement) {
+        copy.href = (style as HTMLLinkElement).href;
+        return new Promise<void>((resolve, reject) => {
+          copy.onload = () => resolve();
+          copy.onerror = () => reject(new Error("Card stylesheet could not be loaded"));
+          doc.head.appendChild(copy);
+        });
+      }
+      doc.head.appendChild(copy);
+      return Promise.resolve();
+    });
 
-  const palette = themeColors[card.theme];
-  const gradient = context.createLinearGradient(0, 0, 1080, 1350);
-  gradient.addColorStop(0, palette.accent);
-  gradient.addColorStop(0.46, "#071426");
-  gradient.addColorStop(1, "#020711");
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, 1080, 1350);
+    const clone = page.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll(".profile-dialog-backdrop, .toast").forEach((node) => node.remove());
+    doc.body.appendChild(clone);
+    await Promise.all(stylesReady);
+    await doc.fonts.ready;
+    await Promise.all(Array.from(clone.querySelectorAll("img")).map(async (img) => {
+      img.loading = "eager";
+      await img.decode();
+    }));
 
-  context.fillStyle = "rgba(255,255,255,.08)";
-  context.beginPath();
-  context.arc(910, 130, 270, 0, Math.PI * 2);
-  context.fill();
+    const surface = clone.querySelector<HTMLElement>(".profile-main-card");
+    if (!surface) throw new Error("Card surface is missing");
+    const bounds = surface.getBoundingClientRect();
+    const width = Math.ceil(bounds.width);
+    const height = Math.ceil(Math.max(bounds.height, surface.scrollHeight));
+    const screenshot = await toCanvas(surface, {
+      width,
+      height,
+      pixelRatio: 3,
+      preferredFontFormat: "woff2"
+    });
 
-  if (card.companyLogo) {
-    try {
-      const logo = await loadCanvasImage(card.companyLogo);
-      context.save();
-      context.beginPath();
-      context.roundRect(70, 68, 116, 116, 28);
-      context.clip();
-      context.fillStyle = "#ffffff";
-      context.fillRect(70, 68, 116, 116);
-      drawCoverImage(context, logo, 70, 68, 116, 116);
-      context.restore();
-    } catch { /* The text fallback below remains available. */ }
+    // Fit the full card into 9:16 without cropping contacts or distorting the QR.
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Canvas is not supported");
+    context.fillStyle = frame.contentWindow.getComputedStyle(surface).backgroundColor;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const scale = Math.min(canvas.width / screenshot.width, canvas.height / screenshot.height);
+    const targetWidth = screenshot.width * scale;
+    const targetHeight = screenshot.height * scale;
+    context.drawImage(screenshot, (1080 - targetWidth) / 2, (1920 - targetHeight) / 2, targetWidth, targetHeight);
+    const blob = await new Promise<Blob>((resolve, reject) =>
+      canvas.toBlob((result) => result ? resolve(result) : reject(new Error("Image export failed")), "image/png")
+    );
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${card.slug || "business-card"}-9x16.png`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } finally {
+    frame.remove();
   }
-
-  context.fillStyle = "rgba(255,255,255,.68)";
-  context.font = "700 25px Arial, sans-serif";
-  context.fillText("ЦИФРОВАЯ ВИЗИТКА", card.companyLogo ? 216 : 70, 102);
-  context.fillStyle = "#ffffff";
-  context.font = "800 42px Arial, sans-serif";
-  context.fillText((card.organization || "Vizora.tj").slice(0, 28), card.companyLogo ? 216 : 70, 155);
-
-  if (card.photo) {
-    try {
-      const photo = await loadCanvasImage(card.photo);
-      context.save();
-      context.beginPath();
-      context.roundRect(70, 245, 360, 430, 48);
-      context.clip();
-      drawCoverImage(context, photo, 70, 245, 360, 430);
-      context.restore();
-    } catch { /* Initials are drawn below when the photo cannot be loaded. */ }
-  }
-  if (!card.photo) {
-    context.fillStyle = "rgba(255,255,255,.12)";
-    context.beginPath();
-    context.roundRect(70, 245, 360, 430, 48);
-    context.fill();
-    context.fillStyle = "#ffffff";
-    context.font = "800 112px Arial, sans-serif";
-    context.fillText(card.fullName.split(/\s+/).map((part) => part[0]).slice(0, 2).join(""), 150, 500);
-  }
-
-  context.fillStyle = "#ffffff";
-  context.font = "800 58px Arial, sans-serif";
-  const nameWords = card.fullName.split(/\s+/);
-  const firstLine = nameWords.slice(0, 2).join(" ");
-  context.fillText(firstLine.slice(0, 24), 490, 330);
-  if (nameWords.length > 2) context.fillText(nameWords.slice(2).join(" ").slice(0, 24), 490, 400);
-  context.fillStyle = "rgba(255,255,255,.72)";
-  context.font = "500 31px Arial, sans-serif";
-  context.fillText((card.position || card.organization || "").slice(0, 34), 490, nameWords.length > 2 ? 458 : 395);
-
-  const contactLines = [
-    card.phone && `☎  ${card.phone}`,
-    card.secondPhone && `☎  ${card.secondPhone}`,
-    card.email && `✉  ${card.email}`,
-    card.website && `⌁  ${card.website.replace(/^https?:\/\//, "")}`,
-    card.address && `⌖  ${card.address}`
-  ].filter(Boolean) as string[];
-  context.font = "600 29px Arial, sans-serif";
-  contactLines.slice(0, 5).forEach((line, index) => {
-    context.fillStyle = index === 0 ? "#ffffff" : "rgba(255,255,255,.82)";
-    context.fillText(line.slice(0, 48), 490, 535 + index * 64);
-  });
-
-  context.fillStyle = "rgba(255,255,255,.1)";
-  context.beginPath();
-  context.roundRect(70, 760, 940, 410, 42);
-  context.fill();
-  context.fillStyle = "#ffffff";
-  context.font = "800 34px Arial, sans-serif";
-  context.fillText("СВЯЗАТЬСЯ", 120, 830);
-  const socials = [
-    card.instagram && "Instagram",
-    card.facebook && "Facebook",
-    card.whatsapp && "WhatsApp",
-    card.telegram && "Telegram"
-  ].filter(Boolean) as string[];
-  context.font = "700 30px Arial, sans-serif";
-  socials.forEach((social, index) => context.fillText(social, 120 + (index % 2) * 400, 910 + Math.floor(index / 2) * 80));
-  context.fillStyle = "rgba(255,255,255,.58)";
-  context.font = "600 25px Arial, sans-serif";
-  context.fillText("Vizora.tj", 70, 1280);
-
-  const blob = await new Promise<Blob>((resolve, reject) =>
-    canvas.toBlob((result) => result ? resolve(result) : reject(new Error("Image export failed")), "image/png", 0.95)
-  );
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `${card.slug || "business-card"}.png`;
-  anchor.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 
 export const downloadQrCode = async (value: string, filename: string) => {
