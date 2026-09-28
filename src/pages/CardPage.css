@@ -568,6 +568,7 @@
 .profile-page:not(.profile-creative) .profile-hero .profile-role { color: #b5d2ff; }
 .profile-page:not(.profile-creative) .profile-hero .profile-company { color: #d1def0; }
 .profile-creative .profile-hero { display: contents; }
+.profile-creative .profile-hero-art { display: none; }
 @keyframes vizora-hero-wave { from { transform: translate3d(-8%, -3%, 0) scale(.96); opacity: .7; } to { transform: translate3d(12%, 7%, 0) scale(1.08); opacity: 1; } }
 @keyframes vizora-hero-float { from { transform: translate3d(-9%, 4%, 0) scale(.94); } to { transform: translate3d(10%, -5%, 0) scale(1.09); } }
 @keyframes vizora-hero-line { from { left: -100%; opacity: 0; } 18% { opacity: .55; } 82% { opacity: .55; } to { left: 100%; opacity: 0; } }
