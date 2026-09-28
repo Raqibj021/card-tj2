@@ -9074,3 +9074,36 @@ body,
 .card-live-actions { display: grid; width: 100%; grid-template-columns: repeat(4,1fr); gap: 6px; }.card-live-actions span { display: grid; justify-items: center; gap: 3px; border-radius: 12px; background: var(--card-soft); padding: 8px 2px; font-size: 10px; }.card-live-actions svg { width: 20px; color: var(--card-accent); }
 .card-live-save { display: flex; width: 100%; align-items: center; justify-content: center; gap: 7px; border-radius: 13px; background: var(--card-accent); padding: 12px; color: white; font-weight: 750; }
 .card-live-bottom { display: grid; width: 100%; grid-template-columns: 88px 1fr; gap: 9px; }.card-live-bottom > span { display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: white; color: #071f45; }.card-live-bottom > div { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }.card-live-bottom small,.card-live-bottom strong { display: grid; place-items: center; border-radius: 10px; background: var(--card-soft); padding: 7px 2px; font-size: 10px; }.card-live-bottom strong { grid-column: 1 / 3; background: var(--card-accent); color: white; }
+
+/* Keep editor preview legible in either site theme. */
+.card-live-preview {
+  --preview-ink: var(--ink);
+  --preview-icon: var(--card-accent);
+  --preview-soft: color-mix(in srgb, var(--card-accent) 12%, var(--panel));
+  color: var(--preview-ink);
+}
+.dark .card-live-preview {
+  --preview-icon: color-mix(in srgb, var(--card-accent) 48%, white);
+  --preview-soft: color-mix(in srgb, var(--card-accent) 18%, var(--panel));
+}
+.card-live-preview .card-live-content,
+.card-live-preview .card-live-identity h3,
+.card-live-preview .card-live-identity p { color: var(--preview-ink); }
+.card-live-preview .card-live-socials > *,
+.card-live-preview .card-live-actions span,
+.card-live-preview .card-live-bottom small {
+  background: var(--preview-soft);
+  color: var(--preview-ink);
+}
+.card-live-preview .card-live-socials > *,
+.card-live-preview .card-live-actions svg { color: var(--preview-icon); }
+.card-live-preview .card-live-cover,
+.card-live-preview .card-live-cover small,
+.card-live-preview .card-live-cover strong,
+.card-live-preview .card-live-status,
+.card-live-preview .card-live-save,
+.card-live-preview .card-live-save svg,
+.card-live-preview .card-live-bottom strong { color: #fff; }
+.card-live-preview .card-live-bottom > span { color: #071f45; }
+.card-live-preview .card-live-actions span,
+.card-live-preview .card-live-bottom small { font-size: 12px; font-weight: 700; }
