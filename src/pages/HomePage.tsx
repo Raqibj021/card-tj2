@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import CardPreview from "../components/CardPreview";
+import ShowcaseCardPreview from "../components/ShowcaseCardPreview";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
 import { demoCards } from "../data/demo";
@@ -221,7 +221,7 @@ export default function HomePage() {
                   aria-label={`${t("openCard")}: ${card.fullName}`}
                 >
                   <div className="design-showcase-canvas">
-                    <CardPreview card={card} />
+                    <ShowcaseCardPreview card={card} />
                   </div>
                   <div className="design-showcase-caption">
                     <span>
@@ -430,7 +430,7 @@ export default function HomePage() {
               <ArrowLeft size={18} /> {t("back")}
             </button>
             <div className="design-viewer-card">
-              <CardPreview card={selectedDesign} />
+              <ShowcaseCardPreview card={selectedDesign} />
             </div>
             <Link to="/create" className="button button-primary" onClick={() => setSelectedDesign(null)}>
               {t("chooseDesign")} <ArrowRight size={18} />
