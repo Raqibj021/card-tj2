@@ -211,6 +211,7 @@ export default function CardPage() {
   const [professionCategoryName, setProfessionCategoryName] = useState("");
   const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [contactSaveError, setContactSaveError] = useState("");
   const [savingImage, setSavingImage] = useState(false);
   const cardUrl = window.location.href;
   const labels = profileCopy[language];
@@ -657,13 +658,14 @@ export default function CardPage() {
           <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
             <h2 id="save-dialog-title">{labels.saveTitle}</h2>
             <div className="profile-dialog-options">
-              <button type="button" onClick={() => { void openVCardSaveDialog(card).then((supported) => { if (!supported) showToast(labels.contactUnsupported); }).catch(() => showToast(labels.contactUnsupported)); }}>
+              <button type="button" onClick={() => { setContactSaveError(""); void openVCardSaveDialog(card).then((supported) => { if (!supported) setContactSaveError(labels.contactUnsupported); }).catch(() => setContactSaveError(labels.contactUnsupported)); }}>
                 <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>{labels.savePhoneHint}</small></div>
               </button>
               <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
                 <span><Images size={22} /></span><div><strong>{labels.saveImage}</strong><small>PNG · 1080 × 1350</small></div>
               </button>
             </div>
+            {contactSaveError && <p role="status">{contactSaveError}</p>}
             <button type="button" className="profile-dialog-cancel" onClick={() => setShowSaveDialog(false)}>{labels.close}</button>
           </section>
         </div>
