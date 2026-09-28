@@ -255,6 +255,7 @@
     align-content: initial;
     padding: 16px 16px max(17px, env(safe-area-inset-bottom));
     flex-direction: column;
+    justify-content: space-between;
   }
 
   .profile-avatar-wrap {
@@ -309,7 +310,7 @@
     justify-content: stretch;
     gap: 10px;
     margin-top: 13px;
-    grid-template-columns: repeat(auto-fit, minmax(54px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .profile-social-primary a {
@@ -317,6 +318,11 @@
     height: 54px;
     border: 1px solid color-mix(in srgb, var(--profile-accent) 20%, var(--line));
     border-radius: 18px;
+  }
+
+  .profile-social-primary a.is-disabled {
+    filter: grayscale(1);
+    opacity: .34;
   }
 
   .profile-social-primary a[aria-label="Instagram"] { color: #d62976; }
