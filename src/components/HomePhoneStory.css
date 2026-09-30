@@ -64,3 +64,29 @@
 .phone-story-video::-webkit-media-controls {
   display: none !important;
 }
+
+/* Keep the rotating NFC cards visible over the phone at smaller widths. */
+@media (max-width: 900px) {
+  .hero-showcase.phone-story .home-hero-card-deck {
+    display: block;
+    right: 0;
+    bottom: 12px;
+    transform: scale(.65);
+    transform-origin: bottom right;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero-showcase.phone-story .home-hero-card-deck {
+    right: 0;
+    bottom: 2px;
+    transform: scale(.42);
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-showcase.phone-story .home-hero-card-deck {
+    bottom: 12px;
+    transform: scale(.38);
+  }
+}
