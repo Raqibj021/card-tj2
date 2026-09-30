@@ -63,6 +63,7 @@ export default function HomePhoneStory(_props: { card: DigitalCard }) {
         <span className="iphone-side-button iphone-volume-up" aria-hidden="true" />
         <span className="iphone-side-button iphone-volume-down" aria-hidden="true" />
         <span className="iphone-side-button iphone-power-button" aria-hidden="true" />
+        <span className="iphone-side-button iphone-camera-button" aria-hidden="true" />
         <div className="phone-speaker" />
         <div className="phone-story-screen">
           <video
@@ -74,7 +75,10 @@ export default function HomePhoneStory(_props: { card: DigitalCard }) {
             loop
             muted
             playsInline
-            controls
+            controls={false}
+            disablePictureInPicture
+            disableRemotePlayback
+            tabIndex={-1}
             preload="metadata"
           />
         </div>
