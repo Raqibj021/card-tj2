@@ -1,7 +1,6 @@
-import { BadgeCheck, Building2, ContactRound, LayoutGrid, QrCode, Search, Share2, SmartphoneNfc, Sparkles } from "lucide-react";
-import { useEffect, useState, type CSSProperties } from "react";
-import CardPreview from "./CardPreview";
-import BrandLogo from "./BrandLogo";
+import { BadgeCheck, ContactRound, QrCode, Share2, SmartphoneNfc } from "lucide-react";
+import { type CSSProperties } from "react";
+import "./HomePhoneStory.css";
 import { useApp } from "../context/AppContext";
 import type { DigitalCard } from "../types/card";
 
@@ -14,9 +13,8 @@ const phoneCardDesigns = [
   "vizora-tajikistan-independence.webp"
 ] as const;
 
-export default function HomePhoneStory({ card }: { card: DigitalCard }) {
+export default function HomePhoneStory(_props: { card: DigitalCard }) {
   const { language } = useApp();
-  const [scene, setScene] = useState(0);
   const copy = {
     ru: {
       launch: "Запускаем ваш цифровой профиль",
@@ -53,12 +51,6 @@ export default function HomePhoneStory({ card }: { card: DigitalCard }) {
     }
   }[language];
 
-  useEffect(() => {
-    const timings = [2400, 6200, 3000, 3000];
-    const timer = window.setTimeout(() => setScene((current) => (current + 1) % 4), timings[scene]);
-    return () => window.clearTimeout(timer);
-  }, [scene]);
-
   return (
     <div className="hero-showcase founder-showcase phone-story" aria-label={copy.card}>
       <div className="hero-orbit hero-orbit-one" />
@@ -73,42 +65,18 @@ export default function HomePhoneStory({ card }: { card: DigitalCard }) {
         <span className="iphone-side-button iphone-power-button" aria-hidden="true" />
         <div className="phone-speaker" />
         <div className="phone-story-screen">
-          <section className={`phone-scene phone-scene-launch${scene === 0 ? " is-active" : ""}`}>
-            <div className="phone-launch-glow" />
-            <BrandLogo light className="phone-launch-logo" />
-            <Sparkles size={27} />
-            <strong>{copy.launch}</strong>
-            <p>{copy.launchText}</p>
-            <i><span /></i>
-          </section>
-          <section className={`phone-scene phone-scene-card${scene === 1 ? " is-active" : ""}`}>
-            <div className="phone-scene-bar"><span>{copy.card}</span><QrCode size={15} /></div>
-            <CardPreview card={card} />
-          </section>
-          <section className={`phone-scene phone-scene-page${scene === 2 ? " is-active" : ""}`}>
-            <div className="phone-mini-header"><BrandLogo /><LayoutGrid size={16} /></div>
-            <div className="phone-page-hero">
-              <Search size={21} />
-              <strong>{copy.directory}</strong>
-              <p>{copy.directoryText}</p>
-            </div>
-            <div className="phone-specialist-list">
-              {[["М", "Медицина"], ["Ҳ", "Ҳуқуқ"], ["Д", "Дизайн"]].map(([letter, name]) => (
-                <div key={name}><span>{letter}</span><b>{name}</b><BadgeCheck size={14} /></div>
-              ))}
-            </div>
-          </section>
-          <section className={`phone-scene phone-scene-page phone-scene-org${scene === 3 ? " is-active" : ""}`}>
-            <div className="phone-mini-header"><BrandLogo /><Building2 size={16} /></div>
-            <div className="phone-page-hero">
-              <Building2 size={22} />
-              <strong>{copy.organizations}</strong>
-              <p>{copy.organizationsText}</p>
-            </div>
-            <div className="phone-org-visual"><span /><span /><span /><i /></div>
-            <div className="phone-org-row"><b>VIZORA.TJ</b><small>12</small></div>
-            <div className="phone-org-row"><b>KHURASON PRINT</b><small>24</small></div>
-          </section>
+          <video
+            className="phone-story-video"
+            src={`${import.meta.env.BASE_URL}videos/vizora-phone.mp4`}
+            poster={`${import.meta.env.BASE_URL}videos/vizora-phone-poster.webp`}
+            aria-label={language === "tj" ? "Видео дар бораи Vizora" : language === "en" ? "Vizora introduction video" : "Видео о Vizora"}
+            autoPlay
+            loop
+            muted
+            playsInline
+            controls
+            preload="metadata"
+          />
         </div>
       </div>
       <div className="home-hero-card-deck" aria-hidden="true">
@@ -120,17 +88,15 @@ export default function HomePhoneStory({ card }: { card: DigitalCard }) {
           </div>
         ))}
       </div>
-      <div className={`floating-chip floating-chip-top${scene === 1 ? " is-highlighted" : ""}`}>
+      <div className="floating-chip floating-chip-top">
         <QrCode size={19} />
         <span>{copy.qr}</span>
       </div>
-      <div className={`floating-chip floating-chip-bottom${scene === 1 ? " is-highlighted" : ""}`}>
+      <div className="floating-chip floating-chip-bottom">
         <BadgeCheck size={19} />
         <span>{copy.saved}</span>
       </div>
-      <div className="phone-story-dots" aria-hidden="true">
-        {[0, 1, 2, 3].map((index) => <span className={scene === index ? "is-active" : ""} key={index} />)}
-      </div>
+
     </div>
   );
 }
