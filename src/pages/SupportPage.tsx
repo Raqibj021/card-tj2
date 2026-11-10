@@ -10,8 +10,8 @@ export default function SupportPage() {
   const [ticket, setTicket] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const managerPhone = "+992084785555";
-  const managerPhoneLabel = "+992 08 478 55 55";
+  const managerPhone = "+992177445511";
+  const managerPhoneLabel = "+992 177 44 55 11";
   const managerTelegram = "mert_mert";
   const copy = {
     ru: { label: "Поддержка Vizora", title: "Связь с менеджером", text: "Опишите вопрос — обращение получит номер и сохранится в вашем кабинете.", name: "Ваше имя *", namePlaceholder: "Имя и фамилия", phone: "Телефон *", topic: "Тема обращения *", topics: ["Создание визитки", "Регистрация организации", "Тариф и оплата", "Проверка специалиста", "Техническая проблема"], number: "Номер заявки", numberHint: "Если имеется", message: "Сообщение *", messageHint: "Кратко опишите вопрос", send: "Отправить обращение", manager: "Менеджер Vizora", working: "Ответ в рабочее время", email: "Электронная почта *", chat: "Открыть чат", write: "Написать менеджеру", call: "Заказать звонок" },

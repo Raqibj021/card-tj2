@@ -353,7 +353,7 @@ export default function AboutPage() {
   ] as const;
 
   const vizoraContacts = [
-    [text.whatsapp, "+992 084 785 555", "https://wa.me/992084785555", MessageCircle],
+    [text.whatsapp, "+992 177 44 55 11", "https://wa.me/992177445511", MessageCircle],
     [text.telegram, "@Mert_mert", "https://t.me/Mert_mert", Send],
     [text.instagramVizora, "@vizora.tj", "https://instagram.com/vizora.tj", Instagram],
     [text.emailVizora, "vizora.platform.tj@gmail.com", "mailto:vizora.platform.tj@gmail.com", Mail]
