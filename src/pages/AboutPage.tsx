@@ -122,7 +122,7 @@ const pageCopy = {
     ctaTitle: "Создайте свою цифровую визитку",
     ctaText: "Одна ссылка, персональный QR-код и все необходимые контакты — в профессиональном оформлении Vizora.",
     ctaButton: "Создать бесплатно",
-    ctaGift: "Первые 50 пользователей получают фирменную NFC-карту Vizora в подарок."
+    ctaGift: "Первые 50 личных пользователей получают год бесплатно и фирменную NFC-карту Vizora в подарок."
   },
   tj: {
     seoTitle: "Дар бораи Vizora.tj — таърихи таъсиси платформа",
@@ -199,7 +199,7 @@ const pageCopy = {
     ctaTitle: "Варақаи рақамии худро созед",
     ctaText: "Як пайванд, QR-коди шахсӣ ва ҳамаи тамосҳои зарурӣ — бо ороиши касбии Vizora.",
     ctaButton: "Ройгон сохтан",
-    ctaGift: "50 корбари аввал корти фирмавии NFC-и Vizora-ро тӯҳфа мегиранд."
+    ctaGift: "50 корбари шахсии аввал 1 сол ройгон ва корти фирмавии NFC-и Vizora-ро тӯҳфа мегиранд."
   },
   en: {
     seoTitle: "About Vizora.tj — the story behind the digital identity platform",
@@ -276,7 +276,7 @@ const pageCopy = {
     ctaTitle: "Create your digital business card",
     ctaText: "One link, a personal QR code and every important contact — presented professionally by Vizora.",
     ctaButton: "Create for free",
-    ctaGift: "The first 50 users receive a branded Vizora NFC card as a gift."
+    ctaGift: "The first 50 personal users get 1 year free and a branded Vizora NFC card as a gift."
   }
 } as const;
 

@@ -26,7 +26,7 @@ const slideCopy = {
     {
       eyebrow: "Главная акция запуска",
       title: "Первые 50 личных пользователей — бесплатно на 1 год",
-      text: "Акция действует только для личных визиток. Организации участвуют по корпоративным тарифам.",
+      text: "И фирменная NFC-карта Vizora в подарок. Акция только для личных визиток — организации участвуют по корпоративным тарифам.",
       action: "Получить бесплатно",
       badge: "Только 50 мест"
     }
@@ -53,7 +53,7 @@ const slideCopy = {
     {
       eyebrow: "Иқдоми асосии оғоз",
       title: "50 корбари шахсии аввал — барои 1 сол ройгон",
-      text: "Иқдом танҳо барои варақаҳои шахсӣ амал мекунад. Ташкилотҳо аз рӯи тарофаҳои корпоративӣ хизмат мегиранд.",
+      text: "Ва корти фирмавии NFC-и Vizora ҳамчун тӯҳфа. Иқдом танҳо барои варақаҳои шахсӣ — ташкилотҳо аз рӯи тарофаҳои корпоративӣ хизмат мегиранд.",
       action: "Ройгон гирифтан",
       badge: "Танҳо 50 ҷой"
     }
@@ -80,7 +80,7 @@ const slideCopy = {
     {
       eyebrow: "Featured launch offer",
       title: "The first 50 personal users get 1 year free",
-      text: "This offer is for personal cards only. Organizations use corporate plans.",
+      text: "Plus a branded Vizora NFC card as a gift. Personal cards only — organizations use corporate plans.",
       action: "Get it free",
       badge: "Only 50 places"
     }

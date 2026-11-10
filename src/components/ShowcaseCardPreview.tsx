@@ -162,7 +162,7 @@ export default function ShowcaseCardPreview({
 
         <div className="card-signature">
           <span className="mini-logo">V</span>
-          <span>vizora.tj/demo</span>
+          <span>vizora.tj</span>
         </div>
       </div>
     </article>

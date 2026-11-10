@@ -13,7 +13,7 @@ const copy = {
   ru: {
     registerHero: "Создайте свою цифровую визитку", loginHero: "С возвращением в Vizora",
     heroText: "Один подтверждённый аккаунт — одна настоящая личность и одна персональная визитка.",
-    launch: "Стартовая акция", launchText: "Первые 50 подтверждённых личных пользователей — бесплатно на 1 год. Организации в акции не участвуют.",
+    launch: "Стартовая акция", launchText: "Первые 50 подтверждённых личных пользователей — бесплатно на 1 год и NFC-карта Vizora в подарок. Организации в акции не участвуют.",
     newAccount: "Новый аккаунт", cabinet: "Личный кабинет", register: "Регистрация", login: "Вход",
     registerIntro: "Заполните настоящие данные. Позже их можно будет подтвердить.", loginIntro: "Введите данные своего аккаунта.",
     fullName: "Имя и фамилия *", fullNamePlaceholder: "Ваше полное имя", email: "Электронная почта *", password: "Пароль *", passwordPlaceholder: "Минимум 8 символов",
@@ -27,14 +27,14 @@ const copy = {
   },
   tj: {
     registerHero: "Варақаи рақамии худро созед", loginHero: "Хуш омадед ба Vizora",
-    heroText: "Як ҳисоби тасдиқшуда — як шахсияти воқеӣ ва як варақаи шахсӣ.", launch: "Иқдоми оғози платформа", launchText: "Барои 50 корбари шахсии аввал пас аз тасдиқ — 1 сол ройгон. Ташкилотҳо дар иқдом иштирок намекунанд.",
+    heroText: "Як ҳисоби тасдиқшуда — як шахсияти воқеӣ ва як варақаи шахсӣ.", launch: "Иқдоми оғози платформа", launchText: "Барои 50 корбари шахсии аввал пас аз тасдиқ — 1 сол ройгон ва корти NFC-и Vizora ҳамчун тӯҳфа. Ташкилотҳо дар иқдом иштирок намекунанд.",
     newAccount: "Ҳисоби нав", cabinet: "Утоқи шахсӣ", register: "Бақайдгирӣ", login: "Воридшавӣ", registerIntro: "Маълумоти воқеии худро ворид намоед.", loginIntro: "Маълумоти ҳисоби худро ворид намоед.",
     fullName: "Ному насаб *", fullNamePlaceholder: "Ному насаби пурраи шумо", email: "Почтаи электронӣ *", password: "Рамз *", passwordPlaceholder: "На камтар аз 8 аломат", consent: "Ман қоидаҳои платформаро қабул мекунам ва дурустии маълумоти худро тасдиқ менамоям.",
     wait: "Интизор шавед…", create: "Сохтани ҳисоб", enter: "Ворид шудан", emailConfirmation: "Тасдиқи почта", duplicateProtection: "Муҳофизат аз такрор", dataSaving: "Нигоҳдории маълумот", hasAccount: "Аллакай ҳисоб доред?", noAccount: "Ҳоло ҳисоб надоред?", registerLink: "Бақайдгирӣ", forgot: "Рамзро фаромӯш кардед?",
     checkEmail: "Мо рамзи шашрақамаро ба почтаи электронии шумо фиристодем.", codeTitle: "Почтаро тасдиқ намоед", codeText: "Рамзи шашрақамаро ворид кунед:", codeLabel: "Рамзи тасдиқ", confirmCode: "Тасдиқи рамз", resendCode: "Рамзро дубора фиристед", resendIn: "Ирсоли такрорӣ пас аз", seconds: "сон.", changeEmail: "Почтаи дигарро ворид кунед", invalidCode: "Рамз нодуруст аст ё муҳлаташ гузаштааст.", codeResent: "Рамзи нав фиристода шуд.", unavailable: "Воридшавӣ муваққатан дастнорас аст. Саҳифаро нав кунед.", invalidLogin: "Почтаи электронӣ ё рамз нодуруст аст.", unconfirmed: "Почтаи электронӣ ҳанӯз тасдиқ нашудааст."
   },
   en: {
-    registerHero: "Create your digital business card", loginHero: "Welcome back to Vizora", heroText: "One verified account — one real identity and one personal business card.", launch: "Launch offer", launchText: "The first 50 verified personal users receive one year free. Organizations are not included.",
+    registerHero: "Create your digital business card", loginHero: "Welcome back to Vizora", heroText: "One verified account — one real identity and one personal business card.", launch: "Launch offer", launchText: "The first 50 verified personal users receive one year free and a Vizora NFC card as a gift. Organizations are not included.",
     newAccount: "New account", cabinet: "Personal account", register: "Registration", login: "Sign in", registerIntro: "Enter your real details.", loginIntro: "Enter your account details.", fullName: "Full name *", fullNamePlaceholder: "Your full name", email: "Email *", password: "Password *", passwordPlaceholder: "At least 8 characters", consent: "I accept the platform rules and confirm that I am registering my own details.", wait: "Please wait…", create: "Create account", enter: "Sign in", emailConfirmation: "Email confirmation", duplicateProtection: "Duplicate protection", dataSaving: "Secure data storage", hasAccount: "Already have an account?", noAccount: "Don’t have an account?", registerLink: "Register", forgot: "Forgot password?",
     checkEmail: "We sent a six-digit code to your email.", codeTitle: "Confirm your email", codeText: "Enter the six-digit code sent to", codeLabel: "Confirmation code", confirmCode: "Confirm code", resendCode: "Resend code", resendIn: "Resend available in", seconds: "sec.", changeEmail: "Use a different email", invalidCode: "The code is incorrect or has expired.", codeResent: "A new code has been sent.", unavailable: "Sign-in is temporarily unavailable. Refresh the page and try again.", invalidLogin: "Incorrect email or password. Check your details or recover your password.", unconfirmed: "Your email has not been confirmed yet."
   }

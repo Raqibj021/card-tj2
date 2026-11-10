@@ -34,6 +34,9 @@ jobs:
           VITE_PUBLIC_SITE_URL: https://vizora.tj
         run: npm run build
 
+      - name: Generate real pages and sitemap for search engines
+        run: node scripts/seo-postbuild.mjs dist
+
       - name: Add SPA fallback
         run: cp deployment/github-pages-404.html dist/404.html
 
