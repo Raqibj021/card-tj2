@@ -42,7 +42,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   useEffect(() => {
-    document.documentElement.lang = language;
+    // "tj" is the internal key; the valid language code for Tajik is "tg".
+    document.documentElement.lang = language === "tj" ? "tg" : language;
     try { localStorage.setItem("vizora.language", language); } catch { /* keep the interface usable */ }
   }, [language]);
 

@@ -385,6 +385,13 @@ class LocalStorageCardRepository implements CardRepository {
       }
     }
 
+    // vizora.tj/demo is printed on every showcase card, so it must always open
+    // the built-in sample instead of "card not found".
+    if (!error && slug.toLowerCase() === "demo") {
+      const sample = demoCards.find((item) => item.slug === "demo");
+      if (sample) return { ...sample, reviewStatus: "approved" as const };
+    }
+
     // A temporary network or Supabase error must never erase the owner's
     // local draft. Hide it for this request, but keep it available for retry.
     if (error) return auth.user ? local : undefined;
