@@ -2124,29 +2124,12 @@ summary:focus-visible {
   mask-image: linear-gradient(to right, black, transparent 85%);
 }
 
-.hero-title {
-  max-width: 900px;
-  margin: 24px 0 0;
-  color: var(--ink);
-  font-size: clamp(52px, 5.2vw, 94px);
-  font-weight: 800;
-  letter-spacing: -0.065em;
-  line-height: 0.98;
-}
-
-.hero-copy,
 .page-copy {
   max-width: 740px;
   margin: 28px 0 0;
   color: var(--muted);
   font-size: clamp(17px, 1.35vw, 21px);
   line-height: 1.72;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 850px;
 }
 
 .hero-showcase {
@@ -2248,47 +2231,6 @@ summary:focus-visible {
 }
 
 /* Public home visual story */
-.home-promo-wrap {
-  position: relative;
-  z-index: 8;
-  padding-top: 15px;
-}
-
-.home-promo-wide {
-  width: calc(100% - 28px);
-  max-width: 1740px;
-  margin-inline: auto;
-}
-
-.home-promo-carousel {
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #061a3b;
-  box-shadow: 0 16px 40px rgba(8, 31, 67, .12);
-}
-
-.home-promo-stage {
-  position: relative;
-  min-height: 142px;
-}
-
-.home-promo-slide {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(28px) scale(.99);
-  transition: opacity .75s ease, transform .9s cubic-bezier(.2,.8,.2,1);
-}
-
-.home-promo-slide.is-active {
-  z-index: 2;
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateX(0) scale(1);
-}
 
 .home-promo-photo,
 .home-promo-overlay {
@@ -2338,133 +2280,6 @@ summary:focus-visible {
   background:
     linear-gradient(90deg, #54110f 0%, #a12d18 54%, rgba(161,45,24,.5) 79%, rgba(161,45,24,.2)),
     radial-gradient(circle at 75% 20%, rgba(255,196,80,.45), transparent 35%);
-}
-
-.home-promo-content {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  min-height: 142px;
-  align-items: center;
-  gap: 15px;
-  padding: 20px 24px;
-  color: #fff;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-
-.home-promo-icon {
-  display: grid;
-  width: 48px;
-  height: 48px;
-  place-items: center;
-  border: 1px solid rgba(255,255,255,.18);
-  border-radius: 15px;
-  background: rgba(255,255,255,.13);
-  box-shadow: inset 0 1px rgba(255,255,255,.15);
-}
-
-.home-promo-eyebrow {
-  display: block;
-  color: #8bc3ff;
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: .11em;
-  text-transform: uppercase;
-}
-
-.is-offer .home-promo-eyebrow {
-  color: #ffd886;
-}
-
-.home-promo-content h2 {
-  max-width: 750px;
-  margin: 5px 0 0;
-  color: #fff;
-  font-size: clamp(15px, 1.45vw, 21px);
-  letter-spacing: -.025em;
-  line-height: 1.2;
-}
-
-.home-promo-content p {
-  max-width: 720px;
-  margin: 5px 0 0;
-  color: rgba(230,240,255,.72);
-  font-size: 10px;
-  line-height: 1.45;
-}
-
-.home-promo-action {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border-radius: 13px;
-  background: #fff;
-  padding: 0 17px;
-  color: #0b315e;
-  font-size: 11px;
-  font-weight: 850;
-  white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(0,0,0,.12);
-}
-
-.home-promo-action-offer {
-  background: linear-gradient(135deg, #ffe7a3, #ffc65a);
-  color: #681d10;
-  box-shadow: 0 10px 30px rgba(255,174,43,.25);
-}
-
-.home-promo-badge {
-  position: absolute;
-  top: 12px;
-  right: 18px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid rgba(255,225,147,.32);
-  border-radius: 999px;
-  background: rgba(86,16,12,.52);
-  padding: 6px 10px;
-  color: #ffe29e;
-  font-size: 9px;
-}
-
-.home-promo-controls {
-  position: absolute;
-  z-index: 5;
-  right: 20px;
-  bottom: 10px;
-  display: flex;
-  gap: 6px;
-}
-
-.home-promo-controls button {
-  width: 22px;
-  height: 4px;
-  overflow: hidden;
-  border: 0;
-  border-radius: 99px;
-  background: rgba(255,255,255,.3);
-  padding: 0;
-  cursor: pointer;
-}
-
-.home-promo-controls button span {
-  display: block;
-  width: 0;
-  height: 100%;
-  border-radius: inherit;
-  background: #fff;
-}
-
-.home-promo-controls button.is-active {
-  width: 44px;
-}
-
-.home-promo-controls button.is-active span {
-  width: 100%;
-  animation: promo-progress 6.2s linear;
 }
 
 .phone-shell-3d {
@@ -2890,11 +2705,6 @@ summary:focus-visible {
   .home-hero-card-deck { display: none; }
 }
 
-@keyframes promo-progress {
-  from { width: 0; }
-  to { width: 100%; }
-}
-
 @keyframes phone-launch-pulse {
   0%,100% { opacity: .55; transform: scale(.85); }
   50% { opacity: 1; transform: scale(1.08); }
@@ -2910,42 +2720,7 @@ summary:focus-visible {
   50% { transform: translate3d(8px,-16px,0) rotate(5deg); }
 }
 
-@media (max-width: 900px) {
-  .home-promo-stage,
-  .home-promo-content {
-    min-height: 160px;
-  }
-
-  .home-promo-content {
-    padding-right: 18px;
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .home-promo-action {
-    position: absolute;
-    right: 18px;
-    bottom: 18px;
-  }
-
-  .home-promo-content > div {
-    padding-right: 130px;
-  }
-}
-
 @media (max-width: 680px) {
-  .home-promo-wrap {
-    width: 100%;
-    padding-top: 8px;
-  }
-
-  .home-promo-carousel {
-    border-radius: 0;
-  }
-
-  .home-promo-stage,
-  .home-promo-content {
-    min-height: 258px;
-  }
 
   .home-promo-photo {
     inset: 0;
@@ -2962,53 +2737,6 @@ summary:focus-visible {
 
   .home-promo-slide.is-offer .home-promo-overlay {
     background: linear-gradient(90deg, rgba(91,18,13,.98), rgba(161,45,24,.72));
-  }
-
-  .home-promo-content {
-    display: block;
-    padding: 23px 20px 54px;
-  }
-
-  .home-promo-icon {
-    width: 39px;
-    height: 39px;
-    margin-bottom: 13px;
-    border-radius: 12px;
-  }
-
-  .home-promo-content > div {
-    padding-right: 0;
-  }
-
-  .home-promo-content h2 {
-    max-width: 360px;
-    font-size: 21px;
-    line-height: 1.15;
-  }
-
-  .home-promo-content p {
-    max-width: 330px;
-    padding-right: 45px;
-    font-size: 10px;
-  }
-
-  .home-promo-action {
-    right: 18px;
-    bottom: 18px;
-    min-height: 38px;
-    padding: 0 13px;
-    font-size: 10px;
-  }
-
-  .home-promo-controls {
-    right: auto;
-    bottom: 31px;
-    left: 20px;
-  }
-
-  .home-promo-badge {
-    top: 18px;
-    right: 17px;
   }
 
   .hero-showcase.phone-story {
@@ -5272,11 +5000,6 @@ summary:focus-visible {
     mask-image: linear-gradient(to bottom, black, transparent 75%);
   }
 
-  .hero-title {
-    font-size: clamp(39px, 13vw, 58px);
-  }
-
-  .hero-copy,
   .page-copy {
     font-size: 15px;
   }
@@ -6525,47 +6248,7 @@ summary:focus-visible {
     display: none;
   }
 
-  .hero-layout {
-    min-height: auto !important;
-    padding-block: 46px 52px !important;
-  }
-
-  .hero-content {
-    max-width: 100%;
-  }
-
   .hero-showcase {
-    display: none;
-  }
-
-  .hero-title {
-    max-width: 560px;
-    margin-top: 17px;
-    font-size: clamp(39px, 12vw, 54px);
-    line-height: 1;
-  }
-
-  .hero-copy {
-    margin-top: 18px;
-    font-size: 15px;
-    line-height: 1.62;
-  }
-
-  .hero-content .eyebrow {
-    font-size: 9px;
-  }
-
-  .hero-content .button-large {
-    min-height: 51px;
-  }
-
-  .hero-content > div:last-child {
-    margin-top: 22px !important;
-    gap: 10px 16px;
-    font-size: 11px;
-  }
-
-  .hero-content > div:last-child span:last-child {
     display: none;
   }
 
@@ -7080,138 +6763,11 @@ summary:focus-visible {
 
 /* Extra-compact mobile landing: strip banners, side phone and animated story rows */
 @media (max-width: 680px) {
-  .home-promo-wrap {
-    padding-top: 5px;
-  }
-
-  .home-promo-stage,
-  .home-promo-content {
-    min-height: 106px;
-  }
 
   .home-promo-photo {
     left: auto;
     width: 43%;
     opacity: .42;
-  }
-
-  .home-promo-content {
-    display: grid;
-    min-height: 106px;
-    align-items: center;
-    gap: 9px;
-    padding: 11px 13px 18px;
-    grid-template-columns: 29px minmax(0,1fr) auto;
-  }
-
-  .home-promo-icon {
-    width: 29px;
-    height: 29px;
-    margin: 0;
-    border-radius: 9px;
-  }
-
-  .home-promo-icon svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  .home-promo-content h2 {
-    max-width: 230px;
-    margin-top: 3px;
-    font-size: 13px;
-    line-height: 1.18;
-  }
-
-  .home-promo-eyebrow {
-    font-size: 6px;
-    letter-spacing: .08em;
-  }
-
-  .home-promo-content p,
-  .home-promo-badge {
-    display: none;
-  }
-
-  .home-promo-action {
-    position: static;
-    min-height: 30px;
-    border-radius: 9px;
-    padding: 0 9px;
-    font-size: 7px;
-  }
-
-  .home-promo-action svg {
-    width: 11px;
-    height: 11px;
-  }
-
-  .home-promo-controls {
-    right: auto;
-    bottom: 7px;
-    left: 51px;
-  }
-
-  .home-promo-controls button {
-    width: 14px;
-    height: 3px;
-  }
-
-  .home-promo-controls button.is-active {
-    width: 27px;
-  }
-
-  .hero-layout {
-    display: grid !important;
-    min-height: 360px !important;
-    align-items: center;
-    gap: 4px !important;
-    padding-block: 27px 30px !important;
-    grid-template-columns: minmax(0,1fr) 142px;
-  }
-
-  .hero-content {
-    min-width: 0;
-  }
-
-  .hero-title {
-    max-width: 235px;
-    margin-top: 11px;
-    font-size: clamp(28px, 8.4vw, 35px);
-    letter-spacing: -.055em;
-    line-height: 1.01;
-  }
-
-  .hero-copy {
-    max-width: 235px;
-    margin-top: 11px;
-    font-size: 11px;
-    line-height: 1.48;
-  }
-
-  .hero-content .eyebrow {
-    gap: 5px;
-    font-size: 6px;
-    letter-spacing: .08em;
-  }
-
-  .hero-content .eyebrow svg {
-    width: 11px;
-    height: 11px;
-  }
-
-  .hero-content .button-large {
-    min-height: 38px;
-    padding-inline: 12px;
-    font-size: 9px;
-  }
-
-  .hero-content > .mt-8 {
-    margin-top: 15px !important;
-  }
-
-  .hero-content > div:last-child {
-    display: none;
   }
 
   .hero-showcase.phone-story {
@@ -8229,83 +7785,10 @@ body,
     0 0 0 24px rgba(255, 255, 255, .07),
     0 0 0 48px rgba(255, 255, 255, .045);
 }
-
-/* Keep the compact mobile hero inside the viewport without reserving full phone height. */
 @media (max-width: 680px) {
-  .home-promo-carousel,
-  .home-promo-stage,
-  .home-promo-slide,
-  .home-promo-content {
-    height: 98px;
-    min-height: 98px;
-  }
-
-  .home-promo-content {
-    gap: 7px;
-    padding: 9px 10px 17px;
-    grid-template-columns: 25px minmax(0, 1fr) auto;
-  }
-
-  .home-promo-icon {
-    width: 25px;
-    height: 25px;
-    border-radius: 8px;
-  }
-
-  .home-promo-content > div {
-    min-width: 0;
-    padding-right: 0;
-  }
-
-  .home-promo-eyebrow {
-    overflow: hidden;
-    max-width: 100%;
-    font-size: 5.5px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .home-promo-content h2 {
-    display: -webkit-box;
-    overflow: hidden;
-    max-width: 100%;
-    margin-top: 2px;
-    font-size: 10px;
-    line-height: 1.15;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-  }
-
-  .home-promo-action {
-    max-width: 92px;
-    min-height: 28px;
-    overflow: hidden;
-    padding: 0 7px;
-    font-size: 6.5px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .home-promo-controls {
-    bottom: 6px;
-    left: 42px;
-  }
 
   .hero-section {
     min-height: 0;
-  }
-
-  .hero-layout {
-    position: relative;
-    min-height: 342px !important;
-    align-items: start;
-    padding-block: 17px 23px !important;
-    grid-template-columns: minmax(0, 1fr) 132px;
-  }
-
-  .hero-content {
-    align-self: start;
-    padding-top: 6px;
   }
 
   .hero-showcase.phone-story {
@@ -8343,10 +7826,6 @@ body,
 }
 
 @media (max-width: 390px) {
-  .hero-layout {
-    gap: 1px !important;
-    grid-template-columns: minmax(0, 1fr) 118px;
-  }
 
   .hero-showcase.phone-story {
     width: 118px;
@@ -9108,16 +8587,6 @@ body,
 .card-live-preview .card-live-actions span,
 .card-live-preview .card-live-bottom small { font-size: 12px; font-weight: 700; }
 
-/* Restore the mobile rotating banner's inset and rounded edges. */
-@media (max-width: 680px) {
-  .home-page .home-promo-wrap.home-promo-wide {
-    width: calc(100% - 24px);
-    max-width: 470px;
-    margin-inline: auto;
-  }
-  .home-page .home-promo-carousel { border-radius: 17px; }
-}
-
 /* Match the Vizora mark to the surface on every loading and card screen. */
 .dark .vizora-brand .vizora-brand-default-image { display: none; }
 .dark .vizora-brand .vizora-brand-light-image { display: block; }
@@ -9176,17 +8645,6 @@ body,
   .dashboard-review-notice { min-width: 0; padding: 10px; }
   .dashboard-review-notice > div { min-width: 0; overflow-wrap: anywhere; }
 }
-
-/* Launch seats counter on the home page (compact strip) */
-.launch-seats { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 10px; padding: 10px 14px; border-radius: 14px; background: rgba(20, 120, 238, 0.14); border: 1px solid rgba(20, 120, 238, 0.35); color: #fff; font-size: 13px; }
-.launch-seats-label { font-weight: 700; }
-.launch-seats-count { font-size: 15px; font-weight: 800; }
-.launch-seats-count > span { display: inline-block; min-width: 1ch; }
-.launch-seats-count small { font-size: 12px; font-weight: 600; opacity: 0.8; }
-.launch-seats-bar { flex: 1 1 120px; height: 6px; min-width: 100px; border-radius: 999px; background: rgba(255, 255, 255, 0.2); overflow: hidden; }
-.launch-seats-bar i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #5bc0ff, #2d7bff); animation: launch-seats-grow 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-.launch-seats-more { margin-left: auto; padding: 6px 12px; border-radius: 999px; background: #fff; color: #0a1f4d; font-weight: 800; text-decoration: none; white-space: nowrap; transition: transform 0.2s ease; }
-.launch-seats-more:hover { transform: translateX(2px); }
 @keyframes launch-seats-grow { from { width: 0; } to { width: var(--fill); } }
 
 /* Language switch on the public business card */
@@ -9219,40 +8677,6 @@ body,
 .card-lang-cover button { min-height: 32px; padding: 0 7px; border-radius: 9px; }
 .card-lang-cover button b { display: none; }
 .card-lang-cover button span { font-size: 16px; line-height: 1; }
-
-
-/* Home hero: less empty height on desktop, natural height on tablets and phones */
-.hero-section .hero-layout { min-height: 560px; }
-@media (min-width: 1280px) { .hero-section .hero-layout { min-height: 600px; } }
-@media (max-width: 1023px) { .hero-section .hero-layout { min-height: 0; } }
-
-/* Phones: counter stays on one line */
-.launch-seats { flex-wrap: nowrap; }
-@media (max-width: 680px) {
-  .launch-seats { gap: 8px; padding: 8px 10px; font-size: 12px; }
-  .launch-seats-label { font-size: 11px; }
-  .launch-seats-count { font-size: 14px; white-space: nowrap; }
-  .launch-seats-bar { min-width: 40px; flex: 1 1 40px; }
-  .launch-seats-more { padding: 5px 9px; font-size: 11px; }
-}
-
-/* Phones: slimmer promo banner */
-@media (max-width: 680px) {
-  .home-promo-stage { min-height: 84px; }
-  .home-promo-content { min-height: 84px; padding: 10px 14px; gap: 10px; }
-  .home-promo-eyebrow { display: none; }
-  .home-promo-content h2 { margin-top: 0; font-size: 14px; line-height: 1.22; }
-  .home-promo-action { min-height: 32px; padding: 0 12px; font-size: 12px; }
-}
-
-/* Phones: promo button text stays whole; hero is shorter */
-.home-promo-action { white-space: nowrap; flex: none; }
-@media (max-width: 680px) {
-  .home-promo-action { padding: 0 10px; max-width: 46%; overflow: hidden; text-overflow: ellipsis; }
-  .hero-section .hero-title { font-size: 40px !important; line-height: 1.04 !important; }
-  .hero-section .hero-copy { font-size: 15px !important; line-height: 1.5 !important; }
-  .hero-section .hero-layout { gap: 16px !important; padding-top: 20px !important; padding-bottom: 20px !important; }
-}
 
 /* Social links help in the card builder */
 .social-help ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; line-height: 1.5; color: var(--ink); }

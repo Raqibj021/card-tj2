@@ -1,4 +1,4 @@
-import { ArrowRight, BadgeCheck, Gift, QrCode, ShieldCheck, Smartphone, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, Gift, QrCode, ShieldCheck, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useApp } from "../context/AppContext";
@@ -7,82 +7,79 @@ const slideCopy = {
   ru: [
     {
       eyebrow: "Скоро официальный запуск",
-      title: "Vizora объединяет ваши контакты в одной красивой ссылке",
+      title: "Все контакты в одной ссылке",
       text: "Электронные визитки для специалистов, команд и организаций Таджикистана.",
       action: "Создать визитку"
     },
     {
       eyebrow: "Знакомьтесь быстрее",
-      title: "Покажите QR-код — и ваш профиль уже у клиента",
+      title: "Делитесь профилем по QR-коду",
       text: "Телефон, мессенджеры, соцсети, адрес и сайт доступны без установки приложения.",
       action: "Открыть каталог"
     },
     {
       eyebrow: "Всегда актуально",
-      title: "Меняйте данные, не меняя ссылку и QR-код",
+      title: "Обновляйте контакты в любое время",
       text: "Обновите профиль один раз — новые контакты сразу увидят все ваши клиенты.",
       action: "Узнать больше"
     },
     {
       eyebrow: "Главная акция запуска",
-      title: "Первые 50 личных пользователей — бесплатно на 1 год",
+      title: "Год бесплатно для первых 50 пользователей",
       text: "И фирменная NFC-карта Vizora в подарок. Акция только для личных визиток — организации участвуют по корпоративным тарифам.",
       action: "Получить бесплатно",
-      badge: "Только 50 мест"
     }
   ],
   tj: [
     {
       eyebrow: "Оғози расмӣ ба наздикӣ",
-      title: "Vizora ҳамаи тамосҳои шуморо дар як пайванди зебо муттаҳид мекунад",
+      title: "Ҳамаи тамосҳо дар як пайванд",
       text: "Варақаҳои рақамӣ барои мутахассисон, гурӯҳҳо ва ташкилотҳои Тоҷикистон.",
       action: "Сохтани варақа"
     },
     {
       eyebrow: "Зудтар шинос шавед",
-      title: "QR-кодро нишон диҳед — профили шумо аллакай назди муштарӣ аст",
+      title: "Профилро бо QR-код мубодила кунед",
       text: "Телефон, паёмрасонҳо, шабакаҳои иҷтимоӣ, суроға ва сомона бе барнома дастрасанд.",
       action: "Кушодани феҳрист"
     },
     {
       eyebrow: "Ҳамеша нав",
-      title: "Маълумотро бе иваз кардани пайванд ва QR-код нав кунед",
+      title: "Тамосҳоро ҳар вақт нав кунед",
       text: "Профилро як бор нав кунед — ҳамаи муштариён маълумоти навро мебинанд.",
       action: "Маълумоти бештар"
     },
     {
       eyebrow: "Иқдоми асосии оғоз",
-      title: "50 корбари шахсии аввал — барои 1 сол ройгон",
+      title: "Як сол ройгон барои 50 корбари аввал",
       text: "Ва корти фирмавии NFC-и Vizora ҳамчун тӯҳфа. Иқдом танҳо барои варақаҳои шахсӣ — ташкилотҳо аз рӯи тарофаҳои корпоративӣ хизмат мегиранд.",
       action: "Ройгон гирифтан",
-      badge: "Танҳо 50 ҷой"
     }
   ],
   en: [
     {
       eyebrow: "Official launch coming soon",
-      title: "Vizora brings every contact into one beautiful link",
+      title: "Every contact in one link",
       text: "Digital business cards for professionals, teams and organizations in Tajikistan.",
       action: "Create a card"
     },
     {
       eyebrow: "Connect faster",
-      title: "Show your QR code — your profile is already with the client",
+      title: "Share your profile by QR code",
       text: "Phone, messengers, social media, address and website with no app required.",
       action: "Open directory"
     },
     {
       eyebrow: "Always up to date",
-      title: "Change your details without changing your link or QR",
+      title: "Update your contacts anytime",
       text: "Update once and every client immediately sees your current contacts.",
       action: "Learn more"
     },
     {
       eyebrow: "Featured launch offer",
-      title: "The first 50 personal users get 1 year free",
+      title: "One year free for the first 50 users",
       text: "Plus a branded Vizora NFC card as a gift. Personal cards only — organizations use corporate plans.",
       action: "Get it free",
-      badge: "Only 50 places"
     }
   ]
 } as const;
@@ -92,15 +89,28 @@ const icons = [Smartphone, QrCode, ShieldCheck, Gift];
 export default function HomePromoCarousel() {
   const { language } = useApp();
   const [active, setActive] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
   const slides = slideCopy[language];
 
   useEffect(() => {
-    const timer = window.setInterval(() => setActive((current) => (current + 1) % slides.length), 6200);
-    return () => window.clearInterval(timer);
-  }, [slides.length]);
+    if (hovered || focused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setTimeout(() => setActive((current) => (current + 1) % slides.length), 6200);
+    return () => window.clearTimeout(timer);
+  }, [active, focused, hovered, slides.length]);
 
   return (
-    <section className="home-promo-carousel" aria-roledescription="carousel" aria-label="Vizora">
+    <section
+      className="home-promo-carousel"
+      aria-roledescription="carousel"
+      aria-label="Vizora"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
+      }}
+    >
       <div className="home-promo-stage">
         {slides.map((slide, index) => {
           const Icon = icons[index];
@@ -108,7 +118,7 @@ export default function HomePromoCarousel() {
           return (
             <article
               className={`home-promo-slide home-promo-slide-${index + 1}${active === index ? " is-active" : ""}${isOffer ? " is-offer" : ""}`}
-              aria-hidden={active !== index}
+              inert={active !== index}
               key={slide.title}
             >
               <div className="home-promo-photo" aria-hidden="true" />
@@ -120,11 +130,9 @@ export default function HomePromoCarousel() {
                   <h2>{slide.title}</h2>
                   <p>{slide.text}</p>
                 </div>
-                {"badge" in slide && slide.badge && <strong className="home-promo-badge"><Users size={15} />{slide.badge}</strong>}
                 <Link
                   to={index === 1 ? "/directory" : index === 2 ? "/services" : "/create"}
                   className={isOffer ? "home-promo-action home-promo-action-offer" : "home-promo-action"}
-                  tabIndex={active === index ? 0 : -1}
                 >
                   {isOffer && <BadgeCheck size={17} />}
                   {slide.action}
@@ -135,12 +143,11 @@ export default function HomePromoCarousel() {
           );
         })}
       </div>
-      <div className="home-promo-controls" role="tablist" aria-label="Баннеры Vizora">
+      <div className="home-promo-controls">
         {slides.map((slide, index) => (
           <button
             type="button"
-            role="tab"
-            aria-selected={active === index}
+            aria-pressed={active === index}
             aria-label={slide.eyebrow}
             className={active === index ? "is-active" : ""}
             onClick={() => setActive(index)}

@@ -7,9 +7,9 @@ const ru = {
   lightTheme: "Светлая тема",
   darkTheme: "Тёмная тема",
   heroEyebrow: "Цифровой образ нового поколения",
-  heroTitle: "Ваша цифровая визитка всегда рядом",
+  heroTitle: "Ваша цифровая визитка",
   heroText:
-    "Один аккуратный профиль вместо бумажных визиток. Делитесь контактами, социальными сетями и своим профессиональным образом за секунды.",
+    "Контакты и соцсети в одном профиле. Поделитесь им через QR, NFC или ссылку.",
   cardsCreated: "визиток создано",
   freeStart: "Бесплатный старт",
   noInstall: "Без установки",
@@ -35,7 +35,7 @@ const ru = {
   howTwoText: "Настройте шаблон и фирменный цвет в живом предпросмотре.",
   howThree: "Поделитесь",
   howThreeText: "Используйте персональную ссылку, QR-код или vCard.",
-  examplesTitle: "Так может выглядеть ваша визитка",
+  examplesTitle: "Примеры оформления",
   examplesText:
     "Деловая, сдержанная или выразительная — содержание всегда остаётся понятным.",
   openCard: "Открыть визитку",
@@ -173,9 +173,9 @@ const tj: Record<CopyKey, string> = {
   lightTheme: "Мавзӯи равшан",
   darkTheme: "Мавзӯи торик",
   heroEyebrow: "Симои рақамии насли нав",
-  heroTitle: "Корти рақамии шумо ҳамеша дар дастрас аст",
+  heroTitle: "Корти рақамии шумо",
   heroText:
-    "Як профили муосир ба ҷойи кортҳои коғазӣ. Маълумоти тамос, шабакаҳои иҷтимоӣ ва симои касбии худро дар чанд сония мубодила кунед.",
+    "Тамосҳо ва шабакаҳои иҷтимоӣ дар як профил. Бо пайванд, QR-код ё NFC мубодила кунед.",
   cardsCreated: "корт сохта шудааст",
   freeStart: "Оғози ройгон",
   noInstall: "Бе насб",
@@ -201,7 +201,7 @@ const tj: Record<CopyKey, string> = {
   howTwoText: "Қолаб ва ранги фирмавиро дар пешнамоиши зинда танзим кунед.",
   howThree: "Мубодила кунед",
   howThreeText: "Пайванди шахсӣ, QR-код ё vCard-ро истифода баред.",
-  examplesTitle: "Корти шумо чунин буда метавонад",
+  examplesTitle: "Намунаҳои тарҳ",
   examplesText:
     "Расмӣ, сода ё ҷолиб — маълумот ҳамеша фаҳмо мемонад.",
   openCard: "Кортро кушодан",
@@ -334,9 +334,9 @@ const en: Record<CopyKey, string> = {
   lightTheme: "Light theme",
   darkTheme: "Dark theme",
   heroEyebrow: "A new generation digital identity",
-  heroTitle: "Your digital business card, always within reach",
+  heroTitle: "Your digital business card",
   heroText:
-    "One polished profile instead of paper cards. Share your contacts, social links and professional identity in seconds.",
+    "Contacts and social links in one profile. Share it by link, QR code or NFC.",
   cardsCreated: "cards created",
   freeStart: "Free to start",
   noInstall: "No installation",
@@ -362,7 +362,7 @@ const en: Record<CopyKey, string> = {
   howTwoText: "Set the template and brand color in the live preview.",
   howThree: "Share it",
   howThreeText: "Use your personal link, QR code or vCard.",
-  examplesTitle: "Your business card can look like this",
+  examplesTitle: "Design examples",
   examplesText:
     "Professional, minimal or expressive — your information stays clear.",
   openCard: "Open card",

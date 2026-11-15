@@ -25,44 +25,12 @@ import HomePhoneStory from "../components/HomePhoneStory";
 import HomePromoCarousel from "../components/HomePromoCarousel";
 import LaunchSeatsCounter from "../components/LaunchSeatsCounter";
 import type { DigitalCard } from "../types/card";
+import "./HomePage.css";
 
 export default function HomePage() {
   const { t, language } = useApp();
   const [selectedDesign, setSelectedDesign] = useState<DigitalCard | null>(null);
   const showcaseDesigns = demoCards.slice(0, 8);
-  const founderDescription = {
-    ru: "Развиваю VIZORA.TJ — платформу современных электронных визиток для специалистов и компаний.",
-    tj: "VIZORA.TJ-ро рушд медиҳам — платформаи варақаҳои рақамии муосир барои мутахассисон ва ширкатҳо.",
-    en: "Building VIZORA.TJ — a modern digital business card platform for professionals and companies."
-  }[language];
-  const founderCard: DigitalCard = {
-    id: "founder-raqibjon",
-    slug: "raqibjon",
-    photo: `${import.meta.env.BASE_URL}images/team/raqibjon-murodqulov.webp`,
-    companyLogo: `${import.meta.env.BASE_URL}brand/vizora-mark-clean.webp`,
-    fullName: "Муродкулов Ракибджон",
-    position: "Основатель VIZORA.TJ",
-    organization: "VIZORA.TJ",
-    description: founderDescription,
-    phone: "+992177445511",
-    secondPhone: "",
-    whatsapp: "+992177445511",
-    telegram: "@raqibjon_vizora",
-    instagram: "@vizora.tj",
-    facebook: "raqibjon.murodqulov",
-    email: "founder@vizora.tj",
-    website: "https://vizora.tj",
-    address: "Душанбе, Таджикистан",
-    language: "tj",
-    theme: "teal",
-    template: "executive",
-    visibility: "public",
-    reviewStatus: "approved",
-    views: 2026,
-    createdAt: "2026-07-30T00:00:00.000Z",
-    updatedAt: "2026-07-30T00:00:00.000Z"
-  };
-
   useEffect(() => {
     if (!selectedDesign) return;
 
@@ -161,13 +129,13 @@ export default function HomePage() {
     <>
       <main className="home-page">
         <div className="home-digital-atmosphere" aria-hidden="true"><i /><i /><i /><span /><span /><span /></div>
-        <div className="home-promo-wrap home-promo-wide">
+        <div className="home-promo-wrap">
           <LaunchSeatsCounter />
           <HomePromoCarousel />
         </div>
         <section className="hero-section overflow-hidden">
           <div className="hero-grid-pattern" />
-          <div className="site-container hero-layout relative grid min-h-[760px] items-center gap-16 py-14 lg:grid-cols-[1.08fr_.92fr] xl:min-h-[800px]">
+          <div className="site-container hero-layout">
             <div className="hero-content">
               <div className="eyebrow">
                 <Sparkles size={15} />
@@ -175,13 +143,13 @@ export default function HomePage() {
               </div>
               <h1 className="hero-title">{t("heroTitle")}</h1>
               <p className="hero-copy">{t("heroText")}</p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="home-hero-action">
                 <Link to="/create" className="button button-primary button-large">
                   {t("create")}
                   <ArrowRight size={19} />
                 </Link>
               </div>
-              <div className="mt-9 flex flex-wrap gap-x-7 gap-y-3 text-sm text-[var(--muted)]">
+              <div className="home-hero-perks">
                 <span className="inline-flex items-center gap-2">
                   <BadgeCheck size={18} className="text-teal-600" />
                   {t("freeStart")}
@@ -197,7 +165,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <HomePhoneStory card={founderCard} />
+            <HomePhoneStory />
           </div>
         </section>
 
