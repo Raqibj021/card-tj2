@@ -1,19 +1,22 @@
-import { BadgeCheck, ContactRound, QrCode, Share2, SmartphoneNfc } from "lucide-react";
-import { type CSSProperties } from "react";
+import { BadgeCheck, ContactRound, QrCode, Share2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import "./HomePhoneStory.css";
 import { useApp } from "../context/AppContext";
 import type { DigitalCard } from "../types/card";
 
-const phoneCardDesigns = [
-  "vizora-tajikistan-building.webp",
-  "vizora-tajikistan-palace.webp",
-  "vizora-tajikistan-somoni.webp",
-  "vizora-tajikistan-arch.webp",
-  "vizora-tajikistan-hissar.webp",
-  "vizora-tajikistan-independence.webp"
-] as const;
+const storyFiles = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `${import.meta.env.BASE_URL}videos/stories/story${n}.mp4`);
+
 
 export default function HomePhoneStory(_props: { card: DigitalCard }) {
+  const [storyIndex, setStoryIndex] = useState(0);
+  const [storyProgress, setStoryProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.load();
+    void video.play().catch(() => undefined);
+  }, [storyIndex]);
   const { language } = useApp();
   const copy = {
     ru: {
@@ -66,31 +69,37 @@ export default function HomePhoneStory(_props: { card: DigitalCard }) {
         <span className="iphone-side-button iphone-camera-button" aria-hidden="true" />
         <div className="phone-speaker" />
         <div className="phone-story-screen">
+          <div className="phone-story-progress" aria-hidden="true">
+            {storyFiles.map((_, index) => (
+              <span key={index} className={index < storyIndex ? "is-done" : ""}>
+                <i style={{ width: index === storyIndex ? `${Math.round(storyProgress * 100)}%` : undefined }} />
+              </span>
+            ))}
+          </div>
           <video
+            ref={videoRef}
             className="phone-story-video"
-            src={`${import.meta.env.BASE_URL}videos/vizora-phone.mp4`}
-            poster={`${import.meta.env.BASE_URL}videos/vizora-phone-poster.webp`}
+            src={storyFiles[storyIndex]}
+            poster={storyIndex === 0 ? `${import.meta.env.BASE_URL}videos/vizora-phone-poster.webp` : undefined}
             aria-label={language === "tj" ? "Видео дар бораи Vizora" : language === "en" ? "Vizora introduction video" : "Видео о Vizora"}
             autoPlay
-            loop
             muted
             playsInline
             controls={false}
             disablePictureInPicture
             disableRemotePlayback
             tabIndex={-1}
-            preload="metadata"
+            preload="auto"
+            onTimeUpdate={(event) => {
+              const video = event.currentTarget;
+              setStoryProgress(video.duration ? video.currentTime / video.duration : 0);
+            }}
+            onEnded={() => {
+              setStoryProgress(0);
+              setStoryIndex((index) => (index + 1) % storyFiles.length);
+            }}
           />
         </div>
-      </div>
-      <div className="home-hero-card-deck" aria-hidden="true">
-        {phoneCardDesigns.map((image, index) => (
-          <div className="home-hero-nfc-card" style={{ "--phone-card-index": index } as CSSProperties} key={image}>
-            <img className="home-hero-nfc-bg" src={`${import.meta.env.BASE_URL}images/cards/${image}`} alt="" />
-            <img className="home-hero-nfc-logo" src={`${import.meta.env.BASE_URL}brand/vizora-logo-card-transparent.png`} alt="" />
-            <span><SmartphoneNfc size={17} /><small>NFC</small></span>
-          </div>
-        ))}
       </div>
       <div className="floating-chip floating-chip-top">
         <QrCode size={19} />
