@@ -9235,3 +9235,12 @@ body,
   .launch-seats-bar { min-width: 40px; flex: 1 1 40px; }
   .launch-seats-more { padding: 5px 9px; font-size: 11px; }
 }
+
+/* Phones: slimmer promo banner */
+@media (max-width: 680px) {
+  .home-promo-stage { min-height: 84px; }
+  .home-promo-content { min-height: 84px; padding: 10px 14px; gap: 10px; }
+  .home-promo-eyebrow { display: none; }
+  .home-promo-content h2 { margin-top: 0; font-size: 14px; line-height: 1.22; }
+  .home-promo-action { min-height: 32px; padding: 0 12px; font-size: 12px; }
+}

@@ -1,22 +1,10 @@
 import { BadgeCheck, ContactRound, QrCode, Share2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import "./HomePhoneStory.css";
 import { useApp } from "../context/AppContext";
 import type { DigitalCard } from "../types/card";
 
-const storyFiles = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `${import.meta.env.BASE_URL}videos/stories/story${n}.mp4`);
-
 
 export default function HomePhoneStory(_props: { card: DigitalCard }) {
-  const [storyIndex, setStoryIndex] = useState(0);
-  const [storyProgress, setStoryProgress] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.load();
-    void video.play().catch(() => undefined);
-  }, [storyIndex]);
   const { language } = useApp();
   const copy = {
     ru: {
@@ -69,20 +57,13 @@ export default function HomePhoneStory(_props: { card: DigitalCard }) {
         <span className="iphone-side-button iphone-camera-button" aria-hidden="true" />
         <div className="phone-speaker" />
         <div className="phone-story-screen">
-          <div className="phone-story-progress" aria-hidden="true">
-            {storyFiles.map((_, index) => (
-              <span key={index} className={index < storyIndex ? "is-done" : ""}>
-                <i style={{ width: index === storyIndex ? `${Math.round(storyProgress * 100)}%` : undefined }} />
-              </span>
-            ))}
-          </div>
           <video
-            ref={videoRef}
             className="phone-story-video"
-            src={storyFiles[storyIndex]}
-            poster={storyIndex === 0 ? `${import.meta.env.BASE_URL}videos/vizora-phone-poster.webp` : undefined}
+            src={`${import.meta.env.BASE_URL}videos/stories/vizora-stories.mp4`}
+            poster={`${import.meta.env.BASE_URL}videos/vizora-phone-poster.webp`}
             aria-label={language === "tj" ? "Видео дар бораи Vizora" : language === "en" ? "Vizora introduction video" : "Видео о Vizora"}
             autoPlay
+            loop
             muted
             playsInline
             controls={false}
@@ -90,14 +71,6 @@ export default function HomePhoneStory(_props: { card: DigitalCard }) {
             disableRemotePlayback
             tabIndex={-1}
             preload="auto"
-            onTimeUpdate={(event) => {
-              const video = event.currentTarget;
-              setStoryProgress(video.duration ? video.currentTime / video.duration : 0);
-            }}
-            onEnded={() => {
-              setStoryProgress(0);
-              setStoryIndex((index) => (index + 1) % storyFiles.length);
-            }}
           />
         </div>
       </div>
