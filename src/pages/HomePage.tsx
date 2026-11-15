@@ -23,6 +23,7 @@ import { useApp } from "../context/AppContext";
 import { demoCards } from "../data/demo";
 import HomePhoneStory from "../components/HomePhoneStory";
 import HomePromoCarousel from "../components/HomePromoCarousel";
+import LaunchSeatsCounter from "../components/LaunchSeatsCounter";
 import type { DigitalCard } from "../types/card";
 
 export default function HomePage() {
@@ -161,6 +162,7 @@ export default function HomePage() {
       <main className="home-page">
         <div className="home-digital-atmosphere" aria-hidden="true"><i /><i /><i /><span /><span /><span /></div>
         <div className="home-promo-wrap home-promo-wide">
+          <LaunchSeatsCounter />
           <HomePromoCarousel />
         </div>
         <section className="hero-section overflow-hidden">
