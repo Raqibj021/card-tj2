@@ -24,9 +24,10 @@ export const socialUrl = (
   type: "telegram" | "instagram" | "facebook",
   value: string
 ) => {
-  if (!value) return "";
-  if (/^https?:\/\//i.test(value)) return value;
-  const clean = value.replace(/^@/, "").trim();
+  const trimmed = value.trim();
+  if (!trimmed || /^https?:\/\//i.test(trimmed)) return trimmed;
+  const clean = trimmed.replace(/^@/, "");
+  if (/^(?:www\.)?(?:t\.me|instagram\.com|facebook\.com)\//i.test(clean)) return normalizeUrl(clean);
   if (type === "telegram") {
     return /^\+?\d+$/.test(clean)
       ? `https://t.me/+${clean.replace(/\D/g, "")}`

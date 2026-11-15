@@ -46,6 +46,8 @@ type FormErrors = Partial<Record<keyof CardDraft, string>>;
 const NAME_PATTERN = /^[\p{L}][\p{L}'’ʼ-]{1,}(?:\s+[\p{L}][\p{L}'’ʼ-]{1,})+$/u;
 const PHONE_CHARACTERS = /^[+\d\s()-]+$/;
 const FACEBOOK_USERNAME_EXAMPLE = "@raqibmurodqulov";
+const TELEGRAM_PHONE_EXAMPLE = "+992900000000";
+const TELEGRAM_PHONE_PATTERN = /^\+992[0-9]{9}$/;
 const SOCIAL_PATTERN = /^(?:https?:\/\/)?(?:www\.)?[\w.-]+(?:\/[\w.@+-]*)*\/?$|^@?[a-zA-Z0-9._-]{3,}$/;
 
 const normalizePhoneInput = (value: string) =>
@@ -160,19 +162,19 @@ export default function CreatePage() {
   const logoInput = useRef<HTMLInputElement>(null);
   const socialHelpCopy = {
     ru: { title: "Где найти ник или ссылку?", items: [
-      ["Telegram", "Откройте профиль в Telegram → «Изменить» → «Имя пользователя». Ник начинается с @, например @ivan_ivanov. Можно вставить ссылку t.me/ivan_ivanov."],
+      ["Telegram", `Откройте профиль в Telegram → «Изменить» → «Имя пользователя». Введите ник (@ivan_ivanov или ivan_ivanov), ссылку t.me/ivan_ivanov или номер, например ${TELEGRAM_PHONE_EXAMPLE}.`],
       ["Instagram", "Откройте свой профиль в Instagram. Имя пользователя написано под именем, например ivan_ivanov. Можно вставить ссылку instagram.com/ivan_ivanov."],
-      ["Facebook", `Откройте свой профиль Facebook. В адресе facebook.com/raqibmurodqulov имя пользователя идёт после facebook.com/. Введите его с @ и без пробелов, например ${FACEBOOK_USERNAME_EXAMPLE}.`]
+      ["Facebook", `Откройте свой профиль Facebook. В адресе facebook.com/raqibmurodqulov имя пользователя идёт после facebook.com/. Введите его без пробелов, например ${FACEBOOK_USERNAME_EXAMPLE} или raqibmurodqulov.`]
     ], note: "Не вставляйте пароли и личные данные, только ник или публичную ссылку." },
     tj: { title: "Ник ё пайвандро аз кучо ёбам?", items: [
-      ["Telegram", "Профили худро дар Telegram кушоед → «Таҳрир» → «Номи корбар». Ник бо @ оғоз мешавад, масалан @ivan_ivanov. Пайванди t.me/ivan_ivanov низ мумкин аст."],
+      ["Telegram", `Профили худро дар Telegram кушоед → «Таҳрир» → «Номи корбар». Номи корбарро (@ivan_ivanov ё ivan_ivanov), пайванди t.me/ivan_ivanov ё рақамро, масалан ${TELEGRAM_PHONE_EXAMPLE}, ворид кунед.`],
       ["Instagram", "Профили худро дар Instagram кушоед. Номи корбар дар зери ном навишта шудааст, масалан ivan_ivanov. Пайванди instagram.com/ivan_ivanov низ мумкин аст."],
-      ["Facebook", `Профили худро дар Facebook кушоед. Дар суроғаи facebook.com/raqibmurodqulov номи корбар пас аз facebook.com/ меояд. Онро бо @ ва бе фосила нависед, масалан ${FACEBOOK_USERNAME_EXAMPLE}.`]
+      ["Facebook", `Профили худро дар Facebook кушоед. Дар суроғаи facebook.com/raqibmurodqulov номи корбар пас аз facebook.com/ меояд. Онро бе фосила нависед, масалан ${FACEBOOK_USERNAME_EXAMPLE} ё raqibmurodqulov.`]
     ], note: "Парол ва маълумоти шахсиро нанависед, танҳо ник ё пайванди ошкорро." },
     en: { title: "Where do I find my username or link?", items: [
-      ["Telegram", "Open your profile in Telegram → Edit → Username. It starts with @, e.g. @ivan_ivanov. You can also paste t.me/ivan_ivanov."],
+      ["Telegram", `Open your Telegram profile → Edit → Username. Enter @ivan_ivanov or ivan_ivanov, a link such as t.me/ivan_ivanov, or a phone number such as ${TELEGRAM_PHONE_EXAMPLE}.`],
       ["Instagram", "Open your Instagram profile. Your username is shown under your name, e.g. ivan_ivanov. You can also paste instagram.com/ivan_ivanov."],
-      ["Facebook", `Open your Facebook profile. In facebook.com/raqibmurodqulov, the username comes after facebook.com/. Enter it with @ and without spaces, for example ${FACEBOOK_USERNAME_EXAMPLE}.`]
+      ["Facebook", `Open your Facebook profile. In facebook.com/raqibmurodqulov, the username comes after facebook.com/. Enter it without spaces, for example ${FACEBOOK_USERNAME_EXAMPLE} or raqibmurodqulov.`]
     ], note: "Never enter passwords or private data, only a username or a public link." }
   }[language];
   const translationCopy = {
@@ -196,7 +198,8 @@ export default function CreatePage() {
       namePlaceholder: "Фируз Саидов", positionPlaceholder: "Руководитель", companyPlaceholder: "Название компании",
       descriptionPlaceholder: "Расскажите коротко о своей работе и преимуществах...", contactsHint: "Добавьте удобные способы связи",
       addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Соцсети необязательны. Если хотите их добавить, укажите ссылку или имя пользователя без пробелов.",
-      facebookHint: `Имя пользователя с @, без пробелов. Например, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      facebookHint: `Имя пользователя без пробелов, с @ или без него. Например, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      telegramHint: `Ник с @ или без него, ссылка или номер вида ${TELEGRAM_PHONE_EXAMPLE}.`,
       designHint: "Подберите оформление под свой образ", saving: "Сохранение...",
       previewHint: "Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран.",
       invalidName: "Введите имя и фамилию буквами, например: Фируз Саидов.",
@@ -215,7 +218,8 @@ export default function CreatePage() {
       namePlaceholder: "Фирӯз Саидов", positionPlaceholder: "Роҳбар", companyPlaceholder: "Номи ширкат",
       descriptionPlaceholder: "Дар бораи фаъолият ва афзалиятҳои худ кӯтоҳ нависед...", contactsHint: "Роҳҳои муносиби тамосро илова кунед",
       addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пур кардани майдонҳои шабакаҳои иҷтимоӣ ихтиёрӣ аст. Барои илова кардан пайванд ё номи корбарро бе фосила ворид кунед.",
-      facebookHint: `Номи корбарро бо @ ва бе фосила нависед. Масалан, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      facebookHint: `Номи корбар бе фосила, бо @ ё бе он. Масалан, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      telegramHint: `Номи корбар бо @ ё бе он, пайванд ё рақам дар шакли ${TELEGRAM_PHONE_EXAMPLE}.`,
       designHint: "Ороишро мувофиқи симои худ интихоб кунед", saving: "Нигоҳдорӣ...",
       previewHint: "Пешнамоиш худкор нав мешавад. Дар телефон варақа дар тамоми экран кушода мешавад.",
       invalidName: "Ном ва насабро бо ҳарфҳо нависед, масалан: Фирӯз Саидов.",
@@ -223,7 +227,7 @@ export default function CreatePage() {
       invalidOrganization: "Ҷойи кор ё номи ташкилотро нависед.",
       invalidPhone: "Рақами пурраро ворид кунед: +992 ва 9 рақами телефон.",
       invalidWebsite: "Суроғаи дурусти сомонаро нависед, масалан: example.tj.",
-      invalidSocial: "Без пробелов: @ivan_ivanov или полная ссылка, например facebook.com/ivan.ivanov.",
+      invalidSocial: "Номи корбарро бе фосила ё пайванди пурраро ворид кунед.",
       invalidAddress: "Суроғаи дурустро ворид кунед (на кам аз 5 аломат).",
       flow: ["Маълумот", "Ороиш", "Пешнамоиш", "Пардохт", "Санҷиш"],
       saveContinue: "Нигоҳ доштан ва идома додан", resubmit: "Нигоҳ доштан ва дубора фиристодан"
@@ -234,7 +238,8 @@ export default function CreatePage() {
       namePlaceholder: "Firuz Saidov", positionPlaceholder: "Manager", companyPlaceholder: "Company name",
       descriptionPlaceholder: "Briefly describe your work and advantages...", contactsHint: "Add convenient ways to contact you",
       addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Social accounts are optional. To add one, enter a link or username without spaces.",
-      facebookHint: `Enter your username with @ and without spaces. For example, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      facebookHint: `Enter your username without spaces, with or without @. For example, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      telegramHint: `A username with or without @, a link, or a number like ${TELEGRAM_PHONE_EXAMPLE}.`,
       designHint: "Choose a design that matches your image", saving: "Saving...",
       previewHint: "The preview updates automatically. On a phone, the card opens full screen.",
       invalidName: "Enter first and last name using letters, for example: Firuz Saidov.",
@@ -482,9 +487,10 @@ export default function CreatePage() {
     if (form.website && !isValidWebsite(form.website)) next.website = builderCopy.invalidWebsite;
     if (form.address && form.address.trim().length < 5) next.address = builderCopy.invalidAddress;
     (["telegram", "instagram", "facebook"] as const).forEach((network) => {
-      if (form[network] && !SOCIAL_PATTERN.test(form[network].trim())) {
-        next[network] = builderCopy.invalidSocial;
-      }
+      const value = form[network].trim();
+      if (!value || SOCIAL_PATTERN.test(value)) return;
+      if (network === "telegram" && TELEGRAM_PHONE_PATTERN.test(value)) return;
+      next[network] = network === "telegram" ? builderCopy.telegramHint : builderCopy.invalidSocial;
     });
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -504,7 +510,7 @@ export default function CreatePage() {
     setSaving(true);
     setSubmitError("");
     try {
-      const card = cardRepository.save(form, existing?.id);
+      const card = await cardRepository.save(form, existing?.id);
       if (existing && ["changes_requested", "rejected"].includes(existing.reviewStatus ?? "")) {
         const result = await cardRepository.requestPublication(card.id);
         navigate(result.ok ? "/dashboard" : `/${card.slug}`);
@@ -832,13 +838,13 @@ export default function CreatePage() {
                   label={t(network)}
                   icon={<AtSign size={16} />}
                   error={errors[network]}
-                  hint={network === "facebook" ? builderCopy.facebookHint : undefined}
+                  hint={network === "facebook" ? builderCopy.facebookHint : network === "telegram" ? builderCopy.telegramHint : undefined}
                 >
                   <input
                     className="form-input"
                     value={form[network]}
                     onChange={(event) => update(network, event.target.value.replace(/\s+/g, ""))}
-                    placeholder={network === "telegram" ? "@ivan_ivanov или t.me/ivan_ivanov" : network === "instagram" ? "@ivan_ivanov или instagram.com/ivan_ivanov" : FACEBOOK_USERNAME_EXAMPLE}
+                    placeholder={network === "telegram" ? "@ivan_ivanov / " + TELEGRAM_PHONE_EXAMPLE : network === "instagram" ? "@ivan_ivanov или instagram.com/ivan_ivanov" : FACEBOOK_USERNAME_EXAMPLE}
                     autoCapitalize="none"
                     autoCorrect="off"
                     spellCheck={false}

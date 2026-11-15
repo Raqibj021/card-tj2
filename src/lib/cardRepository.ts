@@ -11,7 +11,7 @@ export interface CardRepository {
   list(): DigitalCard[];
   getById(id: string): DigitalCard | undefined;
   getBySlug(slug: string): DigitalCard | undefined;
-  save(draft: CardDraft, id?: string): DigitalCard;
+  save(draft: CardDraft, id?: string): Promise<DigitalCard>;
   remove(id: string): Promise<{ ok: boolean; message: string }>;
   incrementViews(id: string): void;
   getPublicBySlug(slug: string): Promise<DigitalCard | undefined>;
@@ -22,7 +22,7 @@ export interface CardRepository {
 const createId = createUuid;
 
 class LocalStorageCardRepository implements CardRepository {
-  private pendingRemoteSaves = new Set<Promise<void>>();
+  private pendingRemoteSaves = new Set<Promise<DigitalCard | null | undefined>>();
 
   private removedIds() {
     try {
@@ -45,10 +45,14 @@ class LocalStorageCardRepository implements CardRepository {
     localStorage.setItem(REMOVED_CARDS_KEY, JSON.stringify([...removed]));
   }
 
-  private trackRemoteSave(card: DigitalCard) {
+  private async trackRemoteSave(card: DigitalCard) {
     const operation = this.saveRemote(card);
     this.pendingRemoteSaves.add(operation);
-    void operation.finally(() => this.pendingRemoteSaves.delete(operation));
+    try {
+      return await operation;
+    } finally {
+      this.pendingRemoteSaves.delete(operation);
+    }
   }
 
   private fromDatabase(row: Record<string, unknown>): DigitalCard {
@@ -137,14 +141,15 @@ class LocalStorageCardRepository implements CardRepository {
     if (!supabase) return;
     if (this.removedIds().has(card.id)) return;
     const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) return;
+    if (!auth.user) return null;
 
-    const { data: existing } = await supabase
+    const { data: existing, error: lookupError } = await supabase
       .from("cards")
-      .select("id, visibility, review_status, photo_path, contacts")
+      .select("id, photo_path, contacts")
       .eq("owner_id", auth.user.id)
       .maybeSingle();
 
+    if (lookupError) throw new Error(lookupError.message);
     const remoteId = String(existing?.id ?? card.id);
     const oldContacts = (existing?.contacts ?? {}) as Record<string, unknown>;
     const [photoAsset, logoAsset] = await Promise.all([
@@ -155,45 +160,36 @@ class LocalStorageCardRepository implements CardRepository {
       await this.removeAssets([photoAsset.path, logoAsset.path]);
       return;
     }
-    const { data: saved, error: saveError } = await supabase.from("cards").upsert(
-      {
-        id: remoteId,
-        owner_id: auth.user.id,
-        slug: card.slug,
-        full_name: card.fullName,
-        position: card.position,
-        organization_name: card.organization,
-        description: card.description,
-        photo_path: photoAsset.url.startsWith("http") ? photoAsset.url : null,
-        contacts: {
-          phone: card.phone,
-          secondPhone: card.secondPhone,
-          whatsapp: card.whatsapp,
-          telegram: card.telegram,
-          instagram: card.instagram,
-          facebook: card.facebook,
-          email: card.email,
-          website: card.website,
-          companyLogo: logoAsset.url.startsWith("http") ? logoAsset.url : ""
-        },
-        address: card.address,
-        language: card.language,
-        ...(card.translations !== undefined ? { translations: card.translations } : {}),
-        theme: card.theme,
-        template: card.template,
-        visibility:
-          existing?.review_status === "approved"
-            ? "private"
-            : existing?.visibility ?? card.visibility ?? "private",
-        review_status:
-          existing?.review_status === "approved"
-            ? "pending"
-            : existing?.review_status ?? card.reviewStatus ?? "draft",
-        trial_expires_at: null,
-        updated_at: new Date().toISOString()
+    const details = {
+      slug: card.slug,
+      full_name: card.fullName,
+      position: card.position,
+      organization_name: card.organization,
+      description: card.description,
+      photo_path: photoAsset.url.startsWith("http") ? photoAsset.url : null,
+      contacts: {
+        phone: card.phone,
+        secondPhone: card.secondPhone,
+        whatsapp: card.whatsapp,
+        telegram: card.telegram,
+        instagram: card.instagram,
+        facebook: card.facebook,
+        email: card.email,
+        website: card.website,
+        companyLogo: logoAsset.url.startsWith("http") ? logoAsset.url : ""
       },
-      { onConflict: "owner_id" }
-    ).select("*").single();
+      address: card.address,
+      language: card.language,
+      ...(card.translations !== undefined ? { translations: card.translations } : {}),
+      theme: card.theme,
+      template: card.template,
+      updated_at: new Date().toISOString()
+    };
+    const cards = supabase.from("cards");
+    const write = existing
+      ? cards.update(details).eq("id", remoteId).eq("owner_id", auth.user.id)
+      : cards.insert({ ...details, id: remoteId, owner_id: auth.user.id });
+    const { data: saved, error: saveError } = await write.select("*").single();
 
     if (saveError || !saved) {
       await this.removeAssets([photoAsset.path, logoAsset.path]);
@@ -205,15 +201,14 @@ class LocalStorageCardRepository implements CardRepository {
       logoAsset.path ? this.assetPath(String(oldContacts.companyLogo ?? "")) : ""
     ]);
 
-    if (saved) {
-      const remoteCard = this.fromDatabase(saved);
-      if (this.removedIds().has(card.id) || this.removedIds().has(remoteCard.id)) {
-        await supabase.from("cards").delete().eq("owner_id", auth.user.id);
-        return;
-      }
-      const localCards = this.read().filter((item) => item.id !== card.id && item.id !== remoteCard.id);
-      this.write([remoteCard, ...localCards]);
+    const remoteCard = this.fromDatabase(saved);
+    if (this.removedIds().has(card.id) || this.removedIds().has(remoteCard.id)) {
+      await supabase.from("cards").delete().eq("owner_id", auth.user.id);
+      return;
     }
+    const localCards = this.read().filter((item) => item.id !== card.id && item.id !== remoteCard.id);
+    this.write([remoteCard, ...localCards]);
+    return remoteCard;
   }
 
   private read(): DigitalCard[] {
@@ -259,7 +254,7 @@ class LocalStorageCardRepository implements CardRepository {
     );
   }
 
-  save(draft: CardDraft, id?: string) {
+  async save(draft: CardDraft, id?: string) {
     const cards = this.read();
     const existing =
       (id ? cards.find((card) => card.id === id) : undefined) ??
@@ -271,16 +266,21 @@ class LocalStorageCardRepository implements CardRepository {
       views: existing?.views ?? 0,
       createdAt: existing?.createdAt ?? timestamp,
       updatedAt: timestamp,
-      visibility: existing?.reviewStatus === "approved" ? "private" : existing?.visibility ?? "private",
-      reviewStatus: existing?.reviewStatus === "approved" ? "pending" : existing?.reviewStatus ?? "draft",
+      visibility: existing?.visibility ?? "private",
+      reviewStatus: existing?.reviewStatus ?? "draft",
       trialExpiresAt: null
     };
+
+    if (supabase) {
+      const saved = await this.trackRemoteSave(card);
+      if (saved) return saved;
+      if (saved !== null || id) throw new Error("Не удалось сохранить визитку.");
+    }
 
     const nextCards = existing
       ? cards.map((item) => (item.id === existing.id ? card : item))
       : [card, ...cards];
     this.write(nextCards);
-    this.trackRemoteSave(card);
     return card;
   }
 
