@@ -1,69 +1,92 @@
-.promo-page { background: #06122b; color: #fff; overflow-x: hidden; }
-.promo-page h1, .promo-page h2, .promo-page h3 { letter-spacing: -0.02em; }
-.promo-page h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 800; margin: 0 0 18px; }
+.promo-page { background: #f4f6fb; color: #0b1a33; overflow-x: hidden; }
 
-.promo-hero { position: relative; padding: 56px 0 64px; background: radial-gradient(120% 80% at 50% 0%, #14377a 0%, #0a1f4d 50%, #06122b 100%); }
-.promo-hero-layout { display: grid; gap: 40px; align-items: center; }
-.promo-eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: rgba(255, 255, 255, 0.12); font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
-.promo-hero h1 { margin: 18px 0 14px; font-size: clamp(32px, 5vw, 56px); font-weight: 800; line-height: 1.08; }
-.promo-hero-copy p { margin: 0; max-width: 560px; font-size: 18px; line-height: 1.55; color: #cfe6ff; }
-.promo-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-.promo-button { display: inline-flex; align-items: center; gap: 10px; padding: 16px 26px; border-radius: 999px; font-weight: 800; font-size: 16px; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.promo-button:hover { transform: translateY(-2px); }
-.promo-button-primary { background: #fff; color: #0a1f4d; box-shadow: 0 0 60px rgba(91, 192, 255, 0.55); }
-.promo-button-ghost { border: 2px solid rgba(143, 184, 255, 0.5); color: #fff; }
+/* Hero */
+.promo-hero { position: relative; overflow: hidden; color: #fff; padding: 52px 0 46px; background: radial-gradient(900px 420px at 85% -10%, rgba(45, 212, 191, 0.26), transparent 60%), linear-gradient(135deg, #06122b 0%, #0b2d4f 100%); }
+.promo-hero-glow { position: absolute; right: -180px; bottom: -260px; width: 560px; height: 560px; border-radius: 50%; background: radial-gradient(circle, rgba(250, 204, 21, 0.2), transparent 65%); pointer-events: none; }
+.promo-hero-layout { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: 36px; align-items: center; }
+.promo-eyebrow { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); font-size: 12px; font-weight: 700; }
+.promo-hero h1 { margin: 14px 0 12px; font-size: clamp(26px, 3.2vw, 40px); line-height: 1.12; letter-spacing: -0.02em; color: #fff; }
+.promo-hero p { margin: 0; font-size: 16px; line-height: 1.6; color: rgba(255, 255, 255, 0.82); max-width: 52ch; }
+.promo-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 
-.promo-seats { justify-self: start; min-width: 280px; padding: 28px; border-radius: 28px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(143, 184, 255, 0.3); backdrop-filter: blur(8px); }
-.promo-seats-number { display: flex; align-items: baseline; gap: 6px; }
-.promo-seats-number strong { font-size: 84px; font-weight: 800; line-height: 1; }
-.promo-seats-number span { font-size: 32px; font-weight: 700; color: #8fb8ff; }
-.promo-seats-label { margin: 6px 0 16px; color: #cfe6ff; font-weight: 600; }
-.promo-seats-bar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
-.promo-seats-bar i { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #5bc0ff, #2d7bff); animation: promo-grow 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-.promo-seats small { display: block; margin-top: 8px; color: #8fb8ff; font-size: 13px; }
-@keyframes promo-grow { from { width: 0; } to { width: var(--fill); } }
+.promo-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 20px; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; white-space: nowrap; transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
+.promo-button-primary { background: linear-gradient(135deg, #facc15, #f59e0b); color: #1a1200; box-shadow: 0 10px 28px rgba(250, 204, 21, 0.25); }
+.promo-button-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 34px rgba(250, 204, 21, 0.35); }
+.promo-button-ghost { color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
+.promo-button-ghost:hover { background: rgba(255, 255, 255, 0.08); }
 
-.promo-section { padding: 64px 0 8px; }
-.promo-section-text { margin: -6px 0 22px; color: #a9cfff; font-size: 17px; }
-.promo-benefits { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.promo-benefit { padding: 24px; border-radius: 22px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(143, 184, 255, 0.18); transition: transform 0.25s ease, background 0.25s ease; }
-.promo-benefit:hover { transform: translateY(-4px); background: rgba(255, 255, 255, 0.09); }
-.promo-benefit-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: #1478ee; margin-bottom: 14px; }
-.promo-benefit h3 { margin: 0 0 6px; font-size: 18px; font-weight: 800; }
-.promo-benefit p { margin: 0; color: #a9cfff; font-size: 15px; line-height: 1.5; }
+/* Hero visual: three floating cards and a seats counter */
+.promo-visual { position: relative; height: 310px; }
+.promo-float { position: absolute; width: 46%; border-radius: 16px; overflow: hidden; box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35); }
+.promo-float img { display: block; width: 100%; height: auto; }
+.promo-float-0 { left: 2%; top: 14px; transform: rotate(-6deg); z-index: 1; }
+.promo-float-1 { left: 27%; top: 0; transform: rotate(2deg); z-index: 2; }
+.promo-float-2 { right: 0; top: 46px; transform: rotate(7deg); z-index: 1; }
+.promo-seats { position: absolute; left: 0; bottom: 0; z-index: 3; width: 232px; padding: 16px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.97); color: #0b1a33; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28); }
+.promo-seats-number { display: flex; align-items: baseline; gap: 4px; }
+.promo-seats-number strong { font-size: 40px; line-height: 1; color: #0b6a5b; font-variant-numeric: tabular-nums; }
+.promo-seats-number span { font-size: 18px; font-weight: 700; color: #55657e; }
+.promo-seats-label { margin: 4px 0 10px; font-size: 13px; color: #33415c; }
+.promo-seats-bar { height: 8px; border-radius: 999px; background: #e3e8f2; overflow: hidden; }
+.promo-seats-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #2dd4bf, #0b6a5b); }
+.promo-seats small { display: block; margin-top: 8px; font-size: 12px; color: #55657e; }
 
-.promo-gallery { display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); }
-.promo-card { margin: 0; position: relative; overflow: hidden; border-radius: 20px; background: #0a1f4d; border: 1px solid rgba(143, 184, 255, 0.18); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.promo-card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.4); }
-.promo-card img { display: block; width: 100%; aspect-ratio: 1.586; object-fit: cover; }
-.promo-card figcaption { padding: 10px 12px; font-size: 13px; font-weight: 600; color: #cfe6ff; }
+/* Sections */
+.promo-section { padding: 36px 0; }
+.promo-section h2 { margin: 0 0 14px; font-size: 22px; letter-spacing: -0.01em; color: #0b1a33; }
+.promo-section-text { margin: -6px 0 12px; font-size: 14px; color: #55657e; }
 
-.promo-two-col { display: grid; gap: 40px; grid-template-columns: 1fr; }
-.promo-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
-.promo-steps li { display: flex; gap: 14px; align-items: flex-start; }
-.promo-steps span { display: grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: #5bc0ff; color: #06122b; font-weight: 800; }
-.promo-steps p { margin: 4px 0 0; color: #cfe6ff; line-height: 1.5; }
-.promo-conditions { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.promo-conditions li { display: flex; gap: 10px; align-items: flex-start; color: #cfe6ff; line-height: 1.5; }
-.promo-conditions svg { flex: 0 0 18px; margin-top: 3px; color: #5bc0ff; }
+.promo-benefits { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.promo-benefit { background: #fff; border: 1px solid #e3e8f2; border-radius: 14px; padding: 16px; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.promo-benefit:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(11, 26, 51, 0.08); }
+.promo-benefit-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: #e6f7f3; color: #0b6a5b; }
+.promo-benefit h3 { margin: 10px 0 4px; font-size: 15px; }
+.promo-benefit p { margin: 0; font-size: 13px; line-height: 1.5; color: #55657e; }
 
-.promo-final { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; margin: 64px auto 40px; padding: 36px; border-radius: 28px; background: linear-gradient(135deg, #0b3b9e 0%, #1478ee 100%); }
-.promo-final h2 { margin: 0; font-size: clamp(22px, 3vw, 30px); }
-.promo-final .promo-button-primary { color: #0a1f4d; }
+/* One horizontal row of designs instead of a tall grid */
+.promo-gallery { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 12px; scrollbar-width: thin; }
+.promo-card { flex: 0 0 150px; margin: 0; scroll-snap-align: start; }
+.promo-card img { display: block; width: 100%; border-radius: 12px; box-shadow: 0 8px 20px rgba(11, 26, 51, 0.12); }
+.promo-card figcaption { margin-top: 6px; font-size: 12px; text-align: center; color: #55657e; }
 
-@media (min-width: 720px) {
-  .promo-gallery { grid-template-columns: repeat(3, 1fr); }
-  .promo-two-col { grid-template-columns: 1fr 1fr; }
+.promo-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.promo-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.promo-steps li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid #e3e8f2; }
+.promo-steps li span { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 50%; background: #0b6a5b; color: #fff; font-size: 13px; font-weight: 700; }
+.promo-steps p { margin: 0; font-size: 14px; line-height: 1.5; }
+.promo-conditions { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.promo-conditions li { display: flex; gap: 10px; font-size: 14px; line-height: 1.5; color: #33415c; }
+.promo-conditions svg { flex: 0 0 18px; margin-top: 2px; color: #0b6a5b; }
+
+/* Closing bar */
+.promo-final { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin: 8px auto 40px; padding: 22px 24px; border-radius: 18px; color: #fff; background: linear-gradient(135deg, #06122b, #0b3b5c); }
+.promo-final h2 { margin: 0; font-size: 20px; color: #fff; }
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .promo-hero-layout { grid-template-columns: 1fr; }
+  .promo-visual { width: 100%; max-width: 440px; height: 270px; margin: 0 auto; }
+  .promo-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .promo-two-col { grid-template-columns: 1fr; }
 }
-@media (min-width: 1024px) {
-  .promo-hero-layout { grid-template-columns: 1.1fr 0.9fr; }
-  .promo-gallery { grid-template-columns: repeat(4, 1fr); }
-  .promo-seats { justify-self: end; }
-}
+
+/* Phone */
 @media (max-width: 640px) {
-  .promo-hero { padding: 40px 0 48px; }
-  .promo-seats { min-width: 0; width: 100%; padding: 22px; }
-  .promo-seats-number strong { font-size: 64px; }
-  .promo-button { width: 100%; justify-content: center; }
-  .promo-final { padding: 26px; }
+  .promo-hero { padding: 34px 0 30px; }
+  .promo-hero h1 { font-size: 26px; }
+  .promo-hero p { font-size: 15px; }
+  .promo-visual { height: 232px; }
+  .promo-float { width: 50%; }
+  .promo-seats { width: 196px; padding: 12px 14px; }
+  .promo-seats-number strong { font-size: 32px; }
+  .promo-section { padding: 26px 0; }
+  .promo-section h2 { font-size: 19px; }
+  .promo-benefit { padding: 13px; }
+  .promo-actions .promo-button { flex: 1 1 100%; }
+  .promo-final { padding: 18px; }
+  .promo-final .promo-button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-button, .promo-benefit { transition: none; }
 }

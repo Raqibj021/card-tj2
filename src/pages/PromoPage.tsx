@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle2, Gift, QrCode, SmartphoneNfc, Sparkles, Users } from "lucide-react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useEffect, useState, type ComponentType } from "react";
 import { Link } from "react-router";
 import Footer from "../components/layout/Footer";
@@ -89,10 +90,34 @@ const copy: Record<Language, Copy> = {
 
 const benefitIcons: ComponentType<{ size?: number }>[] = [Gift, SmartphoneNfc, QrCode, Sparkles];
 
+const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const fadeUp: Variants = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } };
+const stagger: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } } };
+
+// Counts from 0 up to the target once the promo status has loaded.
+function useCountUp(target: number, ready: boolean) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!ready) return;
+    const start = performance.now();
+    const duration = 1200;
+    let frame = 0;
+    const step = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      setValue(Math.round(target * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [target, ready]);
+  return value;
+}
+
 export default function PromoPage() {
   const { language } = useApp();
   const lang: Language = language === "tj" || language === "en" ? language : "ru";
   const c = copy[lang];
+  const reduce = useReducedMotion();
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
   const [viewer, setViewer] = useState<Viewer>("guest");
 
@@ -119,6 +144,7 @@ export default function PromoPage() {
   const taken = Math.min(limit, limit - remaining);
   const percent = Math.round((taken / limit) * 100);
   const soldOut = promo !== null && remaining <= 0;
+  const shown = useCountUp(remaining, promo !== null);
   const formatter = new Intl.NumberFormat(lang === "tj" ? "tg-TJ" : lang === "en" ? "en" : "ru");
   const primary = soldOut
     ? { to: "/create", label: c.soldOutCta }
@@ -127,88 +153,112 @@ export default function PromoPage() {
       : viewer === "no-card"
         ? { to: "/create", label: c.noCardCta }
         : { to: "/register", label: c.guestCta };
+  const initial = reduce ? false : "hidden";
+  const floating = nfcCardDesigns.slice(0, 3);
 
   return (
     <main className="promo-page">
       <section className="promo-hero">
+        <div className="promo-hero-glow" aria-hidden="true" />
         <div className="site-container promo-hero-layout">
-          <div className="promo-hero-copy">
-            <span className="promo-eyebrow"><Users size={15} />{c.eyebrow}</span>
-            <h1>{c.title}</h1>
-            <p>{c.lead}</p>
-            <div className="promo-actions">
+          <motion.div className="promo-hero-copy" variants={stagger} initial={initial} animate="show">
+            <motion.span className="promo-eyebrow" variants={fadeUp}><Users size={15} />{c.eyebrow}</motion.span>
+            <motion.h1 variants={fadeUp}>{c.title}</motion.h1>
+            <motion.p variants={fadeUp}>{c.lead}</motion.p>
+            <motion.div className="promo-actions" variants={fadeUp}>
               <Link to={primary.to} className="promo-button promo-button-primary">{primary.label}<ArrowRight size={18} /></Link>
               {viewer === "guest" && !soldOut && <Link to="/login" className="promo-button promo-button-ghost">{c.guestLogin}</Link>}
-            </div>
-          </div>
-          <div className="promo-seats" aria-label={`${remaining}/${limit}`}>
-            <div className="promo-seats-number">
-              <strong>{promo ? formatter.format(remaining) : "—"}</strong>
-              <span>/{limit}</span>
-            </div>
-            <p className="promo-seats-label">{soldOut ? c.soldOut : c.seatsLeft}</p>
-            <div className="promo-seats-bar" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={taken}>
-              <i style={{ ["--fill" as string]: `${percent}%` }} />
-            </div>
-            <small>{taken}/{limit} {c.seatsTaken}</small>
+            </motion.div>
+          </motion.div>
+
+          <div className="promo-visual" aria-hidden="true">
+            {floating.map((design, index) => (
+              <div key={design.id} className={`promo-float promo-float-${index}`}>
+                <motion.div
+                  initial={reduce ? false : { opacity: 0, y: 30 }}
+                  animate={reduce ? undefined : { opacity: 1, y: [0, -8, 0] }}
+                  transition={reduce ? undefined : {
+                    opacity: { duration: 0.7, delay: 0.2 + index * 0.15 },
+                    y: { duration: 4 + index * 0.7, repeat: Infinity, ease: "easeInOut", delay: 0.9 + index * 0.15 }
+                  }}
+                >
+                  <img src={design.image} alt="" loading="eager" decoding="async" />
+                </motion.div>
+              </div>
+            ))}
+            <motion.div
+              className="promo-seats"
+              aria-label={`${remaining}/${limit}`}
+              initial={reduce ? false : { opacity: 0, y: 20, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.5, ease }}
+            >
+              <div className="promo-seats-number">
+                <strong>{promo ? formatter.format(shown) : "—"}</strong>
+                <span>/{limit}</span>
+              </div>
+              <p className="promo-seats-label">{soldOut ? c.soldOut : c.seatsLeft}</p>
+              <div className="promo-seats-bar" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={taken}>
+                <motion.i initial={reduce ? false : { width: 0 }} animate={{ width: `${percent}%` }} transition={{ duration: 1.4, delay: 0.8, ease: "easeOut" }} />
+              </div>
+              <small>{taken}/{limit} {c.seatsTaken}</small>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="site-container promo-section">
-        <h2>{c.benefitsTitle}</h2>
+      <motion.section className="site-container promo-section" variants={stagger} initial={initial} whileInView="show" viewport={{ once: true, amount: 0.2 }}>
+        <motion.h2 variants={fadeUp}>{c.benefitsTitle}</motion.h2>
         <div className="promo-benefits">
           {c.benefits.map((item, index) => {
             const Icon = benefitIcons[index];
             return (
-              <article key={item.title} className="promo-benefit">
-                <span className="promo-benefit-icon"><Icon size={22} /></span>
+              <motion.article key={item.title} className="promo-benefit" variants={fadeUp}>
+                <span className="promo-benefit-icon"><Icon size={20} /></span>
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
-              </article>
+              </motion.article>
             );
           })}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="site-container promo-section">
-        <h2>{c.galleryTitle}</h2>
-        <p className="promo-section-text">{c.galleryText}</p>
+      <motion.section className="site-container promo-section" variants={stagger} initial={initial} whileInView="show" viewport={{ once: true, amount: 0.2 }}>
+        <motion.h2 variants={fadeUp}>{c.galleryTitle}</motion.h2>
+        <motion.p className="promo-section-text" variants={fadeUp}>{c.galleryText}</motion.p>
         <div className="promo-gallery">
           {nfcCardDesigns.map((design) => (
-            <figure key={design.id} className="promo-card">
+            <motion.figure key={design.id} className="promo-card" variants={fadeUp}>
               <img src={design.image} alt={design.title[lang]} loading="lazy" decoding="async" />
               <figcaption>{design.title[lang]}</figcaption>
-            </figure>
+            </motion.figure>
           ))}
         </div>
-      </section>
+      </motion.section>
 
-      <section className="site-container promo-section promo-two-col">
+      <motion.section className="site-container promo-section promo-two-col" variants={stagger} initial={initial} whileInView="show" viewport={{ once: true, amount: 0.2 }}>
         <div>
-          <h2>{c.stepsTitle}</h2>
+          <motion.h2 variants={fadeUp}>{c.stepsTitle}</motion.h2>
           <ol className="promo-steps">
             {c.steps.map((step, index) => (
-              <li key={step}><span>{index + 1}</span><p>{step}</p></li>
+              <motion.li key={step} variants={fadeUp}><span>{index + 1}</span><p>{step}</p></motion.li>
             ))}
           </ol>
         </div>
         <div>
-          <h2>{c.conditionsTitle}</h2>
+          <motion.h2 variants={fadeUp}>{c.conditionsTitle}</motion.h2>
           <ul className="promo-conditions">
             {c.conditions.map((item) => (
-              <li key={item}><CheckCircle2 size={18} /><span>{item}</span></li>
+              <motion.li key={item} variants={fadeUp}><CheckCircle2 size={18} /><span>{item}</span></motion.li>
             ))}
           </ul>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="site-container promo-final">
-        <div>
-          <h2>{soldOut ? c.soldOut : `${remaining}/${limit} — ${c.seatsLeft}`}</h2>
-        </div>
+      <motion.section className="site-container promo-final" variants={fadeUp} initial={initial} whileInView="show" viewport={{ once: true, amount: 0.5 }}>
+        <h2>{soldOut ? c.soldOut : `${remaining}/${limit} — ${c.seatsLeft}`}</h2>
         <Link to={primary.to} className="promo-button promo-button-primary">{primary.label}<ArrowRight size={18} /></Link>
-      </section>
+      </motion.section>
 
       <Footer />
     </main>
