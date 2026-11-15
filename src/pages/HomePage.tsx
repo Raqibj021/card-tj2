@@ -24,7 +24,6 @@ import { demoCards } from "../data/demo";
 import HomePhoneStory from "../components/HomePhoneStory";
 import HomePromoCarousel from "../components/HomePromoCarousel";
 import LaunchSeatsCounter from "../components/LaunchSeatsCounter";
-import MobileStories from "../components/MobileStories";
 import type { DigitalCard } from "../types/card";
 
 export default function HomePage() {
@@ -202,8 +201,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <MobileStories />
-        <section className="design-showcase-section home-showcase-desktop" aria-label={t("examplesTitle")}>
+        <section className="design-showcase-section" aria-label={t("examplesTitle")}>
           <div className="site-container">
             <div className="design-showcase-head">
               <div>
