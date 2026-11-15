@@ -1,0 +1,32 @@
+name: Deploy approved card edit migration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/042_keep_approved_card_edits_public.sql"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply approved card edit migration
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          set -euo pipefail
+          test -n "$SUPABASE_ACCESS_TOKEN"
+          test -n "$SUPABASE_PROJECT_REF"
+          jq -n --rawfile query supabase/migrations/042_keep_approved_card_edits_public.sql \
+            '{query: $query}' |
+            curl --fail --silent --show-error --max-time 60 \
+              --header "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+              --header "Content-Type: application/json" \
+              --data-binary @- --output /dev/null \
+              "https://api.supabase.com/v1/projects/$SUPABASE_PROJECT_REF/database/query"
