@@ -44,7 +44,7 @@ export default function LaunchSeatsCounter() {
   return (
     <div className="launch-seats" aria-label={c.label}>
       <span className="launch-seats-label">{c.label}</span>
-      <strong className="launch-seats-count"><span key={shown}>{shown}</span>/{promo.limit} <small>{c.left}</small></strong>
+      <strong className="launch-seats-count"><span>{shown}</span>/{promo.limit} <small>{c.left}</small></strong>
       <div className="launch-seats-bar" role="progressbar" aria-valuemin={0} aria-valuemax={promo.limit} aria-valuenow={taken}>
         <i style={{ ["--fill" as string]: `${percent}%` }} />
       </div>
