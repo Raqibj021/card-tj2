@@ -9188,3 +9188,14 @@ body,
 .launch-seats-more { margin-left: auto; padding: 6px 12px; border-radius: 999px; background: #fff; color: #0a1f4d; font-weight: 800; text-decoration: none; white-space: nowrap; transition: transform 0.2s ease; }
 .launch-seats-more:hover { transform: translateX(2px); }
 @keyframes launch-seats-grow { from { width: 0; } to { width: var(--fill); } }
+
+/* Language switch on the public business card */
+.card-lang-switch { display: inline-flex; align-items: center; gap: 3px; padding: 3px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(12px); }
+.card-lang-switch button { display: inline-flex; align-items: center; gap: 5px; min-height: 38px; padding: 0 10px; border: 0; border-radius: 11px; background: transparent; color: #fff; font-size: 12px; cursor: pointer; transition: background 0.2s ease, color 0.2s ease; }
+.card-lang-switch button:hover { background: rgba(255, 255, 255, 0.12); }
+.card-lang-switch button.is-active { background: #fff; color: #0a1f4d; }
+.card-lang-switch button b { font-weight: 800; letter-spacing: 0.03em; }
+@media (max-width: 480px) {
+  .card-lang-switch button { padding: 0 7px; }
+  .card-lang-switch button b { display: none; }
+}
