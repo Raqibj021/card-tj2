@@ -1,6 +1,6 @@
-import { ArrowRight, CheckCircle2, Gift, QrCode, SmartphoneNfc, Sparkles, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2, Users } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Footer from "../components/layout/Footer";
 import { useApp } from "../context/AppContext";
@@ -88,10 +88,8 @@ const copy: Record<Language, Copy> = {
   }
 };
 
-const benefitIcons: ComponentType<{ size?: number }>[] = [Gift, SmartphoneNfc, QrCode, Sparkles];
-
 const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
-const fadeUp: Variants = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } };
+const fadeUp: Variants = { hidden: { opacity: 0, y: 26 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease } } };
 const stagger: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } } };
 
 // Counts from 0 up to the target once the promo status has loaded.
@@ -154,15 +152,20 @@ export default function PromoPage() {
         ? { to: "/create", label: c.noCardCta }
         : { to: "/register", label: c.guestCta };
   const initial = reduce ? false : "hidden";
-  const floating = nfcCardDesigns.slice(0, 3);
+  const seats = Array.from({ length: limit }, (_, index) => index);
+  const marqueeItems = [c.eyebrow, ...c.benefits.map((item) => item.title)];
+  const marqueeSet = (hidden: boolean) => (
+    <span className="promo-marquee-set" aria-hidden={hidden}>
+      {marqueeItems.map((item) => <span key={item}>{item}</span>)}
+    </span>
+  );
 
   return (
     <main className="promo-page">
       <section className="promo-hero">
-        <div className="promo-hero-glow" aria-hidden="true" />
         <div className="site-container promo-hero-layout">
           <motion.div className="promo-hero-copy" variants={stagger} initial={initial} animate="show">
-            <motion.span className="promo-eyebrow" variants={fadeUp}><Users size={15} />{c.eyebrow}</motion.span>
+            <motion.span className="promo-eyebrow" variants={fadeUp}>{c.eyebrow}</motion.span>
             <motion.h1 variants={fadeUp}>{c.title}</motion.h1>
             <motion.p variants={fadeUp}>{c.lead}</motion.p>
             <motion.div className="promo-actions" variants={fadeUp}>
@@ -171,55 +174,55 @@ export default function PromoPage() {
             </motion.div>
           </motion.div>
 
-          <div className="promo-visual" aria-hidden="true">
-            {floating.map((design, index) => (
-              <div key={design.id} className={`promo-float promo-float-${index}`}>
-                <motion.div
-                  initial={reduce ? false : { opacity: 0, y: 30 }}
-                  animate={reduce ? undefined : { opacity: 1, y: [0, -8, 0] }}
-                  transition={reduce ? undefined : {
-                    opacity: { duration: 0.7, delay: 0.2 + index * 0.15 },
-                    y: { duration: 4 + index * 0.7, repeat: Infinity, ease: "easeInOut", delay: 0.9 + index * 0.15 }
-                  }}
-                >
-                  <img src={design.image} alt="" loading="eager" decoding="async" />
-                </motion.div>
-              </div>
-            ))}
-            <motion.div
-              className="promo-seats"
-              aria-label={`${remaining}/${limit}`}
-              initial={reduce ? false : { opacity: 0, y: 20, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.5, ease }}
-            >
-              <div className="promo-seats-number">
-                <strong>{promo ? formatter.format(shown) : "—"}</strong>
-                <span>/{limit}</span>
-              </div>
-              <p className="promo-seats-label">{soldOut ? c.soldOut : c.seatsLeft}</p>
-              <div className="promo-seats-bar" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={taken}>
-                <motion.i initial={reduce ? false : { width: 0 }} animate={{ width: `${percent}%` }} transition={{ duration: 1.4, delay: 0.8, ease: "easeOut" }} />
-              </div>
-              <small>{taken}/{limit} {c.seatsTaken}</small>
-            </motion.div>
-          </div>
+          <motion.div
+            className="promo-ticket"
+            initial={reduce ? false : { opacity: 0, rotate: -6, y: 40 }}
+            animate={{ opacity: 1, rotate: -2, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.25, ease }}
+          >
+            <div className="promo-ticket-head">
+              <span className="promo-ticket-tag">Vizora · {limit}</span>
+              <strong className="promo-ticket-num">{promo ? formatter.format(shown) : "—"}</strong>
+              <span className="promo-ticket-label">{soldOut ? c.soldOut : c.seatsLeft}</span>
+            </div>
+            <div className="promo-seatmap" role="img" aria-label={`${remaining}/${limit}`}>
+              {seats.map((index) => (
+                <motion.i
+                  key={index}
+                  className={index < taken ? "is-taken" : "is-free"}
+                  initial={reduce ? false : { opacity: 0, scale: 0.3 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5 + index * 0.02, duration: 0.35 }}
+                />
+              ))}
+            </div>
+            <div className="promo-ticket-foot">
+              <span>{taken}/{limit} {c.seatsTaken}</span>
+              <span>{percent}%</span>
+            </div>
+          </motion.div>
         </div>
       </section>
 
+      <div className="promo-marquee" aria-hidden="true">
+        <div className="promo-marquee-track">
+          {marqueeSet(false)}
+          {marqueeSet(true)}
+        </div>
+      </div>
+
       <motion.section className="site-container promo-section" variants={stagger} initial={initial} whileInView="show" viewport={{ once: true, amount: 0.2 }}>
         <motion.h2 variants={fadeUp}>{c.benefitsTitle}</motion.h2>
-        <div className="promo-benefits">
-          {c.benefits.map((item, index) => {
-            const Icon = benefitIcons[index];
-            return (
-              <motion.article key={item.title} className="promo-benefit" variants={fadeUp}>
-                <span className="promo-benefit-icon"><Icon size={20} /></span>
+        <div className="promo-tickets">
+          {c.benefits.map((item, index) => (
+            <motion.article key={item.title} className="promo-ticket-card" variants={fadeUp}>
+              <span className="promo-ticket-card-num">{String(index + 1).padStart(2, "0")}</span>
+              <div>
                 <h3>{item.title}</h3>
                 <p>{item.text}</p>
-              </motion.article>
-            );
-          })}
+              </div>
+            </motion.article>
+          ))}
         </div>
       </motion.section>
 
@@ -258,6 +261,7 @@ export default function PromoPage() {
       <motion.section className="site-container promo-final" variants={fadeUp} initial={initial} whileInView="show" viewport={{ once: true, amount: 0.5 }}>
         <h2>{soldOut ? c.soldOut : `${remaining}/${limit} — ${c.seatsLeft}`}</h2>
         <Link to={primary.to} className="promo-button promo-button-primary">{primary.label}<ArrowRight size={18} /></Link>
+        <div className="promo-rings" aria-hidden="true"><i /><i /><i /></div>
       </motion.section>
 
       <Footer />
