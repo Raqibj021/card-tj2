@@ -37,13 +37,7 @@ import { emptyCard } from "../data/demo";
 import { cardRepository } from "../lib/cardRepository";
 import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import { createSlug, themeColors } from "../lib/cardUtils";
-import type {
-  CardDraft,
-  CardTemplate,
-  CardTheme,
-  DigitalCard,
-  Language
-} from "../types/card";
+import type { CardDraft, CardTemplate, CardTheme, DigitalCard, Language, CardTranslation } from "../types/card";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import "./CreatePageFlow.css";
 
@@ -137,6 +131,7 @@ export default function CreatePage() {
           position: existing.position,
           organization: existing.organization,
           description: existing.description,
+          translations: existing.translations ?? {},
           phone: existing.phone,
           secondPhone: existing.secondPhone,
           whatsapp: existing.whatsapp,
@@ -162,6 +157,20 @@ export default function CreatePage() {
   const [submitError, setSubmitError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
+  const translationCopy = {
+    ru: { title: "Другие языки", hint: "Необязательно. Заполните, если визитка нужна и на других языках. Посетители смогут переключить язык на странице визитки.", name: "ФИО", position: "Должность", organization: "Организация", description: "О себе" },
+    tj: { title: "Забонҳои дигар", hint: "Ихтиёрӣ. Агар варақа ба забонҳои дигар ҳам лозим бошад, пуркунед. Меҳмонҳо метавонанд забонро дар саҳифаи варақа иваз кунанд.", name: "Ному насаб", position: "Вазифа", organization: "Ташкилот", description: "Дар бораи худ" },
+    en: { title: "Other languages", hint: "Optional. Fill in if you want the card in other languages too. Visitors can switch the language on the card page.", name: "Full name", position: "Position", organization: "Organization", description: "About" }
+  }[language];
+  const updateTranslation = (lang: Language, key: keyof CardTranslation, value: string) => {
+    setForm((current) => ({
+      ...current,
+      translations: {
+        ...current.translations,
+        [lang]: { ...current.translations?.[lang], [key]: value }
+      }
+    }));
+  };
   const builderCopy = {
     ru: {
       invalidImage: "Выберите файл изображения", imageFailed: "Не удалось обработать изображение",
@@ -700,6 +709,21 @@ export default function CreatePage() {
               />
               <span className="form-counter">{form.description.length}/240</span>
             </Field>
+            <details className="card-translations" open={Object.keys(form.translations ?? {}).length > 0}>
+              <summary>{translationCopy.title}</summary>
+              <p className="card-translations-hint">{translationCopy.hint}</p>
+              {(["ru", "tj", "en"] as Language[]).filter((lang) => lang !== form.language).map((lang) => (
+                <div key={lang} className="card-translation-block">
+                  <p className="form-label mb-2">{lang === "ru" ? "Русский" : lang === "tj" ? "Тоҷикӣ" : "English"}</p>
+                  <div className="form-grid">
+                    <input className="form-input" placeholder={translationCopy.name} value={form.translations?.[lang]?.fullName ?? ""} onChange={(event) => updateTranslation(lang, "fullName", event.target.value)} />
+                    <input className="form-input" placeholder={translationCopy.position} value={form.translations?.[lang]?.position ?? ""} onChange={(event) => updateTranslation(lang, "position", event.target.value)} />
+                    <input className="form-input" placeholder={translationCopy.organization} value={form.translations?.[lang]?.organization ?? ""} onChange={(event) => updateTranslation(lang, "organization", event.target.value)} />
+                  </div>
+                  <textarea className="form-input mt-3 min-h-20 resize-y" placeholder={translationCopy.description} maxLength={240} value={form.translations?.[lang]?.description ?? ""} onChange={(event) => updateTranslation(lang, "description", event.target.value)} />
+                </div>
+              ))}
+            </details>
           </section>
 
           <section className="form-section" id="card-contacts">

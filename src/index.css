@@ -9199,3 +9199,9 @@ body,
   .card-lang-switch button { padding: 0 7px; }
   .card-lang-switch button b { display: none; }
 }
+
+/* Optional translations in the card builder */
+.card-translations { margin-top: 18px; border: 1px dashed var(--line); border-radius: 16px; padding: 14px 16px; }
+.card-translations > summary { cursor: pointer; font-weight: 800; }
+.card-translations-hint { margin: 10px 0 14px; font-size: 13px; color: var(--muted, #64748b); line-height: 1.5; }
+.card-translation-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
