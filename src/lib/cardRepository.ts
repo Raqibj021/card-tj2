@@ -119,6 +119,25 @@ class LocalStorageCardRepository implements CardRepository {
     if (uniquePaths.length) await supabase.storage.from("card-assets").remove(uniquePaths);
   }
 
+  // Every upload for a card lives in `<ownerId>/<cardId>/`, so removing that
+  // folder clears all photos and logos, including ones no longer referenced.
+  private async removeCardFiles(ownerId: string, cardId: string) {
+    if (!supabase) return;
+    const folder = `${ownerId}/${cardId}`;
+    const { data: entries, error } = await supabase.storage
+      .from("card-assets")
+      .list(folder, { limit: 1000 });
+    if (error) {
+      console.warn("Card files could not be listed:", error.message);
+      return;
+    }
+    const paths = (entries ?? []).filter((entry) => entry.id).map((entry) => `${folder}/${entry.name}`);
+    if (paths.length) {
+      const { error: removeError } = await supabase.storage.from("card-assets").remove(paths);
+      if (removeError) console.warn("Card files were not removed:", removeError.message);
+    }
+  }
+
   private async uploadAsset(
     userId: string,
     cardId: string,
@@ -303,10 +322,11 @@ class LocalStorageCardRepository implements CardRepository {
 
     // A personal account has one server card. Delete by owner rather than by
     // the possibly stale local id, so a pending card cannot return on refresh.
-    const { error } = await supabase
+    const { data: deleted, error } = await supabase
       .from("cards")
       .delete()
-      .eq("owner_id", auth.user.id);
+      .eq("owner_id", auth.user.id)
+      .select("id");
 
     if (error) {
       this.unmarkRemoved(id);
@@ -316,8 +336,13 @@ class LocalStorageCardRepository implements CardRepository {
       };
     }
 
+    // Files are removed only after the card row is gone, so a failed delete
+    // never leaves a live card without its photo or logo.
+    const deletedId = deleted?.[0]?.id as string | undefined;
+    if (deletedId) await this.removeCardFiles(auth.user.id, deletedId);
+
     this.write(this.read().filter((item) => item.id !== id));
-    return { ok: true, message: "Визитка удалена навсегда." };
+    return { ok: true, message: "Визитка и все её файлы удалены навсегда." };
   }
 
   incrementViews(id: string) {
