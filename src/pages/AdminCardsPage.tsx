@@ -80,11 +80,6 @@ export default function AdminCardsPage() {
       `Удалить визитку «${card.fullName || card.slug}» навсегда? Будут удалены QR-ссылка, данные визитки и загруженные изображения. Восстановить их будет невозможно.`
     );
     if (!confirmed) return;
-    const repeated = window.prompt(`Для подтверждения введите адрес визитки: ${card.slug}`);
-    if (repeated?.trim().toLowerCase() !== card.slug.toLowerCase()) {
-      setNotice("Удаление отменено: адрес визитки введён неверно.");
-      return;
-    }
     try {
       await adminCardsRepository.deleteForever(card.id);
       setDetails(null);
