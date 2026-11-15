@@ -393,6 +393,29 @@ export default function CardPage() {
     }
   };
 
+  const renderCardLanguageSwitch = (className: string) => (
+    <div className={className} role="group" aria-label={t("cardLanguage")}>
+      {([
+        ["ru", "🇷🇺", "Русский"],
+        ["tj", "🇹🇯", "Тоҷикӣ"],
+        ["en", "🇬🇧", "English"]
+      ] as [Language, string, string][]).map(([code, flag, name]) => (
+        <button
+          key={code}
+          type="button"
+          className={language === code ? "is-active" : ""}
+          aria-pressed={language === code}
+          aria-label={name}
+          title={name}
+          onClick={() => chooseCardLanguage(code)}
+        >
+          <span aria-hidden="true">{flag}</span>
+          <b>{code.toUpperCase()}</b>
+        </button>
+      ))}
+    </div>
+  );
+
   const chooseCardLanguage = (code: Language) => {
     setLanguage(code);
     try { localStorage.setItem("vizora.cardLanguage", code); } catch { /* keep the card usable */ }
@@ -406,26 +429,7 @@ export default function CardPage() {
           <BrandLogo light />
         </Link>
         <div className="flex items-center gap-2">
-          <div className="card-lang-switch" role="group" aria-label={t("cardLanguage")}>
-            {([
-              ["ru", "🇷🇺", "Русский"],
-              ["tj", "🇹🇯", "Тоҷикӣ"],
-              ["en", "🇬🇧", "English"]
-            ] as [Language, string, string][]).map(([code, flag, name]) => (
-              <button
-                key={code}
-                type="button"
-                className={language === code ? "is-active" : ""}
-                aria-pressed={language === code}
-                aria-label={name}
-                title={name}
-                onClick={() => chooseCardLanguage(code)}
-              >
-                <span aria-hidden="true">{flag}</span>
-                <b>{code.toUpperCase()}</b>
-              </button>
-            ))}
-          </div>
+          {renderCardLanguageSwitch("card-lang-switch")}
           <button
             type="button"
             className="profile-toolbar-button"
@@ -445,6 +449,7 @@ export default function CardPage() {
           </button>
         </div>
       </header>
+      {renderCardLanguageSwitch("card-lang-switch card-lang-mobile")}
 
       <div className="profile-layout">
         <section className="profile-main-card">

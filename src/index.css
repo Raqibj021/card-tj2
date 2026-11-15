@@ -9205,3 +9205,9 @@ body,
 .card-translations > summary { cursor: pointer; font-weight: 800; }
 .card-translations-hint { margin: 10px 0 14px; font-size: 13px; color: var(--muted, #64748b); line-height: 1.5; }
 .card-translation-block { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+
+/* Language switch shown inside the card on phones, where the toolbar is hidden */
+.card-lang-mobile { display: none; }
+@media (max-width: 680px) {
+  .card-lang-mobile { display: inline-flex; position: relative; z-index: 3; margin: 14px auto 0; }
+}
