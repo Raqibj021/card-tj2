@@ -429,7 +429,6 @@ export default function CardPage() {
           <BrandLogo light />
         </Link>
         <div className="flex items-center gap-2">
-          {renderCardLanguageSwitch("card-lang-switch")}
           <button
             type="button"
             className="profile-toolbar-button"
@@ -449,7 +448,6 @@ export default function CardPage() {
           </button>
         </div>
       </header>
-      {renderCardLanguageSwitch("card-lang-switch card-lang-mobile")}
 
       <div className="profile-layout">
         <section className="profile-main-card">
@@ -489,10 +487,19 @@ export default function CardPage() {
                 <strong>{card.organization || "Vizora.tj"}</strong>
               </div>
             </div>
-            <span className={`profile-status ${isLocked ? "is-preview" : ""}`}>
-              {isLocked ? <LockKeyhole size={13} /> : <Check size={13} />}
-              {isLocked ? (needsActivation ? labels.preview : labels.pending) : isSpecialistView ? (card.specialistPlan === "pro" ? professionalLabels.pro : professionalLabels.verified) : labels.verified}
-            </span>
+            <div className="profile-cover-end">
+              {renderCardLanguageSwitch("card-lang-switch card-lang-cover")}
+              {isLocked ? (
+                <span className="profile-status is-preview">
+                  <LockKeyhole size={13} />
+                  {needsActivation ? labels.preview : labels.pending}
+                </span>
+              ) : (
+                <span className="profile-verified-badge" role="img" aria-label={labels.verified} title={labels.verified}>
+                  <Check size={14} strokeWidth={3} />
+                </span>
+              )}
+            </div>
           </div>
           <div className="profile-content">
             <div className="profile-hero">

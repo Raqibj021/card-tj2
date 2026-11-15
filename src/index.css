@@ -9211,3 +9211,11 @@ body,
 @media (max-width: 680px) {
   .card-lang-mobile { display: inline-flex; position: relative; z-index: 3; margin: 14px auto 0; }
 }
+
+/* Card cover: verified badge and language flags on the right of the company band */
+.profile-cover-end { display: flex; align-items: center; gap: 10px; flex: none; }
+.profile-verified-badge { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #0095f6; color: #fff; box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9); }
+.card-lang-cover { padding: 2px; gap: 2px; }
+.card-lang-cover button { min-height: 32px; padding: 0 7px; border-radius: 9px; }
+.card-lang-cover button b { display: none; }
+.card-lang-cover button span { font-size: 16px; line-height: 1; }
