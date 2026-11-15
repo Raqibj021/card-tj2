@@ -157,6 +157,23 @@ export default function CreatePage() {
   const [submitError, setSubmitError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
+  const socialHelpCopy = {
+    ru: { title: "Где найти ник или ссылку?", items: [
+      ["Telegram", "Откройте профиль в Telegram → «Изменить» → «Имя пользователя». Ник начинается с @, например @ivan_ivanov. Можно вставить ссылку t.me/ivan_ivanov."],
+      ["Instagram", "Откройте свой профиль в Instagram. Имя пользователя написано под именем, например ivan_ivanov. Можно вставить ссылку instagram.com/ivan_ivanov."],
+      ["Facebook", "Откройте свою страницу. Скопируйте адрес из строки браузера, например facebook.com/ivan.ivanov. Имя с пробелами не подойдёт."]
+    ], note: "Не вставляйте пароли и личные данные, только ник или публичную ссылку." },
+    tj: { title: "Ник ё пайвандро аз кучо ёбам?", items: [
+      ["Telegram", "Профили худро дар Telegram кушоед → «Таҳрир» → «Номи корбар». Ник бо @ оғоз мешавад, масалан @ivan_ivanov. Пайванди t.me/ivan_ivanov низ мумкин аст."],
+      ["Instagram", "Профили худро дар Instagram кушоед. Номи корбар дар зери ном навишта шудааст, масалан ivan_ivanov. Пайванди instagram.com/ivan_ivanov низ мумкин аст."],
+      ["Facebook", "Саҳифаи худро кушоед. Суроғаро аз сатри браузер нусхабардорӣ кунед, масалан facebook.com/ivan.ivanov. Ному насаб бо фосила мувофиқ нест."]
+    ], note: "Парол ва маълумоти шахсиро нанависед, танҳо ник ё пайванди ошкорро." },
+    en: { title: "Where do I find my username or link?", items: [
+      ["Telegram", "Open your profile in Telegram → Edit → Username. It starts with @, e.g. @ivan_ivanov. You can also paste t.me/ivan_ivanov."],
+      ["Instagram", "Open your Instagram profile. Your username is shown under your name, e.g. ivan_ivanov. You can also paste instagram.com/ivan_ivanov."],
+      ["Facebook", "Open your page and copy the address from the browser bar, e.g. facebook.com/ivan.ivanov. A name with spaces will not work."]
+    ], note: "Never enter passwords or private data, only a username or a public link." }
+  }[language];
   const translationCopy = {
     ru: { title: "Другие языки", hint: "Необязательно. Заполните, если визитка нужна и на других языках. Посетители смогут переключить язык на странице визитки.", name: "ФИО", position: "Должность", organization: "Организация", description: "О себе" },
     tj: { title: "Забонҳои дигар", hint: "Ихтиёрӣ. Агар варақа ба забонҳои дигар ҳам лозим бошад, пуркунед. Меҳмонҳо метавонанд забонро дар саҳифаи варақа иваз кунанд.", name: "Ному насаб", position: "Вазифа", organization: "Ташкилот", description: "Дар бораи худ" },
@@ -824,6 +841,15 @@ export default function CreatePage() {
                 </Field>
               ))}
             </div>
+            <details className="card-translations social-help">
+              <summary>{socialHelpCopy.title}</summary>
+              <ul>
+                {socialHelpCopy.items.map(([name, text]) => (
+                  <li key={name}><strong>{name}:</strong> {text}</li>
+                ))}
+              </ul>
+              <p className="card-translations-hint">{socialHelpCopy.note}</p>
+            </details>
           </section>
 
           <section className="form-section" id="card-design">
