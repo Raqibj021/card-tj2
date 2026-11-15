@@ -8681,3 +8681,6 @@ body,
 /* Social links help in the card builder */
 .social-help ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; line-height: 1.5; color: var(--ink); }
 .social-help li strong { font-weight: 800; }
+
+.auth-hint { margin: 10px 2px 0; color: #5b6b82; font-size: 11px; line-height: 1.5; }
+.dark .auth-hint { color: #9fb0c8; }
