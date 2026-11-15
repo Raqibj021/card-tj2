@@ -9220,3 +9220,8 @@ body,
 .card-lang-cover button b { display: none; }
 .card-lang-cover button span { font-size: 16px; line-height: 1; }
 
+
+/* Home hero: less empty height on desktop, natural height on tablets and phones */
+.hero-section .hero-layout { min-height: 560px; }
+@media (min-width: 1280px) { .hero-section .hero-layout { min-height: 600px; } }
+@media (max-width: 1023px) { .hero-section .hero-layout { min-height: 0; } }
