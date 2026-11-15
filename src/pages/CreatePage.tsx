@@ -177,7 +177,7 @@ export default function CreatePage() {
       profileHint: "Основные данные вашего профиля", companyLogo: "Логотип компании", companyLogoHint: "Отдельный логотип для верхней части визитки", uploadLogo: "Загрузить логотип",
       namePlaceholder: "Фируз Саидов", positionPlaceholder: "Руководитель", companyPlaceholder: "Название компании",
       descriptionPlaceholder: "Расскажите коротко о своей работе и преимуществах...", contactsHint: "Добавьте удобные способы связи",
-      addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Укажите ссылку или имя пользователя",
+      addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Вставьте ссылку или имя без пробелов, например @ivan_ivanov. Пустые поля можно пропустить.",
       designHint: "Подберите оформление под свой образ", saving: "Сохранение...",
       previewHint: "Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран.",
       invalidName: "Введите имя и фамилию буквами, например: Фируз Саидов.",
@@ -185,7 +185,7 @@ export default function CreatePage() {
       invalidOrganization: "Укажите место работы или название организации.",
       invalidPhone: "Введите полный номер: +992 и 9 цифр номера.",
       invalidWebsite: "Введите корректный сайт, например: example.tj.",
-      invalidSocial: "Введите корректное имя пользователя или ссылку.",
+      invalidSocial: "Без пробелов: @ivan_ivanov или полная ссылка, например facebook.com/ivan.ivanov.",
       invalidAddress: "Введите корректный адрес (минимум 5 символов).",
       flow: ["Данные", "Дизайн", "Предпросмотр", "Оплата", "Проверка"],
       saveContinue: "Сохранить и продолжить", resubmit: "Сохранить и отправить повторно"
@@ -195,7 +195,7 @@ export default function CreatePage() {
       profileHint: "Маълумоти асосии профили шумо", companyLogo: "Логотипи ширкат", companyLogoHint: "Логотипи алоҳида барои қисми болоии варақа", uploadLogo: "Бор кардани логотип",
       namePlaceholder: "Фирӯз Саидов", positionPlaceholder: "Роҳбар", companyPlaceholder: "Номи ширкат",
       descriptionPlaceholder: "Дар бораи фаъолият ва афзалиятҳои худ кӯтоҳ нависед...", contactsHint: "Роҳҳои муносиби тамосро илова кунед",
-      addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пайванд ё номи корбарро ворид кунед",
+      addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пайванд ё номи корбарро бе фосила ворид кунед, масалан @ivan_ivanov. Майдонҳои холиро гузаронед.",
       designHint: "Ороишро мувофиқи симои худ интихоб кунед", saving: "Нигоҳдорӣ...",
       previewHint: "Пешнамоиш худкор нав мешавад. Дар телефон варақа дар тамоми экран кушода мешавад.",
       invalidName: "Ном ва насабро бо ҳарфҳо нависед, масалан: Фирӯз Саидов.",
@@ -203,7 +203,7 @@ export default function CreatePage() {
       invalidOrganization: "Ҷойи кор ё номи ташкилотро нависед.",
       invalidPhone: "Рақами пурраро ворид кунед: +992 ва 9 рақами телефон.",
       invalidWebsite: "Суроғаи дурусти сомонаро нависед, масалан: example.tj.",
-      invalidSocial: "Номи корбар ё пайванди дурустро ворид кунед.",
+      invalidSocial: "Без пробелов: @ivan_ivanov или полная ссылка, например facebook.com/ivan.ivanov.",
       invalidAddress: "Суроғаи дурустро ворид кунед (на кам аз 5 аломат).",
       flow: ["Маълумот", "Ороиш", "Пешнамоиш", "Пардохт", "Санҷиш"],
       saveContinue: "Нигоҳ доштан ва идома додан", resubmit: "Нигоҳ доштан ва дубора фиристодан"
@@ -213,7 +213,7 @@ export default function CreatePage() {
       profileHint: "Your main profile information", companyLogo: "Company logo", companyLogoHint: "A separate logo for the top of the card", uploadLogo: "Upload logo",
       namePlaceholder: "Firuz Saidov", positionPlaceholder: "Manager", companyPlaceholder: "Company name",
       descriptionPlaceholder: "Briefly describe your work and advantages...", contactsHint: "Add convenient ways to contact you",
-      addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Enter a link or username",
+      addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Paste a link or a username without spaces, e.g. @ivan_ivanov. Empty fields can be skipped.",
       designHint: "Choose a design that matches your image", saving: "Saving...",
       previewHint: "The preview updates automatically. On a phone, the card opens full screen.",
       invalidName: "Enter first and last name using letters, for example: Firuz Saidov.",
@@ -221,7 +221,7 @@ export default function CreatePage() {
       invalidOrganization: "Enter your workplace or organization name.",
       invalidPhone: "Enter the complete number: +992 followed by 9 digits.",
       invalidWebsite: "Enter a valid website, for example: example.tj.",
-      invalidSocial: "Enter a valid username or link.",
+      invalidSocial: "No spaces: @ivan_ivanov or a full link, e.g. facebook.com/ivan.ivanov.",
       invalidAddress: "Enter a valid address (at least 5 characters).",
       flow: ["Details", "Design", "Preview", "Payment", "Review"],
       saveContinue: "Save and continue", resubmit: "Save and resubmit"
@@ -815,9 +815,11 @@ export default function CreatePage() {
                   <input
                     className="form-input"
                     value={form[network]}
-                    onChange={(event) => update(network, event.target.value)}
-                    placeholder={network === "telegram" ? "@username" : "@profile"}
+                    onChange={(event) => update(network, event.target.value.replace(/\s+/g, ""))}
+                    placeholder={network === "telegram" ? "@ivan_ivanov или t.me/ivan_ivanov" : network === "instagram" ? "@ivan_ivanov или instagram.com/ivan_ivanov" : "facebook.com/ivan.ivanov"}
                     autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                   />
                 </Field>
               ))}
