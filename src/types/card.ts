@@ -29,6 +29,8 @@ export interface DigitalCard {
   website: string;
   address: string;
   language: Language;
+  /** Optional text in other languages, keyed by language. Never required. */
+  translations?: CardTranslations;
   theme: CardTheme;
   template: CardTemplate;
   visibility?: "private" | "public" | "organization" | "public_organization";
@@ -52,6 +54,15 @@ export interface DigitalCard {
   specialistConsultation?: string;
   specialistPortfolio?: string[];
 }
+
+export type CardTranslation = {
+  fullName?: string;
+  position?: string;
+  organization?: string;
+  description?: string;
+};
+
+export type CardTranslations = Partial<Record<Language, CardTranslation>>;
 
 export type CardDraft = Omit<
   DigitalCard,

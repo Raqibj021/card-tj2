@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -40,6 +40,7 @@ import {
   themeColors
 } from "../lib/cardUtils";
 import type { DigitalCard, Language } from "../types/card";
+import { localizeCard } from "../lib/cardTranslations";
 import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
@@ -202,9 +203,10 @@ export default function CardPage() {
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const { user } = useAuth();
   const [toast, setToast] = useState("");
-  const [card, setCard] = useState<DigitalCard | undefined>(() =>
+  const [rawCard, setRawCard] = useState<DigitalCard | undefined>(() =>
     cardRepository.getBySlug(slug)
   );
+  const card = useMemo(() => (rawCard ? localizeCard(rawCard, language) : undefined), [rawCard, language]);
   const [loading, setLoading] = useState(!card);
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
@@ -222,16 +224,16 @@ export default function CardPage() {
     let active = true;
     const timer = window.setTimeout(() => {
       if (!active) return;
-      setCard(undefined);
+      setRawCard(undefined);
       setLoading(false);
     }, 12000);
     setLoading(true);
     void cardRepository.getPublicBySlug(slug)
       .then((result) => {
-        if (active) setCard(result);
+        if (active) setRawCard(result);
       })
       .catch(() => {
-        if (active) setCard(undefined);
+        if (active) setRawCard(undefined);
       })
       .finally(() => {
         if (!active) return;
@@ -320,7 +322,7 @@ export default function CardPage() {
     try {
       const result = await promoRepository.claim(card.id);
       setPromo(result);
-      setCard({ ...card, reviewStatus: "pending", trialExpiresAt: null });
+      setRawCard((current) => (current ? { ...current, reviewStatus: "pending", trialExpiresAt: null } : current));
       showToast(labels.pendingText);
     } catch (error) {
       showToast(error instanceof Error ? error.message : "Не удалось применить акцию.");
@@ -334,7 +336,7 @@ export default function CardPage() {
     try {
       const result = await cardRepository.requestPublication(card.id);
       showToast(result.message);
-      if (result.ok) setCard({ ...card, reviewStatus: "pending", trialExpiresAt: null });
+      if (result.ok) setRawCard((current) => (current ? { ...current, reviewStatus: "pending", trialExpiresAt: null } : current));
     } finally {
       setActivating(false);
     }

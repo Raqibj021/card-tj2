@@ -1,3 +1,4 @@
+import { normalizeTranslations } from "./cardTranslations";
 import { demoCards } from "../data/demo";
 import type { CardDraft, DigitalCard } from "../types/card";
 import { createUuid } from "./id";
@@ -71,6 +72,7 @@ class LocalStorageCardRepository implements CardRepository {
       website: contacts.website ?? "",
       address: String(row.address ?? ""),
       language: (row.language as DigitalCard["language"]) ?? "ru",
+      translations: normalizeTranslations(row.translations),
       theme: (row.theme as DigitalCard["theme"]) ?? "blue",
       template: (row.template as DigitalCard["template"]) ?? "executive",
       visibility: (row.visibility as DigitalCard["visibility"]) ?? "private",
@@ -176,6 +178,7 @@ class LocalStorageCardRepository implements CardRepository {
         },
         address: card.address,
         language: card.language,
+        ...(card.translations !== undefined ? { translations: card.translations } : {}),
         theme: card.theme,
         template: card.template,
         visibility:
