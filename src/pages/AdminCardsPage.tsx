@@ -76,10 +76,6 @@ export default function AdminCardsPage() {
   };
 
   const deleteForever = async (card: AdminCardDetails) => {
-    const confirmed = window.confirm(
-      `Удалить визитку «${card.fullName || card.slug}» навсегда? Будут удалены QR-ссылка, данные визитки и загруженные изображения. Восстановить их будет невозможно.`
-    );
-    if (!confirmed) return;
     try {
       await adminCardsRepository.deleteForever(card.id);
       setDetails(null);
