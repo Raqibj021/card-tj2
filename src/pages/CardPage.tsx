@@ -243,7 +243,13 @@ export default function CardPage() {
 
   useEffect(() => {
     if (!card) return;
-    setLanguage(card.language);
+    // A visitor's own language choice wins; the card's language is only the default.
+    let chosen: Language | null = null;
+    try {
+      const stored = localStorage.getItem("vizora.cardLanguage");
+      if (stored === "ru" || stored === "tj" || stored === "en") chosen = stored;
+    } catch { /* storage can be unavailable */ }
+    setLanguage(chosen ?? card.language);
     if (card.reviewStatus !== "approved") return;
     const viewKey = `vizora.viewed.${card.id}`;
     if (!sessionStorage.getItem(viewKey)) {
@@ -385,6 +391,11 @@ export default function CardPage() {
     }
   };
 
+  const chooseCardLanguage = (code: Language) => {
+    setLanguage(code);
+    try { localStorage.setItem("vizora.cardLanguage", code); } catch { /* keep the card usable */ }
+  };
+
   return (
     <main ref={pageRef} className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
@@ -393,21 +404,26 @@ export default function CardPage() {
           <BrandLogo light />
         </Link>
         <div className="flex items-center gap-2">
-          <label className="sr-only" htmlFor="profile-language">
-            {t("cardLanguage")}
-          </label>
-          <select
-            id="profile-language"
-            className="profile-select"
-            value={language}
-            onChange={(event) =>
-              setLanguage(event.target.value as Language)
-            }
-          >
-            <option value="ru">RU</option>
-            <option value="tj">TJ</option>
-            <option value="en">EN</option>
-          </select>
+          <div className="card-lang-switch" role="group" aria-label={t("cardLanguage")}>
+            {([
+              ["ru", "🇷🇺", "Русский"],
+              ["tj", "🇹🇯", "Тоҷикӣ"],
+              ["en", "🇬🇧", "English"]
+            ] as [Language, string, string][]).map(([code, flag, name]) => (
+              <button
+                key={code}
+                type="button"
+                className={language === code ? "is-active" : ""}
+                aria-pressed={language === code}
+                aria-label={name}
+                title={name}
+                onClick={() => chooseCardLanguage(code)}
+              >
+                <span aria-hidden="true">{flag}</span>
+                <b>{code.toUpperCase()}</b>
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             className="profile-toolbar-button"
