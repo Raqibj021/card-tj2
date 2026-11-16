@@ -34,7 +34,7 @@ export const commerceAdminRepository = {
   async workspace() {
     if (!supabase) return empty;
     const { data, error } = await supabase.rpc("get_admin_unified_commerce_workspace");
-    if (error) throw error;
+    if (error) throw new Error(error.message || "Не удалось загрузить заявки и оплаты.");
     return (data ?? empty) as CommerceWorkspace;
   },
   async receiptUrl(path: string) {

@@ -37,7 +37,7 @@ export const moderationRepository = {
   async workspace(): Promise<ModerationWorkspace> {
     if (!supabase) return empty;
     const { data, error } = await supabase.rpc("get_admin_unified_moderation_workspace");
-    if (error) throw error;
+    if (error) throw new Error(error.message || "Не удалось загрузить проверки.");
     return { ...empty, ...((data ?? {}) as ModerationWorkspace) };
   },
   async reviewCard(id: string, decision: ModerationDecision, note: string) {

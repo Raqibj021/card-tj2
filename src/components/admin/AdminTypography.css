@@ -131,3 +131,20 @@
   .admin-detail-drawer h2{font-size:26px!important}
   .moderation-main p{white-space:normal!important}
 }
+
+/* Admin pages always use the light palette, whatever theme the public site is in. */
+.admin-workspace{--ink:#142031;--muted:#5b6b7f;--panel:#ffffff;--panel-2:#f1f5f9;--line:#d5dee9;color-scheme:light}
+
+/* Order and contract actions: visible buttons instead of hidden dropdowns. */
+.admin-action-group{display:grid;gap:6px;margin-top:12px}
+.admin-action-group>small,.admin-comment-field>small{color:var(--muted);font-size:11px!important;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.admin-action-row{display:flex;flex-wrap:wrap;gap:6px}
+.admin-action{min-height:34px;border:1px solid #cfd8e3;border-radius:9px;background:#fff;padding:0 11px;color:#1f2d40;font-size:12px!important;font-weight:700;cursor:pointer}
+.admin-action:hover:not(:disabled){border-color:#1976ed;color:#1976ed}
+.admin-action.is-current{border-color:#1976ed;background:#1976ed;color:#fff;cursor:default}
+.admin-action.is-danger:not(.is-current){border-color:#f3c4bf;color:#b42318}
+.admin-action.is-danger:hover:not(:disabled){background:#fff1ef}
+.admin-action:disabled:not(.is-current){opacity:.5;cursor:wait}
+.admin-comment-field{display:grid;gap:6px;margin-top:12px}
+.admin-comment-field input{min-height:40px;border:1px solid #cfd8e3;border-radius:10px;background:#fff;padding:0 12px;color:#142031;font-size:14px}
+.admin-notice-error{margin-bottom:14px;border:1px solid #f3c4bf;border-radius:13px;background:#fff1ef;padding:13px;color:#8a1f15;font-size:14px}
