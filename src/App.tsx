@@ -39,6 +39,7 @@ import AdminCardsPage from "./pages/AdminCardsPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 const AboutPage = lazy(() => import("./pages/AboutPage"));
+const PromoPage = lazy(() => import("./pages/PromoPage"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -105,6 +106,14 @@ export default function App() {
           element={
             <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" aria-label="Loading" />}>
               <AboutPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/akciya"
+          element={
+            <Suspense fallback={<div className="min-h-[70vh]" aria-busy="true" aria-label="Loading" />}>
+              <PromoPage />
             </Suspense>
           }
         />

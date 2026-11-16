@@ -37,13 +37,7 @@ import { emptyCard } from "../data/demo";
 import { cardRepository } from "../lib/cardRepository";
 import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import { createSlug, themeColors } from "../lib/cardUtils";
-import type {
-  CardDraft,
-  CardTemplate,
-  CardTheme,
-  DigitalCard,
-  Language
-} from "../types/card";
+import type { CardDraft, CardTemplate, CardTheme, DigitalCard, Language, CardTranslation } from "../types/card";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import "./CreatePageFlow.css";
 
@@ -51,6 +45,9 @@ type FormErrors = Partial<Record<keyof CardDraft, string>>;
 
 const NAME_PATTERN = /^[\p{L}][\p{L}'’ʼ-]{1,}(?:\s+[\p{L}][\p{L}'’ʼ-]{1,})+$/u;
 const PHONE_CHARACTERS = /^[+\d\s()-]+$/;
+const FACEBOOK_USERNAME_EXAMPLE = "@raqibmurodqulov";
+const TELEGRAM_PHONE_EXAMPLE = "+992900000000";
+const TELEGRAM_PHONE_PATTERN = /^\+992[0-9]{9}$/;
 const SOCIAL_PATTERN = /^(?:https?:\/\/)?(?:www\.)?[\w.-]+(?:\/[\w.@+-]*)*\/?$|^@?[a-zA-Z0-9._-]{3,}$/;
 
 const normalizePhoneInput = (value: string) =>
@@ -137,6 +134,7 @@ export default function CreatePage() {
           position: existing.position,
           organization: existing.organization,
           description: existing.description,
+          translations: existing.translations ?? {},
           phone: existing.phone,
           secondPhone: existing.secondPhone,
           whatsapp: existing.whatsapp,
@@ -162,13 +160,46 @@ export default function CreatePage() {
   const [submitError, setSubmitError] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
   const logoInput = useRef<HTMLInputElement>(null);
+  const socialHelpCopy = {
+    ru: { title: "Где найти ник или ссылку?", items: [
+      ["Telegram", `Откройте профиль в Telegram → «Изменить» → «Имя пользователя». Введите ник (@ivan_ivanov или ivan_ivanov), ссылку t.me/ivan_ivanov или номер, например ${TELEGRAM_PHONE_EXAMPLE}.`],
+      ["Instagram", "Откройте свой профиль в Instagram. Имя пользователя написано под именем, например ivan_ivanov. Можно вставить ссылку instagram.com/ivan_ivanov."],
+      ["Facebook", `Откройте свой профиль Facebook. В адресе facebook.com/raqibmurodqulov имя пользователя идёт после facebook.com/. Введите его без пробелов, например ${FACEBOOK_USERNAME_EXAMPLE} или raqibmurodqulov.`]
+    ], note: "Не вставляйте пароли и личные данные, только ник или публичную ссылку." },
+    tj: { title: "Ник ё пайвандро аз кучо ёбам?", items: [
+      ["Telegram", `Профили худро дар Telegram кушоед → «Таҳрир» → «Номи корбар». Номи корбарро (@ivan_ivanov ё ivan_ivanov), пайванди t.me/ivan_ivanov ё рақамро, масалан ${TELEGRAM_PHONE_EXAMPLE}, ворид кунед.`],
+      ["Instagram", "Профили худро дар Instagram кушоед. Номи корбар дар зери ном навишта шудааст, масалан ivan_ivanov. Пайванди instagram.com/ivan_ivanov низ мумкин аст."],
+      ["Facebook", `Профили худро дар Facebook кушоед. Дар суроғаи facebook.com/raqibmurodqulov номи корбар пас аз facebook.com/ меояд. Онро бе фосила нависед, масалан ${FACEBOOK_USERNAME_EXAMPLE} ё raqibmurodqulov.`]
+    ], note: "Парол ва маълумоти шахсиро нанависед, танҳо ник ё пайванди ошкорро." },
+    en: { title: "Where do I find my username or link?", items: [
+      ["Telegram", `Open your Telegram profile → Edit → Username. Enter @ivan_ivanov or ivan_ivanov, a link such as t.me/ivan_ivanov, or a phone number such as ${TELEGRAM_PHONE_EXAMPLE}.`],
+      ["Instagram", "Open your Instagram profile. Your username is shown under your name, e.g. ivan_ivanov. You can also paste instagram.com/ivan_ivanov."],
+      ["Facebook", `Open your Facebook profile. In facebook.com/raqibmurodqulov, the username comes after facebook.com/. Enter it without spaces, for example ${FACEBOOK_USERNAME_EXAMPLE} or raqibmurodqulov.`]
+    ], note: "Never enter passwords or private data, only a username or a public link." }
+  }[language];
+  const translationCopy = {
+    ru: { title: "Другие языки", hint: "Необязательно. Заполните, если визитка нужна и на других языках. Посетители смогут переключить язык на странице визитки.", name: "ФИО", position: "Должность", organization: "Организация", description: "О себе" },
+    tj: { title: "Забонҳои дигар", hint: "Ихтиёрӣ. Агар варақа ба забонҳои дигар ҳам лозим бошад, пуркунед. Меҳмонҳо метавонанд забонро дар саҳифаи варақа иваз кунанд.", name: "Ному насаб", position: "Вазифа", organization: "Ташкилот", description: "Дар бораи худ" },
+    en: { title: "Other languages", hint: "Optional. Fill in if you want the card in other languages too. Visitors can switch the language on the card page.", name: "Full name", position: "Position", organization: "Organization", description: "About" }
+  }[language];
+  const updateTranslation = (lang: Language, key: keyof CardTranslation, value: string) => {
+    setForm((current) => ({
+      ...current,
+      translations: {
+        ...current.translations,
+        [lang]: { ...current.translations?.[lang], [key]: value }
+      }
+    }));
+  };
   const builderCopy = {
     ru: {
       invalidImage: "Выберите файл изображения", imageFailed: "Не удалось обработать изображение",
       profileHint: "Основные данные вашего профиля", companyLogo: "Логотип компании", companyLogoHint: "Отдельный логотип для верхней части визитки", uploadLogo: "Загрузить логотип",
       namePlaceholder: "Фируз Саидов", positionPlaceholder: "Руководитель", companyPlaceholder: "Название компании",
       descriptionPlaceholder: "Расскажите коротко о своей работе и преимуществах...", contactsHint: "Добавьте удобные способы связи",
-      addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Укажите ссылку или имя пользователя",
+      addressPlaceholder: "Душанбе, проспект Рӯдакӣ, 1", socialHint: "Соцсети необязательны. Если хотите их добавить, укажите ссылку или имя пользователя без пробелов.",
+      facebookHint: `Имя пользователя без пробелов, с @ или без него. Например, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      telegramHint: `Ник с @ или без него, ссылка или номер вида ${TELEGRAM_PHONE_EXAMPLE}.`,
       designHint: "Подберите оформление под свой образ", saving: "Сохранение...",
       previewHint: "Предпросмотр обновляется автоматически. На телефоне визитка откроется на весь экран.",
       invalidName: "Введите имя и фамилию буквами, например: Фируз Саидов.",
@@ -176,7 +207,7 @@ export default function CreatePage() {
       invalidOrganization: "Укажите место работы или название организации.",
       invalidPhone: "Введите полный номер: +992 и 9 цифр номера.",
       invalidWebsite: "Введите корректный сайт, например: example.tj.",
-      invalidSocial: "Введите корректное имя пользователя или ссылку.",
+      invalidSocial: "Без пробелов: @ivan_ivanov или полная ссылка, например facebook.com/ivan.ivanov.",
       invalidAddress: "Введите корректный адрес (минимум 5 символов).",
       flow: ["Данные", "Дизайн", "Предпросмотр", "Оплата", "Проверка"],
       saveContinue: "Сохранить и продолжить", resubmit: "Сохранить и отправить повторно"
@@ -186,7 +217,9 @@ export default function CreatePage() {
       profileHint: "Маълумоти асосии профили шумо", companyLogo: "Логотипи ширкат", companyLogoHint: "Логотипи алоҳида барои қисми болоии варақа", uploadLogo: "Бор кардани логотип",
       namePlaceholder: "Фирӯз Саидов", positionPlaceholder: "Роҳбар", companyPlaceholder: "Номи ширкат",
       descriptionPlaceholder: "Дар бораи фаъолият ва афзалиятҳои худ кӯтоҳ нависед...", contactsHint: "Роҳҳои муносиби тамосро илова кунед",
-      addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пайванд ё номи корбарро ворид кунед",
+      addressPlaceholder: "Душанбе, хиёбони Рӯдакӣ, 1", socialHint: "Пур кардани майдонҳои шабакаҳои иҷтимоӣ ихтиёрӣ аст. Барои илова кардан пайванд ё номи корбарро бе фосила ворид кунед.",
+      facebookHint: `Номи корбар бе фосила, бо @ ё бе он. Масалан, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      telegramHint: `Номи корбар бо @ ё бе он, пайванд ё рақам дар шакли ${TELEGRAM_PHONE_EXAMPLE}.`,
       designHint: "Ороишро мувофиқи симои худ интихоб кунед", saving: "Нигоҳдорӣ...",
       previewHint: "Пешнамоиш худкор нав мешавад. Дар телефон варақа дар тамоми экран кушода мешавад.",
       invalidName: "Ном ва насабро бо ҳарфҳо нависед, масалан: Фирӯз Саидов.",
@@ -194,7 +227,7 @@ export default function CreatePage() {
       invalidOrganization: "Ҷойи кор ё номи ташкилотро нависед.",
       invalidPhone: "Рақами пурраро ворид кунед: +992 ва 9 рақами телефон.",
       invalidWebsite: "Суроғаи дурусти сомонаро нависед, масалан: example.tj.",
-      invalidSocial: "Номи корбар ё пайванди дурустро ворид кунед.",
+      invalidSocial: "Номи корбарро бе фосила ё пайванди пурраро ворид кунед.",
       invalidAddress: "Суроғаи дурустро ворид кунед (на кам аз 5 аломат).",
       flow: ["Маълумот", "Ороиш", "Пешнамоиш", "Пардохт", "Санҷиш"],
       saveContinue: "Нигоҳ доштан ва идома додан", resubmit: "Нигоҳ доштан ва дубора фиристодан"
@@ -204,7 +237,9 @@ export default function CreatePage() {
       profileHint: "Your main profile information", companyLogo: "Company logo", companyLogoHint: "A separate logo for the top of the card", uploadLogo: "Upload logo",
       namePlaceholder: "Firuz Saidov", positionPlaceholder: "Manager", companyPlaceholder: "Company name",
       descriptionPlaceholder: "Briefly describe your work and advantages...", contactsHint: "Add convenient ways to contact you",
-      addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Enter a link or username",
+      addressPlaceholder: "Dushanbe, Rudaki Avenue, 1", socialHint: "Social accounts are optional. To add one, enter a link or username without spaces.",
+      facebookHint: `Enter your username without spaces, with or without @. For example, ${FACEBOOK_USERNAME_EXAMPLE}.`,
+      telegramHint: `A username with or without @, a link, or a number like ${TELEGRAM_PHONE_EXAMPLE}.`,
       designHint: "Choose a design that matches your image", saving: "Saving...",
       previewHint: "The preview updates automatically. On a phone, the card opens full screen.",
       invalidName: "Enter first and last name using letters, for example: Firuz Saidov.",
@@ -212,7 +247,7 @@ export default function CreatePage() {
       invalidOrganization: "Enter your workplace or organization name.",
       invalidPhone: "Enter the complete number: +992 followed by 9 digits.",
       invalidWebsite: "Enter a valid website, for example: example.tj.",
-      invalidSocial: "Enter a valid username or link.",
+      invalidSocial: "No spaces: @ivan_ivanov or a full link, e.g. facebook.com/ivan.ivanov.",
       invalidAddress: "Enter a valid address (at least 5 characters).",
       flow: ["Details", "Design", "Preview", "Payment", "Review"],
       saveContinue: "Save and continue", resubmit: "Save and resubmit"
@@ -452,9 +487,10 @@ export default function CreatePage() {
     if (form.website && !isValidWebsite(form.website)) next.website = builderCopy.invalidWebsite;
     if (form.address && form.address.trim().length < 5) next.address = builderCopy.invalidAddress;
     (["telegram", "instagram", "facebook"] as const).forEach((network) => {
-      if (form[network] && !SOCIAL_PATTERN.test(form[network].trim())) {
-        next[network] = builderCopy.invalidSocial;
-      }
+      const value = form[network].trim();
+      if (!value || SOCIAL_PATTERN.test(value)) return;
+      if (network === "telegram" && TELEGRAM_PHONE_PATTERN.test(value)) return;
+      next[network] = network === "telegram" ? builderCopy.telegramHint : builderCopy.invalidSocial;
     });
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -474,7 +510,7 @@ export default function CreatePage() {
     setSaving(true);
     setSubmitError("");
     try {
-      const card = cardRepository.save(form, existing?.id);
+      const card = await cardRepository.save(form, existing?.id);
       if (existing && ["changes_requested", "rejected"].includes(existing.reviewStatus ?? "")) {
         const result = await cardRepository.requestPublication(card.id);
         navigate(result.ok ? "/dashboard" : `/${card.slug}`);
@@ -700,6 +736,21 @@ export default function CreatePage() {
               />
               <span className="form-counter">{form.description.length}/240</span>
             </Field>
+            <details className="card-translations" open={Object.keys(form.translations ?? {}).length > 0}>
+              <summary>{translationCopy.title}</summary>
+              <p className="card-translations-hint">{translationCopy.hint}</p>
+              {(["ru", "tj", "en"] as Language[]).filter((lang) => lang !== form.language).map((lang) => (
+                <div key={lang} className="card-translation-block">
+                  <p className="form-label mb-2">{lang === "ru" ? "Русский" : lang === "tj" ? "Тоҷикӣ" : "English"}</p>
+                  <div className="form-grid">
+                    <input className="form-input" placeholder={translationCopy.name} value={form.translations?.[lang]?.fullName ?? ""} onChange={(event) => updateTranslation(lang, "fullName", event.target.value)} />
+                    <input className="form-input" placeholder={translationCopy.position} value={form.translations?.[lang]?.position ?? ""} onChange={(event) => updateTranslation(lang, "position", event.target.value)} />
+                    <input className="form-input" placeholder={translationCopy.organization} value={form.translations?.[lang]?.organization ?? ""} onChange={(event) => updateTranslation(lang, "organization", event.target.value)} />
+                  </div>
+                  <textarea className="form-input mt-3 min-h-20 resize-y" placeholder={translationCopy.description} maxLength={240} value={form.translations?.[lang]?.description ?? ""} onChange={(event) => updateTranslation(lang, "description", event.target.value)} />
+                </div>
+              ))}
+            </details>
           </section>
 
           <section className="form-section" id="card-contacts">
@@ -787,17 +838,29 @@ export default function CreatePage() {
                   label={t(network)}
                   icon={<AtSign size={16} />}
                   error={errors[network]}
+                  hint={network === "facebook" ? builderCopy.facebookHint : network === "telegram" ? builderCopy.telegramHint : undefined}
                 >
                   <input
                     className="form-input"
                     value={form[network]}
-                    onChange={(event) => update(network, event.target.value)}
-                    placeholder={network === "telegram" ? "@username" : "@profile"}
+                    onChange={(event) => update(network, event.target.value.replace(/\s+/g, ""))}
+                    placeholder={network === "telegram" ? "@ivan_ivanov / " + TELEGRAM_PHONE_EXAMPLE : network === "instagram" ? "@ivan_ivanov или instagram.com/ivan_ivanov" : FACEBOOK_USERNAME_EXAMPLE}
                     autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                   />
                 </Field>
               ))}
             </div>
+            <details className="card-translations social-help">
+              <summary>{socialHelpCopy.title}</summary>
+              <ul>
+                {socialHelpCopy.items.map(([name, text]) => (
+                  <li key={name}><strong>{name}:</strong> {text}</li>
+                ))}
+              </ul>
+              <p className="card-translations-hint">{socialHelpCopy.note}</p>
+            </details>
           </section>
 
           <section className="form-section" id="card-design">

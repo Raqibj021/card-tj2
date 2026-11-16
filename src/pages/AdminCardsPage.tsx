@@ -1,5 +1,5 @@
 import {
-  Activity, CheckCircle2, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Pencil, Phone, RefreshCw,
+  Activity, CheckCircle2, ExternalLink, Eye, EyeOff, FileCheck2, Globe2, Mail, MapPin, Pencil, Phone, RefreshCw,
   RotateCcw, Save, Search, ShieldCheck, Trash2, UserRound, WalletCards, X, XCircle
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -76,15 +76,6 @@ export default function AdminCardsPage() {
   };
 
   const deleteForever = async (card: AdminCardDetails) => {
-    const confirmed = window.confirm(
-      `Удалить визитку «${card.fullName || card.slug}» навсегда? Будут удалены QR-ссылка, данные визитки и загруженные изображения. Восстановить их будет невозможно.`
-    );
-    if (!confirmed) return;
-    const repeated = window.prompt(`Для подтверждения введите адрес визитки: ${card.slug}`);
-    if (repeated?.trim().toLowerCase() !== card.slug.toLowerCase()) {
-      setNotice("Удаление отменено: адрес визитки введён неверно.");
-      return;
-    }
     try {
       await adminCardsRepository.deleteForever(card.id);
       setDetails(null);
@@ -141,6 +132,9 @@ export default function AdminCardsPage() {
           </select>
         </header>
         <div className="admin-card-list">
+          <div className="admin-card-list-head" aria-hidden="true">
+            <span /><span>Визитка</span><span>Адрес</span><span>Контакты</span><span>Просмотры</span><span>Видимость</span><span>Статус</span><span />
+          </div>
           {cards.map((card) => <article key={card.id}>
             <span className="admin-card-photo">{card.photo ? <img src={card.photo} alt="" /> : <UserRound size={20} />}</span>
             <div className="admin-card-identity"><strong>{card.fullName || "Без имени"}</strong><small>{card.position || card.organization || card.ownerEmail}</small></div>
@@ -191,10 +185,18 @@ function CardDrawer({ card, editing, onEdit, onCancelEdit, onSave, onClose, onDe
   if (editing) return <CardEditForm card={card} onCancel={onCancelEdit} onSave={onSave} />;
   const contacts = Object.entries(card.contacts ?? {}).filter(([key, value]) => key !== "companyLogo" && String(value).trim());
   return <aside className="admin-card-drawer">
-    <button className="admin-drawer-close" onClick={onClose}><X size={18} /></button>
+    <button className="admin-drawer-close" onClick={onClose} aria-label="Закрыть"><X size={18} /></button>
     <div className="admin-card-drawer-head">
       {card.photo ? <img src={card.photo} alt="" /> : <span><UserRound size={25} /></span>}
-      <div><small>ПОЛНЫЕ ДАННЫЕ ВИЗИТКИ</small><h2>{card.fullName}</h2><p>{card.position}{card.organization ? ` · ${card.organization}` : ""}</p></div>
+      <div><small>ПОЛНЫЕ ДАННЫЕ ВИЗИТКИ</small><h2>{card.fullName || "Без имени"}</h2><p>{card.position}{card.organization ? ` · ${card.organization}` : ""}</p></div>
+    </div>
+    <div className="admin-drawer-actions">
+      <a className="admin-open-card" href={`/${card.slug}`} target="_blank" rel="noopener noreferrer">
+        <ExternalLink size={17} /> Открыть визитку
+      </a>
+      <button type="button" className="admin-card-edit-button" onClick={onEdit}>
+        <Pencil size={17} /> Редактировать
+      </button>
     </div>
     {!["public","public_organization"].includes(card.visibility) && <div className="admin-private-warning"><ShieldCheck size={18} /><span><strong>Закрытая визитка</strong><small>Этот просмотр записан в журнал доступа.</small></span></div>}
     <div className="admin-drawer-grid">
@@ -220,26 +222,27 @@ function CardDrawer({ card, editing, onEdit, onCancelEdit, onSave, onClose, onDe
       <span><small>Язык</small><strong>{card.language.toUpperCase()}</strong></span>
       <span><small>Просмотры</small><strong>{card.views}</strong></span>
     </div>
-    <div className="admin-card-drawer-foot"><FileCheck2 size={17} /> Данные доступны только главному администратору</div>
-    <button type="button" className="admin-card-edit-button" onClick={onEdit}>
-      <Pencil size={17} /> Редактировать визитку
-    </button>
     {card.reviewStatus !== "approved" && (
-      <div className="admin-card-review-actions">
-        <button type="button" className="button button-primary" onClick={() => onReview("approved")}>
+      <section className="admin-card-review-actions">
+        <h3>Решение по визитке</h3>
+        <button type="button" className="admin-review-button is-approve" onClick={() => onReview("approved")}>
           <CheckCircle2 size={17} /> Одобрить и активировать QR
         </button>
-        <button type="button" className="button button-secondary" onClick={() => onReview("changes_requested")}>
+        <button type="button" className="admin-review-button is-changes" onClick={() => onReview("changes_requested")}>
           <RotateCcw size={17} /> Вернуть на исправление
         </button>
-        <button type="button" className="button button-secondary text-red-600" onClick={() => onReview("rejected")}>
+        <button type="button" className="admin-review-button is-reject" onClick={() => onReview("rejected")}>
           <XCircle size={17} /> Отклонить
         </button>
-      </div>
+      </section>
     )}
-    <button type="button" className="admin-card-delete-forever" onClick={onDelete}>
-      <Trash2 size={17} /> Удалить визитку навсегда
-    </button>
+    <div className="admin-card-drawer-foot"><FileCheck2 size={17} /> Данные доступны только главному администратору</div>
+    <section className="admin-card-danger">
+      <h3>Опасная зона</h3>
+      <button type="button" className="admin-card-delete-forever" onClick={onDelete}>
+        <Trash2 size={17} /> Удалить визитку навсегда
+      </button>
+    </section>
   </aside>;
 }
 

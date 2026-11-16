@@ -90,3 +90,124 @@
     transform: scale(.38);
   }
 }
+
+/* Show the whole 9:16 story inside the phone screen without cropping */
+.phone-story-screen { background: #06122b; }
+.phone-story-video { object-fit: contain !important; background: #06122b; }
+
+/* Size the phone in grid flow so its real height sets the hero's height. */
+.home-page .hero-showcase.phone-story {
+  display: grid;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+.home-page .phone-story::before {
+  width: min(92%, 410px);
+  transform: none;
+}
+
+.home-page .phone-story .hero-orbit {
+  top: auto;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.home-page .phone-story .hero-orbit-one { width: min(100%, 450px); }
+.home-page .phone-story .hero-orbit-two { width: min(81%, 365px); }
+
+.home-page .hero-showcase.phone-story .phone-shell-3d {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: clamp(172px, 18vw, 243px);
+  margin: 0;
+  border-width: 5px;
+  border-radius: 31px;
+  transform: perspective(1000px) rotateY(-6deg) rotateZ(1deg);
+}
+
+.home-page .phone-story .phone-shell-3d::before {
+  inset: 3px -7px -4px 5px;
+  border-radius: inherit;
+  transform: translateZ(-9px);
+}
+
+.home-page .phone-story .phone-story-screen {
+  min-height: 0;
+  aspect-ratio: 1 / 2.04;
+  border-radius: calc(31px - 5px);
+}
+
+.home-page .phone-story .phone-speaker {
+  top: 7px;
+  width: 29%;
+  height: 3.5%;
+}
+
+.home-page .phone-story .phone-speaker::after {
+  top: 34%;
+  right: 12%;
+  width: 5px;
+  height: 5px;
+}
+
+.home-page .phone-story .iphone-action-button { top: 16%; height: 5%; left: -8px; }
+.home-page .phone-story .iphone-volume-up { top: 24%; height: 8%; left: -8px; }
+.home-page .phone-story .iphone-volume-down { top: 34%; height: 8%; left: -8px; }
+.home-page .phone-story .iphone-power-button { top: 27%; height: 12%; right: -8px; }
+.home-page .phone-story .iphone-camera-button { top: 64%; height: 7%; right: -8px; }
+
+.home-page .phone-story .floating-chip {
+  padding: 8px 10px;
+  font-size: 11px;
+}
+
+.home-page .phone-story .floating-chip-top { top: 18%; right: 3%; }
+.home-page .phone-story .floating-chip-bottom { bottom: 14%; left: 1%; }
+
+@media (max-width: 900px) {
+  .home-page .phone-story .phone-story-particle,
+  .home-page .phone-story .floating-chip {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-page .hero-showcase.phone-story .phone-shell-3d {
+    width: calc(100% - 5px);
+    border-width: 3px;
+    border-radius: clamp(16px, 4vw, 25px);
+  }
+
+  .home-page .phone-story .phone-shell-3d::before {
+    inset: 2px -4px -3px 4px;
+    transform: translateZ(-4px);
+  }
+
+  .home-page .phone-story .phone-story-screen {
+    border-radius: clamp(13px, calc(4vw - 3px), 22px);
+  }
+
+  .home-page .phone-story .phone-speaker {
+    top: 4px;
+  }
+
+  .home-page .phone-story .phone-speaker::after {
+    width: 3px;
+    height: 3px;
+  }
+
+  .home-page .phone-story .iphone-side-button {
+    width: 2px;
+    left: -5px;
+  }
+
+  .home-page .phone-story .iphone-power-button,
+  .home-page .phone-story .iphone-camera-button {
+    right: -5px;
+    left: auto;
+  }
+}

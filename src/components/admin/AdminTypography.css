@@ -5,29 +5,29 @@
 .admin-workspace-account strong{font-size:12px!important}
 .admin-workspace-account small{font-size:10px!important}
 .admin-workspace-header small{font-size:11px!important}
-.admin-workspace-header h1{font-size:42px!important;line-height:1.08}
-.admin-workspace-header p{font-size:16px!important;line-height:1.55}
+.admin-workspace-header h1{font-size:28px!important;line-height:1.08}
+.admin-workspace-header p{font-size:13px!important;line-height:1.55}
 .admin-workspace-actions>a,.admin-toolbar-button{font-size:13px!important}
 .admin-workspace-notice{font-size:14px!important}
 .admin-command-hero>div:first-child>span{font-size:11px!important}
-.admin-command-hero h2{font-size:42px!important;line-height:1.08}
-.admin-command-hero p{font-size:17px!important;line-height:1.55}
+.admin-command-hero h2{font-size:26px!important;line-height:1.08}
+.admin-command-hero p{font-size:13px!important;line-height:1.55}
 .admin-command-promo small,.admin-command-promo span{font-size:13px!important}
-.admin-command-promo strong{font-size:38px!important}
+.admin-command-promo strong{font-size:24px!important}
 .admin-command-stats small{font-size:12px!important}
-.admin-command-stats strong{font-size:32px!important}
+.admin-command-stats strong{font-size:22px!important}
 .admin-command-stats p{font-size:12px!important}
 .admin-command-panel>header small{font-size:11px!important}
-.admin-command-panel>header h2{font-size:25px!important}
-.admin-command-panel>header>strong{font-size:18px!important}
-.admin-command-actions strong{font-size:15px!important}
+.admin-command-panel>header h2{font-size:17px!important}
+.admin-command-panel>header>strong{font-size:13px!important}
+.admin-command-actions strong{font-size:13px!important}
 .admin-command-actions small{font-size:12px!important}
 .admin-command-actions b{font-size:16px!important}
 .admin-auto-row strong{font-size:14px!important}
 .admin-auto-row small,.admin-auto-row i{font-size:12px!important}
 .admin-launch>p{font-size:14px!important}
 .admin-launch-counts span,.admin-launch label,.admin-launch-actions button{font-size:13px!important}
-.admin-panel-heading h2{font-size:25px!important}
+.admin-panel-heading h2{font-size:18px!important}
 .admin-panel-heading p{font-size:14px!important}
 .admin-table th{font-size:12px!important}
 .admin-table td{font-size:13px!important}
@@ -36,7 +36,7 @@
 .payment-reference-note{font-size:14px!important}
 .payment-code-policy strong{font-size:14px!important}
 .payment-code-policy span{font-size:12px!important}
-.admin-account-stats article strong{font-size:30px!important}
+.admin-account-stats article strong{font-size:22px!important}
 .admin-account-stats article small{font-size:12px!important}
 .admin-account-tabs button{font-size:14px!important}
 .admin-accounts-console input{font-size:14px!important}
@@ -46,12 +46,12 @@
 .admin-account-list>button>span>b{font-size:14px!important}
 .admin-risk,.admin-account-status{font-size:11px!important}
 .admin-detail-drawer>small,.admin-drawer-grid small,.admin-drawer-reason small{font-size:11px!important}
-.admin-detail-drawer h2{font-size:29px!important}
+.admin-detail-drawer h2{font-size:22px!important}
 .admin-detail-drawer>p,.admin-drawer-grid strong,.admin-drawer-warning strong,.admin-drawer-reason p{font-size:14px!important}
 .admin-drawer-warning span,.admin-structure-list b,.admin-member-list small,.admin-member-list>div>span:last-child{font-size:12px!important}
 .admin-detail-drawer>button.block,.admin-detail-drawer>button.restore,.admin-structure-list span,.admin-member-list strong{font-size:14px!important}
 .admin-detail-drawer h3{font-size:19px!important}
-.moderation-stats strong{font-size:28px!important}
+.moderation-stats strong{font-size:22px!important}
 .moderation-stats small{font-size:12px!important}
 .moderation-tabs button{font-size:13px!important}
 .moderation-tabs b{font-size:11px!important}
@@ -64,19 +64,19 @@
 .moderation-history strong{font-size:15px!important}
 .moderation-history p{font-size:13px!important}
 .moderation-history small{font-size:11px!important}
-.commerce-kpis strong{font-size:27px!important}
+.commerce-kpis strong{font-size:22px!important}
 .commerce-kpis small,.commerce-kpis span{font-size:12px!important}
 .commerce-tabs button{font-size:13px!important}
-.commerce-section h2{font-size:22px!important}
+.commerce-section h2{font-size:18px!important}
 .commerce-section header p{font-size:13px!important}
 .commerce-payment-main h3{font-size:15px!important}
 .commerce-payment-list>article>div>strong{font-size:14px!important}
 .commerce-order-list header strong{font-size:16px!important}
 .commerce-order-list header b{font-size:18px!important}
-.support-kpis strong{font-size:29px!important}
+.support-kpis strong{font-size:22px!important}
 .support-kpis small,.support-kpis span{font-size:12px!important}
 .support-tabs button{font-size:13px!important}
-.support-section h2{font-size:22px!important}
+.support-section h2{font-size:18px!important}
 .support-section header p{font-size:13px!important}
 .support-ticket-person strong,.support-ticket-message strong{font-size:14px!important}
 .support-ticket-person small,.support-ticket-message p,.support-ticket-meta span{font-size:12px!important}
@@ -87,12 +87,12 @@
 .support-campaign-note{font-size:13px!important}
 .support-history strong{font-size:14px!important}
 .support-history p{font-size:12px!important}
-.admin-card-kpis strong{font-size:28px!important}
+.admin-card-kpis strong{font-size:22px!important}
 .admin-card-kpis small{font-size:12px!important}
 .admin-card-identity strong{font-size:15px!important}
 .admin-card-identity small,.admin-card-list article>div>b{font-size:12px!important}
 .admin-card-list article>button{font-size:11px!important}
-.admin-card-drawer-head h2{font-size:27px!important}
+.admin-card-drawer-head h2{font-size:20px!important}
 .admin-card-drawer-head p,.admin-card-description{font-size:13px!important}
 .admin-full-contacts strong{font-size:12px!important}
 .admin-mobile-bar{display:none}

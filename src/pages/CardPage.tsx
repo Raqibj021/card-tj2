@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -40,6 +40,7 @@ import {
   themeColors
 } from "../lib/cardUtils";
 import type { DigitalCard, Language } from "../types/card";
+import { localizeCard } from "../lib/cardTranslations";
 import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
@@ -202,9 +203,10 @@ export default function CardPage() {
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const { user } = useAuth();
   const [toast, setToast] = useState("");
-  const [card, setCard] = useState<DigitalCard | undefined>(() =>
+  const [rawCard, setRawCard] = useState<DigitalCard | undefined>(() =>
     cardRepository.getBySlug(slug)
   );
+  const card = useMemo(() => (rawCard ? localizeCard(rawCard, language) : undefined), [rawCard, language]);
   const [loading, setLoading] = useState(!card);
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
@@ -222,16 +224,16 @@ export default function CardPage() {
     let active = true;
     const timer = window.setTimeout(() => {
       if (!active) return;
-      setCard(undefined);
+      setRawCard(undefined);
       setLoading(false);
     }, 12000);
     setLoading(true);
     void cardRepository.getPublicBySlug(slug)
       .then((result) => {
-        if (active) setCard(result);
+        if (active) setRawCard(result);
       })
       .catch(() => {
-        if (active) setCard(undefined);
+        if (active) setRawCard(undefined);
       })
       .finally(() => {
         if (!active) return;
@@ -243,7 +245,13 @@ export default function CardPage() {
 
   useEffect(() => {
     if (!card) return;
-    setLanguage(card.language);
+    // A visitor's own language choice wins; the card's language is only the default.
+    let chosen: Language | null = null;
+    try {
+      const stored = localStorage.getItem("vizora.cardLanguage");
+      if (stored === "ru" || stored === "tj" || stored === "en") chosen = stored;
+    } catch { /* storage can be unavailable */ }
+    setLanguage(chosen ?? card.language);
     if (card.reviewStatus !== "approved") return;
     const viewKey = `vizora.viewed.${card.id}`;
     if (!sessionStorage.getItem(viewKey)) {
@@ -314,7 +322,7 @@ export default function CardPage() {
     try {
       const result = await promoRepository.claim(card.id);
       setPromo(result);
-      setCard({ ...card, reviewStatus: "pending", trialExpiresAt: null });
+      setRawCard((current) => (current ? { ...current, reviewStatus: "pending", trialExpiresAt: null } : current));
       showToast(labels.pendingText);
     } catch (error) {
       showToast(error instanceof Error ? error.message : "Не удалось применить акцию.");
@@ -328,7 +336,7 @@ export default function CardPage() {
     try {
       const result = await cardRepository.requestPublication(card.id);
       showToast(result.message);
-      if (result.ok) setCard({ ...card, reviewStatus: "pending", trialExpiresAt: null });
+      if (result.ok) setRawCard((current) => (current ? { ...current, reviewStatus: "pending", trialExpiresAt: null } : current));
     } finally {
       setActivating(false);
     }
@@ -385,6 +393,34 @@ export default function CardPage() {
     }
   };
 
+  const renderCardLanguageSwitch = (className: string) => (
+    <div className={className} role="group" aria-label={t("cardLanguage")}>
+      {([
+        ["ru", "🇷🇺", "Русский"],
+        ["tj", "🇹🇯", "Тоҷикӣ"],
+        ["en", "🇬🇧", "English"]
+      ] as [Language, string, string][]).map(([code, flag, name]) => (
+        <button
+          key={code}
+          type="button"
+          className={language === code ? "is-active" : ""}
+          aria-pressed={language === code}
+          aria-label={name}
+          title={name}
+          onClick={() => chooseCardLanguage(code)}
+        >
+          <span aria-hidden="true">{flag}</span>
+          <b>{code.toUpperCase()}</b>
+        </button>
+      ))}
+    </div>
+  );
+
+  const chooseCardLanguage = (code: Language) => {
+    setLanguage(code);
+    try { localStorage.setItem("vizora.cardLanguage", code); } catch { /* keep the card usable */ }
+  };
+
   return (
     <main ref={pageRef} className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
@@ -393,21 +429,6 @@ export default function CardPage() {
           <BrandLogo light />
         </Link>
         <div className="flex items-center gap-2">
-          <label className="sr-only" htmlFor="profile-language">
-            {t("cardLanguage")}
-          </label>
-          <select
-            id="profile-language"
-            className="profile-select"
-            value={language}
-            onChange={(event) =>
-              setLanguage(event.target.value as Language)
-            }
-          >
-            <option value="ru">RU</option>
-            <option value="tj">TJ</option>
-            <option value="en">EN</option>
-          </select>
           <button
             type="button"
             className="profile-toolbar-button"
@@ -466,10 +487,19 @@ export default function CardPage() {
                 <strong>{card.organization || "Vizora.tj"}</strong>
               </div>
             </div>
-            <span className={`profile-status ${isLocked ? "is-preview" : ""}`}>
-              {isLocked ? <LockKeyhole size={13} /> : <Check size={13} />}
-              {isLocked ? (needsActivation ? labels.preview : labels.pending) : isSpecialistView ? (card.specialistPlan === "pro" ? professionalLabels.pro : professionalLabels.verified) : labels.verified}
-            </span>
+            <div className="profile-cover-end">
+              {renderCardLanguageSwitch("card-lang-switch card-lang-cover")}
+              {isLocked ? (
+                <span className="profile-status is-preview">
+                  <LockKeyhole size={13} />
+                  {needsActivation ? labels.preview : labels.pending}
+                </span>
+              ) : (
+                <span className="profile-verified-badge" role="img" aria-label={labels.verified} title={labels.verified}>
+                  <Check size={14} strokeWidth={3} />
+                </span>
+              )}
+            </div>
           </div>
           <div className="profile-content">
             <div className="profile-hero">

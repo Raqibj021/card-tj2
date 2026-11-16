@@ -1,0 +1,103 @@
+/* Ticket / poster style: ink, cream and electric lime, bold type, hard shadows */
+.promo-page { --ink: #0a0a0f; --paper: #f3efe6; --lime: #c6ff3d; background: var(--paper); color: var(--ink); overflow-x: hidden; }
+
+/* Hero */
+.promo-hero { position: relative; overflow: hidden; background: var(--ink); color: var(--paper); padding: 56px 0 56px; }
+.promo-hero::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(198, 255, 61, 0.14) 1px, transparent 1px); background-size: 22px 22px; pointer-events: none; }
+.promo-hero-layout { position: relative; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 40px; align-items: center; }
+.promo-eyebrow { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--lime); color: var(--ink); font-size: 12px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.promo-hero h1 { margin: 16px 0 14px; font-size: clamp(34px, 5vw, 62px); line-height: 0.98; letter-spacing: -0.035em; font-weight: 800; color: var(--paper); }
+.promo-hero p { margin: 0; max-width: 48ch; font-size: 16px; line-height: 1.6; color: rgba(243, 239, 230, 0.78); }
+.promo-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+
+.promo-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 12px; font-weight: 800; font-size: 15px; text-decoration: none; white-space: nowrap; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.promo-button-primary { background: var(--lime); color: var(--ink); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--paper); }
+.promo-button-primary:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--paper); }
+.promo-button-ghost { color: var(--paper); border: 2px solid rgba(243, 239, 230, 0.4); }
+.promo-button-ghost:hover { background: rgba(243, 239, 230, 0.08); }
+
+/* Ticket with notches, perforation and a seat map */
+.promo-ticket { position: relative; justify-self: center; width: 100%; max-width: 420px; padding: 22px 22px 18px; border-radius: 22px; background: var(--paper); color: var(--ink); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45); }
+.promo-ticket::before, .promo-ticket::after { content: ""; position: absolute; top: 58%; width: 24px; height: 24px; border-radius: 50%; background: var(--ink); }
+.promo-ticket::before { left: -12px; }
+.promo-ticket::after { right: -12px; }
+.promo-ticket-tag { font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #5b5b66; }
+.promo-ticket-num { display: block; margin-top: 8px; font-size: 84px; line-height: 0.9; font-weight: 800; letter-spacing: -0.05em; font-variant-numeric: tabular-nums; }
+.promo-ticket-label { font-size: 14px; font-weight: 700; }
+.promo-seatmap { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin: 18px 0 14px; }
+.promo-seatmap i { display: block; aspect-ratio: 1; border-radius: 5px; }
+.promo-seatmap .is-taken { background: var(--ink); }
+.promo-seatmap .is-free { background: var(--lime); box-shadow: 0 0 10px rgba(198, 255, 61, 0.7); }
+.promo-ticket-foot { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 2px dashed rgba(10, 10, 15, 0.35); font-size: 12px; font-weight: 800; color: #5b5b66; }
+
+/* Scrolling band */
+.promo-marquee { overflow: hidden; background: var(--lime); color: var(--ink); border-block: 2px solid var(--ink); }
+.promo-marquee-track { display: flex; width: max-content; padding: 12px 0; animation: promo-marquee 30s linear infinite; }
+.promo-marquee-set { display: flex; flex: none; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+.promo-marquee-set span { white-space: nowrap; }
+.promo-marquee-set span::after { content: "✦"; margin: 0 28px; }
+@keyframes promo-marquee { to { transform: translateX(-50%); } }
+
+/* Sections */
+.promo-section { padding: 46px 0; }
+.promo-section h2 { margin: 0 0 16px; font-size: clamp(24px, 3vw, 34px); line-height: 1.05; font-weight: 800; letter-spacing: -0.03em; }
+.promo-section-text { margin: -6px 0 14px; font-size: 14px; color: #4a4a55; }
+
+/* Benefits as tickets with hard shadows */
+.promo-tickets { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.promo-ticket-card { display: flex; gap: 14px; align-items: center; padding: 18px; background: #fff; border: 2px solid var(--ink); border-radius: 16px; box-shadow: 6px 6px 0 var(--ink); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.promo-ticket-card:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--ink); }
+.promo-ticket-card-num { display: grid; place-items: center; flex: 0 0 52px; height: 52px; border: 2px solid var(--ink); border-radius: 12px; background: var(--lime); font-size: 18px; font-weight: 800; }
+.promo-ticket-card h3 { margin: 0 0 4px; font-size: 16px; font-weight: 800; }
+.promo-ticket-card p { margin: 0; font-size: 14px; line-height: 1.5; color: #4a4a55; }
+
+/* Designs: one row, tilted cards */
+.promo-gallery { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 10px 6px 18px; scrollbar-width: none; }
+.promo-card { flex: 0 0 150px; margin: 0; scroll-snap-align: start; transform: rotate(-2deg); transition: transform 0.3s ease; }
+.promo-card:nth-child(even) { transform: rotate(2deg); }
+.promo-card:hover { transform: rotate(0deg) scale(1.04); }
+.promo-card img { display: block; width: 100%; border: 2px solid var(--ink); border-radius: 14px; box-shadow: 5px 5px 0 var(--ink); }
+.promo-card figcaption { margin-top: 8px; font-size: 12px; font-weight: 800; text-align: center; }
+
+/* Steps timeline and conditions */
+.promo-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.promo-steps { position: relative; list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.promo-steps::before { content: ""; position: absolute; left: 12px; top: 13px; bottom: 13px; width: 2px; background: var(--ink); }
+.promo-steps li { position: relative; display: flex; gap: 14px; align-items: flex-start; }
+.promo-steps li span { position: relative; z-index: 1; display: grid; place-items: center; flex: 0 0 26px; height: 26px; border: 2px solid var(--ink); border-radius: 50%; background: var(--lime); font-size: 13px; font-weight: 800; }
+.promo-steps p { margin: 2px 0 0; font-size: 15px; line-height: 1.5; }
+.promo-conditions { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.promo-conditions li { display: flex; gap: 10px; font-size: 14px; line-height: 1.5; color: #33333d; }
+.promo-conditions svg { flex: 0 0 18px; margin-top: 2px; color: var(--ink); }
+
+/* Closing block with NFC rings */
+.promo-final { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin: 12px auto 46px; padding: 30px; border-radius: 24px; background: var(--ink); color: var(--paper); }
+.promo-final h2 { position: relative; z-index: 1; margin: 0; font-size: clamp(20px, 2.6vw, 28px); color: var(--paper); }
+.promo-final .promo-button { position: relative; z-index: 1; }
+.promo-rings { position: absolute; right: 9%; top: 50%; width: 0; height: 0; pointer-events: none; }
+.promo-rings i { position: absolute; left: 0; top: 0; width: 180px; height: 180px; margin: -90px 0 0 -90px; border: 2px solid rgba(198, 255, 61, 0.55); border-radius: 50%; opacity: 0; animation: promo-ring 3s ease-out infinite; }
+.promo-rings i:nth-child(2) { animation-delay: 1s; }
+.promo-rings i:nth-child(3) { animation-delay: 2s; }
+@keyframes promo-ring { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
+
+/* Tablet */
+@media (max-width: 1023px) {
+  .promo-hero-layout { grid-template-columns: 1fr; }
+  .promo-tickets, .promo-two-col { grid-template-columns: 1fr; }
+}
+
+/* Phone */
+@media (max-width: 640px) {
+  .promo-hero { padding: 36px 0 40px; }
+  .promo-ticket-num { font-size: 68px; }
+  .promo-section { padding: 30px 0; }
+  .promo-card { flex-basis: 132px; }
+  .promo-actions .promo-button { flex: 1 1 100%; }
+  .promo-final { padding: 22px; }
+  .promo-final .promo-button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-marquee-track, .promo-rings i { animation: none; }
+  .promo-ticket-card, .promo-card, .promo-button { transition: none; }
+}

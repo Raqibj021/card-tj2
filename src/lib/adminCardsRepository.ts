@@ -154,10 +154,15 @@ export const adminCardsRepository = {
   },
   async deleteForever(cardId: string): Promise<void> {
     if (!supabase) throw new Error("Supabase не подключён.");
-    const { error } = await supabase.rpc("admin_delete_card_permanently", {
+    const { data, error } = await supabase.rpc("admin_delete_card_permanently", {
       target_card_id: cardId
     });
     if (error) throw error;
+    const paths = Array.isArray(data) ? data.map(String).filter(Boolean) : [];
+    if (paths.length > 0) {
+      const { error: storageError } = await supabase.storage.from("card-assets").remove(paths);
+      if (storageError) console.warn("Card files were not removed:", storageError.message);
+    }
     signalAdminCountsChanged();
   },
   async review(cardId: string, decision: "approved" | "changes_requested" | "rejected", note = ""): Promise<void> {
