@@ -148,3 +148,35 @@
 .admin-comment-field{display:grid;gap:6px;margin-top:12px}
 .admin-comment-field input{min-height:40px;border:1px solid #cfd8e3;border-radius:10px;background:#fff;padding:0 12px;color:#142031;font-size:14px}
 .admin-notice-error{margin-bottom:14px;border:1px solid #f3c4bf;border-radius:13px;background:#fff1ef;padding:13px;color:#8a1f15;font-size:14px}
+
+/* Orders as collapsible folder rows: a compact list, opened on tap. */
+.order-views{display:flex;gap:8px;margin:14px 0 10px}
+.order-views button{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid #d5dee9;border-radius:10px;background:#fff;padding:0 12px;color:#334155;font-size:13px!important;font-weight:700;cursor:pointer}
+.order-views button.active{border-color:#1976ed;background:#eaf3ff;color:#0b5cc4}
+.order-views b{font-size:12px!important;color:#64748b}
+.order-folder{display:grid;gap:8px}
+.order-card{border:1px solid #d5dee9;border-radius:14px;background:#fff;overflow:hidden}
+.order-card.is-open{border-color:#b9cde6}
+.order-card-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;background:none;padding:12px 14px;text-align:left;color:#142031;cursor:pointer}
+.order-card-head.is-static{cursor:default}
+.order-card-title{display:grid;gap:3px;min-width:0}
+.order-card-title strong{display:flex;align-items:center;gap:7px;font-size:15px!important}
+.order-card-title small{color:#5b6b7f;font-size:12px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.order-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#1976ed}
+.order-card-side{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.order-card-side>b{font-size:14px!important}
+.order-status{font-style:normal;border-radius:999px;background:#eef2f7;padding:3px 9px;color:#334155;font-size:11px!important;font-weight:700;white-space:nowrap}
+.order-status.s-in_progress,.order-status.s-approved,.order-status.s-signed{background:#eaf3ff;color:#0b5cc4}
+.order-status.s-completed,.order-status.s-ready{background:#e7f8ef;color:#0f7a4a}
+.order-status.s-cancelled{background:#fff1ef;color:#b42318}
+.order-chevron{color:#64748b;transition:transform .15s}
+.order-card.is-open .order-chevron{transform:rotate(180deg)}
+.order-card-body{display:grid;gap:4px;border-top:1px solid #e5eaf1;padding:12px 14px 14px}
+.order-contract-services{margin:0;color:#5b6b7f;font-size:13px!important;line-height:1.5}
+.order-card-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:14px;border-top:1px solid #e5eaf1;padding-top:12px}
+.order-cancel-confirm{display:inline-flex;flex-wrap:wrap;gap:8px}
+.admin-secondary{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid #cfd8e3;border-radius:9px;background:#fff;padding:0 12px;color:#334155;font-size:12px!important;font-weight:700;cursor:pointer}
+.admin-secondary:disabled{opacity:.5;cursor:wait}
+.admin-danger{min-height:36px;border:1px solid #f3c4bf;border-radius:9px;background:#fff;padding:0 12px;color:#b42318;font-size:12px!important;font-weight:700;cursor:pointer}
+.admin-danger:disabled{opacity:.5;cursor:wait}
+.admin-danger.is-armed{border-color:#b42318;background:#b42318;color:#fff}

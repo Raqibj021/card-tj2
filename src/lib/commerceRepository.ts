@@ -34,6 +34,8 @@ export interface ServiceOrderRecord {
   payment_status: PaymentStatus;
   manager_comment: string;
   created_at: string;
+  admin_seen_at: string | null;
+  archived_at: string | null;
 }
 
 export interface ContractRecord {
@@ -52,7 +54,7 @@ export async function listServiceOrders(): Promise<ServiceOrderRecord[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
     .from("service_orders")
-    .select("id,user_id,order_number,customer,items,total,status,payment_status,manager_comment,created_at")
+    .select("id,user_id,order_number,customer,items,total,status,payment_status,manager_comment,created_at,admin_seen_at,archived_at")
     .order("created_at", { ascending: false });
   if (error) throw error;
   return (data ?? []) as ServiceOrderRecord[];
@@ -70,7 +72,7 @@ export async function listContracts(): Promise<ContractRecord[]> {
 
 export async function updateServiceOrder(
   id: string,
-  values: Partial<Pick<ServiceOrderRecord, "status" | "payment_status" | "manager_comment">>
+  values: Partial<Pick<ServiceOrderRecord, "status" | "payment_status" | "manager_comment" | "admin_seen_at" | "archived_at">>
 ) {
   if (!supabase) throw new Error("Supabase не подключён");
   const { error } = await supabase.from("service_orders").update(values).eq("id", id);
