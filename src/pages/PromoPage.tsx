@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Users } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
