@@ -50,9 +50,9 @@ export interface ContractRecord {
   created_at: string;
 }
 
-export async function listServiceOrders(): Promise<ServiceOrderRecord[]> {
-  if (!supabase) return [];
-  const { data, error } = await supabase
+export async function listServiceOrders(client = supabase): Promise<ServiceOrderRecord[]> {
+  if (!client) return [];
+  const { data, error } = await client
     .from("service_orders")
     .select("id,user_id,order_number,customer,items,total,status,payment_status,manager_comment,created_at,admin_seen_at,archived_at")
     .order("created_at", { ascending: false });
@@ -60,9 +60,9 @@ export async function listServiceOrders(): Promise<ServiceOrderRecord[]> {
   return (data ?? []) as ServiceOrderRecord[];
 }
 
-export async function listContracts(): Promise<ContractRecord[]> {
-  if (!supabase) return [];
-  const { data, error } = await supabase
+export async function listContracts(client = supabase): Promise<ContractRecord[]> {
+  if (!client) return [];
+  const { data, error } = await client
     .from("contracts")
     .select("id,user_id,contract_number,customer_type,customer,services,total,status,created_at")
     .order("created_at", { ascending: false });
@@ -72,25 +72,26 @@ export async function listContracts(): Promise<ContractRecord[]> {
 
 export async function updateServiceOrder(
   id: string,
-  values: Partial<Pick<ServiceOrderRecord, "status" | "payment_status" | "manager_comment" | "admin_seen_at" | "archived_at">>
+  values: Partial<Pick<ServiceOrderRecord, "status" | "payment_status" | "manager_comment" | "admin_seen_at" | "archived_at">>,
+  client = supabase
 ) {
-  if (!supabase) throw new Error("Supabase не подключён");
-  const { error } = await supabase.from("service_orders").update(values).eq("id", id);
+  if (!client) throw new Error("Supabase не подключён");
+  const { error } = await client.from("service_orders").update(values).eq("id", id).select("id").single();
   if (error) throw error;
 }
 
-export async function updateContractStatus(id: string, status: ContractStatus) {
-  if (!supabase) throw new Error("Supabase не подключён");
-  const { error } = await supabase
+export async function updateContractStatus(id: string, status: ContractStatus, client = supabase) {
+  if (!client) throw new Error("Supabase не подключён");
+  const { error } = await client
     .from("contracts")
     .update({ status, accepted_at: status === "signed" ? new Date().toISOString() : null })
     .eq("id", id);
   if (error) throw error;
 }
 
-export async function getCommerceStats() {
-  if (!supabase) return { orders: 0, newOrders: 0, unpaid: 0, revenue: 0, contracts: 0 };
-  const { data, error } = await supabase.rpc("get_commerce_admin_stats");
+export async function getCommerceStats(client = supabase) {
+  if (!client) return { orders: 0, newOrders: 0, unpaid: 0, revenue: 0, contracts: 0 };
+  const { data, error } = await client.rpc("get_commerce_admin_stats");
   if (error) throw error;
   return data as { orders: number; newOrders: number; unpaid: number; revenue: number; contracts: number };
 }

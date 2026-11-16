@@ -13,6 +13,8 @@ import {
   type PaymentStatus,
   type ServiceOrderRecord
 } from "../lib/commerceRepository";
+import { signalAdminCountsChanged } from "../lib/adminNotificationRepository";
+import { adminSupabase } from "../lib/supabase";
 import { getNfcCardDesign } from "../lib/nfcCardCatalog";
 
 const orderStatuses: OrderStatus[] = ["new", "clarifying", "approved", "in_progress", "ready", "completed", "cancelled"];
@@ -40,7 +42,7 @@ export default function AdminCommercePage() {
 
   const refresh = async () => {
     try {
-      const [nextOrders, nextContracts, nextStats] = await Promise.all([listServiceOrders(), listContracts(), getCommerceStats()]);
+      const [nextOrders, nextContracts, nextStats] = await Promise.all([listServiceOrders(adminSupabase), listContracts(adminSupabase), getCommerceStats(adminSupabase)]);
       setOrders(nextOrders); setContracts(nextContracts); setStats(nextStats);
     } catch (error) {
       setNotice({ text: error instanceof Error ? error.message : "Ошибка загрузки", error: true });
@@ -53,6 +55,7 @@ export default function AdminCommercePage() {
     setBusy(true);
     try {
       await action();
+      signalAdminCountsChanged();
       setNotice({ text: success });
       await refresh();
     } catch (error) {
@@ -69,7 +72,8 @@ export default function AdminCommercePage() {
     if (opening && !order.admin_seen_at) {
       // Opening an order is what marks it as seen; the badge counts only unseen orders.
       try {
-        await updateServiceOrder(order.id, { admin_seen_at: new Date().toISOString() });
+        await updateServiceOrder(order.id, { admin_seen_at: new Date().toISOString() }, adminSupabase);
+        signalAdminCountsChanged();
         await refresh();
       } catch (error) {
         setNotice({ text: error instanceof Error ? error.message : "Не удалось отметить заказ", error: true });
@@ -79,25 +83,25 @@ export default function AdminCommercePage() {
 
   const setOrderStatus = (order: ServiceOrderRecord, status: OrderStatus) => {
     setArmed(null);
-    return run(`Заказ ${order.order_number}: «${labels[status]}»`, () => updateServiceOrder(order.id, { status }));
+    return run(`Заказ ${order.order_number}: «${labels[status]}»`, () => updateServiceOrder(order.id, { status }, adminSupabase));
   };
 
   const setOrderPayment = (order: ServiceOrderRecord, payment_status: PaymentStatus) =>
-    run(`Оплата заказа ${order.order_number}: «${labels[payment_status]}»`, () => updateServiceOrder(order.id, { payment_status }));
+    run(`Оплата заказа ${order.order_number}: «${labels[payment_status]}»`, () => updateServiceOrder(order.id, { payment_status }, adminSupabase));
 
   const saveComment = (order: ServiceOrderRecord, manager_comment: string) =>
-    run(`Комментарий к заказу ${order.order_number} сохранён`, () => updateServiceOrder(order.id, { manager_comment }));
+    run(`Комментарий к заказу ${order.order_number} сохранён`, () => updateServiceOrder(order.id, { manager_comment }, adminSupabase));
 
   const setArchived = (order: ServiceOrderRecord, archived: boolean) => {
     setOpenId(null);
     setArmed(null);
     return run(archived ? `Заказ ${order.order_number} перенесён в архив` : `Заказ ${order.order_number} возвращён в активные`,
-      () => updateServiceOrder(order.id, { archived_at: archived ? new Date().toISOString() : null }));
+      () => updateServiceOrder(order.id, { archived_at: archived ? new Date().toISOString() : null }, adminSupabase));
   };
 
   const setContractStatus = (contract: ContractRecord, status: ContractStatus) => {
     setArmed(null);
-    return run(`Договор ${contract.contract_number}: «${labels[status]}»`, () => updateContractStatus(contract.id, status));
+    return run(`Договор ${contract.contract_number}: «${labels[status]}»`, () => updateContractStatus(contract.id, status, adminSupabase));
   };
 
   const activeOrders = orders.filter((order) => !order.archived_at);
