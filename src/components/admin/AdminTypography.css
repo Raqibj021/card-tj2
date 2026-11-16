@@ -180,3 +180,28 @@
 .admin-danger{min-height:36px;border:1px solid #f3c4bf;border-radius:9px;background:#fff;padding:0 12px;color:#b42318;font-size:12px!important;font-weight:700;cursor:pointer}
 .admin-danger:disabled{opacity:.5;cursor:wait}
 .admin-danger.is-armed{border-color:#b42318;background:#b42318;color:#fff}
+
+/* Compact density for every admin section. Tap targets stay at 36px or taller. */
+.admin-workspace .admin-subpage{padding:10px 0}
+.admin-workspace .commerce-console,.admin-workspace .support-console{gap:12px}
+.admin-workspace .admin-account-stats,.admin-workspace .moderation-stats,.admin-workspace .admin-card-kpis{margin-top:10px}
+.admin-workspace .admin-accounts-console,.admin-workspace .moderation-console{margin-top:10px}
+.admin-workspace .admin-stats article,.admin-workspace .commerce-kpis article,.admin-workspace .support-kpis article,.admin-workspace .admin-account-stats article,.admin-workspace .moderation-stats article,.admin-workspace .admin-card-kpis article{min-height:0;padding:11px 13px}
+.admin-workspace .commerce-tabs{margin:12px 0 10px}
+.admin-workspace .support-tabs button{padding:8px 12px}
+.admin-workspace .moderation-tabs{padding:8px 12px}
+.admin-workspace .admin-accounts-console>header{padding:10px 12px}
+.admin-workspace .commerce-section>header,.admin-workspace .support-section>header{padding:12px 14px}
+.admin-workspace .commerce-payment-list{padding:8px}
+.admin-workspace .commerce-payment-list>article{padding:10px 12px}
+.admin-workspace .support-ticket-card{padding:10px 14px}
+.admin-workspace .support-outbox-row{padding:9px 14px}
+.admin-workspace .support-history article{padding:9px 14px}
+.admin-workspace .support-campaign{padding:14px}
+.admin-workspace .support-campaigns{padding:0 14px 8px}
+.admin-workspace .support-campaigns article{padding:9px 0}
+.admin-workspace .moderation-list>article{padding:10px 14px}
+.admin-workspace .moderation-history article{padding:9px 14px}
+.admin-workspace .admin-account-list>button{padding:9px 12px}
+.admin-workspace .admin-card-list-head{min-height:32px}
+.admin-workspace .admin-card-list>article{min-height:0;padding:9px 12px}
