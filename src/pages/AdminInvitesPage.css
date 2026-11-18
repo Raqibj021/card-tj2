@@ -25,3 +25,11 @@
 .invite-card footer .primary{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
 .invite-card footer .wa{background:#16a34a;border-color:#16a34a}
 .invite-ava{overflow:hidden}.invite-ava img{width:100%;height:100%;object-fit:cover}
+.invites-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.invites-stats>div{position:relative;overflow:hidden;padding:14px 16px;border:1px solid var(--line,#dde2e8);border-radius:16px;background:var(--surface,#fff)}
+.invites-stats span{display:flex;gap:6px;align-items:center;color:var(--muted,#64748b);font-size:12px;font-weight:800}
+.invites-stats b{display:block;margin-top:6px;font-size:26px;font-weight:900;color:#0f172a}
+.invites-stats .gift{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fcd34d}
+.invites-stats .gift i{position:absolute;left:0;bottom:0;height:5px;background:#f59e0b;border-radius:0 4px 4px 0}
+.invite-card header{flex-wrap:wrap}
+.invite-nfc{flex-basis:100%;margin-left:58px;margin-top:-4px;font-size:12px;font-weight:900;color:#b45309}
