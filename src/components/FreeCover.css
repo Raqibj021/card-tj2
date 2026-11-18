@@ -1,0 +1,25 @@
+.free-scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.free-scene *{transform-box:fill-box}
+.fs-pulse{transform-origin:center;animation:fsPulse 4s ease-in-out infinite}
+@keyframes fsPulse{50%{transform:scale(1.18);opacity:.85}}
+.fs-clouds{animation:fsClouds 22s linear infinite}
+@keyframes fsClouds{to{transform:translateX(-200px)}}
+.fs-drift{animation:fsDrift 9s ease-in-out infinite alternate}
+@keyframes fsDrift{to{transform:translateX(-12px)}}
+.fs-shimmer line{animation:fsShimmer 2.4s ease-in-out infinite}
+.fs-shimmer line:nth-child(2n){animation-delay:-1.2s}
+@keyframes fsShimmer{50%{opacity:.15;transform:translateX(14px)}}
+.fs-aurora{animation:fsAurora 7s ease-in-out infinite alternate}
+@keyframes fsAurora{0%{transform:translateX(-20px) skewX(-6deg);opacity:.7}100%{transform:translateX(20px) skewX(6deg);opacity:1}}
+.fs-twinkle circle{animation:fsTwinkle 2.6s ease-in-out infinite}
+@keyframes fsTwinkle{50%{opacity:.15}}
+.fs-shoot{opacity:0;animation:fsShoot 5s ease-in 1s infinite}
+@keyframes fsShoot{0%{opacity:0;transform:translate(0,0)}6%{opacity:1}16%{opacity:0;transform:translate(120px,40px)}100%{opacity:0}}
+.fs-rays{animation:fsRays 30s linear infinite}
+@keyframes fsRays{to{transform:rotate(360deg)}}
+.fs-waves{animation:fsWaves 6s linear infinite}
+@keyframes fsWaves{to{transform:translateX(200px)}}
+.fs-sparks circle{opacity:0;animation:fsSpark 3.5s ease-in-out infinite}
+@keyframes fsSpark{30%{opacity:.95;transform:scale(1.6)}60%{opacity:0;transform:scale(.6)}}
+@media (prefers-reduced-motion:reduce){.free-scene *{animation:none!important}}
+.fs-rays{transform-box:view-box}

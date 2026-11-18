@@ -4,7 +4,8 @@ import { Link, useNavigate, useParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
-import { findFreeCardDesign, freeCardImage } from "../lib/freeCardDesigns";
+import FreeCover from "../components/FreeCover";
+import { findFreeCardDesign } from "../lib/freeCardDesigns";
 import { inviteRepository, type InvitePreview } from "../lib/inviteRepository";
 import type { CSSProperties } from "react";
 import "./FreeCardPage.css";
@@ -81,7 +82,7 @@ export default function ClaimCardPage() {
             <div className="free-card-zone">
               <article className="free-window done">
                 <div className="free-cover">
-                  <img className="free-cover-img" src={freeCardImage(findFreeCardDesign(invite.design).img)} alt="" />
+                  <div className="free-cover-img"><FreeCover design={findFreeCardDesign(invite.design).key} /></div>
                   <div className="free-photo" role="img"><span>{invite.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span></div>
                 </div>
                 <div className="free-window-body">
