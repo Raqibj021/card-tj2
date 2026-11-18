@@ -38,7 +38,7 @@ export default function AdminInvitesPage() {
   const approve = async (inv: CardInvite) => {
     setBusy(inv.id);
     try {
-      const res = await inviteRepository.approve(inv.id, createSlug(inv.full_name));
+      const res = await inviteRepository.approve(inv.id, createSlug(inv.full_name), inv.photo_data);
       setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "approved" as const, card_id: res.card_id, cards: { slug: res.slug } } : r)));
       setNotice(`Визитка создана: ${SITE}/${res.slug}`);
     } catch (e) {
@@ -79,7 +79,7 @@ export default function AdminInvitesPage() {
           {list.map((inv) => (
             <article key={inv.id} className={`invite-card st-${inv.status}`}>
               <header>
-                <div className="invite-ava">{inv.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</div>
+                <div className="invite-ava">{inv.photo_data ? <img src={inv.photo_data} alt="" /> : inv.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</div>
                 <div>
                   <strong>{inv.full_name}</strong>
                   <span>{inv.profession}{inv.city ? ` · ${inv.city}` : ""}</span>

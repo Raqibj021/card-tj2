@@ -79,13 +79,17 @@ export default function ClaimCardPage() {
         ) : (
           <>
             <div className="free-card-zone">
-              <div className="free-card done">
-                <img className="free-card-img" src={freeCardImage(findFreeCardDesign(invite.design).img)} alt="" />
-                <div className="free-card-info">
-                  <div className="free-avatar">{invite.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</div>
-                  <div className="free-card-text"><strong>{invite.full_name}</strong><span>{invite.profession}</span></div>
+              <article className="free-window done">
+                <div className="free-cover">
+                  <img className="free-cover-img" src={freeCardImage(findFreeCardDesign(invite.design).img)} alt="" />
+                  <div className="free-photo" role="img"><span>{invite.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</span></div>
                 </div>
-              </div>
+                <div className="free-window-body">
+                  <h3>{invite.full_name}</h3>
+                  <p>{invite.profession}</p>
+                  <small>vizora.tj/{invite.slug}</small>
+                </div>
+              </article>
             </div>
             <div className="free-panel free-done">
               {invite.status === "claimed" ? (

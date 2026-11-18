@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { adminSupabase, supabase } from "./supabase";
 
 export type InviteForm = {
   fullName: string;
@@ -12,6 +12,7 @@ export type InviteForm = {
   language: "ru" | "tj" | "en";
   source: string;
   design: string;
+  photo: string;
 };
 
 export type CardInvite = {
@@ -28,6 +29,7 @@ export type CardInvite = {
   language: "ru" | "tj" | "en";
   source: string;
   design: string;
+  photo_data: string;
   status: "new" | "approved" | "rejected" | "claimed";
   card_id: string | null;
   claim_token: string;
@@ -40,6 +42,11 @@ export type InvitePreview = { full_name: string; profession: string; slug: strin
 const client = () => {
   if (!supabase) throw new Error("Supabase is not configured");
   return supabase;
+};
+// Admin screens run on the separate admin session.
+const adminClient = () => {
+  if (!adminSupabase) throw new Error("Supabase is not configured");
+  return adminSupabase;
 };
 
 const errorCode = (message: string) => {
@@ -63,14 +70,15 @@ export const inviteRepository = {
       p_language: form.language,
       p_source: form.source,
       p_consent: true,
-      p_design: form.design
+      p_design: form.design,
+      p_photo: form.photo
     });
     if (error) throw new Error(errorCode(error.message));
     return data as string;
   },
 
   async list() {
-    const { data, error } = await client()
+    const { data, error } = await adminClient()
       .from("card_invites")
       .select("*, cards(slug)")
       .order("created_at", { ascending: false })
@@ -79,15 +87,27 @@ export const inviteRepository = {
     return (data ?? []) as CardInvite[];
   },
 
-  async approve(id: string, slug: string) {
-    const { data, error } = await client().rpc("admin_approve_card_invite", { p_invite_id: id, p_slug: slug });
+  async approve(id: string, slug: string, photoData = "") {
+    const db = adminClient();
+    const { data, error } = await db.rpc("admin_approve_card_invite", { p_invite_id: id, p_slug: slug });
     if (error) throw new Error(error.message);
-    const row = Array.isArray(data) ? data[0] : data;
-    return row as { card_id: string; slug: string; claim_token: string };
+    const row = (Array.isArray(data) ? data[0] : data) as { card_id: string; slug: string; claim_token: string };
+    if (photoData.startsWith("data:image/")) {
+      // Upload the applicant's photo to storage and attach it to the new card.
+      const { data: auth } = await db.auth.getUser();
+      const blob = await (await fetch(photoData)).blob();
+      const path = `${auth.user?.id}/${row.card_id}/photo-${Date.now()}.jpg`;
+      const upload = await db.storage.from("card-assets").upload(path, blob, { upsert: false, contentType: blob.type || "image/jpeg", cacheControl: "31536000" });
+      if (!upload.error) {
+        const url = db.storage.from("card-assets").getPublicUrl(path).data.publicUrl;
+        await db.from("cards").update({ photo_path: url }).eq("id", row.card_id);
+      }
+    }
+    return row;
   },
 
   async reject(id: string) {
-    const { error } = await client().from("card_invites").update({ status: "rejected", updated_at: new Date().toISOString() }).eq("id", id);
+    const { error } = await adminClient().from("card_invites").update({ status: "rejected", updated_at: new Date().toISOString() }).eq("id", id);
     if (error) throw error;
   },
 

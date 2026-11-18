@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Phone, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
+import { ArrowLeft, ArrowRight, Camera, Check, ChevronLeft, ChevronRight, Mail, MapPin, Phone, Sparkles, UserPlus } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type KeyboardEvent, type PointerEvent } from "react";
 import { useSearchParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
@@ -37,6 +37,7 @@ const copy = {
     heroText: "Тарҳи дӯстдоштаатонро интихоб кунед, чанд саволро ҷавоб диҳед — мо визиткаро месозем ва ба каталоги мутахассисон илова мекунем.",
     start: "Оғоз кардан", next: "Давом", back: "Бозгашт", skip: "Гузарондан", send: "Визиткаро гирифтан", sending: "Фиристода мешавад…",
     swipe: "Тарҳро варақ занед",
+    photo: "Акс илова кунед", photoChange: "Акси дигар", save: "Нигоҳ доштани тамос", call: "Занг", kicker: "ВИЗИТКАИ ЭЛЕКТРОНӢ", 
     steps: [
       { q: "Шиносоӣ кунем! Номи шумо чист?", hint: "Ном ва насаб, тавре ки дар визитка бошад", ph: "Масалан: Фарҳод Каримов" },
       { q: "Шумо чӣ кор мекунед?", hint: "Касбро интихоб кунед ё нависед", ph: "Касби худро нависед" },
@@ -60,6 +61,7 @@ const copy = {
     heroText: "Выберите понравившийся дизайн, ответьте на пару вопросов — мы сделаем визитку и добавим вас в каталог специалистов.",
     start: "Начать", next: "Дальше", back: "Назад", skip: "Пропустить", send: "Получить визитку", sending: "Отправляем…",
     swipe: "Листайте дизайн",
+    photo: "Добавить фото", photoChange: "Сменить фото", save: "Сохранить контакт", call: "Позвонить", kicker: "ЦИФРОВАЯ ВИЗИТКА", 
     steps: [
       { q: "Давайте знакомиться! Как вас зовут?", hint: "Имя и фамилия, как на визитке", ph: "Например: Фарход Каримов" },
       { q: "Чем вы занимаетесь?", hint: "Выберите профессию или напишите свою", ph: "Напишите профессию" },
@@ -83,6 +85,7 @@ const copy = {
     heroText: "Pick a design you love, answer a few questions — we will build your card and add you to the Vizora specialists directory.",
     start: "Get started", next: "Next", back: "Back", skip: "Skip", send: "Get my card", sending: "Sending…",
     swipe: "Swipe designs",
+    photo: "Add photo", photoChange: "Change photo", save: "Save contact", call: "Call", kicker: "DIGITAL CARD", 
     steps: [
       { q: "Nice to meet you! What's your name?", hint: "First and last name, as on the card", ph: "e.g. Farhod Karimov" },
       { q: "What do you do?", hint: "Pick a profession or type your own", ph: "Type your profession" },
@@ -117,10 +120,11 @@ export default function FreeCardPage() {
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [designIdx, setDesignIdx] = useState(0);
-  const [form, setForm] = useState({ fullName: "", profession: "", city: "", phone: "", waSame: true, whatsapp: "", tgMode: "nick" as "nick" | "phone", telegram: "", tgSame: true, tgPhone: "", instagram: "", about: "", consent: true });
+  const [form, setForm] = useState({ fullName: "", profession: "", city: "", phone: "", waSame: true, whatsapp: "", tgMode: "nick" as "nick" | "phone", telegram: "", tgSame: true, tgPhone: "", instagram: "", about: "", consent: true, photo: "" });
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const swipe = useRef<number | null>(null);
   const [drag, setDrag] = useState(0);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const total = t.steps.length;
   const design = freeCardDesigns[designIdx];
 
@@ -138,6 +142,27 @@ export default function FreeCardPage() {
   const tgDigits = digits(form.tgSame ? form.phone : form.tgPhone);
   const hasTelegram = form.tgMode === "nick" ? form.telegram.replace(/^@/, "").trim().length > 1 : tgDigits.length === 9;
   const telegramValue = form.tgMode === "nick" ? "@" + form.telegram.replace(/^@/, "").trim() : "+992" + tgDigits;
+
+  const pickPhoto = () => fileRef.current?.click();
+  const onPhoto = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !file.type.startsWith("image/")) return;
+    const url = URL.createObjectURL(file);
+    const image = new Image();
+    image.onload = () => {
+      const size = 360;
+      const canvas = document.createElement("canvas");
+      canvas.width = size; canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const side = Math.min(image.width, image.height);
+      ctx.drawImage(image, (image.width - side) / 2, (image.height - side) / 2, side, side, 0, 0, size, size);
+      set("photo", canvas.toDataURL("image/jpeg", 0.82));
+      URL.revokeObjectURL(url);
+    };
+    image.src = url;
+  };
 
   const canNext = useMemo(() => {
     switch (step) {
@@ -167,7 +192,7 @@ export default function FreeCardPage() {
         whatsapp: form.waSame ? "" : "992" + digits(form.whatsapp),
         telegram: hasTelegram ? telegramValue : "",
         instagram: form.instagram.trim().replace(/^@/, ""),
-        language: lang, source: (params.get("src") ?? "").slice(0, 40), design: design.key
+        language: lang, source: (params.get("src") ?? "").slice(0, 40), design: design.key, photo: form.photo
       });
       setDone(true);
     } catch (e) {
@@ -203,34 +228,43 @@ export default function FreeCardPage() {
 
       <section className="free-wrap">
         <div className="free-card-zone">
-          <div className="free-card-stage" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
-            <div className={`free-card ${done ? "done" : ""}`} style={{ transform: `translateX(${drag * 0.6}px) rotate(${-2 + drag * 0.02}deg)` }} key={design.key}>
-              <img className="free-card-img" src={img(design.img)} alt="" draggable={false} />
-              <div className="free-card-info">
-                <div className="free-avatar">{initials(form.fullName)}</div>
-                <div className="free-card-text">
-                  <strong>{form.fullName.trim() || t.previewName}</strong>
-                  <span>{form.profession.trim() || t.previewRole}{form.city ? ` · ${form.city}` : ""}</span>
-                </div>
-              </div>
-              <div className="free-card-icons">
-                <em className={digits(form.phone).length ? "on" : ""}><Phone size={15} /></em>
-                <em className={digits(form.phone).length ? "on wa" : "wa"}><WhatsAppIcon size={16} /></em>
-                <em className={hasTelegram ? "on" : ""}><TelegramIcon size={20} /></em>
-                <em className={form.instagram ? "on" : ""}><InstagramIcon size={19} /></em>
-              </div>
+          <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
+          <article className={`free-window ${done ? "done" : ""}`}>
+            <div className="free-window-head">
+              <span className="free-window-logo">{(form.profession || "V").charAt(0).toUpperCase()}</span>
+              <span><small>{t.kicker}</small><strong>{form.fullName.trim() || "Vizora.tj"}</strong></span>
+              <span className="free-window-flags"><Flag code="tj" /><Flag code="ru" /><Flag code="en" /></span>
             </div>
-          </div>
+            <div className="free-cover" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
+              <img key={design.key} className="free-cover-img" src={img(design.img)} alt="" draggable={false} style={{ transform: `translateX(${drag * 0.5}px) scale(1.08)` }} />
+              {!done && (<>
+                <button type="button" className="free-cover-nav l" onClick={() => go(-1)} aria-label="prev"><ChevronLeft size={18} /></button>
+                <button type="button" className="free-cover-nav r" onClick={() => go(1)} aria-label="next"><ChevronRight size={18} /></button>
+              </>)}
+              <button type="button" className="free-photo" onClick={pickPhoto} aria-label={t.photo}>
+                {form.photo ? <img src={form.photo} alt="" /> : <span>{initials(form.fullName)}</span>}
+                <i><Camera size={14} /></i>
+              </button>
+            </div>
+            <div className="free-window-body">
+              <h3>{form.fullName.trim() || t.previewName}</h3>
+              <p>{form.profession.trim() || t.previewRole}</p>
+              {form.city && <small><MapPin size={13} /> {form.city}</small>}
+              <div className="free-socials">
+                <em className={hasTelegram ? "on" : ""}><TelegramIcon size={22} /></em>
+                <em className={digits(form.phone).length ? "on wa" : "wa"}><WhatsAppIcon size={22} /></em>
+                <em className={form.instagram ? "on" : ""}><InstagramIcon size={22} /></em>
+              </div>
+              <div className="free-acts">
+                <span className={digits(form.phone).length ? "on" : ""}><Phone size={16} />{t.call}</span>
+                <span><Mail size={16} />E-mail</span>
+                <span className={form.city ? "on" : ""}><MapPin size={16} />{form.city || "—"}</span>
+              </div>
+              <div className="free-save"><UserPlus size={17} /> {t.save}</div>
+            </div>
+          </article>
           {!done && (
-            <div className="free-designs">
-              <button type="button" onClick={() => go(-1)} aria-label="prev"><ChevronLeft size={20} /></button>
-              <div className="free-design-meta">
-                <b>{design.name[lang]}</b>
-                <span>{t.swipe} · {designIdx + 1}/{freeCardDesigns.length}</span>
-                <div className="free-dots">{freeCardDesigns.map((d, i) => <i key={d.key} className={i === designIdx ? "on" : ""} onClick={() => setDesignIdx(i)} />)}</div>
-              </div>
-              <button type="button" onClick={() => go(1)} aria-label="next"><ChevronRight size={20} /></button>
-            </div>
+            <button type="button" className="free-photo-btn" onClick={pickPhoto}><Camera size={17} /> {form.photo ? t.photoChange : t.photo}</button>
           )}
         </div>
 
