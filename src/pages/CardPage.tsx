@@ -84,6 +84,11 @@ const profileCopy = {
     promoButton: "Использовать бесплатную акцию",
     promoPlaces: "Осталось бесплатных мест",
     payButton: "Оплатить и отправить чек",
+    payGateTitle: "Активируйте визитку",
+    payGateText: "Визитка уже в вашем кабинете, но пока видна только вам. Бесплатные места акции закончились — выберите тариф и оплатите, чтобы визитка стала доступна всем, а QR-код и NFC заработали.",
+    payGatePlans: [["personal", "Личная", 20], ["specialist", "Специалист", 50], ["pro", "PRO", 100]],
+    payGatePer: "сомони / год",
+    payGateLater: "Позже",
     activating: "Отправляем…",
     submitReview: "Отправить на проверку",
     pending: "ОЖИДАЕТ ПРОВЕРКИ",
@@ -126,6 +131,11 @@ const profileCopy = {
     promoButton: "Истифодаи аксияи ройгон",
     promoPlaces: "Ҷойҳои ройгони боқимонда",
     payButton: "Пардохт ва фиристодани расид",
+    payGateTitle: "Варақаро фаъол кунед",
+    payGateText: "Варақа аллакай дар кабинети шумост, вале ҳоло танҳо ба шумо намоён аст. Ҷойҳои ройгони аксия тамом шуданд — тарофаро интихоб ва пардохт кунед, то варақа ба ҳама дастрас шавад ва QR-код ва NFC кор кунанд.",
+    payGatePlans: [["personal", "Шахсӣ", 20], ["specialist", "Мутахассис", 50], ["pro", "PRO", 100]],
+    payGatePer: "сомонӣ / сол",
+    payGateLater: "Баъдтар",
     activating: "Фиристода истодааст…",
     submitReview: "Ба санҷиш фиристодан",
     pending: "ИНТИЗОРИ САНҶИШ",
@@ -168,6 +178,11 @@ const profileCopy = {
     promoButton: "Use the free launch offer",
     promoPlaces: "Free places remaining",
     payButton: "Pay and upload receipt",
+    payGateTitle: "Activate your card",
+    payGateText: "The card is already in your account but only you can see it. The free launch places are taken — choose a plan and pay so the card goes public and the QR code and NFC start working.",
+    payGatePlans: [["personal", "Personal", 20], ["specialist", "Specialist", 50], ["pro", "PRO", 100]],
+    payGatePer: "somoni / year",
+    payGateLater: "Later",
     activating: "Submitting…",
     submitReview: "Submit for review",
     pending: "AWAITING REVIEW",
@@ -210,6 +225,7 @@ export default function CardPage() {
   const [loading, setLoading] = useState(!card);
   const [leadSource, setLeadSource] = useState<Lead["source"] | null>(null);
   const [promo, setPromo] = useState<LaunchPromoStatus | null>(null);
+  const [payGateClosed, setPayGateClosed] = useState(false);
   const [activating, setActivating] = useState(false);
   const [professionCategoryName, setProfessionCategoryName] = useState("");
   const [showPhoneDialog, setShowPhoneDialog] = useState(false);
@@ -306,6 +322,9 @@ export default function CardPage() {
   const palette = themeColors[card.theme];
   const isLocked = card.reviewStatus !== "approved";
   const needsActivation = card.reviewStatus === "draft";
+  const payGateKey = `vizora-paygate-${card.id}`;
+  const showPayGate = needsActivation && promo !== null && !promo.hasEntitlement && !(promo.eligible && promo.remaining > 0) && !payGateClosed && (() => { try { return !sessionStorage.getItem(payGateKey); } catch { return true; } })();
+  const closePayGate = () => { try { sessionStorage.setItem(payGateKey, "1"); } catch { /* ignore */ } setPayGateClosed(true); };
   const needsCorrection = card.reviewStatus === "changes_requested" || card.reviewStatus === "rejected";
   const style: AccentStyle = {
     "--profile-accent": palette.accent,
@@ -452,6 +471,23 @@ export default function CardPage() {
       <div className="profile-layout">
         <section className="profile-main-card">
           <div className="profile-ambient" aria-hidden="true"><i /><i /><i /><span /><span /><span /></div>
+          {showPayGate && (
+            <div className="paygate-back" onClick={closePayGate}>
+              <div className="paygate" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+                <div className="paygate-icon" aria-hidden="true">🔒</div>
+                <h2>{labels.payGateTitle}</h2>
+                <p>{labels.payGateText}</p>
+                <div className="paygate-plans">
+                  {(labels.payGatePlans as readonly (readonly [string, string, number])[]).map(([key, name, price]) => (
+                    <Link key={key} to={`/payment?plan=${key}`} className={key === "specialist" ? "on" : ""}>
+                      <b>{name}</b><span>{price} {labels.payGatePer}</span>
+                    </Link>
+                  ))}
+                </div>
+                <button type="button" className="paygate-later" onClick={closePayGate}>{labels.payGateLater}</button>
+              </div>
+            </div>
+          )}
           {isLocked && (
             <>
               <div className="trial-watermark" aria-hidden="true">{needsActivation ? labels.trial : labels.pending}</div>
