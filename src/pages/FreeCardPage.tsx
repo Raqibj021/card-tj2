@@ -287,7 +287,7 @@ export default function FreeCardPage() {
             <p>{t.doneText}</p>
             <p className="free-done-more">{t.doneMore}</p>
             <div className="free-cta-grid">
-              <a className="free-cta wa" href={`https://wa.me/?text=${encodeURIComponent(t.shareText + "https://vizora.tj/free")}`} target="_blank" rel="noreferrer">
+              <a className="free-cta wa" href={`/invite?lang=${lang}`}>
                 <span className="ico"><WhatsAppIcon size={26} /></span><span><b>{t.share}</b><small>{t.shareSub}</small></span><span className="badge">👥 3</span>
               </a>
               <a className="free-cta ig" href="https://www.instagram.com/vizora.tj/" target="_blank" rel="noreferrer">

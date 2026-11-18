@@ -38,6 +38,7 @@ import AdminAccountsPage from "./pages/AdminAccountsPage";
 import AdminCardsPage from "./pages/AdminCardsPage";
 import AdminInvitesPage from "./pages/AdminInvitesPage";
 import FreeCardPage from "./pages/FreeCardPage";
+import InviteFriendsPage from "./pages/InviteFriendsPage";
 import ClaimCardPage from "./pages/ClaimCardPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
@@ -81,7 +82,7 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [modalCard, location.pathname]);
-  const standaloneAuth = ["/free", "/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname) || location.pathname.startsWith("/claim/");
+  const standaloneAuth = ["/free", "/invite", "/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname) || location.pathname.startsWith("/claim/");
   const standaloneAdmin = location.pathname.startsWith("/admin");
 
   return (
@@ -128,6 +129,7 @@ export default function App() {
         <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
         <Route path="/reset-password" element={<PasswordRecoveryPage reset />} />
         <Route path="/free" element={<FreeCardPage />} />
+        <Route path="/invite" element={<InviteFriendsPage />} />
         <Route path="/claim/:token" element={<ClaimCardPage />} />
         <Route path="/create" element={<CreatePage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
