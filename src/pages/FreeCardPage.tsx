@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { useSearchParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
@@ -198,7 +198,7 @@ export default function FreeCardPage() {
 
         {done ? (
           <div className="free-panel free-done">
-            <div className="free-burst" aria-hidden>{Array.from({ length: 18 }).map((_, i) => <i key={i} style={{ ["--i" as string]: i }} />)}</div>
+            <div className="free-burst" aria-hidden>{Array.from({ length: 18 }).map((_, i) => <i key={i} style={{ "--i": i } as CSSProperties} />)}</div>
             <h1>{t.doneTitle}</h1>
             <p>{t.doneText}</p>
             <p className="muted">{t.doneMore}</p>

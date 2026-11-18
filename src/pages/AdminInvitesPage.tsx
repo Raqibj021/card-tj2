@@ -37,7 +37,7 @@ export default function AdminInvitesPage() {
     setBusy(inv.id);
     try {
       const res = await inviteRepository.approve(inv.id, createSlug(inv.full_name));
-      setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "approved", card_id: res.card_id, cards: { slug: res.slug } } : r)));
+      setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "approved" as const, card_id: res.card_id, cards: { slug: res.slug } } : r)));
       setNotice(`Визитка создана: ${SITE}/${res.slug}`);
     } catch (e) {
       setNotice(`Ошибка: ${e instanceof Error ? e.message : "не удалось создать визитку"}`);
@@ -47,7 +47,7 @@ export default function AdminInvitesPage() {
   const reject = async (inv: CardInvite) => {
     if (!window.confirm(`Отклонить заявку ${inv.full_name}?`)) return;
     setBusy(inv.id);
-    try { await inviteRepository.reject(inv.id); setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "rejected" } : r))); }
+    try { await inviteRepository.reject(inv.id); setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "rejected" as const } : r))); }
     finally { setBusy(""); }
   };
 

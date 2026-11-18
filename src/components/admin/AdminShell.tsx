@@ -70,7 +70,7 @@ export default function AdminShell({
         <nav aria-label="Разделы администратора">
           {navigation.map(({ to, label, icon: Icon, end, count }) => (
             <NavLink key={to} to={to} end={end}>
-              <Icon size={18} /><span>{label}</span>{counts[count] > 0 && <b className="admin-nav-badge">{counts[count] > 99 ? "99+" : counts[count]}</b>}
+              <Icon size={18} /><span>{label}</span>{count && counts[count] > 0 && <b className="admin-nav-badge">{counts[count] > 99 ? "99+" : counts[count]}</b>}
             </NavLink>
           ))}
         </nav>
