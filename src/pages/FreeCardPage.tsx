@@ -241,7 +241,7 @@ export default function FreeCardPage() {
       <section className="free-wrap">
         <div className="free-card-zone">
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          <article className={`free-window ${done ? "done typing" : ""} ${typing ? "typing" : ""}`}>
+          <article className={`free-window ${done ? "done" : ""} ${typing ? "typing" : ""}`}>
             <div className="free-window-head">
               <span><small>{t.kicker}</small><strong>{form.fullName.trim() || "Vizora.tj"}</strong></span>
               <span className="free-window-flags"><Flag code="tj" /><Flag code="ru" /><Flag code="en" /></span>
