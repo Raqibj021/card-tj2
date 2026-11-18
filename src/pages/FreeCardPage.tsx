@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Camera, Check, ChevronLeft, ChevronRight, Mail, MapPin, Phone, Sparkles, UserPlus } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Check, ChevronLeft, ChevronRight, MapPin, Phone, Sparkles, UserPlus } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type KeyboardEvent, type PointerEvent } from "react";
 import { useSearchParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
@@ -53,7 +53,7 @@ const copy = {
     consent: "Розӣ ҳастам, ки визиткаи ман дар сайти vizora.tj ва каталоги мутахассисон ҷойгир карда шавад",
     previewName: "Номи шумо", previewRole: "Касби шумо",
     doneTitle: "Офарин! Дархост қабул шуд 🎉", doneText: "Мо визиткаи шуморо бо тарҳи интихобкардаатон омода мекунем ва пайвандро ба WhatsApp мефиристем. Одатан то 24 соат.",
-    doneMore: "Ба дӯстон ҳам маслиҳат диҳед — ин ройгон аст!", share: "Ба дӯстон фиристодан", shareText: "Визиткаи электронии ройгон дар Vizora гир: ",
+    doneMore: "То визиткаатон омода мешавад — як кори хуб кунед 😉", share: "Ба 3 дӯст фиристед", shareSub: "Бигзор онҳо ҳам ройгон гиранд", follow: "Ба Instagram обуна шавед", followSub: "Аввалин шуда навигариҳоро бинед", or: "ё", shareText: "Визиткаи электронии ройгон дар Vizora гир: ",
     errors: { bad_name: "Лутфан ном ва насабро пурра нависед", bad_phone: "Рақам бояд 9 рақам бошад: 90 000 00 00", bad_whatsapp: "Рақами WhatsApp нодуруст аст", too_many_requests: "Аз ин рақам аллакай дархост фиристода шудааст", consent_required: "Лутфан розигиро қайд кунед", unknown: "Хатогӣ рӯй дод. Боз кӯшиш кунед ё ба WhatsApp нависед" }
   },
   ru: {
@@ -77,7 +77,7 @@ const copy = {
     consent: "Согласен(на) на размещение моей визитки на сайте vizora.tj и в каталоге специалистов",
     previewName: "Ваше имя", previewRole: "Ваша профессия",
     doneTitle: "Отлично! Заявка принята 🎉", doneText: "Мы подготовим визитку в выбранном дизайне и пришлём ссылку в WhatsApp. Обычно в течение 24 часов.",
-    doneMore: "Посоветуйте друзьям — это бесплатно!", share: "Отправить друзьям", shareText: "Получи бесплатную электронную визитку на Vizora: ",
+    doneMore: "Пока готовим визитку — сделайте доброе дело 😉", share: "Отправьте 3 друзьям", shareSub: "Пусть тоже получат бесплатно", follow: "Подпишитесь в Instagram", followSub: "Узнавайте новости первыми", or: "или", shareText: "Получи бесплатную электронную визитку на Vizora: ",
     errors: { bad_name: "Пожалуйста, укажите имя и фамилию полностью", bad_phone: "Номер должен быть из 9 цифр: 90 000 00 00", bad_whatsapp: "Номер WhatsApp указан неверно", too_many_requests: "С этого номера заявка уже отправлена", consent_required: "Пожалуйста, отметьте согласие", unknown: "Что-то пошло не так. Попробуйте ещё раз или напишите в WhatsApp" }
   },
   en: {
@@ -101,7 +101,7 @@ const copy = {
     consent: "I agree to publish my card on vizora.tj and in the specialists directory",
     previewName: "Your name", previewRole: "Your profession",
     doneTitle: "Great! Request received 🎉", doneText: "We will prepare your card in the design you chose and send the link to your WhatsApp, usually within 24 hours.",
-    doneMore: "Tell your friends — it's free!", share: "Send to friends", shareText: "Get a free digital business card on Vizora: ",
+    doneMore: "While we prepare your card — do one good thing 😉", share: "Send to 3 friends", shareSub: "Let them get one free too", follow: "Follow us on Instagram", followSub: "Be the first to see news", or: "or", shareText: "Get a free digital business card on Vizora: ",
     errors: { bad_name: "Please enter your full first and last name", bad_phone: "The number must have 9 digits: 90 000 00 00", bad_whatsapp: "The WhatsApp number is invalid", too_many_requests: "A request from this number was already sent", consent_required: "Please tick the consent box", unknown: "Something went wrong. Try again or message us on WhatsApp" }
   }
 } as const;
@@ -257,7 +257,6 @@ export default function FreeCardPage() {
               </div>
               <div className="free-acts">
                 <span className={digits(form.phone).length ? "on" : ""}><Phone size={16} />{t.call}</span>
-                <span><Mail size={16} />E-mail</span>
                 <span className={form.city ? "on" : ""}><MapPin size={16} />{form.city || "—"}</span>
               </div>
               <div className="free-save"><UserPlus size={17} /> {t.save}</div>
@@ -273,8 +272,16 @@ export default function FreeCardPage() {
             <div className="free-burst" aria-hidden>{Array.from({ length: 18 }).map((_, i) => <i key={i} style={{ "--i": i } as CSSProperties} />)}</div>
             <h1>{t.doneTitle}</h1>
             <p>{t.doneText}</p>
-            <p className="muted">{t.doneMore}</p>
-            <a className="free-btn free-btn-wa" href={`https://wa.me/?text=${encodeURIComponent(t.shareText + "https://vizora.tj/free")}`} target="_blank" rel="noreferrer"><WhatsAppIcon size={18} /> {t.share}</a>
+            <p className="free-done-more">{t.doneMore}</p>
+            <div className="free-cta-grid">
+              <a className="free-cta wa" href={`https://wa.me/?text=${encodeURIComponent(t.shareText + "https://vizora.tj/free")}`} target="_blank" rel="noreferrer">
+                <span className="ico"><WhatsAppIcon size={26} /></span><span><b>{t.share}</b><small>{t.shareSub}</small></span><span className="badge">👥 3</span>
+              </a>
+              <div className="free-or">{t.or}</div>
+              <a className="free-cta ig" href="https://www.instagram.com/vizora.tj/" target="_blank" rel="noreferrer">
+                <span className="ico"><InstagramIcon size={26} /></span><span><b>{t.follow}</b><small>{t.followSub}</small></span><span className="badge">@vizora.tj</span>
+              </a>
+            </div>
           </div>
         ) : step < 0 ? (
           <div className="free-panel free-intro">
