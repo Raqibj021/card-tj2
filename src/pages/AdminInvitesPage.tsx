@@ -104,20 +104,43 @@ export default function AdminInvitesPage() {
       : ch === "telegram" ? tgLink(inv)
         : `https://www.instagram.com/${inv.instagram.replace(/^@/, "")}/`;
 
+  // Copy the card image to the clipboard as PNG (what chat apps accept on paste).
+  const copyImage = async (file: File) => {
+    try {
+      if (!("ClipboardItem" in window) || !navigator.clipboard?.write) return false;
+      const bmp = await createImageBitmap(file);
+      const canvas = document.createElement("canvas");
+      canvas.width = bmp.width; canvas.height = bmp.height;
+      canvas.getContext("2d")?.drawImage(bmp, 0, 0);
+      const png = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
+      if (!png) return false;
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
+      return true;
+    } catch { return false; }
+  };
+
+  // Opens the chat of this exact person (no contact picker). WhatsApp gets the
+  // text pre-filled; the card photo goes to the clipboard (or is downloaded)
+  // so it can be pasted into the same chat.
   const send = async (inv: CardInvite, withPhoto: boolean) => {
+    const link = channelLink(inv, channel);
+    const win = window.open("about:blank", "_blank");
     setBusy(inv.id);
     try {
       const msg = text(inv);
+      let photoNote = "";
       if (withPhoto) {
         const file = await cardFile(inv);
-        if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], text: msg }); return; }
-        download(file);
+        if (await copyImage(file)) photoNote = "Фото визитки скопировано — вставьте его в чат (долгое нажатие → Вставить, или Ctrl+V) и отправьте.";
+        else { download(file); photoNote = "Фото визитки скачано — прикрепите его в чат 📎."; }
+      } else if (channel !== "whatsapp") {
+        await navigator.clipboard.writeText(msg).catch(() => undefined);
       }
-      await navigator.clipboard.writeText(msg).catch(() => undefined);
-      window.open(channelLink(inv, channel), "_blank");
-      if (withPhoto || channel !== "whatsapp") setNotice(`Текст скопирован — вставьте его в чат${withPhoto ? ", фото визитки скачано — прикрепите его" : ""}.`);
-    } catch (e) {
-      if ((e as Error).name !== "AbortError") setNotice("Не удалось подготовить сообщение");
+      if (win) win.location.href = link; else window.location.href = link;
+      setNotice([channel === "whatsapp" ? "Открыт чат WhatsApp с текстом." : "Текст скопирован — вставьте его в чат.", photoNote].filter(Boolean).join(" "));
+    } catch {
+      win?.close();
+      setNotice("Не удалось подготовить сообщение");
     } finally { setBusy(""); }
   };
 
