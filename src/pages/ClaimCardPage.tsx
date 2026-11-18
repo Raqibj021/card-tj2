@@ -76,7 +76,7 @@ export default function ClaimCardPage() {
         {invite === undefined ? (
           <div className="free-panel"><p>{t.loading}</p></div>
         ) : invite === null || !invite.slug ? (
-          <div className="free-panel"><p>{t.notFound}</p></div>
+          <div className="free-panel"><p>{t.notFound}</p><a className="free-btn" href="/free">Vizora.tj/free →</a></div>
         ) : (
           <>
             <div className="free-card-zone">
