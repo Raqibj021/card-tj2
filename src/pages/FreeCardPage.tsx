@@ -125,15 +125,25 @@ export default function FreeCardPage() {
   const swipe = useRef<number | null>(null);
   const [drag, setDrag] = useState(0);
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [swiped, setSwiped] = useState(false);
+  const [typing, setTyping] = useState(false);
   const total = t.steps.length;
   const design = freeCardDesigns[designIdx];
 
   useEffect(() => { document.title = lang === "tj" ? "Визиткаи ройгон — Vizora" : lang === "ru" ? "Бесплатная визитка — Vizora" : "Free business card — Vizora"; }, [lang]);
-  useEffect(() => { setError(""); window.setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 250); }, [step]);
+  useEffect(() => {
+    setError("");
+    const mobile = window.matchMedia("(max-width: 880px)").matches;
+    window.setTimeout(() => {
+      if (mobile) panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      else inputRef.current?.focus({ preventScroll: true });
+    }, 120);
+  }, [step]);
   useEffect(() => { freeCardDesigns.forEach((d) => { const i = new Image(); i.src = img(d.img); }); }, []);
 
   const set = <K extends keyof typeof form>(key: K, value: (typeof form)[K]) => setForm((f) => ({ ...f, [key]: value }));
-  const go = (dir: number) => setDesignIdx((i) => (i + dir + freeCardDesigns.length) % freeCardDesigns.length);
+  const go = (dir: number) => { setSwiped(true); setDesignIdx((i) => (i + dir + freeCardDesigns.length) % freeCardDesigns.length); };
 
   const onDown = (e: PointerEvent<HTMLDivElement>) => { swipe.current = e.clientX; e.currentTarget.setPointerCapture(e.pointerId); };
   const onMove = (e: PointerEvent<HTMLDivElement>) => { if (swipe.current !== null) setDrag(e.clientX - swipe.current); };
@@ -229,15 +239,16 @@ export default function FreeCardPage() {
       <section className="free-wrap">
         <div className="free-card-zone">
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          <article className={`free-window ${done ? "done" : ""}`}>
+          <article className={`free-window ${done ? "done" : ""} ${typing ? "typing" : ""}`}>
             <div className="free-window-head">
-              <span className="free-window-logo">{(form.profession || "V").charAt(0).toUpperCase()}</span>
               <span><small>{t.kicker}</small><strong>{form.fullName.trim() || "Vizora.tj"}</strong></span>
               <span className="free-window-flags"><Flag code="tj" /><Flag code="ru" /><Flag code="en" /></span>
             </div>
-            <div className="free-cover" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
+            <div className={`free-cover ${swiped ? "" : "hint"}`} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
               <img key={design.key} className="free-cover-img" src={img(design.img)} alt="" draggable={false} style={{ transform: `translateX(${drag * 0.5}px) scale(1.08)` }} />
               {!done && (<>
+                <div className="free-bars">{freeCardDesigns.map((d, i) => <i key={d.key} className={i === designIdx ? "on" : ""} />)}</div>
+                {!swiped && <div className="free-swipe-hint" aria-hidden><span>👆</span></div>}
                 <button type="button" className="free-cover-nav l" onClick={() => go(-1)} aria-label="prev"><ChevronLeft size={18} /></button>
                 <button type="button" className="free-cover-nav r" onClick={() => go(1)} aria-label="next"><ChevronRight size={18} /></button>
               </>)}
@@ -291,7 +302,7 @@ export default function FreeCardPage() {
             <button type="button" className="free-btn" onClick={() => setStep(0)}>{t.start} <ArrowRight size={18} /></button>
           </div>
         ) : (
-          <div className="free-panel" key={step}>
+          <div className="free-panel" key={step} ref={panelRef} onFocus={(e) => { if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) setTyping(true); }} onBlur={() => setTyping(false)}>
             <div className="free-count">{step + 1} / {total}</div>
             <h1>{t.steps[step].q}</h1>
             <p className="free-hint">{t.steps[step].hint}</p>
