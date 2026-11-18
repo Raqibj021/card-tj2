@@ -1,0 +1,3 @@
+-- Approving a free card can set its directory category and summary so it
+-- appears in the public catalog like other approved cards.
+-- (applied via Supabase; see function admin_approve_card_invite(uuid, text, uuid))

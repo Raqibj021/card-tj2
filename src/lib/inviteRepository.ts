@@ -87,9 +87,14 @@ export const inviteRepository = {
     return (data ?? []) as CardInvite[];
   },
 
-  async approve(id: string, slug: string, photoData = "") {
+  async categories() {
+    const { data } = await adminClient().rpc("get_enabled_profession_categories", { language_code: "ru" });
+    return (data ?? []) as { id: string; name: string; slug: string }[];
+  },
+
+  async approve(id: string, slug: string, photoData = "", category: string | null = null) {
     const db = adminClient();
-    const { data, error } = await db.rpc("admin_approve_card_invite", { p_invite_id: id, p_slug: slug });
+    const { data, error } = await db.rpc("admin_approve_card_invite", { p_invite_id: id, p_slug: slug, p_category: category });
     if (error) throw new Error(error.message);
     const row = (Array.isArray(data) ? data[0] : data) as { card_id: string; slug: string; claim_token: string };
     if (photoData.startsWith("data:image/")) {
