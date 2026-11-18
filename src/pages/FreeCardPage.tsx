@@ -12,7 +12,7 @@ import "./FreeCardPage.css";
 type Lang = "tj" | "ru" | "en";
 
 /* ---------- flags & brand icons (inline SVG, no emoji) ---------- */
-const Flag = ({ code }: { code: Lang }) =>
+export const Flag = ({ code }: { code: Lang }) =>
   code === "tj" ? (
     <svg viewBox="0 0 30 20" aria-hidden><rect width="30" height="20" fill="#fff" /><rect width="30" height="6" fill="#cc0000" /><rect y="14" width="30" height="6" fill="#006600" /><path d="M12.6 11.2h4.8l-.4-1.6-1 .7-.6-1.5-.6 1.5-1-.7z" fill="#f8c300" /><g fill="#f8c300">{[0, 1, 2, 3, 4, 5, 6].map((i) => { const a = Math.PI * (0.95 - i * 0.15); return <circle key={i} cx={15 + Math.cos(a) * 4.2} cy={10.6 - Math.sin(a) * 3.4} r=".5" />; })}</g></svg>
   ) : code === "ru" ? (
@@ -21,10 +21,10 @@ const Flag = ({ code }: { code: Lang }) =>
     <svg viewBox="0 0 60 40" aria-hidden><rect width="60" height="40" fill="#012169" /><path d="M0 0l60 40M60 0L0 40" stroke="#fff" strokeWidth="8" /><path d="M0 0l60 40M60 0L0 40" stroke="#c8102e" strokeWidth="3" /><path d="M30 0v40M0 20h60" stroke="#fff" strokeWidth="12" /><path d="M30 0v40M0 20h60" stroke="#c8102e" strokeWidth="7" /></svg>
   );
 
-const TelegramIcon = ({ size = 20 }: { size?: number }) => (
+export const TelegramIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden><circle cx="12" cy="12" r="12" fill="#29a9eb" /><path d="M5.4 11.7l11.2-4.3c.5-.2 1 .1.8.9l-1.9 9c-.1.6-.5.8-1 .5l-2.9-2.1-1.4 1.3c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.3-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z" fill="#fff" /></svg>
 );
-const InstagramIcon = ({ size = 20 }: { size?: number }) => {
+export const InstagramIcon = ({ size = 20 }: { size?: number }) => {
   const gid = `ig${useId().replace(/:/g, "")}`;
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
@@ -35,7 +35,7 @@ const InstagramIcon = ({ size = 20 }: { size?: number }) => {
 };
 
 /* ---------- copy ---------- */
-const copy = {
+export const copy = {
   tj: {
     badge: "Ройгон · 1 дақиқа", gift: "🎁 Ба 50 нафари аввал — корти NFC тӯҳфа!", heroTitle: "Визиткаи электронии худро ройгон гиред",
     heroText: "Тарҳи дӯстдоштаатонро интихоб кунед, чанд саволро ҷавоб диҳед — мо визиткаро месозем ва ба каталоги мутахассисон илова мекунем.",
@@ -115,7 +115,7 @@ const copy = {
 
 const digits = (v: string) => v.replace(/\D/g, "").replace(/^992/, "").slice(0, 9);
 const fmtPhone = (v: string) => { const d = digits(v); return [d.slice(0, 2), d.slice(2, 5), d.slice(5, 7), d.slice(7, 9)].filter(Boolean).join(" "); };
-const initials = (name: string) => name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "✦";
+export const initials = (name: string) => name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "✦";
 
 export default function FreeCardPage() {
   const { language } = useApp();

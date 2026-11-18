@@ -8,19 +8,18 @@ import { inviteRepository, type CardInvite } from "../lib/inviteRepository";
 import "./AdminInvitesPage.css";
 
 const SITE = "https://vizora.tj";
-const statusNames: Record<CardInvite["status"], string> = { new: "Новая", approved: "Создана", rejected: "Отклонена", claimed: "Зарегистрирован" };
+const statusNames: Record<CardInvite["status"], string> = { new: "Новая", approved: "Создана", rejected: "Отклонена", claimed: "Зарегистрирован", expired: "Удалена (3 дня)" };
 type Channel = "whatsapp" | "telegram" | "instagram";
 
-const message = (inv: CardInvite, slug: string, token: string, left: number) => {
+const message = (inv: CardInvite, token: string, left: number) => {
   const name = inv.full_name.trim().split(/\s+/)[0];
-  const card = `${SITE}/${slug}`;
   const claim = `${SITE}/claim/${token}`;
   const lines =
     inv.language === "ru"
-      ? [`${name}, здравствуйте! 🎉`, `Ваша бесплатная электронная визитка Vizora готова 👇`, card, "", left > 0 ? `🎁 Зарегистрируйтесь сейчас — получите 1 год бесплатно и NFC-карту в подарок (осталось ${left} мест из 50)!` : "", `✅ Чтобы управлять визиткой (фото, контакты, статистика), зарегистрируйтесь — она сразу появится в вашем кабинете:`, claim, "", `Команда Vizora 💙`]
+      ? [`${name}, здравствуйте! 🎉`, `Ваша бесплатная электронная визитка Vizora готова 👇`, claim, "", left > 0 ? `🎁 Зарегистрируйтесь сейчас — получите 1 год бесплатно и NFC-карту в подарок (осталось ${left} мест из 50)!` : "", `✅ Откройте ссылку и зарегистрируйтесь — визитка сразу появится в вашем кабинете, и вы сможете менять фото, контакты и смотреть статистику.`, "", `⏳ Визитка хранится 3 дня. Если за это время не зарегистрироваться, она удалится автоматически.`, "", `Команда Vizora 💙`]
       : inv.language === "en"
-        ? [`Hi ${name}! 🎉`, `Your free Vizora digital card is ready 👇`, card, "", left > 0 ? `🎁 Sign up now to get 1 year free and an NFC card as a gift (${left} of 50 places left)!` : "", `✅ To manage your card (photo, contacts, stats), sign up — it will appear in your account right away:`, claim, "", `Team Vizora 💙`]
-        : [`${name}, ассалому алайкум! 🎉`, `Визиткаи электронии ройгони шумо дар Vizora омода шуд 👇`, card, "", left > 0 ? `🎁 Ҳозир номнавис шавед — 1 сол ройгон ва корти NFC тӯҳфа мегиред (аз 50 ҷой ${left} монд)!` : "", `✅ Барои идора кардани визитка (акс, тамосҳо, омор) номнавис шавед — он дарҳол ба кабинети шумо мегузарад:`, claim, "", `Дастаи Vizora 💙`];
+        ? [`Hi ${name}! 🎉`, `Your free Vizora digital card is ready 👇`, claim, "", left > 0 ? `🎁 Sign up now to get 1 year free and an NFC card as a gift (${left} of 50 places left)!` : "", `✅ Open the link and sign up — the card will appear in your account right away, and you can change the photo, contacts and see stats.`, "", `⏳ The card is kept for 3 days. If you don't sign up by then, it is deleted automatically.`, "", `Team Vizora 💙`]
+        : [`${name}, ассалому алайкум! 🎉`, `Визиткаи электронии ройгони шумо дар Vizora омода шуд 👇`, claim, "", left > 0 ? `🎁 Ҳозир номнавис шавед — 1 сол ройгон ва корти NFC тӯҳфа мегиред (аз 50 ҷой ${left} монд)!` : "", `✅ Пайвандро кушоед ва номнавис шавед — визитка дарҳол ба кабинети шумо мегузарад ва шумо метавонед акс, тамосҳоро иваз кунед ва оморро бинед.`, "", `⏳ Визитка 3 рӯз нигоҳ дошта мешавад. Агар дар ин муддат номнавис нашавед, он худкор нест мешавад.`, "", `Дастаи Vizora 💙`];
   return lines.filter((l, i, arr) => l !== "" || arr[i - 1] !== "").join("\n");
 };
 
@@ -33,7 +32,7 @@ const Avatar = ({ inv, size = 40 }: { inv: CardInvite; size?: number }) => (
 
 export default function AdminInvitesPage() {
   const [rows, setRows] = useState<CardInvite[]>([]);
-  const [filter, setFilter] = useState<"new" | "approved" | "claimed" | "rejected" | "all">("new");
+  const [filter, setFilter] = useState<"new" | "approved" | "claimed" | "rejected" | "expired" | "all">("new");
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState("");
   const [promo, setPromo] = useState<{ limit: number; used: number; places: Record<string, number> }>({ limit: 50, used: 0, places: {} });
@@ -83,9 +82,9 @@ export default function AdminInvitesPage() {
     finally { setBusy(""); }
   };
 
-  const text = (inv: CardInvite) => message(inv, slugOf(inv), inv.claim_token, left);
+  const text = (inv: CardInvite) => message(inv, inv.claim_token, left);
   const cardFile = async (inv: CardInvite) => {
-    const blob = await renderInviteCardImage(inv, slugOf(inv), left > 0 ? left : null);
+    const blob = await renderInviteCardImage(inv, `${SITE}/claim/${inv.claim_token}`, left > 0 ? left : null);
     return new File([blob], `vizora-${slugOf(inv) || "card"}.jpg`, { type: "image/jpeg" });
   };
   const download = (file: File) => {
@@ -147,7 +146,7 @@ export default function AdminInvitesPage() {
   const channels: { key: Channel; label: string; ok: boolean }[] = open
     ? [{ key: "whatsapp", label: "WhatsApp", ok: true }, { key: "telegram", label: "Telegram", ok: Boolean(open.telegram) }, { key: "instagram", label: "Instagram", ok: Boolean(open.instagram) }]
     : [];
-  const canApprove = open && (open.status === "new" || open.status === "rejected" || !slugOf(open));
+  const canApprove = open && open.status !== "claimed" && (open.status === "new" || open.status === "rejected" || open.status === "expired" || !slugOf(open));
   const canSend = open && (open.status === "approved" || open.status === "claimed") && slugOf(open);
 
   return (
@@ -165,7 +164,7 @@ export default function AdminInvitesPage() {
         </div>
 
         <div className="inv-tabs">
-          {(["new", "approved", "claimed", "rejected", "all"] as const).map((k) => (
+          {(["new", "approved", "claimed", "rejected", "expired", "all"] as const).map((k) => (
             <button key={k} className={filter === k ? "active" : ""} onClick={() => setFilter(k)}>
               {k === "all" ? "Все" : k === "new" ? "Новые" : statusNames[k]} <b>{k === "all" ? rows.length : counts[k] ?? 0}</b>
             </button>
@@ -201,6 +200,7 @@ export default function AdminInvitesPage() {
             </header>
             <div className="inv-tags">
               <span className={`inv-pill st-${open.status}`}>{statusNames[open.status]}</span>
+              {open.status === "approved" && open.approved_at && <span className="inv-pill">⏳ удалится {new Date(new Date(open.approved_at).getTime() + 3 * 864e5).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</span>}
               {open.needs_payment && <span className="inv-pill st-new">Ждёт выбора тарифа и оплаты</span>}
               {promo.places[open.id] ? <span className="inv-place">🎁 Место №{promo.places[open.id]} · NFC-карта</span> : null}
             </div>

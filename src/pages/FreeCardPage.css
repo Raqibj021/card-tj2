@@ -167,3 +167,19 @@
 .free-cta small{font-size:11px}
 .free-cta .badge{margin:0;padding:3px 8px;font-size:10.5px}
 .free-gift{margin-top:16px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,rgba(251,191,36,.22),rgba(251,191,36,.08));border:1px solid rgba(251,191,36,.45);color:#fde68a;font-weight:900;font-size:15px}
+
+/* Off-screen snapshot of the card for the admin's WhatsApp message */
+.invite-shot{min-height:0;width:420px;padding:22px 22px 26px;overflow:visible}
+.invite-shot *,.invite-shot *::before,.invite-shot *::after{animation:none!important;transition:none!important}
+.invite-shot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.invite-shot-top b{font-size:16px;font-weight:900;letter-spacing:.04em;color:#fff}
+.invite-shot-gift{padding:5px 10px;border-radius:999px;background:#fbbf24;color:#0b1430;font-size:11.5px;font-weight:900}
+.invite-shot-title{margin:4px 0 14px;font-size:22px;font-weight:900;color:#fff;text-align:center}
+.invite-shot .free-photo{cursor:default}
+.invite-shot-qr{display:flex;align-items:center;gap:12px;margin-top:12px;padding:10px;border-radius:16px;background:rgba(255,255,255,.06);border:1px dashed rgba(255,255,255,.22);text-align:left}
+.invite-shot-qr-box{position:relative;flex:none;width:92px;height:92px;border-radius:12px;overflow:hidden;background:#fff}
+.invite-shot-qr-box img{width:100%;height:100%;display:block;opacity:.72;filter:grayscale(1)}
+.invite-shot-qr-box span{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%) rotate(-12deg);padding:3px 0;background:#ef4444;color:#fff;font-size:9px;font-weight:900;text-align:center;letter-spacing:.03em}
+.invite-shot-qr div:last-child{display:grid;gap:3px}
+.invite-shot-qr b{font-size:14px;color:#fff}
+.invite-shot-qr small{font-size:12px;color:rgba(255,255,255,.7)}
