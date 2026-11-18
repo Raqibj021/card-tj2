@@ -7,6 +7,7 @@ import { useApp } from "../context/AppContext";
 import FreeCover from "../components/FreeCover";
 import { freeCardDesigns } from "../lib/freeCardDesigns";
 import { inviteRepository } from "../lib/inviteRepository";
+import { promoRepository } from "../lib/promoRepository";
 import "./FreeCardPage.css";
 
 type Lang = "tj" | "ru" | "en";
@@ -37,7 +38,7 @@ export const InstagramIcon = ({ size = 20 }: { size?: number }) => {
 /* ---------- copy ---------- */
 export const copy = {
   tj: {
-    badge: "Ройгон · 1 дақиқа", gift: "🎁 Ба 50 нафари аввал — корти NFC тӯҳфа!", heroTitle: "Визиткаи электронии худро ройгон гиред",
+    badgeAfter: "Ҳамагӣ 1 дақиқа", heroTitleAfter: "Визиткаи электронии худро созед", badge: "Ройгон · 1 дақиқа", gift: "🎁 Ба 50 нафари аввал — корти NFC тӯҳфа!", heroTitle: "Визиткаи электронии худро ройгон гиред",
     heroText: "Тарҳи дӯстдоштаатонро интихоб кунед, чанд саволро ҷавоб диҳед — мо визиткаро месозем ва ба каталоги мутахассисон илова мекунем.",
     start: "Оғоз кардан", next: "Давом", back: "Бозгашт", skip: "Гузарондан", send: "Визиткаро гирифтан", sending: "Фиристода мешавад…",
     swipe: "Тарҳро варақ занед",
@@ -62,7 +63,7 @@ export const copy = {
     errors: { bad_name: "Лутфан ном ва насабро пурра нависед", bad_phone: "Рақам бояд 9 рақам бошад: 90 000 00 00", bad_whatsapp: "Рақами WhatsApp нодуруст аст", too_many_requests: "Аз ин рақам аллакай дархост фиристода шудааст", consent_required: "Лутфан розигиро қайд кунед", unknown: "Хатогӣ рӯй дод. Боз кӯшиш кунед ё ба WhatsApp нависед" }
   },
   ru: {
-    badge: "Бесплатно · 1 минута", gift: "🎁 Первым 50 — NFC-карта в подарок!", heroTitle: "Получите электронную визитку бесплатно",
+    badgeAfter: "Всего 1 минута", heroTitleAfter: "Создайте свою электронную визитку", badge: "Бесплатно · 1 минута", gift: "🎁 Первым 50 — NFC-карта в подарок!", heroTitle: "Получите электронную визитку бесплатно",
     heroText: "Выберите понравившийся дизайн, ответьте на пару вопросов — мы сделаем визитку и добавим вас в каталог специалистов.",
     start: "Начать", next: "Дальше", back: "Назад", skip: "Пропустить", send: "Получить визитку", sending: "Отправляем…",
     swipe: "Листайте дизайн",
@@ -87,7 +88,7 @@ export const copy = {
     errors: { bad_name: "Пожалуйста, укажите имя и фамилию полностью", bad_phone: "Номер должен быть из 9 цифр: 90 000 00 00", bad_whatsapp: "Номер WhatsApp указан неверно", too_many_requests: "С этого номера заявка уже отправлена", consent_required: "Пожалуйста, отметьте согласие", unknown: "Что-то пошло не так. Попробуйте ещё раз или напишите в WhatsApp" }
   },
   en: {
-    badge: "Free · 1 minute", gift: "🎁 First 50 get a free NFC card!", heroTitle: "Get your digital business card for free",
+    badgeAfter: "Just 1 minute", heroTitleAfter: "Create your digital business card", badge: "Free · 1 minute", gift: "🎁 First 50 get a free NFC card!", heroTitle: "Get your digital business card for free",
     heroText: "Pick a design you love, answer a few questions — we will build your card and add you to the Vizora specialists directory.",
     start: "Get started", next: "Next", back: "Back", skip: "Skip", send: "Get my card", sending: "Sending…",
     swipe: "Swipe designs",
@@ -138,6 +139,8 @@ export default function FreeCardPage() {
   const total = t.steps.length;
   const design = freeCardDesigns[designIdx];
 
+  const [promoOn, setPromoOn] = useState(true);
+  useEffect(() => { promoRepository.status().then((p) => setPromoOn(p.remaining > 0)).catch(() => undefined); }, []);
   useEffect(() => { document.title = lang === "tj" ? "Визиткаи ройгон — Vizora" : lang === "ru" ? "Бесплатная визитка — Vizora" : "Free business card — Vizora"; }, [lang]);
   useEffect(() => {
     setError("");
@@ -297,10 +300,10 @@ export default function FreeCardPage() {
           </div>
         ) : step < 0 ? (
           <div className="free-panel free-intro">
-            <span className="free-badge"><Sparkles size={15} /> {t.badge}</span>
-            <h1>{t.heroTitle}</h1>
+            <span className="free-badge"><Sparkles size={15} /> {promoOn ? t.badge : t.badgeAfter}</span>
+            <h1>{promoOn ? t.heroTitle : t.heroTitleAfter}</h1>
             <p>{t.heroText}</p>
-            <div className="free-gift">{t.gift}</div>
+            {promoOn && <div className="free-gift">{t.gift}</div>}
             <button type="button" className="free-btn" onClick={() => setStep(0)}>{t.start} <ArrowRight size={18} /></button>
           </div>
         ) : (

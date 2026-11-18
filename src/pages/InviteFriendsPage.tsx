@@ -1,33 +1,40 @@
 import { Check, Copy, Share2 } from "lucide-react";
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import { useApp } from "../context/AppContext";
+import { promoRepository } from "../lib/promoRepository";
 import { Flag, InstagramIcon, TelegramIcon } from "./FreeCardPage";
 import "./FreeCardPage.css";
 import "./InviteFriendsPage.css";
 
 type Lang = "tj" | "ru" | "en";
 const URL_FREE = "https://vizora.tj/free";
-const IMAGE = "/og-free.jpg";
+
 
 const copy = {
   tj: {
     title: "Дӯстонатонро даъват кунед 🎁",
+    textAfter: "Бигзор онҳо ҳам визиткаи электронии худро созанд. Шабакаро интихоб кунед — паём ва акс тайёранд.",
     text: "Бигзор онҳо ҳам визиткаи электронии ройгон гиранд. Шабакаро интихоб кунед — паём ва акс тайёранд.",
+    msgAfter: `✨ Салом! Визиткаи электронии худро дар Vizora созед — телефон, WhatsApp, Telegram ва Instagram дар як пайванд. Ҳамагӣ 1 дақиқа!\n\nБо QR-код ва корти NFC мизоҷон шуморо осон меёбанд 🔥\n\nБарои худ созед 👇\n${URL_FREE}`,
     msg: `🎁 Салом! Визиткаи электронии РОЙГОН дар Vizora — телефон, WhatsApp, Telegram ва Instagram дар як пайванд. Ҳамагӣ 1 дақиқа!\n\n50 нафари аввал корти NFC тӯҳфа мегиранд 🔥\n\nБарои худ созед 👇\n${URL_FREE}`,
     withPhoto: "Фиристодан бо акс", withPhotoSub: "Барномаро интихоб кунед", copy: "Нусхабардории матн", copied: "Нусхабардорӣ шуд!", igHint: "Матн нусхабардорӣ шуд — дар Instagram ба Direct ё Stories гузоред.", back: "Визиткаи худро созед", preview: "Паём"
   },
   ru: {
     title: "Пригласите друзей 🎁",
+    textAfter: "Пусть тоже сделают свою электронную визитку. Выберите соцсеть — сообщение и фото уже готовы.",
     text: "Пусть тоже получат бесплатную электронную визитку. Выберите соцсеть — сообщение и фото уже готовы.",
+    msgAfter: `✨ Привет! Сделай свою электронную визитку на Vizora — телефон, WhatsApp, Telegram и Instagram в одной ссылке. Всего 1 минута!\n\nС QR-кодом и NFC-картой клиенты легко тебя находят 🔥\n\nСделай себе 👇\n${URL_FREE}`,
     msg: `🎁 Привет! БЕСПЛАТНАЯ электронная визитка на Vizora — телефон, WhatsApp, Telegram и Instagram в одной ссылке. Всего 1 минута!\n\nПервым 50 — NFC-карта в подарок 🔥\n\nСделай себе 👇\n${URL_FREE}`,
     withPhoto: "Отправить с фото", withPhotoSub: "Выберите приложение", copy: "Скопировать текст", copied: "Скопировано!", igHint: "Текст скопирован — вставьте его в Direct или Stories в Instagram.", back: "Создать свою визитку", preview: "Сообщение"
   },
   en: {
     title: "Invite your friends 🎁",
+    textAfter: "Let them make their own digital card too. Pick a network — the message and photo are ready.",
     text: "Let them get a free digital business card too. Pick a network — the message and photo are ready.",
+    msgAfter: `✨ Hi! Make your digital business card on Vizora — phone, WhatsApp, Telegram and Instagram in one link. Takes 1 minute!\n\nWith a QR code and an NFC card clients find you easily 🔥\n\nMake yours 👇\n${URL_FREE}`,
     msg: `🎁 Hi! A FREE digital business card on Vizora — phone, WhatsApp, Telegram and Instagram in one link. Takes 1 minute!\n\nThe first 50 get an NFC card as a gift 🔥\n\nMake yours 👇\n${URL_FREE}`,
     withPhoto: "Send with photo", withPhotoSub: "Choose an app", copy: "Copy text", copied: "Copied!", igHint: "Text copied — paste it into Instagram Direct or Stories.", back: "Create your own card", preview: "Message"
   }
@@ -43,8 +50,11 @@ export default function InviteFriendsPage() {
   const initial = (params.get("lang") ?? language) as string;
   const [lang, setLang] = useState<Lang>(initial === "ru" ? "ru" : initial === "en" ? "en" : "tj");
   const [notice, setNotice] = useState("");
+  const [promoOn, setPromoOn] = useState(true);
+  useEffect(() => { promoRepository.status().then((p) => setPromoOn(p.remaining > 0)).catch(() => undefined); }, []);
+  const IMAGE = promoOn ? "/og-free.jpg" : "/og-after.jpg";
   const t = copy[lang];
-  const msg = t.msg;
+  const msg = promoOn ? t.msg : t.msgAfter;
   const enc = encodeURIComponent(msg);
 
   const flash = (text: string) => { setNotice(text); window.setTimeout(() => setNotice(""), 3500); };
@@ -82,7 +92,7 @@ export default function InviteFriendsPage() {
       <section className="invite-wrap">
         <div className="free-panel invite-panel">
           <h1>{t.title}</h1>
-          <p>{t.text}</p>
+          <p>{promoOn ? t.text : t.textAfter}</p>
 
           <div className="invite-preview">
             <img src={IMAGE} alt="" />
