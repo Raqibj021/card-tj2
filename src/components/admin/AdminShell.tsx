@@ -1,6 +1,7 @@
 import {
   Banknote,
   Building2,
+  Gift,
   ContactRound,
   Headphones,
   LayoutDashboard,
@@ -23,6 +24,7 @@ const navigation = [
   { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck, count: "moderation" as const },
   { to: "/admin/payments", label: "Заявки и оплаты", icon: Banknote, count: "payments" as const },
   { to: "/admin/commerce", label: "Заказы услуг", icon: ShoppingBag, count: "services" as const },
+  { to: "/admin/invites", label: "Бесплатные визитки", icon: Gift },
   { to: "/admin/support", label: "Поддержка", icon: Headphones, count: "support" as const }
 ];
 
