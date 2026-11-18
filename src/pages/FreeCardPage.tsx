@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, Camera, Check, ChevronLeft, ChevronRight, MapPin, Phone, Sparkles, UserPlus } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type KeyboardEvent, type PointerEvent } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type KeyboardEvent, type PointerEvent } from "react";
 import { useSearchParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
@@ -24,12 +24,15 @@ const Flag = ({ code }: { code: Lang }) =>
 const TelegramIcon = ({ size = 20 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden><circle cx="12" cy="12" r="12" fill="#29a9eb" /><path d="M5.4 11.7l11.2-4.3c.5-.2 1 .1.8.9l-1.9 9c-.1.6-.5.8-1 .5l-2.9-2.1-1.4 1.3c-.2.2-.3.3-.6.3l.2-3 5.4-4.9c.2-.2 0-.3-.3-.1l-6.7 4.2-2.9-.9c-.6-.2-.6-.6.1-.9z" fill="#fff" /></svg>
 );
-const InstagramIcon = ({ size = 20 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
-    <defs><radialGradient id="igg" cx="30%" cy="107%" r="150%"><stop offset="0" stopColor="#fdf497" /><stop offset=".05" stopColor="#fdf497" /><stop offset=".45" stopColor="#fd5949" /><stop offset=".6" stopColor="#d6249f" /><stop offset=".9" stopColor="#285aeb" /></radialGradient></defs>
-    <rect width="24" height="24" rx="6" fill="url(#igg)" /><rect x="5" y="5" width="14" height="14" rx="4.2" fill="none" stroke="#fff" strokeWidth="1.8" /><circle cx="12" cy="12" r="3.3" fill="none" stroke="#fff" strokeWidth="1.8" /><circle cx="16.3" cy="7.7" r="1" fill="#fff" />
-  </svg>
-);
+const InstagramIcon = ({ size = 20 }: { size?: number }) => {
+  const gid = `ig${useId().replace(/:/g, "")}`;
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden>
+      <defs><radialGradient id={gid} cx="30%" cy="107%" r="150%"><stop offset="0" stopColor="#fdf497" /><stop offset=".05" stopColor="#fdf497" /><stop offset=".45" stopColor="#fd5949" /><stop offset=".6" stopColor="#d6249f" /><stop offset=".9" stopColor="#285aeb" /></radialGradient></defs>
+      <rect width="24" height="24" rx="6" fill={`url(#${gid})`} /><rect x="5" y="5" width="14" height="14" rx="4.2" fill="none" stroke="#fff" strokeWidth="2" /><circle cx="12" cy="12" r="3.3" fill="none" stroke="#fff" strokeWidth="2" /><circle cx="16.3" cy="7.7" r="1.1" fill="#fff" />
+    </svg>
+  );
+};
 
 /* ---------- copy ---------- */
 const copy = {
