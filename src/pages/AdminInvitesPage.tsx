@@ -10,9 +10,8 @@ import "./AdminInvitesPage.css";
 const SITE = "https://vizora.tj";
 const statusNames: Record<CardInvite["status"], string> = { new: "Новая", approved: "Визитка создана", rejected: "Отклонена", claimed: "Забрал в кабинет" };
 
-const NFC_LIMIT = 50;
-
-const message = (inv: CardInvite, slug: string, token: string, nfc: number | null) => {
+const message = (inv: CardInvite, slug: string, token: string, left: number | null) => {
+  const nfc = left !== null && left > 0;
   const name = inv.full_name.trim().split(/\s+/)[0];
   const card = `${SITE}/${slug}`;
   const claim = `${SITE}/claim/${token}`;
@@ -21,7 +20,7 @@ const message = (inv: CardInvite, slug: string, token: string, nfc: number | nul
     `Ваша бесплатная электронная визитка Vizora готова 👇`,
     card,
     ``,
-    nfc ? `🎁 Вы среди первых ${NFC_LIMIT} — вам положена фирменная NFC-карта в подарок!` : ``,
+    nfc ? `🎁 Зарегистрируйтесь сейчас — получите 1 год бесплатно и NFC-карту в подарок (осталось ${left} мест из 50)!` : ``,
     `✅ Чтобы управлять визиткой (фото, контакты, статистика), зарегистрируйтесь — она сразу появится в вашем кабинете:`,
     claim,
     ``,
@@ -32,7 +31,7 @@ const message = (inv: CardInvite, slug: string, token: string, nfc: number | nul
     `Your free Vizora digital card is ready 👇`,
     card,
     ``,
-    nfc ? `🎁 You are among the first ${NFC_LIMIT} — a branded NFC card is your gift!` : ``,
+    nfc ? `🎁 Sign up now to get 1 year free and an NFC card as a gift (${left} of 50 places left)!` : ``,
     `✅ To manage your card (photo, contacts, stats), sign up — it will appear in your account right away:`,
     claim,
     ``,
@@ -43,7 +42,7 @@ const message = (inv: CardInvite, slug: string, token: string, nfc: number | nul
     `Визиткаи электронии ройгони шумо дар Vizora омода шуд 👇`,
     card,
     ``,
-    nfc ? `🎁 Шумо дар қатори ${NFC_LIMIT} нафари аввал ҳастед — корти NFC-и фирмавӣ ба шумо тӯҳфа!` : ``,
+    nfc ? `🎁 Ҳозир номнавис шавед — 1 сол ройгон ва корти NFC тӯҳфа мегиред (аз 50 ҷой ${left} монд)!` : ``,
     `✅ Барои идора кардани визитка (акс, тамосҳо, омор) номнавис шавед — он дарҳол ба кабинети шумо мегузарад:`,
     claim,
     ``,
@@ -56,10 +55,11 @@ export default function AdminInvitesPage() {
   const [filter, setFilter] = useState<"new" | "approved" | "claimed" | "rejected" | "all">("new");
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState("");
+  const [promo, setPromo] = useState<{ limit: number; used: number; places: Record<string, number> }>({ limit: 50, used: 0, places: {} });
 
   const refresh = async () => {
     setBusy("refresh");
-    try { setRows(await inviteRepository.list()); setNotice(""); }
+    try { const [list, p] = await Promise.all([inviteRepository.list(), inviteRepository.promo()]); setRows(list); setPromo(p); setNotice(""); }
     catch (e) { setNotice(e instanceof Error ? e.message : "Не удалось загрузить заявки"); }
     finally { setBusy(""); }
   };
@@ -67,9 +67,10 @@ export default function AdminInvitesPage() {
 
   const counts = useMemo(() => rows.reduce<Record<string, number>>((a, r) => ({ ...a, [r.status]: (a[r.status] ?? 0) + 1 }), {}), [rows]);
   const list = rows.filter((r) => filter === "all" || r.status === filter);
-  const made = useMemo(() => rows.filter((r) => r.status === "approved" || r.status === "claimed").sort((a, b) => a.created_at.localeCompare(b.created_at)), [rows]);
-  const nfcOf = (id: string) => { const i = made.findIndex((r) => r.id === id); return i >= 0 && i < NFC_LIMIT ? i + 1 : null; };
-  const gifts = Math.min(made.length, NFC_LIMIT);
+  const made = rows.filter((r) => r.status === "approved" || r.status === "claimed");
+  const left = Math.max(0, promo.limit - promo.used);
+  const placeOf = (id: string) => promo.places[id] ?? null;
+  const freeWithGift = Object.keys(promo.places).length;
 
   const approve = async (inv: CardInvite) => {
     setBusy(inv.id);
@@ -89,9 +90,9 @@ export default function AdminInvitesPage() {
     finally { setBusy(""); }
   };
 
-  const waLink = (inv: CardInvite) => `https://wa.me/${inv.whatsapp || inv.phone}?text=${encodeURIComponent(message(inv, inv.cards?.slug ?? "", inv.claim_token, nfcOf(inv.id)))}`;
+  const waLink = (inv: CardInvite) => `https://wa.me/${inv.whatsapp || inv.phone}?text=${encodeURIComponent(message(inv, inv.cards?.slug ?? "", inv.claim_token, left))}`;
   const cardImage = async (inv: CardInvite) => {
-    const blob = await renderInviteCardImage(inv, inv.cards?.slug ?? "", nfcOf(inv.id));
+    const blob = await renderInviteCardImage(inv, inv.cards?.slug ?? "", left > 0 ? left : null);
     return new File([blob], `vizora-${inv.cards?.slug ?? "card"}.jpg`, { type: "image/jpeg" });
   };
   const download = (file: File) => {
@@ -103,7 +104,7 @@ export default function AdminInvitesPage() {
     setBusy(inv.id);
     try {
       const file = await cardImage(inv);
-      const text = message(inv, inv.cards?.slug ?? "", inv.claim_token, nfcOf(inv.id));
+      const text = message(inv, inv.cards?.slug ?? "", inv.claim_token, left);
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], text });
       } else {
@@ -118,21 +119,22 @@ export default function AdminInvitesPage() {
   };
   const downloadPhoto = async (inv: CardInvite) => { setBusy(inv.id); try { download(await cardImage(inv)); } finally { setBusy(""); } };
   const copyText = async (inv: CardInvite) => {
-    await navigator.clipboard.writeText(message(inv, inv.cards?.slug ?? "", inv.claim_token, nfcOf(inv.id)));
+    await navigator.clipboard.writeText(message(inv, inv.cards?.slug ?? "", inv.claim_token, left));
     setNotice("Сообщение скопировано — вставьте его в Instagram или Telegram");
   };
 
   return (
     <AdminShell
       title="Бесплатные визитки"
-      description={`Заявки с формы ${SITE}/free. Первые ${NFC_LIMIT} созданных визиток получают NFC-карту в подарок.`}
+      description={`Заявки с формы ${SITE}/free. Счётчик акции общий: бесплатные визитки продолжают те же «первые ${promo.limit}».`}
       actions={<button className="admin-toolbar-button" disabled={busy === "refresh"} onClick={() => void refresh()}><RefreshCw className={busy === "refresh" ? "spin" : ""} size={16} /> Обновить</button>}
     >
       <div className="admin-subpage invites-page">
         <div className="invites-stats">
           <div><span>Создано визиток</span><b>{made.length}</b></div>
-          <div className="gift"><span><Gift size={15} /> NFC-карт в подарок</span><b>{gifts} / {NFC_LIMIT}</b><i style={{ width: `${(gifts / NFC_LIMIT) * 100}%` }} /></div>
-          <div><span>Осталось подарков</span><b>{NFC_LIMIT - gifts}</b></div>
+          <div className="gift"><span><Gift size={15} /> Акция «первые {promo.limit}»: занято</span><b>{promo.used} / {promo.limit}</b><i style={{ width: `${(promo.used / promo.limit) * 100}%` }} /></div>
+          <div><span>Осталось мест (общий счётчик)</span><b>{left}</b></div>
+          <div><span>Из них по бесплатным визиткам</span><b>{freeWithGift}</b></div>
           <div><span>Забрали в кабинет</span><b>{counts.claimed ?? 0}</b></div>
           <div><span>Новые заявки</span><b>{counts.new ?? 0}</b></div>
         </div>
@@ -155,7 +157,7 @@ export default function AdminInvitesPage() {
                   <span>{inv.profession}{inv.city ? ` · ${inv.city}` : ""}</span>
                 </div>
                 <em>{statusNames[inv.status]}</em>
-                {nfcOf(inv.id) && <span className="invite-nfc">🎁 NFC №{nfcOf(inv.id)}</span>}
+                {placeOf(inv.id) ? <span className="invite-nfc">🎁 Акция: место №{placeOf(inv.id)} · NFC-карта</span> : inv.status === "approved" && left > 0 ? <span className="invite-nfc muted">🎁 Получит место в акции после регистрации</span> : null}
               </header>
               <dl>
                 <dt>Телефон</dt><dd>+{inv.phone}</dd>

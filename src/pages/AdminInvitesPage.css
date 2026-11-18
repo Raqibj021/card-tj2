@@ -33,3 +33,4 @@
 .invites-stats .gift i{position:absolute;left:0;bottom:0;height:5px;background:#f59e0b;border-radius:0 4px 4px 0}
 .invite-card header{flex-wrap:wrap}
 .invite-nfc{flex-basis:100%;margin-left:58px;margin-top:-4px;font-size:12px;font-weight:900;color:#b45309}
+.invite-nfc.muted{color:#64748b;font-weight:700}
