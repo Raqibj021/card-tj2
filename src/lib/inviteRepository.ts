@@ -106,6 +106,12 @@ export const inviteRepository = {
     return row;
   },
 
+  async promo() {
+    const { data, error } = await adminClient().rpc("admin_card_invites_promo");
+    if (error) throw error;
+    return data as { limit: number; used: number; places: Record<string, number> };
+  },
+
   async reject(id: string) {
     const { error } = await adminClient().from("card_invites").update({ status: "rejected", updated_at: new Date().toISOString() }).eq("id", id);
     if (error) throw error;

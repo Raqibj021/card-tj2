@@ -35,7 +35,7 @@ const roundRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 };
 
 /** Draws a 1080×1350 picture of the specialist's ready card to send with the WhatsApp message. */
-export async function renderInviteCardImage(inv: CardInvite, slug: string, nfcNumber: number | null) {
+export async function renderInviteCardImage(inv: CardInvite, slug: string, placesLeft: number | null) {
   const design = findFreeCardDesign(inv.design);
   const W = 1080, H = 1350;
   const canvas = document.createElement("canvas");
@@ -108,8 +108,8 @@ export async function renderInviteCardImage(inv: CardInvite, slug: string, nfcNu
   // header + NFC gift ribbon
   ctx.fillStyle = "#fff"; ctx.font = "900 44px Inter, Arial, sans-serif"; ctx.textAlign = "left";
   ctx.fillText("VIZORA.TJ", 90, 100);
-  if (nfcNumber) {
-    const label = inv.language === "ru" ? `🎁 NFC-карта в подарок · №${nfcNumber}` : inv.language === "en" ? `🎁 Free NFC card · #${nfcNumber}` : `🎁 Корти NFC тӯҳфа · №${nfcNumber}`;
+  if (placesLeft) {
+    const label = inv.language === "ru" ? "🎁 + NFC-карта в подарок" : inv.language === "en" ? "🎁 + free NFC card" : "🎁 + корти NFC тӯҳфа";
     ctx.font = "900 34px Inter, Arial, sans-serif";
     const w = ctx.measureText(label).width + 56;
     roundRect(ctx, W - 90 - w, 52, w, 70, 35); ctx.fillStyle = "#fbbf24"; ctx.fill();
