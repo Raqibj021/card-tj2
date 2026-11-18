@@ -155,3 +155,18 @@
 .free-photo-big span{display:grid;place-items:center;width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#e0f2fe,#bfdbfe);color:#1e3a8a;font-size:40px;font-weight:900}
 .free-photo-big i{position:absolute;right:2px;bottom:6px;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--acc);color:#0b1430;border:4px solid #0f1729}
 .free-btn-soft{background:rgba(255,255,255,.1);color:#fff;box-shadow:none;border:1.5px solid rgba(255,255,255,.25)}
+/* compact success screen */
+.free-done{padding:20px 18px}
+.free-done h1{font-size:22px;margin:2px 0 6px}
+.free-done>p{font-size:14px!important;line-height:1.4}
+.free-done .free-done-more{margin-top:10px!important;font-size:14px!important}
+.free-cta-grid{grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.free-cta{flex-direction:column;align-items:center;text-align:center;gap:6px;padding:12px 8px;border-radius:16px}
+.free-cta .ico{width:38px;height:38px;border-radius:12px}
+.free-cta b{font-size:13.5px;line-height:1.2}
+.free-cta small{font-size:11px}
+.free-cta .badge{margin:0;padding:3px 8px;font-size:10.5px}
+.free-window.done .free-window-head,.free-window.done .free-socials,.free-window.done .free-acts,.free-window.done .free-save{display:none}
+.free-window.done .free-cover{height:70px}
+.free-window.done .free-photo{width:64px;height:64px;margin-left:-32px;bottom:-30px}
+.free-window.done .free-window-body{padding:36px 12px 10px}

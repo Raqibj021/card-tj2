@@ -241,7 +241,7 @@ export default function FreeCardPage() {
       <section className="free-wrap">
         <div className="free-card-zone">
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          <article className={`free-window ${done ? "done" : ""} ${typing ? "typing" : ""}`}>
+          <article className={`free-window ${done ? "done typing" : ""} ${typing ? "typing" : ""}`}>
             <div className="free-window-head">
               <span><small>{t.kicker}</small><strong>{form.fullName.trim() || "Vizora.tj"}</strong></span>
               <span className="free-window-flags"><Flag code="tj" /><Flag code="ru" /><Flag code="en" /></span>
@@ -287,7 +287,6 @@ export default function FreeCardPage() {
               <a className="free-cta wa" href={`https://wa.me/?text=${encodeURIComponent(t.shareText + "https://vizora.tj/free")}`} target="_blank" rel="noreferrer">
                 <span className="ico"><WhatsAppIcon size={26} /></span><span><b>{t.share}</b><small>{t.shareSub}</small></span><span className="badge">👥 3</span>
               </a>
-              <div className="free-or">{t.or}</div>
               <a className="free-cta ig" href="https://www.instagram.com/vizora.tj/" target="_blank" rel="noreferrer">
                 <span className="ico"><InstagramIcon size={26} /></span><span><b>{t.follow}</b><small>{t.followSub}</small></span><span className="badge">@vizora.tj</span>
               </a>
