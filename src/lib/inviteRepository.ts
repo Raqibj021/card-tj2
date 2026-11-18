@@ -30,6 +30,7 @@ export type CardInvite = {
   source: string;
   design: string;
   photo_data: string;
+  needs_payment?: boolean;
   status: "new" | "approved" | "rejected" | "claimed";
   card_id: string | null;
   claim_token: string;

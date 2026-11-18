@@ -160,6 +160,7 @@ export default function AdminInvitesPage() {
                 <span className="inv-name"><b>{inv.full_name}</b><small>{inv.profession}{inv.city ? ` · ${inv.city}` : ""}</small></span>
                 {promo.places[inv.id] ? <span className="inv-place">🎁 №{promo.places[inv.id]}</span> : null}
                 <span className={`inv-pill st-${inv.status}`}>{statusNames[inv.status]}</span>
+                {inv.needs_payment && <span className="inv-pill st-new">Ждёт оплаты</span>}
                 <time>{new Date(inv.created_at).toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit" })}</time>
               </button>
             </li>
@@ -177,6 +178,7 @@ export default function AdminInvitesPage() {
             </header>
             <div className="inv-tags">
               <span className={`inv-pill st-${open.status}`}>{statusNames[open.status]}</span>
+              {open.needs_payment && <span className="inv-pill st-new">Ждёт выбора тарифа и оплаты</span>}
               {promo.places[open.id] ? <span className="inv-place">🎁 Место №{promo.places[open.id]} · NFC-карта</span> : null}
             </div>
 
