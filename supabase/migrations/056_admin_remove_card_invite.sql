@@ -1,0 +1,1 @@
+-- admin_remove_card_invite(p_invite_id, p_mode 'reject'|'delete') — applied via Supabase

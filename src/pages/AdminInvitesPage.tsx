@@ -1,4 +1,4 @@
-import { CheckCircle2, Copy, Download, ExternalLink, Gift, ImageUp, RefreshCw, Send, X } from "lucide-react";
+import { Ban, CheckCircle2, Copy, Download, ExternalLink, Gift, ImageUp, RefreshCw, Send, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
 import { createSlug } from "../lib/cardUtils";
@@ -80,6 +80,22 @@ export default function AdminInvitesPage() {
     setBusy(inv.id);
     try { await inviteRepository.reject(inv.id); setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "rejected" as const } : r))); setOpenId(null); }
     finally { setBusy(""); }
+  };
+
+  const remove = async (inv: CardInvite, mode: "reject" | "delete") => {
+    const q = mode === "delete"
+      ? `Удалить заявку ${inv.full_name}${inv.status === "claimed" ? "? Визитка останется у владельца в кабинете." : " вместе с визиткой?"}`
+      : `Отклонить ${inv.full_name}? Созданная визитка будет удалена.`;
+    if (!window.confirm(q)) return;
+    setBusy(inv.id);
+    try {
+      await inviteRepository.remove(inv.id, mode);
+      setRows((all) => mode === "delete" ? all.filter((r) => r.id !== inv.id) : all.map((r) => (r.id === inv.id ? { ...r, status: "rejected" as const, card_id: null, cards: null } : r)));
+      setOpenId(null);
+      setNotice(mode === "delete" ? "Заявка удалена" : "Заявка отклонена, визитка удалена");
+    } catch (e) {
+      setNotice(`Ошибка: ${e instanceof Error ? e.message : "не удалось"}`);
+    } finally { setBusy(""); }
   };
 
   const text = (inv: CardInvite) => message(inv, inv.claim_token, left);
@@ -250,6 +266,10 @@ export default function AdminInvitesPage() {
                 <p className="inv-hint">Удалить визитку можно в разделе «Визитки» — она там вместе со всеми.</p>
               </div>
             )}
+            <div className="inv-row small inv-danger-row">
+              {(open.status === "approved" || open.status === "expired") && <button className="inv-btn danger" disabled={busy === open.id} onClick={() => void remove(open, "reject")}><Ban size={15} /> Отклонить</button>}
+              <button className="inv-btn danger" disabled={busy === open.id} onClick={() => void remove(open, "delete")}><Trash2 size={15} /> Удалить</button>
+            </div>
           </div>
         </div>
       )}
