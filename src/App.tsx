@@ -82,6 +82,11 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [modalCard, location.pathname]);
+  useEffect(() => {
+    const key = location.pathname === "/free" ? "free" : location.pathname === "/invite" ? "invite" : "vizora";
+    document.querySelector('link[rel="manifest"]')?.setAttribute("href", `/${key}.webmanifest`);
+    document.querySelector('link[rel="apple-touch-icon"]')?.setAttribute("href", `/icons/${key}-192.png`);
+  }, [location.pathname]);
   const standaloneAuth = ["/free", "/invite", "/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname) || location.pathname.startsWith("/claim/");
   const standaloneAdmin = location.pathname.startsWith("/admin");
 

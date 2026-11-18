@@ -45,6 +45,8 @@ async function rewrite(context, url) {
     .on('meta[name="twitter:title"]', set(m.title))
     .on('meta[name="twitter:description"]', set(m.desc))
     .on('meta[name="twitter:image"]', set(m.image))
+    .on('link[rel="manifest"]', { element(el) { el.setAttribute("href", "/free.webmanifest"); } })
+    .on('link[rel="apple-touch-icon"]', { element(el) { el.setAttribute("href", "/icons/free-192.png"); } })
     .on("title", { element(el) { el.setInnerContent(m.title); } })
     .transform(response);
 }
