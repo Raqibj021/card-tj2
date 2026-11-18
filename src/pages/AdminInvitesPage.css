@@ -62,3 +62,4 @@
 .inv-hint{margin:0;color:#718198;font-size:12px}
 .spin{animation:inv-spin 1s linear infinite}
 @keyframes inv-spin{to{transform:rotate(360deg)}}
+.inv-danger-row{padding-top:10px;border-top:1px solid #edf1f6}

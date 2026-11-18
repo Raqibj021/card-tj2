@@ -113,6 +113,11 @@ export const inviteRepository = {
     return row;
   },
 
+  async remove(id: string, mode: "reject" | "delete") {
+    const { error } = await adminClient().rpc("admin_remove_card_invite", { p_invite_id: id, p_mode: mode });
+    if (error) throw new Error(error.message);
+  },
+
   async promo() {
     const { data, error } = await adminClient().rpc("admin_card_invites_promo");
     if (error) throw error;
