@@ -36,6 +36,9 @@ import AdminSupportPage from "./pages/AdminSupportPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminAccountsPage from "./pages/AdminAccountsPage";
 import AdminCardsPage from "./pages/AdminCardsPage";
+import AdminInvitesPage from "./pages/AdminInvitesPage";
+import FreeCardPage from "./pages/FreeCardPage";
+import ClaimCardPage from "./pages/ClaimCardPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 
 const AboutPage = lazy(() => import("./pages/AboutPage"));
@@ -78,7 +81,7 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [modalCard, location.pathname]);
-  const standaloneAuth = ["/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname);
+  const standaloneAuth = ["/free", "/login", "/register", "/forgot-password", "/reset-password", "/admin/login"].includes(location.pathname) || location.pathname.startsWith("/claim/");
   const standaloneAdmin = location.pathname.startsWith("/admin");
 
   return (
@@ -124,6 +127,8 @@ export default function App() {
         <Route path="/register" element={<UserAuthPage mode="register" />} />
         <Route path="/forgot-password" element={<PasswordRecoveryPage />} />
         <Route path="/reset-password" element={<PasswordRecoveryPage reset />} />
+        <Route path="/free" element={<FreeCardPage />} />
+        <Route path="/claim/:token" element={<ClaimCardPage />} />
         <Route path="/create" element={<CreatePage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
         <Route path="/dashboard/leads" element={<ProtectedRoute><CrmPage /></ProtectedRoute>} />
@@ -136,6 +141,7 @@ export default function App() {
         <Route path="/admin/payments" element={<AdminProtectedRoute><AdminPaymentsPage /></AdminProtectedRoute>} />
         <Route path="/admin/moderation" element={<AdminProtectedRoute><ModerationPage /></AdminProtectedRoute>} />
         <Route path="/admin/commerce" element={<AdminProtectedRoute><AdminCommercePage /></AdminProtectedRoute>} />
+        <Route path="/admin/invites" element={<AdminProtectedRoute><AdminInvitesPage /></AdminProtectedRoute>} />
         <Route path="/admin/support" element={<AdminProtectedRoute><AdminSupportPage /></AdminProtectedRoute>} />
         <Route path="/card/:slug" element={<CardPage />} />
         <Route path="/:slug" element={<CardPage />} />

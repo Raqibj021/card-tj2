@@ -1,6 +1,7 @@
 import {
   Banknote,
   Building2,
+  Gift,
   ContactRound,
   Headphones,
   LayoutDashboard,
@@ -23,6 +24,7 @@ const navigation = [
   { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck, count: "moderation" as const },
   { to: "/admin/payments", label: "Заявки и оплаты", icon: Banknote, count: "payments" as const },
   { to: "/admin/commerce", label: "Заказы услуг", icon: ShoppingBag, count: "services" as const },
+  { to: "/admin/invites", label: "Бесплатные визитки", icon: Gift },
   { to: "/admin/support", label: "Поддержка", icon: Headphones, count: "support" as const }
 ];
 
@@ -68,7 +70,7 @@ export default function AdminShell({
         <nav aria-label="Разделы администратора">
           {navigation.map(({ to, label, icon: Icon, end, count }) => (
             <NavLink key={to} to={to} end={end}>
-              <Icon size={18} /><span>{label}</span>{counts[count] > 0 && <b className="admin-nav-badge">{counts[count] > 99 ? "99+" : counts[count]}</b>}
+              <Icon size={18} /><span>{label}</span>{count && counts[count] > 0 && <b className="admin-nav-badge">{counts[count] > 99 ? "99+" : counts[count]}</b>}
             </NavLink>
           ))}
         </nav>
