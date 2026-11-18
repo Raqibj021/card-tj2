@@ -2,6 +2,7 @@ import { CheckCircle2, Copy, ExternalLink, RefreshCw, Send, X } from "lucide-rea
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
 import { createSlug } from "../lib/cardUtils";
+import { findFreeCardDesign } from "../lib/freeCardDesigns";
 import { inviteRepository, type CardInvite } from "../lib/inviteRepository";
 import "./AdminInvitesPage.css";
 
@@ -9,11 +10,12 @@ const SITE = "https://vizora.tj";
 const statusNames: Record<CardInvite["status"], string> = { new: "Новая", approved: "Визитка создана", rejected: "Отклонена", claimed: "Забрал в кабинет" };
 
 const message = (inv: CardInvite, slug: string, token: string) => {
+  const name = inv.full_name.trim().split(/\s+/)[0];
   const card = `${SITE}/${slug}`;
   const claim = `${SITE}/claim/${token}`;
-  return inv.language === "ru"
-    ? `Здравствуйте, ${inv.full_name.split(" ")[0]}! 🎉\n\nВаша бесплатная электронная визитка Vizora готова:\n${card}\n\nЧтобы управлять ею (менять данные, добавить фото), зарегистрируйтесь по ссылке — визитка сразу появится в вашем кабинете:\n${claim}\n\nКоманда Vizora`
-    : `Ассалому алайкум, ${inv.full_name.split(" ")[0]}! 🎉\n\nВизиткаи электронии ройгони шумо дар Vizora омода шуд:\n${card}\n\nБарои идора кардан (тағйири маълумот, илова кардани акс) бо ин пайванд номнавис шавед — визитка дарҳол ба кабинети шумо мегузарад:\n${claim}\n\nДастаи Vizora`;
+  if (inv.language === "ru") return `${name}, здравствуйте! 🎉\nВаша бесплатная визитка Vizora готова: ${card}\n\nЧтобы управлять ею, зарегистрируйтесь: ${claim}`;
+  if (inv.language === "en") return `Hi ${name}! 🎉\nYour free Vizora card is ready: ${card}\n\nTo manage it, sign up here: ${claim}`;
+  return `${name}, салом! 🎉\nВизиткаи ройгони шумо дар Vizora омода шуд: ${card}\n\nБарои идора кардан номнавис шавед: ${claim}`;
 };
 
 export default function AdminInvitesPage() {
@@ -90,6 +92,7 @@ export default function AdminInvitesPage() {
                 {inv.telegram && (<><dt>Telegram</dt><dd>{inv.telegram}</dd></>)}
                 {inv.instagram && (<><dt>Instagram</dt><dd>@{inv.instagram}</dd></>)}
                 {inv.about && (<><dt>О себе</dt><dd>{inv.about}</dd></>)}
+                {inv.design && (<><dt>Дизайн</dt><dd>{findFreeCardDesign(inv.design).name.ru}</dd></>)}
                 <dt>Дата</dt><dd>{new Date(inv.created_at).toLocaleString("ru-RU")}{inv.source ? ` · ${inv.source}` : ""}</dd>
               </dl>
               <footer>

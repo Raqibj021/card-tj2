@@ -11,6 +11,7 @@ export type InviteForm = {
   instagram: string;
   language: "ru" | "tj" | "en";
   source: string;
+  design: string;
 };
 
 export type CardInvite = {
@@ -26,6 +27,7 @@ export type CardInvite = {
   instagram: string;
   language: "ru" | "tj" | "en";
   source: string;
+  design: string;
   status: "new" | "approved" | "rejected" | "claimed";
   card_id: string | null;
   claim_token: string;
@@ -33,7 +35,7 @@ export type CardInvite = {
   cards?: { slug: string } | null;
 };
 
-export type InvitePreview = { full_name: string; profession: string; slug: string | null; status: string; language: string };
+export type InvitePreview = { full_name: string; profession: string; slug: string | null; status: string; language: string; design: string };
 
 const client = () => {
   if (!supabase) throw new Error("Supabase is not configured");
@@ -60,7 +62,8 @@ export const inviteRepository = {
       p_instagram: form.instagram,
       p_language: form.language,
       p_source: form.source,
-      p_consent: true
+      p_consent: true,
+      p_design: form.design
     });
     if (error) throw new Error(errorCode(error.message));
     return data as string;

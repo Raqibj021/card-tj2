@@ -4,7 +4,9 @@ import { Link, useNavigate, useParams } from "react-router";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
 import { useAuth } from "../context/AuthContext";
+import { findFreeCardDesign, freeCardImage } from "../lib/freeCardDesigns";
 import { inviteRepository, type InvitePreview } from "../lib/inviteRepository";
+import type { CSSProperties } from "react";
 import "./FreeCardPage.css";
 
 const copy = {
@@ -66,9 +68,9 @@ export default function ClaimCardPage() {
   };
 
   return (
-    <main className="free-page">
+    <main className="free-page" style={(() => { const d = findFreeCardDesign(invite?.design ?? ""); return { "--c1": d.c1, "--c2": d.c2, "--acc": d.accent } as CSSProperties; })()}>
       <div className="free-bg" aria-hidden><i /><i /><i /></div>
-      <header className="free-top"><BrandLogo /></header>
+      <header className="free-top"><BrandLogo light /></header>
       <section className="free-wrap">
         {invite === undefined ? (
           <div className="free-panel"><p>{t.loading}</p></div>
@@ -76,13 +78,14 @@ export default function ClaimCardPage() {
           <div className="free-panel"><p>{t.notFound}</p></div>
         ) : (
           <>
-            <div className="free-card done">
-              <div className="free-card-top">
-                <div className="free-avatar">{invite.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</div>
-                <div><strong>{invite.full_name}</strong><span>{invite.profession}</span></div>
+            <div className="free-card-zone">
+              <div className="free-card done">
+                <img className="free-card-img" src={freeCardImage(findFreeCardDesign(invite.design).img)} alt="" />
+                <div className="free-card-info">
+                  <div className="free-avatar">{invite.full_name.split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase()}</div>
+                  <div className="free-card-text"><strong>{invite.full_name}</strong><span>{invite.profession}</span></div>
+                </div>
               </div>
-              <div className="free-card-chips"><em className="on">📞</em><em className="on">💬</em><em className="on">🔗</em></div>
-              <div className="free-card-foot">vizora.tj/{invite.slug}<b>NFC · QR</b></div>
             </div>
             <div className="free-panel free-done">
               {invite.status === "claimed" ? (
