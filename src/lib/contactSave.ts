@@ -1,7 +1,7 @@
 import type { DigitalCard } from "../types/card";
 import { sanitizePhone } from "./cardUtils";
 
-const vcfUrl = (card: DigitalCard) => `${location.origin}/vcard/${encodeURIComponent(card.slug)}.vcf`;
+const vcfUrl = (card: DigitalCard) => `${location.origin}/contact?s=${encodeURIComponent(card.slug)}`;
 
 /**
  * Android: an intent that opens the phone's own "New contact" form already filled in.

@@ -637,9 +637,15 @@ export default function CardPage() {
               {card.address && <a href={isLocked ? undefined : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.address)}`} target="_blank" rel="noreferrer" aria-label={t("address")} className="profile-contact-action"><MapPin size={24} /><span>{t("address")}</span></a>}
             </div>
 
-            <button type="button" className="profile-save-button" disabled={isLocked} onClick={() => isLocked ? showToast(labels.pendingQrText) : setShowSaveDialog(true)}>
-              <UserPlus size={20} />{t("saveContact")}
-            </button>
+            {isLocked ? (
+              <button type="button" className="profile-save-button" disabled onClick={() => showToast(labels.pendingQrText)}>
+                <UserPlus size={20} />{t("saveContact")}
+              </button>
+            ) : (
+              <a className="profile-save-button" href={contactSaveUrl(card)} rel="nofollow">
+                <UserPlus size={20} />{t("saveContact")}
+              </a>
+            )}
 
             {pendingClaim && <section className="profile-mobile-tools claim-qr-locked" aria-label={labels.qrActions}>
               <div className="profile-mobile-qr"><QRCodeImage value={cardUrl} size={116} /><i aria-hidden="true">🔒</i></div>
