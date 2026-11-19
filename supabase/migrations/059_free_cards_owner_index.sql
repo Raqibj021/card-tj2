@@ -1,0 +1,1 @@
+-- cards_one_personal_card_per_owner now excludes pending_claim cards; approve inserts locked; claim raises already_has_card — applied via Supabase
