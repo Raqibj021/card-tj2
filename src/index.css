@@ -8707,3 +8707,8 @@ body,
 .claim-qr-locked .profile-mobile-qr i{position:absolute;inset:0;display:grid;place-items:center;font-size:38px;font-style:normal}
 .claim-qr-text{display:grid;gap:10px;flex:1}
 .claim-qr-text strong{font-size:14px}
+
+/* Several cards shown as one: switcher at the top of the card */
+.card-group-switch{position:sticky;top:10px;z-index:30;display:flex;gap:4px;width:max-content;max-width:calc(100% - 24px);margin:10px auto 0;padding:4px;border-radius:999px;background:rgba(10,18,36,.72);border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.3);overflow-x:auto}
+.card-group-switch button{flex:none;padding:9px 16px;border:0;border-radius:999px;background:none;color:rgba(255,255,255,.75);font:800 13.5px/1 inherit;cursor:pointer;white-space:nowrap;transition:background .25s,color .25s}
+.card-group-switch button.on{background:#fff;color:#0b1430;box-shadow:0 4px 14px rgba(0,0,0,.25)}

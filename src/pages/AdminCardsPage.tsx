@@ -4,6 +4,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
+import CardGroupsPanel from "../components/admin/CardGroupsPanel";
 import {
   adminCardsRepository, type AdminCardDetails, type AdminCardSummary, type AdminCardUpdate, type AdminCardWorkspace
 } from "../lib/adminCardsRepository";
@@ -113,6 +114,7 @@ export default function AdminCardsPage() {
     <AdminShell title="Все визитки" description="Единый реестр открытых и закрытых визиток. Просмотр полных данных автоматически фиксируется в защищённом журнале."
       actions={<button className="admin-toolbar-button" onClick={() => void refresh()} disabled={loading}><RefreshCw className={loading ? "spin" : ""} size={16} /> Обновить</button>}>
       {notice && <div className="admin-workspace-notice">{notice}</div>}
+      <CardGroupsPanel />
       <section className="admin-card-kpis">
         <Kpi icon={WalletCards} label="Все визитки" value={stats.total} />
         <Kpi icon={Globe2} label="Открытые" value={stats.public} />
