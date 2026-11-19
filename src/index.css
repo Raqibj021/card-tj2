@@ -8700,3 +8700,10 @@ body,
 .pending-claim-box p{margin:0;color:#4a5b72;font-size:14.5px;line-height:1.5}
 .pending-claim-box .button{width:100%;justify-content:center}
 .pending-claim-login{color:#0e71d2;font-weight:700;font-size:14px;text-decoration:none}
+.claim-countdown .button{width:100%;justify-content:center}
+.claim-qr-locked{align-items:center}
+.claim-qr-locked .profile-mobile-qr{position:relative}
+.claim-qr-locked .profile-mobile-qr img,.claim-qr-locked .profile-mobile-qr canvas,.claim-qr-locked .profile-mobile-qr svg{filter:grayscale(1);opacity:.3}
+.claim-qr-locked .profile-mobile-qr i{position:absolute;inset:0;display:grid;place-items:center;font-size:38px;font-style:normal}
+.claim-qr-text{display:grid;gap:10px;flex:1}
+.claim-qr-text strong{font-size:14px}
