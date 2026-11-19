@@ -1,6 +1,7 @@
 import { Ban, CheckCircle2, Copy, Download, ExternalLink, Gift, ImageUp, RefreshCw, Send, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AdminShell from "../components/admin/AdminShell";
+import { signalAdminCountsChanged } from "../lib/adminNotificationRepository";
 import { createSlug } from "../lib/cardUtils";
 import { findFreeCardDesign } from "../lib/freeCardDesigns";
 import { renderInviteCardImage } from "../lib/inviteCardImage";
@@ -47,7 +48,7 @@ export default function AdminInvitesPage() {
       const [list, p, cats] = await Promise.all([inviteRepository.list(), inviteRepository.promo(), inviteRepository.categories()]);
       setRows(list); setPromo(p); setCategories(cats); setNotice("");
     } catch (e) { setNotice(e instanceof Error ? e.message : "Не удалось загрузить заявки"); }
-    finally { setBusy(""); }
+    finally { setBusy(""); signalAdminCountsChanged(); }
   };
   useEffect(() => { void refresh(); }, []);
 
@@ -72,14 +73,14 @@ export default function AdminInvitesPage() {
       setNotice(`Визитка создана: ${SITE}/${res.slug}`);
     } catch (e) {
       setNotice(`Ошибка: ${e instanceof Error ? e.message : "не удалось создать визитку"}`);
-    } finally { setBusy(""); }
+    } finally { setBusy(""); signalAdminCountsChanged(); }
   };
 
   const reject = async (inv: CardInvite) => {
     if (!window.confirm(`Отклонить заявку ${inv.full_name}?`)) return;
     setBusy(inv.id);
     try { await inviteRepository.reject(inv.id); setRows((all) => all.map((r) => (r.id === inv.id ? { ...r, status: "rejected" as const } : r))); setOpenId(null); }
-    finally { setBusy(""); }
+    finally { setBusy(""); signalAdminCountsChanged(); }
   };
 
   const remove = async (inv: CardInvite, mode: "reject" | "delete") => {
@@ -95,7 +96,7 @@ export default function AdminInvitesPage() {
       setNotice(mode === "delete" ? "Заявка удалена" : "Заявка отклонена, визитка удалена");
     } catch (e) {
       setNotice(`Ошибка: ${e instanceof Error ? e.message : "не удалось"}`);
-    } finally { setBusy(""); }
+    } finally { setBusy(""); signalAdminCountsChanged(); }
   };
 
   const text = (inv: CardInvite) => message(inv, inv.claim_token, left);
@@ -156,7 +157,7 @@ export default function AdminInvitesPage() {
     } catch {
       win?.close();
       setNotice("Не удалось подготовить сообщение");
-    } finally { setBusy(""); }
+    } finally { setBusy(""); signalAdminCountsChanged(); }
   };
 
   const channels: { key: Channel; label: string; ok: boolean }[] = open

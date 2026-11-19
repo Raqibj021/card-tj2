@@ -1,12 +1,12 @@
 import { adminSupabase } from "./supabase";
 
 export type AdminNavCounts = {
-  total: number; accounts: number; cards: number; moderation: number; payments: number; services: number; support: number;
+  total: number; accounts: number; cards: number; moderation: number; payments: number; services: number; support: number; invites: number;
 };
 
 export const adminCountsChangedEvent = "vizora:admin-counts-changed";
 export const signalAdminCountsChanged = () => window.dispatchEvent(new Event(adminCountsChangedEvent));
-export const emptyAdminNavCounts: AdminNavCounts = { total: 0, accounts: 0, cards: 0, moderation: 0, payments: 0, services: 0, support: 0 };
+export const emptyAdminNavCounts: AdminNavCounts = { total: 0, accounts: 0, cards: 0, moderation: 0, payments: 0, services: 0, support: 0, invites: 0 };
 
 export const adminNotificationRepository = {
   async counts(): Promise<AdminNavCounts> {
@@ -14,5 +14,11 @@ export const adminNotificationRepository = {
     const { data, error } = await adminSupabase.rpc("get_admin_nav_counts");
     if (error) return emptyAdminNavCounts;
     return { ...emptyAdminNavCounts, ...((data ?? {}) as AdminNavCounts) };
+  },
+
+  async markSeen(section: "cards") {
+    if (!adminSupabase) return;
+    await adminSupabase.rpc("admin_mark_nav_seen", { p_section: section });
+    signalAdminCountsChanged();
   }
 };

@@ -24,7 +24,7 @@ const navigation = [
   { to: "/admin/moderation", label: "Проверки", icon: ShieldCheck, count: "moderation" as const },
   { to: "/admin/payments", label: "Заявки и оплаты", icon: Banknote, count: "payments" as const },
   { to: "/admin/commerce", label: "Заказы услуг", icon: ShoppingBag, count: "services" as const },
-  { to: "/admin/invites", label: "Бесплатные визитки", icon: Gift },
+  { to: "/admin/invites", label: "Бесплатные визитки", icon: Gift, count: "invites" as const },
   { to: "/admin/support", label: "Поддержка", icon: Headphones, count: "support" as const }
 ];
 
@@ -42,6 +42,10 @@ export default function AdminShell({
   const { profile, signOut } = useAdminAuth();
   const [counts, setCounts] = useState(emptyAdminNavCounts);
   const refreshCounts = useCallback(async () => setCounts(await adminNotificationRepository.counts()), []);
+
+  useEffect(() => {
+    if (window.location.pathname.startsWith("/admin/cards")) void adminNotificationRepository.markSeen("cards");
+  }, []);
 
   useEffect(() => {
     void refreshCounts();
