@@ -1,0 +1,1 @@
+-- admin_nav_seen table, admin_mark_nav_seen(), get_admin_nav_counts() with new cards + new free-card requests — applied via Supabase
