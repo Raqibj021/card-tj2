@@ -23,7 +23,8 @@ import {
   SmartphoneNfc,
   WalletCards
 } from "lucide-react";
-import { Link, useParams, useSearchParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import { supabase } from "../lib/supabase";
 import QRCodeImage from "../components/QRCode";
 import BrandLogo from "../components/BrandLogo";
 import { useApp } from "../context/AppContext";
@@ -218,6 +219,16 @@ export default function CardPage() {
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
   const { user } = useAuth();
   const [toast, setToast] = useState("");
+  const navigate = useNavigate();
+  const [group, setGroup] = useState<{ slug: string; card_position: string; full_name: string }[]>([]);
+  useEffect(() => {
+    let alive = true;
+    if (!supabase || !slug) return;
+    void supabase.rpc("get_card_group", { p_slug: slug }).then(({ data }) => {
+      if (alive) setGroup(Array.isArray(data) && data.length > 1 ? (data as { slug: string; card_position: string; full_name: string }[]) : []);
+    });
+    return () => { alive = false; };
+  }, [slug]);
   const [rawCard, setRawCard] = useState<DigitalCard | undefined>(() =>
     cardRepository.getBySlug(slug)
   );
@@ -449,6 +460,15 @@ export default function CardPage() {
   return (
     <main ref={pageRef} className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
+      {group.length > 1 && (
+        <nav className="card-group-switch" aria-label="Visit cards">
+          {group.map((g) => (
+            <button key={g.slug} type="button" className={g.slug === card.slug ? "on" : ""} onClick={() => g.slug !== card.slug && navigate(`/${g.slug}`, { replace: true })}>
+              {g.card_position || g.full_name}
+            </button>
+          ))}
+        </nav>
+      )}
       <header className="profile-toolbar">
         <Link to="/" className="profile-brand">
           <BrandLogo light />
