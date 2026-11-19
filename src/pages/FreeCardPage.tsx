@@ -244,10 +244,10 @@ export default function FreeCardPage() {
 
       <div className="free-progress" aria-hidden><span style={{ width: `${progress}%` }} /></div>
 
-      <section className="free-wrap">
+      <section className={`free-wrap ${typing ? "typing" : ""}`}>
         <div className="free-card-zone">
           <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPhoto} />
-          <article className={`free-window ${done ? "done" : ""} ${typing ? "typing" : ""}`}>
+          <article className={`free-window ${done ? "done" : ""} ${typing ? "typing" : ""} ${step < 0 ? "intro" : ""}`}>
             <div className="free-window-head">
               <span><small>{t.kicker}</small><strong>{form.fullName.trim() || "Vizora.tj"}</strong></span>
               <span className="free-window-flags"><Flag code="tj" /><Flag code="ru" /><Flag code="en" /></span>

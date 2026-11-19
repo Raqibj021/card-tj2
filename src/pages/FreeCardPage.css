@@ -140,7 +140,7 @@
 @keyframes freePulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--acc) 45%,transparent)}}
 /* mobile: compact preview while typing so the keyboard never hides the field */
 @media (max-width:880px){
-  .free-wrap{padding-bottom:40vh}
+  .free-wrap.typing{padding-bottom:40vh}
   .free-panel{scroll-margin-top:12px}
   .free-window.typing .free-window-body .free-socials,.free-window.typing .free-acts,.free-window.typing .free-save,.free-window.typing .free-window-head{display:none}
   .free-window.typing .free-cover{height:70px}
@@ -183,3 +183,54 @@
 .invite-shot-qr div:last-child{display:grid;gap:3px}
 .invite-shot-qr b{font-size:14px;color:#fff}
 .invite-shot-qr small{font-size:12px;color:rgba(255,255,255,.7)}
+
+/* Phones: the whole step fits on one screen, no scrolling to find the button */
+@media (max-width:880px){
+  .free-page{min-height:100dvh;padding:0 0 12px}
+  .free-top{padding:10px 14px}
+  .free-top img{max-height:28px}
+  .free-wrap{gap:10px;padding:4px 12px 0}
+  .free-window{border-radius:22px}
+  .free-window-head{padding:8px 12px}
+  .free-cover{height:96px}
+  .free-photo{width:74px;height:74px;margin-left:-37px;bottom:-34px}
+  .free-window-body{padding:40px 12px 12px}
+  .free-window-body h3{font-size:19px}
+  .free-window-body p{font-size:13px}
+  .free-socials{margin-top:10px;gap:6px}
+  .free-socials em,.free-acts span{height:40px;border-radius:12px}
+  .free-acts{gap:6px;margin-top:6px}
+  .free-save{height:42px;margin-top:8px;border-radius:12px;font-size:14px}
+  .free-window:not(.done) .free-acts,.free-window:not(.done) .free-save{display:none}
+  .free-photo-big{width:104px!important;height:104px!important;margin:10px auto!important}
+  .free-photo-big span{font-size:34px!important}
+  .free-nav{margin-top:12px!important}
+  .free-window:not(.done):not(.intro) .free-window-head{display:none}
+  .free-window:not(.done):not(.intro) .free-cover{height:84px}
+  .free-chips{gap:6px;margin-bottom:10px}
+  .free-chips button{padding:7px 11px!important;font-size:13px!important;min-height:0!important}
+  .free-panel .free-input{min-height:46px}
+  .free-panel h1{font-size:20px}
+  .free-intro h1{font-size:22px}
+  .free-chips button{padding:5px 9px!important;font-size:12.5px!important}
+  .free-chips{gap:5px;margin-bottom:8px}
+  .free-photo-step{flex-direction:row;justify-content:center;flex-wrap:wrap;gap:14px;padding:4px 0}
+  .free-panel{padding:14px 16px}
+  .free-panel p{font-size:13.5px}
+  button.free-photo-big{width:96px;height:96px}
+  .free-panel{padding:16px;border-radius:20px}
+  .free-panel h1{margin:6px 0 6px;font-size:22px}
+  .free-panel p{font-size:14px;line-height:1.42}
+  .free-badge{padding:5px 10px;font-size:12px}
+  .free-gift{margin-top:10px;padding:9px 12px;font-size:13.5px;border-radius:12px}
+  .free-intro .free-btn{margin-top:12px;width:100%}
+  .free-btn{min-height:50px}
+}
+@media (max-width:880px) and (max-height:700px){
+  .free-window-head{display:none}
+  .free-cover{height:80px}
+  .free-photo{width:64px;height:64px;margin-left:-32px;bottom:-30px}
+  .free-window-body{padding:34px 12px 10px}
+  .free-panel h1{font-size:20px}
+  .free-panel p{font-size:13px}
+}
