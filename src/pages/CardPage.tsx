@@ -101,7 +101,7 @@ const profileCopy = {
     phoneNumbers: "Номера для звонка",
     saveTitle: "Как сохранить визитку?",
     savePhone: "В контакты телефона",
-    savePhoneHint: "Выберите «Контакты» в системном меню, если доступно",
+    savePhoneHint: "Имя, телефоны, e-mail и фото — сразу в «Контакты»",
     contactUnsupported: "Браузер не поддерживает передачу контакта приложению. Автоматическое скачивание отключено.",
     saveImage: "Как фото визитки",
     imageSaved: "Фото визитки загружено",
@@ -148,7 +148,7 @@ const profileCopy = {
     phoneNumbers: "Рақамҳо барои занг",
     saveTitle: "Варақаро чӣ гуна нигоҳ дорем?",
     savePhone: "Ба тамосҳои телефон",
-    savePhoneHint: "Дар менюи телефон «Тамосҳо»-ро интихоб кунед, агар дастрас бошад",
+    savePhoneHint: "Ном, телефонҳо, e-mail ва сурат — рост ба «Тамосҳо»",
     contactUnsupported: "Браузер интиқоли тамосро дастгирӣ намекунад. Боргирии худкор хомӯш аст.",
     saveImage: "Ҳамчун сурати варақа",
     imageSaved: "Сурати варақа бор шуд",
@@ -195,7 +195,7 @@ const profileCopy = {
     phoneNumbers: "Phone numbers",
     saveTitle: "How would you like to save it?",
     savePhone: "Save to phone contacts",
-    savePhoneHint: "Choose Contacts in the system menu, if available",
+    savePhoneHint: "Name, phones, e-mail and photo — straight to Contacts",
     contactUnsupported: "This browser cannot pass a contact to an app. Automatic downloads are disabled.",
     saveImage: "Download card image",
     imageSaved: "Card image downloaded",
@@ -771,7 +771,7 @@ export default function CardPage() {
           <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
             <h2 id="save-dialog-title">{labels.saveTitle}</h2>
             <div className="profile-dialog-options">
-              <button type="button" onClick={() => { setContactSaveError(""); void openVCardSaveDialog(card).then((supported) => { if (!supported) setContactSaveError(labels.contactUnsupported); }).catch(() => setContactSaveError(labels.contactUnsupported)); }}>
+              <button type="button" onClick={() => { setContactSaveError(""); if (card.reviewStatus === "approved" && !pendingClaim) { window.location.href = `/vcard/${encodeURIComponent(card.slug)}.vcf`; return; } void openVCardSaveDialog(card).then((supported) => { if (!supported) setContactSaveError(labels.contactUnsupported); }).catch(() => setContactSaveError(labels.contactUnsupported)); }}>
                 <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>{labels.savePhoneHint}</small></div>
               </button>
               <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
