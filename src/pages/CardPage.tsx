@@ -319,33 +319,15 @@ export default function CardPage() {
     );
   }
 
-  if (card.pendingClaim) {
-    const lk = card.language === "tj"
-      ? { t: "Визитка ҳоло фаъол нест", d: "Агар ин визиткаи шумост — пайвандеро, ки ба WhatsApp фиристодем, кушоед ва номнавис шавед. Пас аз номнависӣ визитка барои ҳама кушода мешавад.", b: "Номнавис шудан", h: "Аллакай аккаунт доред? Ворид шавед" }
-      : card.language === "en"
-        ? { t: "This card is not active yet", d: "If this is your card, open the link we sent you on WhatsApp and sign up. After that the card opens for everyone.", b: "Sign up", h: "Already have an account? Log in" }
-        : { t: "Визитка ещё не активирована", d: "Если это ваша визитка — откройте ссылку, которую мы отправили вам в WhatsApp, и зарегистрируйтесь. После регистрации визитка откроется для всех.", b: "Зарегистрироваться", h: "Уже есть аккаунт? Войти" };
-    return (
-      <main className="card-missing card-pending-claim">
-        <Link to="/" className="brand-mark"><BrandLogo /></Link>
-        <div className="pending-claim-box">
-          <div className="pending-claim-card" aria-hidden>
-            <div className="pending-claim-photo">{card.photo ? <img src={card.photo} alt="" /> : <span>{card.fullName.split(/\s+/).map((w) => w[0]).slice(0, 2).join("")}</span>}</div>
-            <b>{card.fullName}</b><small>{card.position}</small>
-            <div className="pending-claim-qr"><QRCodeImage value={`https://vizora.tj/${card.slug}`} size={120} /><i>🔒</i></div>
-          </div>
-          <h1>{lk.t}</h1>
-          <p>{lk.d}</p>
-          <Link to="/register" className="button button-primary">{lk.b}</Link>
-          <Link to="/login" className="pending-claim-login">{lk.h}</Link>
-        </div>
-      </main>
-    );
-  }
-
   const palette = themeColors[card.theme];
-  const isLocked = card.reviewStatus !== "approved";
-  const needsActivation = card.reviewStatus === "draft";
+  const pendingClaim = Boolean(card.pendingClaim);
+  const isLocked = card.reviewStatus !== "approved" || pendingClaim;
+  const needsActivation = card.reviewStatus === "draft" && !pendingClaim;
+  const claimCopy = card.language === "tj"
+    ? { mark: "ФАЪОЛ НЕСТ", t: "Визитка ҳоло фаъол нест", d: "Агар ин визиткаи шумост — пайвандеро, ки ба WhatsApp фиристодем, кушоед ва номнавис шавед. Пас аз номнависӣ визитка ва QR-код барои ҳама кор мекунанд.", b: "Номнавис шудан", l: "Ворид шудан", qr: "QR-код пас аз номнависӣ кор мекунад" }
+    : card.language === "en"
+      ? { mark: "NOT ACTIVE", t: "This card is not active yet", d: "If this is your card, open the link we sent you on WhatsApp and sign up. After that the card and its QR code work for everyone.", b: "Sign up", l: "Log in", qr: "QR code works after sign-up" }
+      : { mark: "НЕ АКТИВИРОВАНА", t: "Визитка ещё не активирована", d: "Если это ваша визитка — откройте ссылку, которую мы отправили вам в WhatsApp, и зарегистрируйтесь. После регистрации визитка и QR-код заработают для всех.", b: "Зарегистрироваться", l: "Войти", qr: "QR-код заработает после регистрации" };
   const payGateKey = `vizora-paygate-${card.id}`;
   const showPayGate = needsActivation && promo !== null && !promo.hasEntitlement && !(promo.eligible && promo.remaining > 0) && !payGateClosed && (() => { try { return !sessionStorage.getItem(payGateKey); } catch { return true; } })();
   const closePayGate = () => { try { sessionStorage.setItem(payGateKey, "1"); } catch { /* ignore */ } setPayGateClosed(true); };
@@ -514,7 +496,15 @@ export default function CardPage() {
           )}
           {isLocked && (
             <>
-              <div className="trial-watermark" aria-hidden="true">{needsActivation ? labels.trial : labels.pending}</div>
+              <div className="trial-watermark" aria-hidden="true">{pendingClaim ? claimCopy.mark : needsActivation ? labels.trial : labels.pending}</div>
+              {pendingClaim ? (
+                <div className="trial-countdown claim-countdown" role="status">
+                  <strong>{claimCopy.t}</strong>
+                  <span>{claimCopy.d}</span>
+                  <Link to="/register" className="button button-primary">{claimCopy.b}</Link>
+                  <Link to="/login" className="button button-secondary">{claimCopy.l}</Link>
+                </div>
+              ) : (
               <div className="trial-countdown" role="status">
                 <strong>{needsActivation ? labels.trial : labels.pending}</strong>
                 <span>{needsActivation ? labels.trialText : labels.pendingText}</span>
@@ -531,6 +521,7 @@ export default function CardPage() {
                 ) : needsActivation && <Link to="/payment?plan=personal" className="button button-secondary">{labels.payButton}</Link>}
                 {needsCorrection && <Link to={`/create?edit=${card.id}`} className="button button-primary">{labels.fixAndResubmit}</Link>}
               </div>
+              )}
             </>
           )}
           <div className="profile-cover">
@@ -552,7 +543,7 @@ export default function CardPage() {
               {isLocked ? (
                 <span className="profile-status is-preview">
                   <LockKeyhole size={13} />
-                  {needsActivation ? labels.preview : labels.pending}
+                  {pendingClaim ? claimCopy.mark : needsActivation ? labels.preview : labels.pending}
                 </span>
               ) : (
                 <span className="profile-verified-badge" role="img" aria-label={labels.verified} title={labels.verified}>
@@ -629,6 +620,11 @@ export default function CardPage() {
               <UserPlus size={20} />{t("saveContact")}
             </button>
 
+            {pendingClaim && <section className="profile-mobile-tools claim-qr-locked" aria-label={labels.qrActions}>
+              <div className="profile-mobile-qr"><QRCodeImage value={cardUrl} size={116} /><i aria-hidden="true">🔒</i></div>
+              <div className="claim-qr-text"><strong>{claimCopy.qr}</strong><Link to="/register" className="button button-primary">{claimCopy.b}</Link></div>
+            </section>}
+
             {!isLocked && <section className="profile-mobile-tools" aria-label={labels.qrActions}>
               <div className="profile-mobile-qr">
                 <QRCodeImage value={cardUrl} size={116} />
@@ -675,8 +671,9 @@ export default function CardPage() {
                 <LockKeyhole size={44} />
                 <span>DEMO</span>
               </div>
-              <h2>{needsActivation ? labels.trialQrTitle : labels.pendingQrTitle}</h2>
-              <p>{needsActivation ? labels.trialQrText : labels.pendingQrText}</p>
+              <h2>{pendingClaim ? claimCopy.t : needsActivation ? labels.trialQrTitle : labels.pendingQrTitle}</h2>
+              <p>{pendingClaim ? claimCopy.d : needsActivation ? labels.trialQrText : labels.pendingQrText}</p>
+              {pendingClaim && <Link to="/register" className="button button-primary mt-5 w-full">{claimCopy.b}</Link>}
               {needsActivation && promo?.eligible && !promo.hasEntitlement && promo.remaining > 0 && (
                 <button type="button" disabled={activating} className="button button-primary mt-5 w-full" onClick={() => void claimPromo()}>
                   {activating ? labels.activating : labels.promoButton}

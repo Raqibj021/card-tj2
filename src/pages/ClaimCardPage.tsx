@@ -22,6 +22,7 @@ const copy = {
     claimed: "Тайёр! Визитка дар кабинети шумост",
     notFound: "Пайванд нодуруст аст ё муҳлаташ гузаштааст. Ба WhatsApp-и Vizora нависед.",
     taken: "Ин визитка аллакай ба аккаунти дигар пайваст шудааст.",
+    hasCard: "Дар ин аккаунт аллакай визитка ҳаст. Бо рақам ё почтаи дигар номнавис шавед.",
     loading: "Бор шуда истодааст…"
   },
   ru: {
@@ -35,6 +36,7 @@ const copy = {
     claimed: "Готово! Визитка в вашем кабинете",
     notFound: "Ссылка неверная или устарела. Напишите в WhatsApp Vizora.",
     taken: "Эта визитка уже привязана к другому аккаунту.",
+    hasCard: "У этого аккаунта уже есть своя визитка. Зарегистрируйтесь с другим номером или почтой.",
     loading: "Загрузка…"
   }
 } as const;
@@ -62,7 +64,8 @@ export default function ClaimCardPage() {
       await inviteRepository.claim(token);
       navigate("/dashboard", { replace: true });
     } catch (e) {
-      setError((e as Error).message === "already_claimed" ? t.taken : t.notFound);
+      const m = (e as Error).message;
+      setError(m.includes("already_claimed") ? t.taken : m.includes("already_has_card") ? (t as { hasCard?: string }).hasCard ?? t.notFound : t.notFound);
     } finally {
       setBusy(false);
     }
