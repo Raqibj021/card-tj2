@@ -8684,3 +8684,19 @@ body,
 
 .auth-hint { margin: 10px 2px 0; color: #5b6b82; font-size: 11px; line-height: 1.5; }
 .dark .auth-hint { color: #9fb0c8; }
+
+/* Free card not yet claimed by its owner */
+.card-pending-claim{display:flex;flex-direction:column;align-items:center;gap:24px;padding:28px 16px 48px}
+.pending-claim-box{width:min(420px,100%);display:grid;gap:14px;justify-items:center;text-align:center;padding:26px 22px;border-radius:24px;background:#fff;color:#122137;box-shadow:0 24px 60px rgba(15,25,40,.14)}
+.pending-claim-card{width:100%;display:grid;justify-items:center;gap:4px;padding:20px 16px;border-radius:20px;background:linear-gradient(160deg,#0e3f86,#06142e);color:#fff}
+.pending-claim-photo{width:84px;height:84px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:linear-gradient(135deg,#0e71d2,#5aa9f0);font:800 28px/1 inherit;border:3px solid rgba(255,255,255,.8);margin-bottom:6px}
+.pending-claim-photo img{width:100%;height:100%;object-fit:cover}
+.pending-claim-card b{font-size:19px}
+.pending-claim-card small{opacity:.75;font-size:13.5px}
+.pending-claim-qr{position:relative;margin-top:12px;padding:8px;border-radius:14px;background:#fff;filter:grayscale(1)}
+.pending-claim-qr img,.pending-claim-qr canvas,.pending-claim-qr svg{opacity:.35;display:block}
+.pending-claim-qr i{position:absolute;inset:0;display:grid;place-items:center;font-size:40px;font-style:normal}
+.pending-claim-box h1{margin:4px 0 0;font-size:22px;font-weight:800}
+.pending-claim-box p{margin:0;color:#4a5b72;font-size:14.5px;line-height:1.5}
+.pending-claim-box .button{width:100%;justify-content:center}
+.pending-claim-login{color:#0e71d2;font-weight:700;font-size:14px;text-decoration:none}
