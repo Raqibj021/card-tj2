@@ -52,7 +52,7 @@ const adminClient = () => {
 };
 
 const errorCode = (message: string) => {
-  for (const code of ["bad_phone", "bad_whatsapp", "bad_name", "consent_required", "too_many_requests", "already_claimed", "not_found", "not_ready", "auth_required", "already_processed"]) {
+  for (const code of ["bad_phone", "bad_whatsapp", "bad_name", "consent_required", "too_many_requests", "already_claimed", "not_found", "not_ready", "auth_required", "already_processed", "already_has_card"]) {
     if (message.includes(code)) return code;
   }
   return "unknown";
