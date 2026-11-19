@@ -63,3 +63,5 @@
 .spin{animation:inv-spin 1s linear infinite}
 @keyframes inv-spin{to{transform:rotate(360deg)}}
 .inv-danger-row{padding-top:10px;border-top:1px solid #edf1f6}
+.inv-shot{width:100%;max-width:220px;justify-self:center;border-radius:14px;box-shadow:0 10px 30px rgba(15,25,40,.18)}
+.inv-shot-wait{display:grid;place-items:center;min-height:120px;max-width:none;padding:14px;background:#f6f9fc;color:#718198;font-size:13px;text-align:center;box-shadow:none}

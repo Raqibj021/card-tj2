@@ -121,43 +121,69 @@ export default function AdminInvitesPage() {
         : `https://www.instagram.com/${inv.instagram.replace(/^@/, "")}/`;
 
   // Copy the card image to the clipboard as PNG (what chat apps accept on paste).
-  const copyImage = async (file: File) => {
-    try {
-      if (!("ClipboardItem" in window) || !navigator.clipboard?.write) return false;
-      const bmp = await createImageBitmap(file);
-      const canvas = document.createElement("canvas");
-      canvas.width = bmp.width; canvas.height = bmp.height;
-      canvas.getContext("2d")?.drawImage(bmp, 0, 0);
-      const png = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
-      if (!png) return false;
-      await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
-      return true;
-    } catch { return false; }
+  // The card photo is prepared as soon as the window opens, so the click can
+  // put it on the clipboard right away (browsers only allow that inside the tap).
+  const [shot, setShot] = useState<{ id: string; file: File; png: Blob; url: string } | null>(null);
+  const [shotErr, setShotErr] = useState("");
+  const toPng = async (file: File) => {
+    const bmp = await createImageBitmap(file);
+    const canvas = document.createElement("canvas");
+    canvas.width = bmp.width; canvas.height = bmp.height;
+    canvas.getContext("2d")?.drawImage(bmp, 0, 0);
+    return await new Promise<Blob>((r, j) => canvas.toBlob((b) => (b ? r(b) : j(new Error("png"))), "image/png"));
   };
+  const openSlug = open ? slugOf(open) : "";
+  useEffect(() => {
+    if (!open || !openSlug || !(open.status === "approved" || open.status === "claimed")) return;
+    if (shot?.id === open.id) return;
+    let alive = true;
+    setShotErr("");
+    (async () => {
+      try {
+        const file = await cardFile(open);
+        const png = await toPng(file);
+        if (alive) setShot({ id: open.id, file, png, url: URL.createObjectURL(file) });
+      } catch (e) {
+        if (alive) setShotErr(e instanceof Error ? e.message : String(e));
+      }
+    })();
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open?.id, openSlug, open?.status]);
 
   // Opens the chat of this exact person (no contact picker). WhatsApp gets the
-  // text pre-filled; the card photo goes to the clipboard (or is downloaded)
+  // text pre-filled; the card photo is put on the clipboard (or downloaded)
   // so it can be pasted into the same chat.
   const send = async (inv: CardInvite, withPhoto: boolean) => {
     const link = channelLink(inv, channel);
-    const win = window.open("about:blank", "_blank");
-    setBusy(inv.id);
+    const msg = text(inv);
+    let photoNote = "";
+    if (withPhoto) {
+      const ready = shot?.id === inv.id ? shot : null;
+      if (!ready) { setNotice("Фото визитки ещё готовится — подождите секунду и нажмите снова."); return; }
+      let copied = false;
+      try {
+        if ("ClipboardItem" in window && navigator.clipboard?.write) {
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": ready.png })]);
+          copied = true;
+        }
+      } catch { copied = false; }
+      if (copied) photoNote = "Фото визитки скопировано — в чате нажмите и удерживайте поле ввода → «Вставить», затем отправьте.";
+      else { download(ready.file); photoNote = "Фото визитки скачано — прикрепите его в чат через 📎."; }
+    } else if (channel !== "whatsapp") {
+      await navigator.clipboard.writeText(msg).catch(() => undefined);
+    }
+    window.open(link, "_blank");
+    setNotice([channel === "whatsapp" ? "Открыт чат WhatsApp с текстом." : "Текст скопирован — вставьте его в чат.", photoNote].filter(Boolean).join(" "));
+  };
+
+  const sharePhoto = async (inv: CardInvite) => {
+    const ready = shot?.id === inv.id ? shot : null;
+    if (!ready) return;
     try {
-      const msg = text(inv);
-      let photoNote = "";
-      if (withPhoto) {
-        const file = await cardFile(inv);
-        if (await copyImage(file)) photoNote = "Фото визитки скопировано — вставьте его в чат (долгое нажатие → Вставить, или Ctrl+V) и отправьте.";
-        else { download(file); photoNote = "Фото визитки скачано — прикрепите его в чат 📎."; }
-      } else if (channel !== "whatsapp") {
-        await navigator.clipboard.writeText(msg).catch(() => undefined);
-      }
-      if (win) win.location.href = link; else window.location.href = link;
-      setNotice([channel === "whatsapp" ? "Открыт чат WhatsApp с текстом." : "Текст скопирован — вставьте его в чат.", photoNote].filter(Boolean).join(" "));
-    } catch {
-      win?.close();
-      setNotice("Не удалось подготовить сообщение");
-    } finally { setBusy(""); signalAdminCountsChanged(); }
+      if (navigator.canShare?.({ files: [ready.file] })) await navigator.share({ files: [ready.file], text: text(inv) });
+      else download(ready.file);
+    } catch { /* cancelled */ }
   };
 
   const channels: { key: Channel; label: string; ok: boolean }[] = open
@@ -249,6 +275,9 @@ export default function AdminInvitesPage() {
 
             {canSend && (
               <div className="inv-block">
+                {shot?.id === open.id
+                  ? <img className="inv-shot" src={shot.url} alt="Фото визитки" />
+                  : <div className="inv-shot inv-shot-wait">{shotErr ? `Не удалось сделать фото: ${shotErr}` : "Готовим фото визитки…"}</div>}
                 <div className="inv-label">Куда отправить</div>
                 <div className="inv-channels">
                   {channels.map((c) => (
@@ -256,12 +285,13 @@ export default function AdminInvitesPage() {
                   ))}
                 </div>
                 <div className="inv-row">
-                  <button className="inv-btn primary" disabled={busy === open.id} onClick={() => void send(open, true)}><ImageUp size={16} /> С фото визитки</button>
+                  <button className="inv-btn primary" disabled={shot?.id !== open.id} onClick={() => void send(open, true)}><ImageUp size={16} /> С фото визитки</button>
                   <button className="inv-btn" disabled={busy === open.id} onClick={() => void send(open, false)}><Send size={16} /> Только текст</button>
                 </div>
                 <div className="inv-row small">
                   <button className="inv-btn" onClick={() => void navigator.clipboard.writeText(text(open)).then(() => setNotice("Текст скопирован"))}><Copy size={15} /> Текст</button>
-                  <button className="inv-btn" disabled={busy === open.id} onClick={async () => { setBusy(open.id); try { download(await cardFile(open)); } finally { setBusy(""); } }}><Download size={15} /> Фото</button>
+                  <button className="inv-btn" disabled={shot?.id !== open.id} onClick={() => shot && download(shot.file)}><Download size={15} /> Фото</button>
+                  <button className="inv-btn" disabled={shot?.id !== open.id} onClick={() => void sharePhoto(open)}><Send size={15} /> Поделиться</button>
                   <a className="inv-btn" href={`/${slugOf(open)}`} target="_blank" rel="noreferrer"><ExternalLink size={15} /> Визитка</a>
                 </div>
                 <p className="inv-hint">Удалить визитку можно в разделе «Визитки» — она там вместе со всеми.</p>

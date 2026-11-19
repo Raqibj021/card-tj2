@@ -36,6 +36,8 @@ export interface DigitalCard {
   visibility?: "private" | "public" | "organization" | "public_organization";
   reviewStatus?: "draft" | "pending" | "approved" | "changes_requested" | "rejected" | "suspended";
   trialExpiresAt?: string | null;
+  /** Free card made by the team that the specialist has not claimed yet. */
+  pendingClaim?: boolean;
   views: number;
   createdAt: string;
   updatedAt: string;

@@ -79,7 +79,7 @@ export async function renderInviteCardImage(inv: CardInvite, claimUrl: string, p
     await document.fonts.ready;
     await Promise.all(Array.from(host.querySelectorAll("img")).map((img) => (img.complete ? null : new Promise((r) => { img.onload = img.onerror = r; }))));
     const node = host.firstElementChild as HTMLElement;
-    const url = await toJpeg(node, { quality: 0.93, pixelRatio: 1080 / 420, cacheBust: true });
+    const url = await toJpeg(node, { quality: 0.93, pixelRatio: 1080 / 420, skipFonts: true, backgroundColor: "#06142e" });
     return await (await fetch(url)).blob();
   } finally {
     root.unmount();

@@ -1,0 +1,1 @@
+-- cards.pending_claim + trigger card_invites_lock_card (locked page, hidden from catalog until claimed) — applied via Supabase

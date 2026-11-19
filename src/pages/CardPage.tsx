@@ -319,6 +319,30 @@ export default function CardPage() {
     );
   }
 
+  if (card.pendingClaim) {
+    const lk = card.language === "tj"
+      ? { t: "Визитка ҳоло фаъол нест", d: "Агар ин визиткаи шумост — пайвандеро, ки ба WhatsApp фиристодем, кушоед ва номнавис шавед. Пас аз номнависӣ визитка барои ҳама кушода мешавад.", b: "Номнавис шудан", h: "Аллакай аккаунт доред? Ворид шавед" }
+      : card.language === "en"
+        ? { t: "This card is not active yet", d: "If this is your card, open the link we sent you on WhatsApp and sign up. After that the card opens for everyone.", b: "Sign up", h: "Already have an account? Log in" }
+        : { t: "Визитка ещё не активирована", d: "Если это ваша визитка — откройте ссылку, которую мы отправили вам в WhatsApp, и зарегистрируйтесь. После регистрации визитка откроется для всех.", b: "Зарегистрироваться", h: "Уже есть аккаунт? Войти" };
+    return (
+      <main className="card-missing card-pending-claim">
+        <Link to="/" className="brand-mark"><BrandLogo /></Link>
+        <div className="pending-claim-box">
+          <div className="pending-claim-card" aria-hidden>
+            <div className="pending-claim-photo">{card.photo ? <img src={card.photo} alt="" /> : <span>{card.fullName.split(/\s+/).map((w) => w[0]).slice(0, 2).join("")}</span>}</div>
+            <b>{card.fullName}</b><small>{card.position}</small>
+            <div className="pending-claim-qr"><QRCodeImage value={`https://vizora.tj/${card.slug}`} size={120} /><i>🔒</i></div>
+          </div>
+          <h1>{lk.t}</h1>
+          <p>{lk.d}</p>
+          <Link to="/register" className="button button-primary">{lk.b}</Link>
+          <Link to="/login" className="pending-claim-login">{lk.h}</Link>
+        </div>
+      </main>
+    );
+  }
+
   const palette = themeColors[card.theme];
   const isLocked = card.reviewStatus !== "approved";
   const needsActivation = card.reviewStatus === "draft";

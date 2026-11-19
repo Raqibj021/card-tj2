@@ -82,6 +82,7 @@ class LocalStorageCardRepository implements CardRepository {
       visibility: (row.visibility as DigitalCard["visibility"]) ?? "private",
       reviewStatus: (row.review_status as DigitalCard["reviewStatus"]) ?? "draft",
       trialExpiresAt: row.trial_expires_at ? String(row.trial_expires_at) : null,
+      pendingClaim: Boolean(row.pending_claim),
       views: Number(row.views ?? 0),
       createdAt: String(row.created_at ?? new Date().toISOString()),
       updatedAt: String(row.updated_at ?? new Date().toISOString())
