@@ -35,9 +35,9 @@ async function photoLine(path) {
 export async function onRequestGet({ params, request }) {
   const slug = String(params.slug || "").replace(/\.vcf$/i, "").toLowerCase();
   if (!/^[a-z0-9-]{1,80}$/.test(slug)) return new Response("Not found", { status: 404 });
-  const r = await fetch(`${SB}/rest/v1/cards?slug=eq.${slug}&select=slug,full_name,position,organization_name,description,contacts,photo_path,pending_claim,review_status&limit=1`, { headers: { apikey: KEY, authorization: `Bearer ${KEY}` } });
+  const r = await fetch(`${SB}/rest/v1/cards?slug=eq.${slug}&select=slug,full_name,position,organization_name,description,contacts,photo_path,pending_claim,review_status&limit=1`, { headers: { apikey: KEY } });
   const row = r.ok ? (await r.json())[0] : null;
-  if (!row || row.pending_claim || row.review_status !== "approved") return new Response("Not found", { status: 404 });
+  if (!row || row.pending_claim || row.review_status !== "approved") return Response.redirect(`https://vizora.tj/card/${slug}`, 302);
   const c = row.contacts || {};
   const parts = String(row.full_name || "").trim().split(/\s+/);
   const last = parts.length > 1 ? parts.pop() : ""; const first = parts.join(" ");
