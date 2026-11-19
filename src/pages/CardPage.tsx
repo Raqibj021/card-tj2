@@ -45,6 +45,7 @@ import { localizeCard } from "../lib/cardTranslations";
 import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
+import { contactSaveUrl } from "../lib/contactSave";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import ReportCardButton from "../components/ReportCardButton";
 import { verificationRepository } from "../lib/verificationRepository";
@@ -771,7 +772,7 @@ export default function CardPage() {
           <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
             <h2 id="save-dialog-title">{labels.saveTitle}</h2>
             <div className="profile-dialog-options">
-              <button type="button" onClick={() => { setContactSaveError(""); if (card.reviewStatus === "approved" && !pendingClaim) { window.location.href = `/vcard/${encodeURIComponent(card.slug)}.vcf`; return; } void openVCardSaveDialog(card).then((supported) => { if (!supported) setContactSaveError(labels.contactUnsupported); }).catch(() => setContactSaveError(labels.contactUnsupported)); }}>
+              <button type="button" onClick={() => { setContactSaveError(""); if (card.reviewStatus === "approved" && !pendingClaim) { window.location.href = contactSaveUrl(card); return; } void openVCardSaveDialog(card).then((supported) => { if (!supported) setContactSaveError(labels.contactUnsupported); }).catch(() => setContactSaveError(labels.contactUnsupported)); }}>
                 <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>{labels.savePhoneHint}</small></div>
               </button>
               <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
