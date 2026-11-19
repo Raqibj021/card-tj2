@@ -415,6 +415,14 @@
 @media (prefers-reduced-motion: reduce) {
   .card-modal-backdrop, .profile-page .profile-main-card { animation: none; }
 }
+/* «Креатив» — всегда светлая карточка цвета слоновой кости, даже в тёмной теме сайта. */
+.profile-page.profile-creative .profile-main-card,
+.dark .profile-page.profile-creative .profile-main-card {
+  background-image: linear-gradient(90deg, transparent 64%, rgba(196,160,94,.06)), linear-gradient(#fff, #fff);
+  background-size: 100% 100%;
+  animation: none;
+  color: #111827;
+}
 
 /* The card itself has a quiet animated surface on both screen sizes. */
 .profile-page:not(.profile-creative) .profile-main-card { isolation: isolate; }
