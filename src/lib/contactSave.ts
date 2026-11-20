@@ -7,11 +7,9 @@ if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
   }).catch(() => { /* The contact page works without a service worker. */ });
 }
 
-const vcfUrl = (card: DigitalCard) => `${location.origin}/phone-contact/?s=${encodeURIComponent(card.slug)}`;
+export const vcfUrl = (card: DigitalCard) => `${location.origin}/phone-contact/?s=${encodeURIComponent(card.slug)}`;
 
-export const contactSaveUrl = (card: DigitalCard) => {
-  if (!/Android/i.test(navigator.userAgent)) return vcfUrl(card);
-
+export const googleContactUrl = (card: DigitalCard) => {
   const url = new URL("https://contacts.google.com/new");
   // Keep the full name in the order entered on the card.
   url.searchParams.set("givenname", card.fullName.trim());
@@ -20,3 +18,10 @@ export const contactSaveUrl = (card: DigitalCard) => {
   if (card.email?.trim()) url.searchParams.set("email", card.email.trim());
   return url.href;
 };
+
+export const isAndroidContactDevice = /Android/i.test(navigator.userAgent);
+export const isAppleContactDevice = /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+export const contactSaveUrl = (card: DigitalCard) =>
+  isAndroidContactDevice ? googleContactUrl(card) : vcfUrl(card);
