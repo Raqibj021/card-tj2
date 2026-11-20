@@ -30,6 +30,7 @@ jobs:
 
       - name: Build for vizora.tj
         env:
+          VITE_GOOGLE_CONTACTS_CLIENT_ID: ${{ vars.VITE_GOOGLE_CONTACTS_CLIENT_ID }}
           VITE_BASE_PATH: /
           VITE_PUBLIC_SITE_URL: https://vizora.tj
         run: npm run build
