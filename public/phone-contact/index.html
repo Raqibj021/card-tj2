@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Сохранить контакт · Vizora</title>
+<style>body{font:18px system-ui;margin:12vh auto;padding:24px;max-width:30rem;color:#182832}a{display:inline-block;padding:14px 20px;border-radius:12px;background:#126158;color:white;text-decoration:none}a[hidden]{display:none}</style>
+<main><h1>Сохранить контакт</h1><p role="status">Подготавливаем контакт…</p><a hidden>Открыть контакт</a></main>
+<script type="module">
+import { onRequestGet } from "./contact.js";
+const status = document.querySelector("p");
+try {
+  const response = await onRequestGet({ request: new Request(location.href) });
+  if (!response.ok) throw new Error();
+  const link = document.querySelector("a");
+  link.href = URL.createObjectURL(await response.blob());
+  link.hidden = false;
+  status.textContent = "Нажмите, чтобы открыть заполненную карточку.";
+} catch {
+  status.textContent = "Не удалось получить контакт. Проверьте соединение и обновите страницу.";
+}
+</script></html>
