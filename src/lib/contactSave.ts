@@ -9,24 +9,14 @@ if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
 
 const vcfUrl = (card: DigitalCard) => `${location.origin}/phone-contact/?s=${encodeURIComponent(card.slug)}`;
 
-/**
- * Android: an intent that opens the phone's own "New contact" form already filled in.
- * iPhone and others: a real .vcf from the server — Safari shows the "Create contact" card.
- */
 export const contactSaveUrl = (card: DigitalCard) => {
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  if (!isAndroid) return vcfUrl(card);
-  const extra = (key: string, value?: string) => value ? `S.${key}=${encodeURIComponent(value)};` : "";
-  const link = `${location.origin}/card/${card.slug}`;
-  return "intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.dir/contact;"
-    + extra("name", card.fullName)
-    + extra("phone", card.phone ? sanitizePhone(card.phone) : "")
-    + "i.phone_type=2;"
-    + extra("secondary_phone", card.secondPhone ? sanitizePhone(card.secondPhone) : "")
-    + extra("email", card.email?.trim())
-    + extra("company", card.organization)
-    + extra("job_title", card.position)
-    + extra("notes", [card.description, link].filter(Boolean).join("\n"))
-    + extra("browser_fallback_url", vcfUrl(card))
-    + "end";
+  if (!/Android/i.test(navigator.userAgent)) return vcfUrl(card);
+
+  const url = new URL("https://contacts.google.com/new");
+  // Keep the full name in the order entered on the card.
+  url.searchParams.set("givenname", card.fullName.trim());
+  const phone = card.phone?.trim() || card.secondPhone?.trim();
+  if (phone) url.searchParams.set("phone", sanitizePhone(phone));
+  if (card.email?.trim()) url.searchParams.set("email", card.email.trim());
+  return url.href;
 };
