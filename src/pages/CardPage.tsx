@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   Building2,
@@ -33,8 +33,6 @@ import { cardRepository } from "../lib/cardRepository";
 import { promoRepository, type LaunchPromoStatus } from "../lib/promoRepository";
 import {
   downloadQrCode,
-  downloadCardImage,
-  openVCardSaveDialog,
   normalizeUrl,
   sanitizePhone,
   socialUrl,
@@ -45,7 +43,7 @@ import { localizeCard } from "../lib/cardTranslations";
 import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
-import { contactSaveUrl, googleContactUrl, isAndroidContactDevice, isAppleContactDevice, vcfUrl } from "../lib/contactSave";
+import { contactClientId, createGoogleContact, downloadContactFile, googleContactUrl, loadContactAuthorization } from "../lib/contactSave";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import ReportCardButton from "../components/ReportCardButton";
 import { verificationRepository } from "../lib/verificationRepository";
@@ -101,14 +99,11 @@ const profileCopy = {
     missingInfo: "Информация не добавлена",
     phoneNumbers: "Номера для звонка",
     saveTitle: "Как сохранить визитку?",
-    savePhone: "В контакты телефона",
-    googleContact: "Сохранить в Google Контакты",
-    fullContact: "Скачать полную визитку (.vcf)",
-    savePhoneHint: "Имя, телефоны, e-mail и фото — сразу в «Контакты»",
-    contactUnsupported: "Браузер не поддерживает передачу контакта приложению. Автоматическое скачивание отключено.",
-    saveImage: "Как фото визитки",
-    imageSaved: "Фото визитки загружено",
-    imageError: "Не удалось сохранить фото визитки.",
+    googleContact: "Google Контакты",
+    fullContact: "Как файл (.vcf)",
+    basicFields: "Имя, один номер и почта",
+    saveError: "Не удалось завершить сохранение. Проверьте контакты или выберите файл.",
+    savedToGoogle: "Контакт добавлен в Google",
     close: "Закрыть",
     orderNfc: "Заказать NFC-карту",
     qrActions: "QR-код визитки"
@@ -150,14 +145,11 @@ const profileCopy = {
     missingInfo: "Маълумот илова нашудааст",
     phoneNumbers: "Рақамҳо барои занг",
     saveTitle: "Варақаро чӣ гуна нигоҳ дорем?",
-    savePhone: "Ба тамосҳои телефон",
-    googleContact: "Дар Google Contacts сабт кардан",
-    fullContact: "Боргирии корти пурра (.vcf)",
-    savePhoneHint: "Ном, телефонҳо, e-mail ва сурат — рост ба «Тамосҳо»",
-    contactUnsupported: "Браузер интиқоли тамосро дастгирӣ намекунад. Боргирии худкор хомӯш аст.",
-    saveImage: "Ҳамчун сурати варақа",
-    imageSaved: "Сурати варақа бор шуд",
-    imageError: "Сурати варақаро нигоҳ дошта натавонистем.",
+    googleContact: "Google Contacts",
+    fullContact: "Ҳамчун файл (.vcf)",
+    basicFields: "Ном, як рақам ва почтаи электронӣ",
+    saveError: "Сабт анҷом наёфт. Тамосҳоро санҷед ё файлро интихоб кунед.",
+    savedToGoogle: "Тамос дар Google сабт шуд",
     close: "Пӯшидан",
     orderNfc: "Фармоиши корти NFC",
     qrActions: "QR-коди варақа"
@@ -199,14 +191,11 @@ const profileCopy = {
     missingInfo: "Information not provided",
     phoneNumbers: "Phone numbers",
     saveTitle: "How would you like to save it?",
-    savePhone: "Save to phone contacts",
-    googleContact: "Save to Google Contacts",
-    fullContact: "Download full contact (.vcf)",
-    savePhoneHint: "Name, phones, e-mail and photo — straight to Contacts",
-    contactUnsupported: "This browser cannot pass a contact to an app. Automatic downloads are disabled.",
-    saveImage: "Download card image",
-    imageSaved: "Card image downloaded",
-    imageError: "Could not download the card image.",
+    googleContact: "Google Contacts",
+    fullContact: "As a file (.vcf)",
+    basicFields: "Name, one number and email",
+    saveError: "Could not finish saving. Check your contacts or choose the file option.",
+    savedToGoogle: "Contact added to Google",
     close: "Close",
     orderNfc: "Order an NFC card",
     qrActions: "Business card QR code"
@@ -220,7 +209,6 @@ const specialistCopy = {
 } as const;
 
 export default function CardPage() {
-  const pageRef = useRef<HTMLElement>(null);
   const { slug = "" } = useParams();
   const [searchParams] = useSearchParams();
   const { t, language, setLanguage, theme, toggleTheme } = useApp();
@@ -249,7 +237,15 @@ export default function CardPage() {
   const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [contactSaveError, setContactSaveError] = useState("");
-  const [savingImage, setSavingImage] = useState(false);
+  const [savingContact, setSavingContact] = useState(false);
+  const [googleReady, setGoogleReady] = useState(false);
+  useEffect(() => {
+    if (!showSaveDialog || !contactClientId) return;
+    let active = true;
+    void loadContactAuthorization().then(() => { if (active) setGoogleReady(true); })
+      .catch(() => { if (active) setContactSaveError(profileCopy[language].saveError); });
+    return () => { active = false; };
+  }, [showSaveDialog, language]);
   const cardUrl = `${window.location.origin}/${slug}`;
   const labels = profileCopy[language];
   const professionalLabels = specialistCopy[language];
@@ -422,17 +418,25 @@ export default function CardPage() {
   const phoneNumbers = Array.from(new Set([card.phone, card.secondPhone].map((phone) => phone.trim()).filter(Boolean)));
   const phoneAction = phoneNumbers.length === 1 ? `tel:${sanitizePhone(phoneNumbers[0])}` : undefined;
 
-  const saveAsImage = async () => {
-    setSavingImage(true);
+  const saveContact = async (format: "google" | "file") => {
+    if (savingContact || isLocked) return;
+    if (format === "google" && !contactClientId) {
+      window.location.assign(googleContactUrl(card));
+      return;
+    }
+    setContactSaveError("");
+    setSavingContact(true);
     try {
-      if (!pageRef.current) throw new Error("Card is not ready");
-      await downloadCardImage(card, pageRef.current);
+      if (format === "file") await downloadContactFile(card);
+      else {
+        await createGoogleContact(card);
+        showToast(labels.savedToGoogle);
+      }
       setShowSaveDialog(false);
-      showToast(labels.imageSaved);
     } catch {
-      setContactSaveError(labels.imageError);
+      setContactSaveError(labels.saveError);
     } finally {
-      setSavingImage(false);
+      setSavingContact(false);
     }
   };
 
@@ -465,7 +469,7 @@ export default function CardPage() {
   };
 
   return (
-    <main ref={pageRef} className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
+    <main className={`profile-page profile-${card.template} ${isLocked ? "profile-trial" : ""}`} style={style}>
       <div className="profile-background-shape" />
       {group.length > 1 && (
         <nav className="card-group-switch" aria-label="Visit cards">
@@ -648,16 +652,9 @@ export default function CardPage() {
                 <UserPlus size={20} />{t("saveContact")}
               </button>
             ) : (
-              <a className="profile-save-button" href={contactSaveUrl(card)} rel="nofollow noreferrer">
-                <UserPlus size={20} />{isAndroidContactDevice ? labels.googleContact : t("saveContact")}
-              </a>
-            )}
-
-            {!isLocked && (isAppleContactDevice || isAndroidContactDevice) && (
-              <a className="block py-2 text-center text-sm underline" rel="nofollow noreferrer"
-                href={isAndroidContactDevice ? vcfUrl(card) : googleContactUrl(card)}>
-                {isAndroidContactDevice ? labels.fullContact : labels.googleContact}
-              </a>
+              <button type="button" className="profile-save-button" aria-haspopup="dialog" onClick={() => { setContactSaveError(""); setShowSaveDialog(true); }}>
+                <UserPlus size={20} />{t("saveContact")}
+              </button>
             )}
 
             {pendingClaim && <section className="profile-mobile-tools claim-qr-locked" aria-label={labels.qrActions}>
@@ -786,16 +783,16 @@ export default function CardPage() {
           </section>
         </div>
       )}
-      {showSaveDialog && (
+      {showSaveDialog && !isLocked && (
         <div className="profile-dialog-backdrop" role="presentation" onMouseDown={() => setShowSaveDialog(false)}>
           <section className="profile-dialog" role="dialog" aria-modal="true" aria-labelledby="save-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
             <h2 id="save-dialog-title">{labels.saveTitle}</h2>
             <div className="profile-dialog-options">
-              <button type="button" onClick={() => { setContactSaveError(""); if (card.reviewStatus === "approved" && !pendingClaim) { window.location.href = contactSaveUrl(card); return; } void openVCardSaveDialog(card).then((supported) => { if (!supported) setContactSaveError(labels.contactUnsupported); }).catch(() => setContactSaveError(labels.contactUnsupported)); }}>
-                <span><UserPlus size={22} /></span><div><strong>{labels.savePhone}</strong><small>{labels.savePhoneHint}</small></div>
+              <button type="button" disabled={savingContact || (!!contactClientId && !googleReady)} onClick={() => void saveContact("google")}>
+                <span><UserPlus size={22} /></span><div><strong>{labels.googleContact}</strong>{!contactClientId && <small>{labels.basicFields}</small>}</div>
               </button>
-              <button type="button" disabled={savingImage} onClick={() => void saveAsImage()}>
-                <span><Images size={22} /></span><div><strong>{labels.saveImage}</strong><small>PNG · 9:16 · 1080 × 1920</small></div>
+              <button type="button" disabled={savingContact} onClick={() => void saveContact("file")}>
+                <span><Download size={22} /></span><div><strong>{labels.fullContact}</strong></div>
               </button>
             </div>
             {contactSaveError && <p role="status">{contactSaveError}</p>}
