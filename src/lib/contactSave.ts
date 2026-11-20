@@ -1,7 +1,13 @@
 import type { DigitalCard } from "../types/card";
 import { sanitizePhone } from "./cardUtils";
 
-const vcfUrl = (card: DigitalCard) => `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/public-contact?s=${encodeURIComponent(card.slug)}`;
+if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+  void navigator.serviceWorker.register("/phone-contact/worker.js", {
+    scope: "/phone-contact/", type: "module"
+  }).catch(() => { /* The contact page works without a service worker. */ });
+}
+
+const vcfUrl = (card: DigitalCard) => `${location.origin}/phone-contact/?s=${encodeURIComponent(card.slug)}`;
 
 /**
  * Android: an intent that opens the phone's own "New contact" form already filled in.
