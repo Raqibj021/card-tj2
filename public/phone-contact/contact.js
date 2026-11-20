@@ -57,6 +57,10 @@ export async function onRequestGet({ request }) {
   const parts = String(row.full_name || "").trim().split(/\s+/);
   const last = parts.length > 1 ? parts.pop() : ""; const first = parts.join(" ");
   const card = `https://vizora.tj/card/${row.slug}`;
+  // Importers that ignore X-SOCIALPROFILE can still show these links in Notes.
+  const profileNotes = ["instagram", "facebook", "telegram"].filter(kind => c[kind])
+    .map(kind => social(kind, c[kind]));
+  if (c.whatsapp) profileNotes.push(`https://wa.me/${tel(c.whatsapp).replace("+", "")}`);
   const lines = [
     "BEGIN:VCARD", "VERSION:3.0",
     `N:${esc(last)};${esc(first)};;;`, `FN:${esc(row.full_name)}`,
@@ -72,7 +76,7 @@ export async function onRequestGet({ request }) {
     c.telegram && `X-SOCIALPROFILE;TYPE=telegram:${social("telegram", c.telegram)}`,
     c.instagram && `X-SOCIALPROFILE;TYPE=instagram:${social("instagram", c.instagram)}`,
     c.facebook && `X-SOCIALPROFILE;TYPE=facebook:${social("facebook", c.facebook)}`,
-    `NOTE:${esc([row.description, card].filter(Boolean).join("\n"))}`,
+    `NOTE:${esc([row.description, ...profileNotes, card].filter(Boolean).join("\n"))}`,
     await photoLine(row.photo_path),
     "END:VCARD"
   ].filter(Boolean).map(fold).join("\r\n") + "\r\n";
