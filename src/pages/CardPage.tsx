@@ -101,7 +101,6 @@ const profileCopy = {
     saveTitle: "Как сохранить визитку?",
     googleContact: "Google Контакты",
     fullContact: "Как файл (.vcf)",
-    basicFields: "Имя, один номер и почта",
     saveError: "Не удалось завершить сохранение. Проверьте контакты или выберите файл.",
     savedToGoogle: "Контакт добавлен в Google",
     close: "Закрыть",
@@ -147,7 +146,6 @@ const profileCopy = {
     saveTitle: "Варақаро чӣ гуна нигоҳ дорем?",
     googleContact: "Google Contacts",
     fullContact: "Ҳамчун файл (.vcf)",
-    basicFields: "Ном, як рақам ва почтаи электронӣ",
     saveError: "Сабт анҷом наёфт. Тамосҳоро санҷед ё файлро интихоб кунед.",
     savedToGoogle: "Тамос дар Google сабт шуд",
     close: "Пӯшидан",
@@ -193,7 +191,6 @@ const profileCopy = {
     saveTitle: "How would you like to save it?",
     googleContact: "Google Contacts",
     fullContact: "As a file (.vcf)",
-    basicFields: "Name, one number and email",
     saveError: "Could not finish saving. Check your contacts or choose the file option.",
     savedToGoogle: "Contact added to Google",
     close: "Close",
@@ -789,7 +786,7 @@ export default function CardPage() {
             <h2 id="save-dialog-title">{labels.saveTitle}</h2>
             <div className="profile-dialog-options">
               <button type="button" disabled={savingContact || (!!contactClientId && !googleReady)} onClick={() => void saveContact("google")}>
-                <span><UserPlus size={22} /></span><div><strong>{labels.googleContact}</strong>{!contactClientId && <small>{labels.basicFields}</small>}</div>
+                <span><UserPlus size={22} /></span><div><strong>{labels.googleContact}</strong></div>
               </button>
               <button type="button" disabled={savingContact} onClick={() => void saveContact("file")}>
                 <span><Download size={22} /></span><div><strong>{labels.fullContact}</strong></div>

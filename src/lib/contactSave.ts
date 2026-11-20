@@ -9,10 +9,19 @@ if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
 
 export const vcfUrl = (card: DigitalCard) => `${location.origin}/phone-contact/?s=${encodeURIComponent(card.slug)}`;
 
+function contactName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/);
+  const familyName = parts.length > 1 ? parts.pop() : undefined;
+  return { givenName: parts.join(" "), familyName };
+}
+
 export const googleContactUrl = (card: DigitalCard) => {
   const url = new URL("https://contacts.google.com/new");
-  // Keep the full name in the order entered on the card.
-  url.searchParams.set("givenname", card.fullName.trim());
+  const { givenName, familyName } = contactName(card.fullName);
+  url.searchParams.set("givenname", givenName);
+  if (familyName) url.searchParams.set("familyname", familyName);
+  if (card.organization?.trim()) url.searchParams.set("organization", card.organization.trim());
+  if (card.position?.trim()) url.searchParams.set("jobtitle", card.position.trim());
   const phone = card.phone?.trim() || card.secondPhone?.trim();
   if (phone) url.searchParams.set("phone", sanitizePhone(phone));
   if (card.email?.trim()) url.searchParams.set("email", card.email.trim());
@@ -51,7 +60,7 @@ export function googlePerson(card: DigitalCard) {
   }
   if (card.whatsapp) urls.push({ type: "WhatsApp", value: "https://wa.me/" + sanitizePhone(card.whatsapp).replace(/^\+/, "") });
   return {
-    names: [{ unstructuredName: card.fullName }],
+    names: [contactName(card.fullName)],
     phoneNumbers: phones.map(value => ({ value })), urls,
     ...(card.email && { emailAddresses: [{ value: card.email.trim() }] }),
     ...(card.address && { addresses: [{ formattedValue: card.address }] }),
