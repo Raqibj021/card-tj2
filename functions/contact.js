@@ -1,1 +1,1 @@
-export { onRequestGet } from "../supabase/functions/_shared/contact.js";
+export { onRequestGet } from "../public/phone-contact/contact.js";

@@ -3,7 +3,7 @@
 const SB = "https://kzyjkvztucihkbhitrvu.supabase.co";
 const KEY = "sb_publishable_QqJRxSp98Et-OkZn356Pmg_PZiu_L4q";
 
-const esc = (v) => String(v ?? "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\;");
+const esc = (v) => String(v ?? "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 const tel = (v) => String(v ?? "").replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
 const url = (v) => !v ? "" : /^https?:\/\//i.test(v) ? v : `https://${v}`;
 const social = (kind, v) => {
