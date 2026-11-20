@@ -45,7 +45,7 @@ import { localizeCard } from "../lib/cardTranslations";
 import LeadFormModal from "../components/LeadFormModal";
 import type { Lead } from "../lib/leadRepository";
 import { walletAdapter } from "../lib/wallet";
-import { contactSaveUrl } from "../lib/contactSave";
+import { contactSaveUrl, googleContactUrl, isAndroidContactDevice, isAppleContactDevice, vcfUrl } from "../lib/contactSave";
 import WhatsAppIcon from "../components/icons/WhatsAppIcon";
 import ReportCardButton from "../components/ReportCardButton";
 import { verificationRepository } from "../lib/verificationRepository";
@@ -102,6 +102,8 @@ const profileCopy = {
     phoneNumbers: "Номера для звонка",
     saveTitle: "Как сохранить визитку?",
     savePhone: "В контакты телефона",
+    googleContact: "Сохранить в Google Контакты",
+    fullContact: "Скачать полную визитку (.vcf)",
     savePhoneHint: "Имя, телефоны, e-mail и фото — сразу в «Контакты»",
     contactUnsupported: "Браузер не поддерживает передачу контакта приложению. Автоматическое скачивание отключено.",
     saveImage: "Как фото визитки",
@@ -149,6 +151,8 @@ const profileCopy = {
     phoneNumbers: "Рақамҳо барои занг",
     saveTitle: "Варақаро чӣ гуна нигоҳ дорем?",
     savePhone: "Ба тамосҳои телефон",
+    googleContact: "Дар Google Contacts сабт кардан",
+    fullContact: "Боргирии корти пурра (.vcf)",
     savePhoneHint: "Ном, телефонҳо, e-mail ва сурат — рост ба «Тамосҳо»",
     contactUnsupported: "Браузер интиқоли тамосро дастгирӣ намекунад. Боргирии худкор хомӯш аст.",
     saveImage: "Ҳамчун сурати варақа",
@@ -196,6 +200,8 @@ const profileCopy = {
     phoneNumbers: "Phone numbers",
     saveTitle: "How would you like to save it?",
     savePhone: "Save to phone contacts",
+    googleContact: "Save to Google Contacts",
+    fullContact: "Download full contact (.vcf)",
     savePhoneHint: "Name, phones, e-mail and photo — straight to Contacts",
     contactUnsupported: "This browser cannot pass a contact to an app. Automatic downloads are disabled.",
     saveImage: "Download card image",
@@ -642,8 +648,15 @@ export default function CardPage() {
                 <UserPlus size={20} />{t("saveContact")}
               </button>
             ) : (
-              <a className="profile-save-button" href={contactSaveUrl(card)} rel="nofollow">
-                <UserPlus size={20} />{t("saveContact")}
+              <a className="profile-save-button" href={contactSaveUrl(card)} rel="nofollow noreferrer">
+                <UserPlus size={20} />{isAndroidContactDevice ? labels.googleContact : t("saveContact")}
+              </a>
+            )}
+
+            {!isLocked && (isAppleContactDevice || isAndroidContactDevice) && (
+              <a className="block py-2 text-center text-sm underline" rel="nofollow noreferrer"
+                href={isAndroidContactDevice ? vcfUrl(card) : googleContactUrl(card)}>
+                {isAndroidContactDevice ? labels.fullContact : labels.googleContact}
               </a>
             )}
 
