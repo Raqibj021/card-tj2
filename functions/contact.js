@@ -1,5 +1,5 @@
 // Real contact file for "Сохранить контакт": the phone opens it straight in Contacts.
-// iPhone (Safari) shows the "Create contact" card; Android downloads it and opens the Contacts app.
+// Let the browser hand the contact to its registered viewer.
 const SB = "https://kzyjkvztucihkbhitrvu.supabase.co";
 const KEY = "sb_publishable_QqJRxSp98Et-OkZn356Pmg_PZiu_L4q";
 
@@ -61,12 +61,10 @@ export async function onRequestGet({ request }) {
     await photoLine(row.photo_path),
     "END:VCARD"
   ].filter(Boolean).map(fold).join("\r\n") + "\r\n";
-  const ua = request.headers.get("user-agent") || "";
-  const ios = /iPhone|iPad|iPod/i.test(ua);
   const name = `${row.slug}.vcf`;
   return new Response(lines, { headers: {
     "content-type": "text/vcard; charset=utf-8",
-    "content-disposition": `${ios ? "inline" : "attachment"}; filename="${name}"`,
+    "content-disposition": `inline; filename="${name}"`,
     "cache-control": "no-store"
   } });
 }
